@@ -172,5 +172,6 @@ gradle-app.setting
 
 *.bin
 
-
+jslMessages/
+jslOutput/
 
