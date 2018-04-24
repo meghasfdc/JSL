@@ -3,7 +3,7 @@ The JSL repository.
 This is a Gradle based project.
 
 If you are using IntelliJ, you can use its clone repository functionality to 
-up a working version. Here are the steps:
+setup a working version. Here are the steps:
 
 Within IntelliJ
 
