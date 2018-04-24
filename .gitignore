@@ -175,3 +175,19 @@ gradle-app.setting
 jslMessages/
 jslOutput/
 
+
+settings\.gradle
+
+gradlew\.bat
+
+gradlew
+
+gradle/wrapper/gradle-wrapper\.properties
+
+gradle/wrapper/gradle-wrapper\.jar
+
+\.idea/vcs\.xml
+
+\.idea/misc\.xml
+
+\.idea/inspectionProfiles/Project_Default\.xml

@@ -1,0 +1,74 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+*
+* Copyright (c) Manuel D. Rossetti (rossetti@uark.edu)
+*
+* Contact:
+*	Manuel D. Rossetti, Ph.D., P.E.
+*	Department of Industrial Engineering
+*	University of Arkansas
+*	4207 Bell Engineering Center
+*	Fayetteville, AR 72701
+*	Phone: (479) 575-6756
+*	Email: rossetti@uark.edu
+*	Web: www.uark.edu/~rossetti
+*
+* This file is part of the JSL (a Java Simulation Library). The JSL is a framework
+* of Java classes that permit the easy development and execution of discrete event
+* simulation programs.
+*
+* The JSL is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* The JSL is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with the JSL (see file COPYING in the distribution);
+* if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+* Boston, MA  02110-1301  USA, or see www.fsf.org
+*
+ */
+
+package ex.montecarlo.dicepackage;
+
+public class TwoSixSidedDice implements RollIfc {
+
+    private Dice myDice;
+
+    public TwoSixSidedDice() {
+        myDice = new Dice();
+        myDice.add(new Die());
+        myDice.add(new Die());
+    }
+
+    public int roll(){
+        return myDice.roll();
+    }
+
+    public int countRolls(int point){
+        if ((point < 2) || (point > 12))
+            throw new IllegalArgumentException("The point must be in 2 to 12");
+        
+        int n = 0;
+        do {
+            n = n + 1;
+        } while (roll() != point);
+        return n;
+    }
+
+    public double estimateMeanNumberOfRolls(int point, int sampleSize){
+        if (sampleSize < 1)
+            throw new IllegalArgumentException("The sample size must be >= 1");
+        double sum = 0.0;
+        for(int i=1;i<=sampleSize;i++)
+            sum = sum + countRolls(point);
+        return sum/sampleSize;
+    }
+
+}

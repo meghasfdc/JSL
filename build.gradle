@@ -1,0 +1,90 @@
+group 'rossetti'
+version '1.0-SNAPSHOT'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+apply plugin: 'java-library'
+
+sourceCompatibility = 1.8
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+//apply plugin: 'java'
+
+
+dependencies {
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
+    // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core
+    compile group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.12.0'
+
+    // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-plot
+    compile group: 'tech.tablesaw', name: 'tablesaw-plot', version: '0.12.0'
+
+    // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-smile
+    compile group: 'tech.tablesaw', name: 'tablesaw-smile', version: '0.12.0'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
+
+    // https://mvnrepository.com/artifact/org.apache.derby/derby
+    compile group: 'org.apache.derby', name: 'derby', version: '10.14.1.0'
+    // https://mvnrepository.com/artifact/org.apache.derby/derbyclient
+    compile group: 'org.apache.derby', name: 'derbyclient', version: '10.14.1.0'
+
+    // https://mvnrepository.com/artifact/org.jooq/jooq
+    compile group: 'org.jooq', name: 'jooq', version: '3.10.4'
+    // https://mvnrepository.com/artifact/org.jooq/jooq-meta
+    compile group: 'org.jooq', name: 'jooq-meta', version: '3.10.4'
+    // https://mvnrepository.com/artifact/org.jooq/jooq-codegen
+    compile group: 'org.jooq', name: 'jooq-codegen', version: '3.10.4'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+//    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-core
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    compile group: 'org.apache.poi', name: 'poi', version: '3.17'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
+
+    // include local jar files found in libs folder in the compile
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+// exclude all tests from the build
+// commment this out if you want to run the tests
+test {
+    exclude '**/**'
+}
+

@@ -1,0 +1,123 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package test.modeling;
+
+import jsl.modeling.EventActionIfc;
+import jsl.modeling.JSLEvent;
+import jsl.modeling.Model;
+import jsl.modeling.ModelElement;
+import jsl.modeling.Simulation;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+/**
+ *
+ * @author rossetti
+ */
+public class TestModelElementScheduler {
+
+    public TestModelElementScheduler() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() {
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+    }
+
+    @Before
+    public void setUp() {
+    }
+
+    @After
+    public void tearDown() {
+    }
+
+    @Test
+    public void test1() {
+        System.out.println("Begin Test 1 -----------------------------------");
+        Simulation mySim = new Simulation();
+        Model myModel = mySim.getModel();
+        new TestME(myModel);
+        //myModel.setTimeUnit(ModelElement.TIME_UNIT_DAY);
+        //myModel.setTimeUnit(ModelElement.TIME_UNIT_HOUR);
+        //myModel.setTimeUnit(ModelElement.TIME_UNIT_HOUR);
+        System.out.println("time units = " + myModel.getTimeUnit());
+        System.out.println("millisecond = " + myModel.millisecond());
+        System.out.println("second = " + myModel.second());
+        System.out.println("minute = " + myModel.minute());
+        System.out.println("hour = " + myModel.hour());
+        System.out.println("day = " + myModel.day());
+        System.out.println("week = " + myModel.week());
+        mySim.setNumberOfReplications(2);
+        mySim.setLengthOfReplication(200.0);
+
+        System.out.println("Test new event scheduling");
+        mySim.run();
+    }
+
+    // @Test
+    public void test2() {
+        Simulation mySim = new Simulation();
+        Model myModel = mySim.getModel();
+        //myModel.setTimeUnit(ModelElement.TIME_UNIT_DAY);
+        //myModel.setTimeUnit(ModelElement.TIME_UNIT_HOUR);
+        myModel.setTimeUnit(ModelElement.TIME_UNIT_HOUR);
+        System.out.println("time units = " + myModel.getTimeUnit());
+        System.out.println("millisecond = " + myModel.millisecond());
+        System.out.println("second = " + myModel.second());
+        System.out.println("minute = " + myModel.minute());
+        System.out.println("hour = " + myModel.hour());
+        System.out.println("day = " + myModel.day());
+        System.out.println("week = " + myModel.week());
+    }
+
+    public class TestME extends ModelElement {
+
+        private TestAction myAction;
+
+        public TestME(ModelElement parent) {
+            super(parent);
+            myAction = new TestAction();
+        }
+
+        @Override
+        protected void initialize() {
+            //schedule(myAction).in(100).units();
+            schedule(myAction).now();
+            schedule(this::doSomething).name("test").in(1).units();
+            //schedule(myAction).in(1).hours();
+        }
+
+        public void doSomething(JSLEvent evt) {
+            System.out.println(getTime() + " In doSomething");
+            System.out.println("event name = " + evt.getName() );
+        }
+
+        private class TestAction implements EventActionIfc {
+
+            @Override
+            public void action(JSLEvent evt) {
+                schedule(myAction).in(20).units();
+                //schedule(myAction).in(20).hours();
+                //schedule(myAction).in(1).days();
+                //schedule(myAction).in(1).minutes();
+                System.out.println(getTime() + " In the action");
+            }
+
+        }
+    }
+    // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+    // @Test
+    // public void hello() {}
+}

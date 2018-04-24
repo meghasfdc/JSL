@@ -1,0 +1,80 @@
+/*
+ *  Copyright (C) 2017 rossetti
+ * 
+ *  Contact:
+ * 	Manuel D. Rossetti, Ph.D., P.E.
+ * 	Department of Industrial Engineering
+ * 	University of Arkansas
+ * 	4207 Bell Engineering Center
+ * 	Fayetteville, AR 72701
+ * 	Phone: (479) 575-6756
+ * 	Email: rossetti@uark.edu
+ * 	Web: www.uark.edu/~rossetti
+ * 
+ *  This file is part of the JSL (a Java Simulation Library). The JSL is a framework
+ *  of Java classes that permit the easy development and execution of discrete event
+ *  simulation programs.
+ * 
+ *  The JSL is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  The JSL is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package jsl.utilities.math;
+
+import java.util.Set;
+import java.util.TreeSet;
+
+/** Some basic set operations
+ *
+ * @author rossetti
+ */
+public class Sets {
+
+    public static <T> Set<T> union(Set<T> setA, Set<T> setB) {
+        Set<T> tmp = new TreeSet<>(setA);
+        tmp.addAll(setB);
+        return tmp;
+    }
+
+    public static <T> Set<T> intersection(Set<T> setA, Set<T> setB) {
+        Set<T> tmp = new TreeSet<>();
+        for (T x : setA) {
+            if (setB.contains(x)) {
+                tmp.add(x);
+            }
+        }
+        return tmp;
+    }
+
+    public static <T> Set<T> difference(Set<T> setA, Set<T> setB) {
+        Set<T> tmp = new TreeSet<>(setA);
+        tmp.removeAll(setB);
+        return tmp;
+    }
+
+    public static <T> Set<T> symDifference(Set<T> setA, Set<T> setB) {
+        Set<T> tmpA;
+        Set<T> tmpB;
+
+        tmpA = union(setA, setB);
+        tmpB = intersection(setA, setB);
+        return difference(tmpA, tmpB);
+    }
+
+    public static <T> boolean isSubset(Set<T> setA, Set<T> setB) {
+        return setB.containsAll(setA);
+    }
+
+    public static <T> boolean isSuperset(Set<T> setA, Set<T> setB) {
+        return setA.containsAll(setB);
+    }
+}
