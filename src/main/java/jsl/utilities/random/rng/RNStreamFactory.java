@@ -1,32 +1,17 @@
 /*
- *  Copyright (C) 2010 rossetti
- * 
- *  Contact:
- * 	Manuel D. Rossetti, Ph.D., P.E.
- * 	Department of Industrial Engineering
- * 	University of Arkansas
- * 	4207 Bell Engineering Center
- * 	Fayetteville, AR 72701
- * 	Phone: (479) 575-6756
- * 	Email: rossetti@uark.edu
- * 	Web: www.uark.edu/~rossetti
- * 
- *  This file is part of the JSL (a Java Simulation Library). The JSL is a framework
- *  of Java classes that permit the development and execution of discrete event
- *  simulation programs.
- * 
- *  The JSL is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- * 
- *  The JSL is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (c) 2018. Manuel D. Rossetti, manuelrossetti@gmail.com
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package jsl.utilities.random.rng;
 
@@ -37,37 +22,6 @@ import jsl.utilities.IdentityIfc;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.reporting.JSL;
 
-/**
- * A RNStreamFactory has the ability to create objects that implement the RngIfc
- * interface. These objects represent a stream of random numbers. Random number
- * streams produce pseudo-random numbers U(0,1)
- *
- * This class is based on RngStream.java from Pierre L' Ecuyer but modified to
- * provide very flexible stream control. The streams of random numbers are
- * created from the RNStreamFactory class
- *
- * The generator is the combined multiple recursive generator (CMRG) Mrg32k3a
- * implemented in 64-bit floating-point arithmetic.
- *
- * The generator has period length 2^{191}
- *
- * The seed of the RNG, and the state of a stream at any given step, are
- * 6-dimensional vectors of 32-bit integers.
- *
- * The default initial seed of the package is 12345, 12345, 12345, 12345, 12345,
- * 12345
- *
- * Downloaded on 9-19-2007 from:
- * http://www.iro.umontreal.ca/~lecuyer/myftp/streams00/java/
- *
- * Copyright: Pierre L'Ecuyer, University of Montreal Notice: This code can be
- * used freely for personal, academic, or non-commercial purposes. For
- * commercial purposes, please contact P. L'Ecuyer at: lecuyer@iro.UMontreal.ca
- * Version 1.0 Date: 14 August 2001
- *
- *
- * @author rossetti
- */
 public class RNStreamFactory extends Identity {
 
     private static RNStream DEFAULT_RNG;
