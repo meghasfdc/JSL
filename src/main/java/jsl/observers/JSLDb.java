@@ -181,7 +181,9 @@ public class JSLDb {
         long milliseconds = ZonedDateTime.now().toInstant().toEpochMilli();
         record.setExpStartTimeStamp(new Timestamp(milliseconds));
         record.setNumReps(sim.getNumberOfReplications());
-        record.setLengthOfRep(sim.getLengthOfReplication());
+        if (!Double.isNaN(sim.getLengthOfReplication()) && !Double.isInfinite(sim.getLengthOfReplication())){
+            record.setLengthOfRep(sim.getLengthOfReplication());
+        }
         record.setLengthOfWarmUp(sim.getLengthOfWarmUp());
         record.setRepAllowedExecTime(sim.getMaximumAllowedExecutionTimePerReplication());
         record.setRepInitOption(sim.getReplicationInitializationOption());
