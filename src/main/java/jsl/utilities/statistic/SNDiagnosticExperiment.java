@@ -147,11 +147,24 @@ public class SNDiagnosticExperiment {
         SNDiagnosticExperiment build();
     }
 
-    /**
+    /** Uses common random numbers across simulation runs
+     *
      * @param numBootstrapSamples the number of bootstrap samples to make for each input distribution
      * @param numReplications     the number of replications in the diagnostic experiment
      */
     public void runDiagnosticExperiment(int numBootstrapSamples, int numReplications) {
+        runDiagnosticExperiment(numBootstrapSamples, numReplications, true);
+    }
+
+    /**
+     *  @param useCRN, if true the stream for every random variable is the same across the
+     *                     bootstraps to facilitate common random number generation (CRN). If false
+     *                   different streams are used for each created random variable. Each
+     *                 factor gets its own unique stream regardless.
+     * @param numBootstrapSamples the number of bootstrap samples to make for each input distribution
+     * @param numReplications     the number of replications in the diagnostic experiment
+     */
+    public void runDiagnosticExperiment(int numBootstrapSamples, int numReplications, boolean useCRN) {
         if (numBootstrapSamples <= 1) {
             throw new IllegalArgumentException("The number of boot strap samples must be greater than 1");
         }
@@ -168,7 +181,7 @@ public class SNDiagnosticExperiment {
         // after this call, each distribution will have b=myNumBootstrapSamples saved
         myBootstrapper.generateSamples(numBootstrapSamples, true);
         // fill the data for running the simulation replications
-        fillSimulationInputTable(numBootstrapSamples);
+        fillSimulationInputTable(numBootstrapSamples, useCRN);
         // defined to hold simulation results
         mySimOutput = new double[numBootstrapSamples];
         for (int i = 0; i < numBootstrapSamples; i++) {
@@ -263,8 +276,8 @@ public class SNDiagnosticExperiment {
         return Optional.ofNullable(myOLSModel);
     }
 
-    private void fillSimulationInputTable(int numBootstrapSamples) {
-        Map<String, List<RVariableIfc>> rvInputs = myBootstrapper.getBootstrapRandomVariables();
+    private void fillSimulationInputTable(int numBootstrapSamples, boolean useCRN) {
+        Map<String, List<RVariableIfc>> rvInputs = myBootstrapper.getBootstrapRandomVariables(useCRN);
         for (int i = 0; i < numBootstrapSamples; i++) {
             for (String name : rvInputs.keySet()) {
                 RVariableIfc rv = rvInputs.get(name).get(i);

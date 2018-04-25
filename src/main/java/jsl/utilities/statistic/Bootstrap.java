@@ -21,6 +21,7 @@ import jsl.utilities.Interval;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RandomStreamIfc;
 import jsl.utilities.random.rng.RngIfc;
 import jsl.utilities.random.robj.DPopulation;
@@ -344,16 +345,37 @@ public class Bootstrap implements IdentityIfc, RandomStreamIfc {
     }
 
     /** Creates a random variable to represent the data in each bootstrap generate for which
-     *  the data was saved.
+     *  the data was saved. By default, the stream for every random variable is the same across the
+     *   bootstraps to facilitate common random number generation (CRN)
      *
      * @return a list of the random variables
      */
     public final List<RVariableIfc> getEmpiricalRVForEachBootstrapSample(){
+        return getEmpiricalRVForEachBootstrapSample(true);
+    }
+
+    /** Creates a random variable to represent the data in each bootstrap generate for which
+     *  the data was saved.
+     *
+     * @param useCRN, if true the stream for every random variable is the same across the
+     *                bootstraps to facilitate common random number generation (CRN). If false
+     *                different streams are used for each created random variable
+     * @return a list of the random variables
+     */
+    public final List<RVariableIfc> getEmpiricalRVForEachBootstrapSample(boolean useCRN){
         List<RVariableIfc> list = new ArrayList<>();
+        RNStreamFactory.RNStream rnStream = null;
+        if (useCRN){
+            rnStream = RNStreamFactory.getDefault().getStream();
+        }
         for(Statistic s: myBSStatList){
             if ((s.myData != null)){
                 if (s.myData.length != 0){
-                    list.add(new EmpiricalRV(s.myData));
+                    if (useCRN){
+                        list.add(new EmpiricalRV(s.myData, rnStream));
+                    } else {
+                        list.add(new EmpiricalRV(s.myData));
+                    }
                 }
             }
         }

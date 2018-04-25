@@ -319,13 +319,30 @@ public class MultiBootstrap implements RandomStreamIfc {
      *  of bootstrap samples generated. Each element of the list is a RVariableIfc
      *  representation of the data with the bootstrap generate.
      *
+     *  The stream for every random variable is the same across the
+     *  bootstraps (but different across factors) to facilitate common random number generation (CRN).
      * @return a map of the list of bootstrap random variable representations
      */
     public Map<String, List<RVariableIfc>> getBootstrapRandomVariables(){
+        return getBootstrapRandomVariables(true);
+    }
+
+    /** Gets a map with key = name, where name is the associated bootstrap name
+     *  and the value is List holding a RVariableIfc representation for each
+     *  bootstrap generate within the bootstrap.  The size of the list is the number
+     *  of bootstrap samples generated. Each element of the list is a RVariableIfc
+     *  representation of the data with the bootstrap generate.
+     *
+     *  @param useCRN, if true the stream for every random variable is the same across the
+     *                     bootstraps to facilitate common random number generation (CRN). If false
+     *                   different streams are used for each created random variable
+     * @return a map of the list of bootstrap random variable representations
+     */
+    public Map<String, List<RVariableIfc>> getBootstrapRandomVariables(boolean useCRN){
         Map<String, List<RVariableIfc>> map = new LinkedHashMap<>();
         for (String name : myBootstraps.keySet()) {
             Bootstrap bootstrap = myBootstraps.get(name);
-            List<RVariableIfc> list = bootstrap.getEmpiricalRVForEachBootstrapSample();
+            List<RVariableIfc> list = bootstrap.getEmpiricalRVForEachBootstrapSample(useCRN);
             map.put(name, list);
         }
         return map;

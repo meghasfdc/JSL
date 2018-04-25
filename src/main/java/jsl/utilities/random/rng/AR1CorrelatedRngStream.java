@@ -15,22 +15,24 @@
  */
 package jsl.utilities.random.rng;
 
-import jsl.utilities.random.ar.AR1Normal;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.AR1NormalRV;
 
-/**  Uses the auto-regressive to anything algorithm
- *   to generate correlated uniform variates.
- *   The user supplies the correlation of the underlying
- *   AR(1) process.  The resulting correlation in the u's
- *   may not necessarily meet this correlation, due to
- *   the correlation matching problem.
- *
+/**
+ * Uses the auto-regressive to anything algorithm
+ * to generate correlated uniform variates.
+ * The user supplies the correlation of the underlying
+ * AR(1) process.  The resulting correlation in the u's
+ * may not necessarily meet this correlation, due to
+ * the correlation matching problem.
  */
 public class AR1CorrelatedRngStream implements RngIfc {
 
-    private AR1Normal myAR1;
+    private AR1NormalRV myAR1;
 
     private double myPrevU;
+
+    private RngIfc myRNG;
 
     /**
      *
@@ -40,20 +42,19 @@ public class AR1CorrelatedRngStream implements RngIfc {
     }
 
     /**
-     *
-     * @param correlation 
+     * @param correlation
      */
     public AR1CorrelatedRngStream(double correlation) {
         this(correlation, RNStreamFactory.getDefault().getStream());
     }
 
     /**
-     *
      * @param correlation
      * @param rng
      */
     public AR1CorrelatedRngStream(double correlation, RngIfc rng) {
-        myAR1 = new AR1Normal(0.0, 1.0, correlation, rng);
+        myAR1 = new AR1NormalRV(0.0, 1.0, correlation, rng);
+        myRNG = rng;
     }
 
     public double randU01() {
@@ -65,8 +66,10 @@ public class AR1CorrelatedRngStream implements RngIfc {
         return u;
     }
 
-    /** Returns a (pseudo)random number from the discrete uniform distribution
+    /**
+     * Returns a (pseudo)random number from the discrete uniform distribution
      * over the integers {i, i + 1, . . . , j }, using this stream. Calls randU01 once.
+     *
      * @param i start of range
      * @param j end of range
      * @return The integer pseudo random number
@@ -91,19 +94,16 @@ public class AR1CorrelatedRngStream implements RngIfc {
         myAR1.setAntitheticOption(flag);
     }
 
-        public boolean getAntitheticOption() {
+    public boolean getAntitheticOption() {
         return myAR1.getAntitheticOption();
-    }
-
-    public final void setLag1Correlation(double phi) {
-        myAR1.setLag1Correlation(phi);
     }
 
     public final double getLag1Correlation() {
         return myAR1.getLag1Correlation();
     }
 
-    /** The previous U(0,1) generated (returned) by randU01()
+    /**
+     * The previous U(0,1) generated (returned) by randU01()
      *
      * @return
      */
@@ -111,8 +111,9 @@ public class AR1CorrelatedRngStream implements RngIfc {
         return myPrevU;
     }
 
-    /** Returns the antithetic of the previous U(0,1)
-     *  i.e. 1.0 - getPrevU01()
+    /**
+     * Returns the antithetic of the previous U(0,1)
+     * i.e. 1.0 - getPrevU01()
      *
      * @return
      */
@@ -125,17 +126,15 @@ public class AR1CorrelatedRngStream implements RngIfc {
     }
 
     public RngIfc newInstance(String name) {
-       RngIfc rng = myAR1.getRandomNumberGenerator();
-       RngIfc c = rng.newInstance(name);
-       double r = getLag1Correlation();
-       return new AR1CorrelatedRngStream(r, c);
+        RngIfc c = myRNG.newInstance(name);
+        double r = getLag1Correlation();
+        return new AR1CorrelatedRngStream(r, c);
     }
 
     public RngIfc newAntitheticInstance(String name) {
-       RngIfc rng = myAR1.getRandomNumberGenerator();
-       RngIfc c = rng.newAntitheticInstance(name);
-       double r = getLag1Correlation();
-       return new AR1CorrelatedRngStream(r, c);
+        RngIfc c = myRNG.newAntitheticInstance(name);
+        double r = getLag1Correlation();
+        return new AR1CorrelatedRngStream(r, c);
     }
 
     public RngIfc newAntitheticInstance() {

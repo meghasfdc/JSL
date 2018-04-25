@@ -16,7 +16,8 @@
 package jsl.utilities.random.rng;
 
 /**
- *
+ * The new instance has the same state as the underlying stream.  This is a new stream
+ * but it has the same state (starting values, etc.)
  * @author rossetti
  */
 public interface NewStreamInstanceIfc {
