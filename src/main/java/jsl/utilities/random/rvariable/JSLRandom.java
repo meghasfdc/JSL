@@ -994,7 +994,7 @@ public class JSLRandom {
         }
 
         // more than 1, need to randomly pick
-        return list.get(rng.randInt(0, list.size()));
+        return list.get(rng.randInt(0, list.size()-1));
     }
 
     /**

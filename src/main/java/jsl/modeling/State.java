@@ -18,97 +18,135 @@ package jsl.modeling;
 import jsl.utilities.statistic.*;
 import jsl.utilities.*;
 
+import java.util.Optional;
+
 /**
  */
 public class State implements IdentityIfc, StateAccessorIfc {
 
-    /** incremented to give a running total of the
-     *  number of states created
+    /**
+     * incremented to give a running total of the
+     * number of states created
      */
     private static int myCounter_;
 
-    /** The id of the state, currently if
-     *  the state is the ith state created
-     *  then the id is equal to i
+    /**
+     * The id of the state, currently if
+     * the state is the ith state created
+     * then the id is equal to i
      */
-    private int myId;
+    private final int myId;
 
-    /** The name of the state
+    /**
+     * A user defined integer label for the state
+     */
+    private final int myNumber;
+
+    /**
+     * The name of the state
      */
     protected String myName;
 
-    /** indicates whether or not currently in the state
+    /**
+     * indicates whether or not currently in the state
      */
     protected boolean myInStateIndicator;
 
-    /** number of times the state was entered
+    /**
+     * number of times the state was entered
      */
     protected double myNumTimesEntered;
 
-    /** number of times the state was exited
+    /**
+     * number of times the state was exited
      */
     protected double myNumTimesExited;
 
-    /** time the state was last entered
+    /**
+     * time the state was last entered
      */
     protected double myEnteredTime;
-    
+
     /**
-     *  time that the state was entered for the first time
+     * time that the state was entered for the first time
      */
     protected double myTimeFirstEntered;
 
-    /** time the state was last exited
+    /**
+     * time the state was last exited
      */
     protected double myExitedTime;
 
-    /** Total time spent in state
+    /**
+     * Total time spent in state
      */
     protected double myTotalStateTime;
 
-    /** statistical collector
+    /**
+     * statistical collector
      */
     protected Statistic myStatistic;
 
-    /** Indicates whether or not statistics should be collected on
-     *  time spent in the state. The default is false
+    /**
+     * Indicates whether or not statistics should be collected on
+     * time spent in the state. The default is false
      */
     protected boolean myCollectSojournStatisticsFlag = false;
 
-    /** Create a state with no name and
-     *  do not use a Statistic object to
-     *  collect additional statistics
-     *
-     */
     public State() {
-        this(null, false);
+        this(null, myCounter_ + 1, false);
     }
 
-    /** Create a state with given name and
-     *  do not use a Statistic object to
-     *  collect additional statistics
+    /**
+     * Create a state with no name and
+     * do not use a Statistic object to
+     * collect additional statistics
+     */
+    public State(int number) {
+        this(null, number, false);
+    }
+
+    /**
+     * Create a state with given name and
+     * do not use a Statistic object to
+     * collect additional statistics
+     *
      * @param name The name of the state
      */
-    public State(String name) {
-        this(name, false);
+    public State(String name, int number) {
+        this(name, number, false);
     }
 
-    /** Create a state with no name
+    public State(String name) {
+        this(name, myCounter_ + 1, false);
+    }
+
+    public State(String name, boolean useStatistic) {
+        this(name, myCounter_ + 1, useStatistic);
+    }
+
+    /**
+     * Create a state with no name
+     *
      * @param useStatistic True means collect additional statistics
      */
-    public State(boolean useStatistic) {
-        this(null, useStatistic);
+    public State(int number, boolean useStatistic) {
+        this(null, number, useStatistic);
     }
 
-    /** Create a state with given name and
-     *  indicate usage of a Statistic object to
-     *  collect additional statistics
-     * @param name The name of the state
+    /**
+     * Create a state with given name and
+     * indicate usage of a Statistic object to
+     * collect additional statistics
+     *
+     * @param name         The name of the state
+     * @param number       a number assigned to the state for labeling purposes
      * @param useStatistic True means collect sojourn time statistics
      */
-    public State(String name, boolean useStatistic) {
+    public State(String name, int number, boolean useStatistic) {
         myCounter_ = myCounter_ + 1;
         myId = myCounter_;
+        myNumber = number;
         setName(name);
 
         if (useStatistic) {
@@ -118,7 +156,16 @@ public class State implements IdentityIfc, StateAccessorIfc {
         initialize();
     }
 
-    /** Sets the name of this state
+    /**
+     * @return the number assigned to the state, by default getId() if never assigned
+     */
+    public final int getNumber() {
+        return myNumber;
+    }
+
+    /**
+     * Sets the name of this state
+     *
      * @param str The name as a string.
      */
     public final void setName(String str) {
@@ -128,13 +175,15 @@ public class State implements IdentityIfc, StateAccessorIfc {
             if (k != -1) {
                 s = s.substring(k + 1);
             }
-            myName = s;
+            myName = s+":"+getNumber();
         } else {
             myName = str;
         }
     }
 
-    /** Gets this model element's name.
+    /**
+     * Gets this model element's name.
+     *
      * @return The name of the model element.
      */
     @Override
@@ -142,9 +191,11 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myName;
     }
 
-    /** Gets a uniquely assigned integer identifier for this state.
+    /**
+     * Gets a uniquely assigned integer identifier for this state.
      * This identifier is assigned when the state is
      * created.  It may vary if the order of creation changes.
+     *
      * @return The identifier for the state.
      */
     @Override
@@ -154,10 +205,17 @@ public class State implements IdentityIfc, StateAccessorIfc {
 
     @Override
     public String toString() {
-        return (getName());
+        final StringBuilder sb = new StringBuilder("State{");
+        sb.append("id=").append(myId);
+        sb.append(", number=").append(myNumber);
+        sb.append(", name='").append(myName).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
-    /** Gets whether or not the state has been entered
+    /**
+     * Gets whether or not the state has been entered
+     *
      * @return True means that the state has been entered
      */
     @Override
@@ -165,11 +223,12 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myInStateIndicator;
     }
 
-    /** Causes the state to be entered
-     *  If the state has already been entered then nothing happens.
-     *  Preconditions: time must be &gt;= 0, must not be Double.NaN and must not
-     *  be Double.Infinity
-     * 
+    /**
+     * Causes the state to be entered
+     * If the state has already been entered then nothing happens.
+     * Preconditions: time must be &gt;= 0, must not be Double.NaN and must not
+     * be Double.Infinity
+     *
      * @param time The time that the state is being entered
      */
     public final void enter(double time) {
@@ -187,7 +246,7 @@ public class State implements IdentityIfc, StateAccessorIfc {
         }
 
         myNumTimesEntered = myNumTimesEntered + 1.0;
-        if (myNumTimesEntered == 1){
+        if (myNumTimesEntered == 1) {
             myTimeFirstEntered = time;
         }
         myEnteredTime = time;
@@ -195,16 +254,19 @@ public class State implements IdentityIfc, StateAccessorIfc {
         onEnter();
     }
 
-    /** can be overwritten by subclasses to
-     *  perform work when the state is entered
+    /**
+     * can be overwritten by subclasses to
+     * perform work when the state is entered
      */
     protected void onEnter() {
     }
 
-    /** Causes the state to be exited
-     *  @param time the time that the state was exited, must
-     *         be &gt;= time entered, &gt;= 0, not Double.NaN not Double.Infinity
-     *  @return the time spent in the  state as a double
+    /**
+     * Causes the state to be exited
+     *
+     * @param time the time that the state was exited, must
+     *             be &gt;= time entered, &gt;= 0, not Double.NaN not Double.Infinity
+     * @return the time spent in the  state as a double
      */
     public final double exit(double time) {
         if (Double.isNaN(time)) {
@@ -218,7 +280,7 @@ public class State implements IdentityIfc, StateAccessorIfc {
         }
 
         if (time < myEnteredTime) {
-            throw new IllegalArgumentException("The exit time was < enter time");
+            throw new IllegalArgumentException("The exit time = " + time + " was < enter time = " + myEnteredTime);
         }
 
         if (myInStateIndicator == false) {
@@ -237,20 +299,20 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return (timeInState);
     }
 
-    /** can be overwritten by subclasses to
-     *  perform work when the state is exited
+    /**
+     * can be overwritten by subclasses to
+     * perform work when the state is exited
      */
     protected void onExit() {
     }
 
     /**
-     *  Initializes the state back to new
-     *   - not in state
-     *   - enter/exited time/time first entered = Double.NaN
-     *   - total time in state = 0.0
-     *   - enter/exited count = 0.0
-     *   - sojourn statistics reset if turned on
-     *
+     * Initializes the state back to new
+     * - not in state
+     * - enter/exited time/time first entered = Double.NaN
+     * - total time in state = 0.0
+     * - enter/exited count = 0.0
+     * - sojourn statistics reset if turned on
      */
     public final void initialize() {
         myInStateIndicator = false;
@@ -265,8 +327,9 @@ public class State implements IdentityIfc, StateAccessorIfc {
         }
     }
 
-    /** Indicates whether or not statistics should be collected on the
-     *  sojourn times within the state
+    /**
+     * Indicates whether or not statistics should be collected on the
+     * sojourn times within the state
      *
      * @return Returns the collect sojourn time flag.
      */
@@ -274,7 +337,8 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myCollectSojournStatisticsFlag;
     }
 
-    /** Turns on statistical collection for the sojourn time in the state
+    /**
+     * Turns on statistical collection for the sojourn time in the state
      */
     public final void turnOnSojournTimeCollection() {
         myCollectSojournStatisticsFlag = true;
@@ -283,13 +347,15 @@ public class State implements IdentityIfc, StateAccessorIfc {
         }
     }
 
-    /** Turns off statistical collection of the sojourn times in the state
+    /**
+     * Turns off statistical collection of the sojourn times in the state
      */
     public final void turnOffSojournTimeCollection() {
         myCollectSojournStatisticsFlag = false;
     }
 
-    /** Resets the statistics collected on the sojourn time in the state
+    /**
+     * Resets the statistics collected on the sojourn time in the state
      */
     public final void resetSojournTimeStatistics() {
         if (myStatistic != null) {
@@ -297,11 +363,12 @@ public class State implements IdentityIfc, StateAccessorIfc {
         }
     }
 
-    /** Resets the counters for the number of times a state
-     *  was entered, exited, and the total time spent in the state
-     *  This does not effect whether or the state has been entered,
-     *  the time it was last entered, or the time it was last exited.
-     *  To reset those quantities and the state counters use initialize()
+    /**
+     * Resets the counters for the number of times a state
+     * was entered, exited, and the total time spent in the state
+     * This does not effect whether or the state has been entered,
+     * the time it was last entered, or the time it was last exited.
+     * To reset those quantities and the state counters use initialize()
      */
     public final void resetStateCollection() {
         myNumTimesEntered = 0.0;
@@ -310,14 +377,15 @@ public class State implements IdentityIfc, StateAccessorIfc {
     }
 
     /**
-     * 
      * @return The time that the state was first entered
      */
-    public final double getTimeFirstEntered(){
+    public final double getTimeFirstEntered() {
         return myTimeFirstEntered;
     }
-    
-    /** Gets the time that the state was last entered
+
+    /**
+     * Gets the time that the state was last entered
+     *
      * @return A double representing the time that the state was last entered
      */
     @Override
@@ -325,7 +393,9 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myEnteredTime;
     }
 
-    /** Gets the time that the state was last exited
+    /**
+     * Gets the time that the state was last exited
+     *
      * @return A double representing the time that the state was last exited
      */
     @Override
@@ -333,7 +403,9 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myExitedTime;
     }
 
-    /** Gets the number of times the state was entered
+    /**
+     * Gets the number of times the state was entered
+     *
      * @return A double representing the number of times entered
      */
     @Override
@@ -341,7 +413,9 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myNumTimesEntered;
     }
 
-    /** Gets the number of times the state was exited
+    /**
+     * Gets the number of times the state was exited
+     *
      * @return A double representing the number of times exited
      */
     @Override
@@ -349,16 +423,20 @@ public class State implements IdentityIfc, StateAccessorIfc {
         return myNumTimesExited;
     }
 
-    /** Gets a statistic that collected sojourn times
+    /**
+     * Gets a statistic that collected sojourn times
+     *
      * @return A statistic for sojourn times or null if
-     *         the statistics were never turned on
+     * the statistics were never turned on
      */
     @Override
-    public final Statistic getSojournTimeStatistic() {
-        return myStatistic;
+    public final Optional<Statistic> getSojournTimeStatistic() {
+        return Optional.ofNullable(myStatistic);
     }
 
-    /** Gets the total time spent in the state
+    /**
+     * Gets the total time spent in the state
+     *
      * @return a double representing the total sojourn time
      */
     @Override

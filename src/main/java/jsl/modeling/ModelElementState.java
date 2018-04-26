@@ -15,6 +15,7 @@
  */
 package jsl.modeling;
 
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import jsl.utilities.statistic.Statistic;
@@ -165,7 +166,7 @@ public class ModelElementState extends ModelElement implements StateAccessorIfc 
     }
 
     @Override
-    public final Statistic getSojournTimeStatistic() {
+    public final Optional<Statistic> getSojournTimeStatistic() {
         return myState.getSojournTimeStatistic();
     }
 

@@ -22,6 +22,7 @@ import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.Simulation;
+import jsl.modeling.elements.variable.LevelResponse;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.DistributionIfc;
@@ -47,6 +48,8 @@ public class DriverLicenseBureau extends SchedulingElement {
 
     private TimeWeighted myNS;
 
+    private LevelResponse myQLimitResponse;
+
     private ArrivalEventAction myArrivalEventAction;
 
     private EndServiceEventAction myEndServiceEventAction;
@@ -56,7 +59,7 @@ public class DriverLicenseBureau extends SchedulingElement {
     }
 
     public DriverLicenseBureau(ModelElement parent, int numServers,
-            DistributionIfc ad, DistributionIfc sd) {
+                               DistributionIfc ad, DistributionIfc sd) {
         super(parent);
 
         setNumberOfServers(numServers);
@@ -66,8 +69,11 @@ public class DriverLicenseBureau extends SchedulingElement {
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
 
         myNQ = new TimeWeighted(this, 0.0, "NQ");
+        myNQ.turnOnAcrossReplicationMaxCollection();
 
         myNS = new TimeWeighted(this, 0.0, "NS");
+
+        myQLimitResponse = new LevelResponse(myNQ, 10.0, "NQ_Limit");
 
         myArrivalEventAction = new ArrivalEventAction();
         myEndServiceEventAction = new EndServiceEventAction();
@@ -190,12 +196,8 @@ public class DriverLicenseBureau extends SchedulingElement {
 
         // run the simulation
         sim.run();
-        
-        SimulationReporter r = sim.makeSimulationReporter();
 
-        // write out some results
-        r.printAcrossReplicationStatistics();
-        System.out.println("Done!");
+        sim.printHalfWidthSummaryReport();
 
     }
 }
