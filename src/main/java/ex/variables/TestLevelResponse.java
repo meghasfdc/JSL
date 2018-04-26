@@ -16,17 +16,22 @@
 
 package ex.variables;
 
+import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
 import jsl.modeling.Simulation;
 import jsl.modeling.elements.variable.LevelResponse;
 import jsl.modeling.elements.variable.RandomVariable;
+import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.utilities.random.distributions.Normal;
+
 
 public class TestLevelResponse extends ModelElement {
 
     private RandomVariable myRV;
 
     private LevelResponse myLR;
+
+    private ResponseVariable myR;
 
     public TestLevelResponse(ModelElement parent) {
         this(parent, null);
@@ -36,13 +41,20 @@ public class TestLevelResponse extends ModelElement {
         super(parent, name);
         myRV = new RandomVariable(this, new Normal());
         myLR = new LevelResponse(myRV, 0.0);
+        myR = new ResponseVariable(this, "Observations");
     }
 
     @Override
-    protected void montecarlo() {
-        for (int i=1;i<=100;i++){
-            myRV.getValue();
-        }
+    protected void initialize() {
+        schedule(this::variableUpdate).in(1.0).units();
+    }
+
+    protected void variableUpdate(JSLEvent evnt){
+
+        double x = myRV.getValue();
+        myR.setValue(x);
+        schedule(this::variableUpdate).in(1.0).units();
+        //System.out.println("in variable update");
     }
 
     public static void main(String[] args) {
@@ -51,7 +63,7 @@ public class TestLevelResponse extends ModelElement {
         new TestLevelResponse(s.getModel());
 
         s.setNumberOfReplications(10);
-
+        s.setLengthOfReplication(10000.0);
         s.run();
 
         s.printHalfWidthSummaryReport();

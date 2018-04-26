@@ -869,7 +869,7 @@ public class Request extends QObject {
     protected class RequestState extends State {
         
         protected RequestState(String name) {
-            super(name, false);
+            super(name);
         }
         
         protected void dequeued(Queue queue, double time) {

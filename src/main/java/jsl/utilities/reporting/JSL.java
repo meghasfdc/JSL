@@ -19,6 +19,7 @@ import java.awt.Desktop;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.logging.*;
 import javax.swing.JOptionPane;
 
@@ -43,6 +44,8 @@ public class JSL {
     private static int myEnumCounter_;
 
     private static int myFileCounter_;
+
+    public static final DecimalFormat D2FORMAT = new DecimalFormat(".##");
 
     /**
      * for logging

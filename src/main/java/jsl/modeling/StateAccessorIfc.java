@@ -18,6 +18,8 @@ package jsl.modeling;
 import jsl.utilities.IdentityIfc;
 import jsl.utilities.statistic.Statistic;
 
+import java.util.Optional;
+
 /**
  *
  */
@@ -28,52 +30,51 @@ public interface StateAccessorIfc extends IdentityIfc {
      *
      * @return True means that the state has been entered
      */
-    public abstract boolean isEntered();
+    boolean isEntered();
 
     /**
      * Gets the time that the state was last entered
      *
      * @return A double representing the time that the state was last entered
      */
-    public abstract double getTimeStateEntered();
+    double getTimeStateEntered();
 
     /**
      * Gets the time that the state was last exited
      *
      * @return A double representing the time that the state was last exited
      */
-    public abstract double getTimeStateExited();
+    double getTimeStateExited();
 
     /**
      * Gets the number of times the state was entered
      *
      * @return A double representing the number of times entered
      */
-    public abstract double getNumberOfTimesEntered();
+    double getNumberOfTimesEntered();
 
     /**
      * Gets the number of times the state was exited
      *
      * @return A double representing the number of times exited
      */
-    public abstract double getNumberOfTimesExited();
+    double getNumberOfTimesExited();
 
     /**
      * Gets a statistic that collected sojourn times
      *
      * @return A statistic for sojourn times or null if use statistic was false
      */
-    public abstract Statistic getSojournTimeStatistic();
+    Optional<Statistic> getSojournTimeStatistic();
 
     /**
      * Gets the total time spent in the state
      *
      * @return a double representing the total sojourn time
      */
-    public abstract double getTotalTimeInState();
+    double getTotalTimeInState();
 
     /**
-     * 
      * @return returns getTimeStateExited() - getTimeStateEntered()
      */
     default double getTimeInState() {

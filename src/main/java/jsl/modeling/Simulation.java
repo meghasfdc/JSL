@@ -959,6 +959,7 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
             throw new IllegalArgumentException("The PrintWriter was null");
         }
         out.print(getHalfWidthSummaryReport(title, confLevel).toString());
+        out.flush();
     }
 
     /**
