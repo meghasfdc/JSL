@@ -37,9 +37,20 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 /**
  * Simulation represents a model and experiment that can be run. It encapsulates
  * a model to which model elements can be attached. It allows an experiment and
- * its run parameters to be specified. Finally, it allows reporting of results
- * to files via a SimulationReporter.  It provides access to the simulation
+ * its run parameters to be specified. It allows reporting of results
+ * to text files via a SimulationReporter.  It provides access to the simulation
  * statistical database and allows the changing of experiment settings.
+ *
+ * Whether or not the current data in the database will be cleared prior to the run is controlled by the
+ *  setClearDbOption() option.  Clearing the data is the default option.  Clearing the database
+ *  causes the previous database to be deleted and a brand new database with the same name to
+ *  be constructed to hold statistical output generated during the simulation when calling run().
+ *  The generated database has the same name as the simulation and can be found in the jslOutput/db directory.
+ *  The generated database is an embedded database. That is, only one client can be using the database at a time.
+ *
+ *  If the setClearDbOption() is set to false, then any subsequent calls to run() will add their
+ *  generated data to the simulation database.  This is useful when comparing data across simulation
+ *  runs if the simulation inputs are changed between runs.
  *
  * @author Manuel Rossetti (rossetti@uark.edu)
  */
@@ -1004,7 +1015,8 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
         }
     }
 
-    /**
+    /** True is the default.
+     *
      * @return true means that a JSLDbObserver will be attached automatically
      */
     public final boolean isDbOptionOn() {
@@ -1012,13 +1024,15 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
+     *  True is the default setting
+     *
      * @param option true means that a JSLDbObserver will be attached automatically
      */
     public final void setDbOption(boolean option) {
         this.myDbOption = option;
     }
 
-    /**
+    /** True is the default setting
      * @return true means that the automatically attached JSLDbObserver will
      * be cleared of all data when attached
      */
@@ -1026,7 +1040,7 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
         return myClearDbOption;
     }
 
-    /**
+    /** True is the default setting
      * @param option true means that the automatically attached JSLDbObserver will
      *               be cleared of all data when attached
      */

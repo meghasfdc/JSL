@@ -199,5 +199,9 @@ public class DriverLicenseBureau extends SchedulingElement {
 
         sim.printHalfWidthSummaryReport();
 
+        sim.setClearDbOption(false);
+
+        sim.run();
+
     }
 }

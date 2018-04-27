@@ -39,7 +39,11 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- *  Used by Simulation to attach an embedded database to collect statistics
+ *  Used by Simulation to attach an embedded database to collect statistics. Whether or not
+ *  the current data in the database will be cleared prior to the run is controlled by the
+ *  clearDbFlag option.  Clearing the data is the default option.  Clearing the database
+ *  causes the previous database to be deleted and a brand new database with the same name to
+ *  be constructed to hold statistical output generated during the simulation.
  */
 public class JSLDbObserver extends ModelElementObserver {
 
