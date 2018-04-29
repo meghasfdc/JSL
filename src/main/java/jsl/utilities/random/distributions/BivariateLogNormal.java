@@ -18,7 +18,7 @@ package jsl.utilities.random.distributions;
 import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**  Allows for the generation of bivariate lognormal random variables.
  *
@@ -45,14 +45,14 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      * 
      */
     public BivariateLogNormal() {
-        this(1.0, 1.0, 1.0, 1.0, 0.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, 1.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a bivariate lognormal with mean's = 1.0, variance = 1.0. correlation = 0.0
      *
      * @param rng
      */
-    public BivariateLogNormal(RngIfc rng) {
+    public BivariateLogNormal(RNStreamIfc rng) {
         this(1.0, 1.0, 1.0, 1.0, 0.0, rng);
     }
 
@@ -65,7 +65,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      * @param rho
      */
     public BivariateLogNormal(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefault().getStream());
+        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Interprets the array of parameters as the parameters
@@ -79,7 +79,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      */
     public BivariateLogNormal(double[] param) {
         this(param[0], param[1], param[2], param[3], param[4],
-                RNStreamFactory.getDefault().getStream());
+                RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Interprets the array of parameters as the parameters
@@ -92,7 +92,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      * @param param
      * @param rng
      */
-    public BivariateLogNormal(double[] param, RngIfc rng) {
+    public BivariateLogNormal(double[] param, RNStreamIfc rng) {
         this(param[0], param[1], param[2], param[3], param[4], rng);
     }
 
@@ -105,7 +105,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      * @param rho correlation of lognormals
      * @param rng
      */
-    public BivariateLogNormal(double mean1, double var1, double mean2, double var2, double rho, RngIfc rng) {
+    public BivariateLogNormal(double mean1, double var1, double mean2, double var2, double rho, RNStreamIfc rng) {
         myBVN = new BivariateNormal(rng);
         setParameters(mean1, var1, mean2, var2, rho);
     }
@@ -383,11 +383,11 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
         return (getValues(new double[2]));
     }
 
-    public RngIfc getRandomNumberGenerator() {
+    public RNStreamIfc getRandomNumberGenerator() {
         return myBVN.getRandomNumberGenerator();
     }
 
-    public void setRandomNumberGenerator(RngIfc rng) {
+    public void setRandomNumberGenerator(RNStreamIfc rng) {
         myBVN.setRandomNumberGenerator(rng);
     }
 

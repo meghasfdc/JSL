@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Weibull(shape, scale) random variable
@@ -28,10 +28,10 @@ public final class WeibullRV extends AbstractRVariable {
     private final double myScale;
 
     public WeibullRV(double shape, double scale){
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public WeibullRV(double shape, double scale, RngIfc rng){
+    public WeibullRV(double shape, double scale, RNStreamIfc rng){
         super(rng);
         if (shape <= 0) {
             throw new IllegalArgumentException("Shape parameter must be positive");
@@ -48,7 +48,7 @@ public final class WeibullRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final WeibullRV newInstance(RngIfc rng){
+    public final WeibullRV newInstance(RNStreamIfc rng){
         return new WeibullRV(this.getShape(), this.getScale(), rng);
     }
 

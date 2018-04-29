@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.LogLogisticRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -40,7 +40,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
      * @param scale
      */
     public LogLogistic(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -48,7 +48,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
      * @param parameters
      */
     public LogLogistic(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -56,7 +56,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
      * @param parameters
      * @param rng
      */
-    public LogLogistic(double[] parameters, RngIfc rng) {
+    public LogLogistic(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -66,7 +66,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
      * @param scale
      * @param rng
      */
-    public LogLogistic(double shape, double scale, RngIfc rng) {
+    public LogLogistic(double shape, double scale, RNStreamIfc rng) {
         super(rng);
         setShape(shape);
         setScale(scale);
@@ -88,7 +88,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
      * @return
      */
     @Override
-    public final LogLogistic newInstance(RngIfc rng) {
+    public final LogLogistic newInstance(RNStreamIfc rng) {
         return (new LogLogistic(getParameters(), rng));
     }
 
@@ -99,7 +99,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
      */
     @Override
     public final LogLogistic newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -236,7 +236,7 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new LogLogisticRV(myShape, myScale, rng);
     }
 

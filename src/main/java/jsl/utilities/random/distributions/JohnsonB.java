@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.AbstractRandom;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *
@@ -33,26 +33,26 @@ public class JohnsonB extends AbstractRandom {
 
     private double myMax;
 
-    private RngIfc myRNG;
+    private RNStreamIfc myRNG;
 
     public JohnsonB() {
-        this(0.0, 1.0, 0.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, 0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     public JohnsonB(double[] parameters) {
         this(parameters[0], parameters[1], parameters[2], parameters[3],
-                RNStreamFactory.getDefault().getStream());
+                RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public JohnsonB(double[] parameters, RngIfc rng) {
+    public JohnsonB(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], parameters[2], parameters[3], rng);
     }
 
     public JohnsonB(double alpha1, double alpha2, double min, double max) {
-        this(alpha1, alpha2, min, max, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, min, max, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public JohnsonB(double alpha1, double alpha2, double min, double max, RngIfc rng) {
+    public JohnsonB(double alpha1, double alpha2, double min, double max, RNStreamIfc rng) {
         setParameters(alpha1, alpha2, min, max);
         setRandomNumberGenerator(rng);
     }
@@ -68,7 +68,7 @@ public class JohnsonB extends AbstractRandom {
      * @return
      */
     @Override
-    public final JohnsonB newInstance(RngIfc rng) {
+    public final JohnsonB newInstance(RNStreamIfc rng) {
         return (new JohnsonB(getParameters(), rng));
     }
 
@@ -78,7 +78,7 @@ public class JohnsonB extends AbstractRandom {
      * @return
      */
     public final JohnsonB newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -174,11 +174,11 @@ public class JohnsonB extends AbstractRandom {
         myMax = max;
     }
 
-    public RngIfc getRandomNumberGenerator() {
+    public RNStreamIfc getRandomNumberGenerator() {
         return (myRNG);
     }
 
-    public final void setRandomNumberGenerator(RngIfc rng) {
+    public final void setRandomNumberGenerator(RNStreamIfc rng) {
         if (rng == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }

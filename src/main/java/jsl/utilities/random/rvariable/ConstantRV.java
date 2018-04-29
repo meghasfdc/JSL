@@ -18,8 +18,7 @@ package jsl.utilities.random.rvariable;
 
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Allows a constant to pretend to be a random variable
@@ -58,7 +57,7 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final ConstantRV newInstance(RngIfc rng){
+    public final ConstantRV newInstance(RNStreamIfc rng){
         return new ConstantRV(this.value);
     }
 

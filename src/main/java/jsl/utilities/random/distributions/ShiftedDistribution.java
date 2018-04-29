@@ -15,7 +15,7 @@
  */
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Represents a Distribution that has been Shifted (translated to the right)
  *  The shift must be &gt;= 0.0
@@ -43,7 +43,7 @@ public class ShiftedDistribution extends Distribution {
      * @param shift The linear shift
      * @param rng
      */
-    public ShiftedDistribution(DistributionIfc distribution, double shift, RngIfc rng) {
+    public ShiftedDistribution(DistributionIfc distribution, double shift, RNStreamIfc rng) {
         super(rng);
         setDistribution(distribution, shift);
     }
@@ -63,7 +63,7 @@ public class ShiftedDistribution extends Distribution {
      * @param rng
      * @return
      */
-    public final ShiftedDistribution newInstance(RngIfc rng) {
+    public final ShiftedDistribution newInstance(RNStreamIfc rng) {
         DistributionIfc d = (DistributionIfc) myDistribution.newInstance();
         return (new ShiftedDistribution(d, myShift, rng));
     }
@@ -74,7 +74,7 @@ public class ShiftedDistribution extends Distribution {
      * @return
      */
     public final ShiftedDistribution newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 

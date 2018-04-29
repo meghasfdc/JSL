@@ -17,8 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
-import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.UniformRV;
@@ -38,7 +37,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
     /** Constructs a uniform distribution over the range (0,1)
      */
     public Uniform() {
-        this(0.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a uniform distribution with
@@ -46,7 +45,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @param parameters The array of parameters
      */
     public Uniform(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a uniform distribution with
@@ -54,7 +53,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @param parameters The array of parameters
      * @param rng
      */
-    public Uniform(double[] parameters, RngIfc rng) {
+    public Uniform(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -64,7 +63,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @param upperLimit limit of the distribution
      */
     public Uniform(double lowerLimit, double upperLimit) {
-        this(lowerLimit, upperLimit, RNStreamFactory.getDefault().getStream());
+        this(lowerLimit, upperLimit, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a uniform distribution over the provided range
@@ -73,7 +72,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @param upperLimit limit of the distribution
      * @param rng A RngIfc
      */
-    public Uniform(double lowerLimit, double upperLimit, RngIfc rng) {
+    public Uniform(double lowerLimit, double upperLimit, RNStreamIfc rng) {
         super(rng);
         setRange(lowerLimit, upperLimit);
     }
@@ -94,7 +93,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @return
      */
     @Override
-    public final Uniform newInstance(RngIfc rng) {
+    public final Uniform newInstance(RNStreamIfc rng) {
         return (new Uniform(getParameters(), rng));
     }
 
@@ -105,7 +104,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      */
     @Override
     public final Uniform newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -251,7 +250,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng){
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng){
         return new UniformRV(getMinimum(), getMaximum(), rng);
     }
 }

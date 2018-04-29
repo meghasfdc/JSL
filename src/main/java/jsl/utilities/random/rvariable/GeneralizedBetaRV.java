@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  JohnsonB(alpha1, alpha2, min, max) random variable
@@ -31,10 +31,10 @@ public final class GeneralizedBetaRV extends AbstractRVariable {
     private final BetaRV myBeta;
 
     public GeneralizedBetaRV(double alpha1, double alpha2, double min, double max){
-        this(alpha1, alpha2, min, max, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, min, max, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public GeneralizedBetaRV(double alpha1, double alpha2, double min, double max, RngIfc rng){
+    public GeneralizedBetaRV(double alpha1, double alpha2, double min, double max, RNStreamIfc rng){
         super(rng);
         myBeta = new BetaRV(alpha1, alpha2, rng);
         if (max <= min) {
@@ -49,7 +49,7 @@ public final class GeneralizedBetaRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final GeneralizedBetaRV newInstance(RngIfc rng){
+    public final GeneralizedBetaRV newInstance(RNStreamIfc rng){
         return new GeneralizedBetaRV(getAlpha1(), getAlpha2(), myMin, myMax, rng);
     }
 

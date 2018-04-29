@@ -20,7 +20,7 @@
  */
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** A distribution on a single value.  The value may
  *  be changed via the setParameters() method
@@ -29,7 +29,7 @@ import jsl.utilities.random.rng.RngIfc;
  */
 public class VConstant extends Constant {
 
-    public VConstant(double value, RngIfc rng) {
+    public VConstant(double value, RNStreamIfc rng) {
         super(value, rng);
     }
 
@@ -57,7 +57,7 @@ public class VConstant extends Constant {
      * @return
      */
     @Override
-    public VConstant newInstance(RngIfc rng) {
+    public VConstant newInstance(RNStreamIfc rng) {
         return (newInstance());
     }
 

@@ -25,7 +25,7 @@ import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.rootfinding.BisectionRootFinder;
 import jsl.utilities.rootfinding.RootFinder;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * The standard beta distribution defined over the range from (0,1)
@@ -59,7 +59,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      *
      */
     public Beta() {
-        this(1.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -69,7 +69,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param alpha2
      */
     public Beta(double alpha1, double alpha2) {
-        this(alpha1, alpha2, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -78,7 +78,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param parameters
      */
     public Beta(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -87,7 +87,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param parameters
      * @param rng
      */
-    public Beta(double[] parameters, RngIfc rng) {
+    public Beta(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -98,7 +98,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param alpha2
      * @param rng
      */
-    public Beta(double alpha1, double alpha2, RngIfc rng) {
+    public Beta(double alpha1, double alpha2, RNStreamIfc rng) {
         super(rng);
         setParameters(alpha1, alpha2);
         myRootFinder.setMaximumIterations(200);
@@ -123,7 +123,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @return
      */
     @Override
-    public final Beta newInstance(RngIfc rng) {
+    public final Beta newInstance(RNStreamIfc rng) {
         return (new Beta(getParameters(), rng));
     }
 
@@ -135,7 +135,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      */
     @Override
     public final Beta newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -603,7 +603,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new BetaRV(getAlpha1(), getAlpha2(), rng);
     }
 

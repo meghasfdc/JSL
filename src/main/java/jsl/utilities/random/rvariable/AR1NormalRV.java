@@ -16,8 +16,9 @@
 
 package jsl.utilities.random.rvariable;
 
+import jsl.utilities.controls.Controls;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 public class AR1NormalRV extends AbstractRVariable {
 
@@ -35,10 +36,10 @@ public class AR1NormalRV extends AbstractRVariable {
      *
      */
     public AR1NormalRV() {
-        this(0.0, 1.0, 0.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public AR1NormalRV(RngIfc rng) {
+    public AR1NormalRV(RNStreamIfc rng) {
         this(0.0, 1.0, 0.0, rng);
     }
 
@@ -47,7 +48,7 @@ public class AR1NormalRV extends AbstractRVariable {
      * @param correlation
      */
     public AR1NormalRV(double correlation) {
-        this(0.0, 1.0, correlation, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, correlation, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates an autoregressive order 1 normal process
@@ -57,7 +58,7 @@ public class AR1NormalRV extends AbstractRVariable {
      * @param correlation
      */
     public AR1NormalRV(double mean, double variance, double correlation) {
-        this(mean, variance, correlation, RNStreamFactory.getDefault().getStream());
+        this(mean, variance, correlation, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates an autoregressive order 1 normal process
@@ -67,7 +68,7 @@ public class AR1NormalRV extends AbstractRVariable {
      * @param correlation
      * @param rng
      */
-    public AR1NormalRV(double mean, double variance, double correlation, RngIfc rng) {
+    public AR1NormalRV(double mean, double variance, double correlation, RNStreamIfc rng) {
         super(rng);
         if (variance <= 0) {
             throw new IllegalArgumentException("Variance must be positive");
@@ -86,7 +87,7 @@ public class AR1NormalRV extends AbstractRVariable {
         myErrors = new NormalRV(0.0, v, rng);
     }
     @Override
-    public RVariableIfc newInstance(RngIfc rng) {
+    public RVariableIfc newInstance(RNStreamIfc rng) {
         return new AR1NormalRV(myMean, myVar, myPhi, rng);
     }
 

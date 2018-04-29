@@ -20,7 +20,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
 import jsl.utilities.random.*;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.reporting.*;
 
 /** A random variable (RandomVariable) is a function that
@@ -446,11 +446,11 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
 
     @Override
     public final RandomVariable newInstance() {
-        return newInstance(RNStreamFactory.getDefault().getStream());
+        return newInstance(RNStreamFactory.getDefaultFactory().getStream());
     }
 
     @Override
-    public final RandomVariable newInstance(RngIfc rng) {
+    public final RandomVariable newInstance(RNStreamIfc rng) {
         double iv = this.getInitialValue();
         double ll = this.getLowerLimit();
         double ul = this.getUpperLimit();

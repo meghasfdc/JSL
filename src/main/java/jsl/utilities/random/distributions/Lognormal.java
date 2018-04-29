@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.LognormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -40,7 +40,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
     /** Constructs a lognormal distribution with mean 1.0 and variance 1.0
      */
     public Lognormal() {
-        this(1.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a lognormal distribution with
@@ -48,7 +48,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @param parameters An array with the mean and variance
      */
     public Lognormal(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a lognormal distribution with
@@ -56,7 +56,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @param parameters An array with the mean and variance
      * @param rng
      */
-    public Lognormal(double[] parameters, RngIfc rng) {
+    public Lognormal(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -69,7 +69,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @param variance must be &gt; 0
      */
     public Lognormal(double mean, double variance) {
-        this(mean, variance, RNStreamFactory.getDefault().getStream());
+        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a lognormal distribution with
@@ -81,7 +81,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @param variance must be &gt; 0
      * @param rng A RngIfc
      */
-    public Lognormal(double mean, double variance, RngIfc rng) {
+    public Lognormal(double mean, double variance, RNStreamIfc rng) {
         super(rng);
         setParameters(mean, variance);
     }
@@ -102,7 +102,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @return
      */
     @Override
-    public final Lognormal newInstance(RngIfc rng) {
+    public final Lognormal newInstance(RNStreamIfc rng) {
         return (new Lognormal(getParameters(), rng));
     }
 
@@ -113,7 +113,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      */
     @Override
     public final Lognormal newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -320,7 +320,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new LognormalRV(getMean(), getVariance(), rng);
     }
 }

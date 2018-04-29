@@ -23,7 +23,7 @@ import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.robj.DPopulation;
 import jsl.utilities.random.rvariable.EmpiricalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -257,7 +257,7 @@ public class Bootstrap implements IdentityIfc, RandomStreamIfc {
      *
      * @return
      */
-    public RngIfc getRandomNumberGenerator() {
+    public RNStreamIfc getRandomNumberGenerator() {
         return myOriginalPop.getRandomNumberGenerator();
     }
 
@@ -267,7 +267,7 @@ public class Bootstrap implements IdentityIfc, RandomStreamIfc {
      *
      * @param rng the reference to the random number generator
      */
-    public void setRandomNumberGenerator(RngIfc rng) {
+    public void setRandomNumberGenerator(RNStreamIfc rng) {
         myOriginalPop.setRandomNumberGenerator(rng);
     }
 
@@ -364,9 +364,9 @@ public class Bootstrap implements IdentityIfc, RandomStreamIfc {
      */
     public final List<RVariableIfc> getEmpiricalRVForEachBootstrapSample(boolean useCRN){
         List<RVariableIfc> list = new ArrayList<>();
-        RNStreamFactory.RNStream rnStream = null;
+        RNStreamIfc rnStream = null;
         if (useCRN){
-            rnStream = RNStreamFactory.getDefault().getStream();
+            rnStream = RNStreamFactory.getDefaultFactory().getStream();
         }
         for(Statistic s: myBSStatList){
             if ((s.myData != null)){

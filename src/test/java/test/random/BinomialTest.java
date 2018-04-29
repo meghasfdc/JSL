@@ -15,7 +15,7 @@
  */
 package test.random;
 
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Binomial;
@@ -111,7 +111,7 @@ public class BinomialTest {
         System.out.println("n = " + n);
         System.out.println("p = " + p);
         
-        RngIfc rng = RNStreamFactory.getDefault().getStream();
+        RNStreamIfc rng = RNStreamFactory.getDefaultFactory().getStream();
         //RngStream rng = new RngStream();
 
         Binomial b = new Binomial(p, n, rng);
@@ -140,7 +140,7 @@ public class BinomialTest {
         System.out.println("n = " + n);
         System.out.println("p = " + p);
 
-        RngIfc rng = RNStreamFactory.getDefault().getStream();
+        RNStreamIfc rng = RNStreamFactory.getDefaultFactory().getStream();
 
         Binomial b = new Binomial(p, n, rng);
 
@@ -167,7 +167,7 @@ public class BinomialTest {
         System.out.println("n = " + n);
         System.out.println("p = " + p);
 
-        RngIfc rng = RNStreamFactory.getDefault().getStream();
+        RNStreamIfc rng = RNStreamFactory.getDefaultFactory().getStream();
 
         Binomial b = new Binomial(p, n, rng);
 

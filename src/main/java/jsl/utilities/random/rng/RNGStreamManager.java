@@ -33,19 +33,19 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
 
     /** Holds the streams
      */
-    protected List<RandomStreamIfc> myStreams;
+    protected List<RNStreamIfc> myStreams;
 
     public RNGStreamManager() {
         myStreams = new ArrayList<>();
     }
 
     /** Makes a stream manager and fills it with streams from
-     *  RNStreamFactory.getDefault()
+     *  RNStreamFactory.getDefaultFactory()
      * @param numStreams, must be &gt; 0
      * @return
      */
     public static RNGStreamManager makeRngStreams(int numStreams) {
-        return makeRngStreams(numStreams, RNStreamFactory.getDefault());
+        return makeRngStreams(numStreams, RNStreamFactory.getDefaultFactory());
     }
 
     /** Makes RNStreams and fills a RNGStreamManager
@@ -70,21 +70,21 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
 
     @Override
     public void resetStartStream() {
-        for (RandomStreamIfc r : myStreams) {
+        for (RNStreamIfc r : myStreams) {
             r.resetStartStream();
         }
     }
 
     @Override
     public void resetStartSubstream() {
-        for (RandomStreamIfc r : myStreams) {
+        for (RNStreamIfc r : myStreams) {
             r.resetStartSubstream();
         }
     }
 
     @Override
     public void advanceToNextSubstream() {
-        for (RandomStreamIfc r : myStreams) {
+        for (RNStreamIfc r : myStreams) {
             r.advanceToNextSubstream();
         }
     }
@@ -105,7 +105,7 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
 
     @Override
     public void setAntitheticOption(boolean flag) {
-        for (RandomStreamIfc r : myStreams) {
+        for (RNStreamIfc r : myStreams) {
             r.setAntitheticOption(flag);
         }
     }
@@ -116,7 +116,7 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
             throw new IllegalStateException("There were no streams present");
         }
 
-        ListIterator<RandomStreamIfc> listIterator = myStreams.listIterator();
+        ListIterator<RNStreamIfc> listIterator = myStreams.listIterator();
         boolean b = listIterator.next().getAntitheticOption();
 
         while( listIterator.hasNext()){
@@ -136,7 +136,7 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
      * @param element, must not be null
      * @return the RandomStreamIfc
      */
-    public RandomStreamIfc set(int index, RngIfc element) {
+    public RNStreamIfc set(int index, RNStreamIfc element) {
         if (element == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -148,15 +148,15 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
      * @param index must be a valid index
      * @return RandomStreamIfc
      */
-    public RandomStreamIfc remove(int index) {
+    public RNStreamIfc remove(int index) {
         return myStreams.remove(index);
     }
 
-    public boolean remove(RngIfc o) {
+    public boolean remove(RNStreamIfc o) {
         return myStreams.remove(o);
     }
 
-    public Iterator<RandomStreamIfc> iterator() {
+    public Iterator<RNStreamIfc> iterator() {
         return myStreams.iterator();
     }
 
@@ -166,7 +166,7 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
     }
 
     @Override
-    public int indexOf(RandomStreamIfc o) {
+    public int indexOf(RNStreamIfc o) {
         return myStreams.indexOf(o);
     }
 
@@ -176,12 +176,12 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
      * @return RandomStreamIfc
      */
     @Override
-    public RandomStreamIfc get(int index) {
+    public RNStreamIfc get(int index) {
         return myStreams.get(index);
     }
 
     @Override
-    public boolean contains(RandomStreamIfc o) {
+    public boolean contains(RNStreamIfc o) {
         return myStreams.contains(o);
     }
 
@@ -194,7 +194,7 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
      * @param index, must be a valid index
      * @param element, must not be null
      */
-    public void add(int index, RandomStreamIfc element) {
+    public void add(int index, RNStreamIfc element) {
         if (element == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -206,19 +206,19 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
      * @param e must not be null
      * @return true if added
      */
-    public boolean add(RandomStreamIfc e) {
+    public boolean add(RNStreamIfc e) {
         if (e == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
         return myStreams.add(e);
     }
 
-    /** Adds a stream from RNStreamFactory.getDefault()
+    /** Adds a stream from RNStreamFactory.getDefaultFactory()
      *
      * @return the added RNStream
      */
-    public RNStream addNewRNStream() {
-        return addNewRNStream(RNStreamFactory.getDefault());
+    public RNStreamIfc addNewRNStream() {
+        return addNewRNStream(RNStreamFactory.getDefaultFactory());
     }
 
     /** Creates a new stream from the supplied factory and adds it
@@ -226,11 +226,11 @@ public class RNGStreamManager implements RandomStreamManagerIfc {
      * @param f, must not be null
      * @return the created stream
      */
-    public RNStream addNewRNStream(RNStreamFactory f) {
+    public RNStreamIfc addNewRNStream(RNStreamFactory f) {
         if (f == null) {
             throw new IllegalArgumentException("The supplied RNStreamFactory was null");
         }
-        RNStream s = f.getStream();
+        RNStreamIfc s = f.getStream();
         add(s);
         return s;
     }

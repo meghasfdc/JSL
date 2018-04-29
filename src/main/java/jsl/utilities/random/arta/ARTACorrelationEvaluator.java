@@ -15,7 +15,7 @@
  */
 package jsl.utilities.random.arta;
 
-import jsl.utilities.random.rng.AR1CorrelatedRngStream;
+import jsl.utilities.random.rng.AR1CorrelatedRNStreamStream;
 import jsl.utilities.random.distributions.Distribution;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.statistic.Statistic;
@@ -31,7 +31,7 @@ public class ARTACorrelationEvaluator {
 	 *  the NORTA process
 	 * 
 	 */
-	protected AR1CorrelatedRngStream myCorrelatedRng;
+	protected AR1CorrelatedRNStreamStream myCorrelatedRng;
 	
 	/** The distribution from which we want the
 	 *  correlated random variates
@@ -134,7 +134,7 @@ public class ARTACorrelationEvaluator {
 	 */
 	public ARTACorrelationEvaluator(Distribution distribution, double lag1,
 			int sampleSize, int numReps, boolean antitheticFlag) {
-		myCorrelatedRng = new AR1CorrelatedRngStream(lag1);
+		myCorrelatedRng = new AR1CorrelatedRNStreamStream(lag1);
 		setDistribution(distribution);
 		distribution.setRandomNumberGenerator(myCorrelatedRng);
 		setSampleSize(sampleSize);

@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Poisson(mean) random variable
@@ -27,10 +27,10 @@ public final class PoissonRV extends AbstractRVariable {
     private final double mean;
 
     public PoissonRV(double mean){
-        this(mean, RNStreamFactory.getDefault().getStream());
+        this(mean, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public PoissonRV(double mean, RngIfc rng){
+    public PoissonRV(double mean, RNStreamIfc rng){
         super(rng);
         if (mean <= 0.0) {
             throw new IllegalArgumentException("Poisson mean must be > 0.0");
@@ -43,7 +43,7 @@ public final class PoissonRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final PoissonRV newInstance(RngIfc rng){
+    public final PoissonRV newInstance(RNStreamIfc rng){
         return new PoissonRV(this.mean, rng);
     }
 

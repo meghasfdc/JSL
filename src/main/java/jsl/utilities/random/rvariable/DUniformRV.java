@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  discrete uniform(min, max) random variable
@@ -28,10 +28,10 @@ public final class DUniformRV extends AbstractRVariable {
     private final int max;
 
     public DUniformRV(int min, int max){
-        this(min, max, RNStreamFactory.getDefault().getStream());
+        this(min, max, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public DUniformRV(int min, int max, RngIfc rng){
+    public DUniformRV(int min, int max, RNStreamIfc rng){
         super(rng);
         if (min >= max) {
             throw new IllegalArgumentException("Lower limit must be < upper limit. lower limit = " + min + " upper limit = " + max);
@@ -45,7 +45,7 @@ public final class DUniformRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final DUniformRV newInstance(RngIfc rng){
+    public final DUniformRV newInstance(RNStreamIfc rng){
         return new DUniformRV(this.min, this.max, rng);
     }
 

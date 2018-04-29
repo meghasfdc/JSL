@@ -16,9 +16,10 @@
 
 package jsl.utilities.random.rvariable;
 
+import jsl.utilities.controls.Controls;
 import jsl.utilities.random.distributions.Beta;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Beta(alpha1, alpha2) random variable, range (0,1)
@@ -28,10 +29,10 @@ public final class BetaRV extends AbstractRVariable {
     private final Beta myBeta;
 
     public BetaRV(double alpha1, double alpha2){
-        this(alpha1, alpha2, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public BetaRV(double alpha1, double alpha2, RngIfc rng){
+    public BetaRV(double alpha1, double alpha2, RNStreamIfc rng){
         super(rng);
         myBeta = new Beta(alpha1, alpha2);
     }
@@ -41,7 +42,7 @@ public final class BetaRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final BetaRV newInstance(RngIfc rng){
+    public final BetaRV newInstance(RNStreamIfc rng){
         return new BetaRV(getAlpha1(), getAlpha2(), rng);
     }
 
@@ -74,4 +75,5 @@ public final class BetaRV extends AbstractRVariable {
         double v = myBeta.invCDF(myRNG.randU01());
         return v;
     }
+    
 }

@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.PearsonType5RV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -45,7 +45,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * scale = 1.0
      */
     public PearsonType5() {
-        this(1.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates a PearsonType5 distribution
@@ -55,7 +55,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * @param parameters
      */
     public PearsonType5(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates a PearsonType5 distribution
@@ -65,7 +65,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * @param parameters
      * @param rng
      */
-    public PearsonType5(double[] parameters, RngIfc rng) {
+    public PearsonType5(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -75,7 +75,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * @param scale must be &gt; 0
      */
     public PearsonType5(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates a PearsonType5 distribution
@@ -84,7 +84,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * @param scale must be &gt; 0
      * @param rng
      */
-    public PearsonType5(double shape, double scale, RngIfc rng) {
+    public PearsonType5(double shape, double scale, RNStreamIfc rng) {
         super(rng);
         setParameters(shape, scale);
     }
@@ -105,7 +105,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * @return
      */
     @Override
-    public final PearsonType5 newInstance(RngIfc rng) {
+    public final PearsonType5 newInstance(RNStreamIfc rng) {
         return (new PearsonType5(getParameters(), rng));
     }
 
@@ -116,7 +116,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      */
     @Override
     public final PearsonType5 newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -244,7 +244,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new PearsonType5RV(myShape, myScale, rng);
     }
 }

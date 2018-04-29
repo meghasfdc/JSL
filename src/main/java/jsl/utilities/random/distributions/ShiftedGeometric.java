@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.ShiftedGeometricRV;
@@ -46,7 +46,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      *
      */
     public ShiftedGeometric() {
-        this(0.5, RNStreamFactory.getDefault().getStream());
+        this(0.5, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -56,7 +56,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      * @param parameters
      */
     public ShiftedGeometric(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -66,7 +66,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      * @param parameters
      * @param rng
      */
-    public ShiftedGeometric(double[] parameters, RngIfc rng) {
+    public ShiftedGeometric(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], rng);
     }
 
@@ -75,7 +75,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      * @param prob the probability of success
      */
     public ShiftedGeometric(double prob) {
-        this(prob, RNStreamFactory.getDefault().getStream());
+        this(prob, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a ShiftedGeometric using the supplied success probability
@@ -84,7 +84,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      * @param prob
      * @param rng
      */
-    public ShiftedGeometric(double prob, RngIfc rng) {
+    public ShiftedGeometric(double prob, RNStreamIfc rng) {
         super(rng);
         setProbabilityOfSuccess(prob);
     }
@@ -105,7 +105,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      * @return
      */
     @Override
-    public final ShiftedGeometric newInstance(RngIfc rng) {
+    public final ShiftedGeometric newInstance(RNStreamIfc rng) {
         return (new ShiftedGeometric(getParameters(), rng));
     }
 
@@ -116,7 +116,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
      */
     @Override
     public final ShiftedGeometric newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -235,7 +235,7 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new ShiftedGeometricRV(myProbSuccess, rng);
     }
 }

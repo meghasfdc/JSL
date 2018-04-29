@@ -18,7 +18,7 @@ package jsl.utilities.random.distributions;
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
 
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -63,7 +63,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
     /** Constructs a normal distribution with mean 0.0 and variance 1.0
      */
     public Normal() {
-        this(0.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a normal distribution with
@@ -71,7 +71,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the mean and variance
      */
     public Normal(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a normal distribution with
@@ -79,7 +79,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the mean and variance
      * @param rng
      */
-    public Normal(double[] parameters, RngIfc rng) {
+    public Normal(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -89,7 +89,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param variance must be &gt; 0
      */
     public Normal(double mean, double variance) {
-        this(mean, variance, RNStreamFactory.getDefault().getStream());
+        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a normal distribution with mean and variance.
@@ -98,7 +98,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param variance must be &gt; 0
      * @param rng A RngIfc
      */
-    public Normal(double mean, double variance, RngIfc rng) {
+    public Normal(double mean, double variance, RNStreamIfc rng) {
         super(rng);
         setMean(mean);
         setVariance(variance);
@@ -120,7 +120,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @return
      */
     @Override
-    public final Normal newInstance(RngIfc rng) {
+    public final Normal newInstance(RNStreamIfc rng) {
         return (new Normal(getParameters(), rng));
     }
 
@@ -131,7 +131,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      */
     @Override
     public final Normal newAntitheticInstance() {
-        RngIfc ac = myRNG.newAntitheticInstance();
+        RNStreamIfc ac = myRNG.newAntitheticInstance();
         return newInstance(ac);
     }
 
@@ -411,7 +411,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new NormalRV(getMean(), getVariance(), rng);
     }
 }

@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.WeibullRV;
@@ -35,7 +35,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
     /** Creates new weibull with shape 1.0, scale 1.0
      */
     public Weibull() {
-        this(1.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a weibull distribution with
@@ -43,7 +43,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the shape and scale
      */
     public Weibull(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a weibull distribution with
@@ -51,7 +51,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the shape and scale
      * @param rng
      */
-    public Weibull(double[] parameters, RngIfc rng) {
+    public Weibull(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -61,7 +61,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @param scale The scale parameter of the distribution
      */
     public Weibull(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a weibull distribution with supplied shape and scale
@@ -70,7 +70,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @param scale The scale parameter of the distribution
      * @param rng A RngIfc
      */
-    public Weibull(double shape, double scale, RngIfc rng) {
+    public Weibull(double shape, double scale, RNStreamIfc rng) {
         super(rng);
         setParameters(shape, scale);
     }
@@ -91,7 +91,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @return
      */
     @Override
-    public final Weibull newInstance(RngIfc rng) {
+    public final Weibull newInstance(RNStreamIfc rng) {
         return (new Weibull(getParameters(), rng));
     }
 
@@ -102,7 +102,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      */
     @Override
     public final Weibull newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -286,7 +286,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new WeibullRV(myShape, myScale, rng);
     }
 }

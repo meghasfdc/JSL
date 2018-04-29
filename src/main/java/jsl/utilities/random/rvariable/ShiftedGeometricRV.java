@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Shifted Geometric(probability of success) random variable, range 1, 2, 3, ..
@@ -27,10 +27,10 @@ public final class ShiftedGeometricRV extends AbstractRVariable {
     private final double myProbSuccess;
 
     public ShiftedGeometricRV(double prob){
-        this(prob, RNStreamFactory.getDefault().getStream());
+        this(prob, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public ShiftedGeometricRV(double prob, RngIfc rng){
+    public ShiftedGeometricRV(double prob, RNStreamIfc rng){
         super(rng);
         if ((prob < 0.0) || (prob > 1.0)) {
             throw new IllegalArgumentException("Probability must be [0,1]");
@@ -43,7 +43,7 @@ public final class ShiftedGeometricRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final ShiftedGeometricRV newInstance(RngIfc rng){
+    public final ShiftedGeometricRV newInstance(RNStreamIfc rng){
         return new ShiftedGeometricRV(this.myProbSuccess, rng);
     }
 

@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.PoissonRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -49,7 +49,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
     /** Constructs a Poisson with mean rate parameter 1.0
      */
     public Poisson() {
-        this(1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Poisson using the supplied parameter
@@ -57,7 +57,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
      * @param parameters A array that holds the parameters, parameters[0] should be the mean rate
      */
     public Poisson(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Poisson using the supplied parameter
@@ -65,7 +65,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
      * @param parameters A array that holds the parameters, parameters[0] should be the mean rate
      * @param rng
      */
-    public Poisson(double[] parameters, RngIfc rng) {
+    public Poisson(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], rng);
     }
 
@@ -85,7 +85,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
      * @return
      */
     @Override
-    public final Poisson newInstance(RngIfc rng) {
+    public final Poisson newInstance(RNStreamIfc rng) {
         return (new Poisson(getParameters(), rng));
     }
 
@@ -96,7 +96,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
      */
     @Override
     public final Poisson newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -105,7 +105,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
      * @param mean the mean rate
      */
     public Poisson(double mean) {
-        this(mean, RNStreamFactory.getDefault().getStream());
+        this(mean, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Poisson using the supplied parameter
@@ -113,7 +113,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
      * @param mean the mean rate
      * @param rng A RngIfc
      */
-    public Poisson(double mean, RngIfc rng) {
+    public Poisson(double mean, RNStreamIfc rng) {
         super(rng);
         setMean(mean);
     }
@@ -662,7 +662,7 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new PoissonRV(getMean(), rng);
     }
 }

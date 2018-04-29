@@ -18,7 +18,7 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * Represents the basic interface that all probability distributions must implement.
@@ -30,7 +30,7 @@ public interface DistributionIfc extends RandomIfc, DistributionFunctionIfc {
 	 * 
 	 * @return
 	 */
-	public RngIfc getRandomNumberGenerator();
+	public RNStreamIfc getRandomNumberGenerator();
 
 }
 

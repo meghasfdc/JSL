@@ -25,6 +25,7 @@ package ex.randomnumbers;
 import jsl.utilities.random.distributions.DEmpiricalCDF;
 import jsl.utilities.random.distributions.DEmpiricalPMF;
 import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *
@@ -39,11 +40,11 @@ public class DiscreteEmpiricalExamples {
         // make a factory for creating streams
         RNStreamFactory f1 = new RNStreamFactory();
         // get the first stream from the factory
-        RNStreamFactory.RNStream f1s1 = f1.getStream();
+        RNStreamIfc f1s1 = f1.getStream();
         // make another factory, the factories are identical
         RNStreamFactory f2 = new RNStreamFactory();
         // thus the first streams returned are identical
-        RNStreamFactory.RNStream f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.getStream();
         
         DEmpiricalPMF n1 = new DEmpiricalPMF(f1s1);
         n1.addProbabilityPoint(1.0, 1.0/6.0);

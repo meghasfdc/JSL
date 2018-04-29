@@ -16,12 +16,11 @@
 package jsl.utilities.random.distributions;
 
 import java.util.*;
-import jsl.utilities.math.JSLMath;
+
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
-import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
@@ -54,7 +53,7 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * @param pairs An array holding the value cumulative probability
      */
     public DEmpiricalCDF(double[] pairs) {
-        this(pairs, RNStreamFactory.getDefault().getStream());
+        this(pairs, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -68,7 +67,7 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * @param pairs An array holding the value, cumulative probability pairs.
      * @param rng
      */
-    public DEmpiricalCDF(double[] pairs, RngIfc rng) {
+    public DEmpiricalCDF(double[] pairs, RNStreamIfc rng) {
         super(rng);
         myProbabilityPoints = new LinkedList<ProbPoint>();
         setParameters(pairs);
@@ -143,7 +142,7 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * @return
      */
     @Override
-    public final DEmpiricalCDF newInstance(RngIfc rng) {
+    public final DEmpiricalCDF newInstance(RNStreamIfc rng) {
         return (new DEmpiricalCDF(getParameters(), rng));
     }
 
@@ -155,7 +154,7 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      */
     @Override
     public final DEmpiricalCDF newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -386,7 +385,7 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         double[] values = new double[myProbabilityPoints.size()];
         double[] cdf = new double[myProbabilityPoints.size()];
         int i= 0;

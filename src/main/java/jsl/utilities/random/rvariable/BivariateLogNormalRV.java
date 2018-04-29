@@ -15,9 +15,8 @@
  */
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Allows for the generation of bivariate normal
  *  random variables
@@ -42,13 +41,13 @@ public class BivariateLogNormalRV extends AbstractMVRVariable{
      *
      */
     public BivariateLogNormalRV() {
-        this(1.0, 1.0, 1.0, 1.0, 0.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, 1.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a standard bivariate normal with no correlation
      *
      */
-    public BivariateLogNormalRV(RngIfc rng) {
+    public BivariateLogNormalRV(RNStreamIfc rng) {
         this(1.0, 1.0, 1.0, 1.0, 0.0, rng);
     }
 
@@ -61,7 +60,7 @@ public class BivariateLogNormalRV extends AbstractMVRVariable{
      * @param rho
      */
     public BivariateLogNormalRV(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefault().getStream());
+        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a bivariate normal with the provided parameters
@@ -73,7 +72,7 @@ public class BivariateLogNormalRV extends AbstractMVRVariable{
      * @param r
      * @param rng
      */
-    public BivariateLogNormalRV(double m1, double v1, double m2, double v2, double r, RngIfc rng) {
+    public BivariateLogNormalRV(double m1, double v1, double m2, double v2, double r, RNStreamIfc rng) {
         super(rng);
 
         if (m1 <= 0) {
@@ -178,7 +177,7 @@ public class BivariateLogNormalRV extends AbstractMVRVariable{
     }
 
     @Override
-    public MVRVariableIfc newInstance(RngIfc rng) {
+    public MVRVariableIfc newInstance(RNStreamIfc rng) {
         return new BivariateLogNormalRV(myMu1, myVar1, myMu2, myVar2, myRho, rng);
     }
 }

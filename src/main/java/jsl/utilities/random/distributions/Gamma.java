@@ -19,7 +19,7 @@ import jsl.modeling.JSLTooManyIterationsException;
 import jsl.utilities.Interval;
 import jsl.utilities.math.*;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GammaRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -62,7 +62,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
     /** Creates new Gamma with shape 1.0, scale 1.0
      */
     public Gamma() {
-        this(1.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a gamma distribution with
@@ -70,7 +70,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the shape and scale
      */
     public Gamma(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a gamma distribution with
@@ -78,7 +78,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the shape and scale
      * @param rng
      */
-    public Gamma(double[] parameters, RngIfc rng) {
+    public Gamma(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], rng);
     }
 
@@ -88,7 +88,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @param scale The scale parameter of the distribution
      */
     public Gamma(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a gamma distribution with supplied shape and scale
@@ -97,7 +97,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @param scale The scale parameter of the distribution
      * @param rng a RngIfc
      */
-    public Gamma(double shape, double scale, RngIfc rng) {
+    public Gamma(double shape, double scale, RNStreamIfc rng) {
         super(rng);
         setNorm(scale, shape);
         setShape(shape);
@@ -120,7 +120,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @return
      */
     @Override
-    public final Gamma newInstance(RngIfc rng) {
+    public final Gamma newInstance(RNStreamIfc rng) {
         return (new Gamma(getParameters(), rng));
     }
 
@@ -131,7 +131,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      */
     @Override
     public final Gamma newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -932,7 +932,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new GammaRV(myShape, myScale, rng);
     }
 

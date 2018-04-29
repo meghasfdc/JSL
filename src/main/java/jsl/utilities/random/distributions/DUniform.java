@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamFactory;
 
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.DUniformRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -38,7 +38,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
     /** Constructs a discrete uniform over the range {0,1}
      */
     public DUniform() {
-        this(0, 1, RNStreamFactory.getDefault().getStream());
+        this(0, 1, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a discrete uniform where parameter[0] is the
@@ -48,7 +48,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      */
     public DUniform(double[] parameters) {
         this((int) parameters[0], (int) parameters[1],
-                RNStreamFactory.getDefault().getStream());
+                RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a discrete uniform where parameter[0] is the
@@ -57,7 +57,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      * @param parameters A array containing the lower limit and upper limit
      * @param rng
      */
-    public DUniform(double[] parameters, RngIfc rng) {
+    public DUniform(double[] parameters, RNStreamIfc rng) {
         this((int) parameters[0], (int) parameters[1], rng);
     }
 
@@ -67,7 +67,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      * @param maximum The upper limit of the range
      */
     public DUniform(int minimum, int maximum) {
-        this(minimum, maximum, RNStreamFactory.getDefault().getStream());
+        this(minimum, maximum, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a discrete uniform over the supplied range
@@ -76,7 +76,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      * @param maximum The upper limit of the range
      * @param rng
      */
-    public DUniform(int minimum, int maximum, RngIfc rng) {
+    public DUniform(int minimum, int maximum, RNStreamIfc rng) {
         super(rng);
         setRange(minimum, maximum);
     }
@@ -97,7 +97,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      * @return
      */
     @Override
-    public final DUniform newInstance(RngIfc rng) {
+    public final DUniform newInstance(RNStreamIfc rng) {
         return (new DUniform(getParameters(), rng));
     }
 
@@ -108,7 +108,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      */
     @Override
     public final DUniform newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -235,7 +235,7 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new DUniformRV(myMinimum, myMaximum, rng);
     }
 }

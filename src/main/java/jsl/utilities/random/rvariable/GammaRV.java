@@ -18,7 +18,7 @@ package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.distributions.Gamma;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Gamma(shape, scale) random variable
@@ -28,10 +28,10 @@ public final class GammaRV extends AbstractRVariable {
     private final Gamma myGamma;
 
     public GammaRV(double shape, double scale){
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public GammaRV(double shape, double scale, RngIfc rng){
+    public GammaRV(double shape, double scale, RNStreamIfc rng){
         super(rng);
         myGamma = new Gamma(shape, scale);
     }
@@ -41,7 +41,7 @@ public final class GammaRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final GammaRV newInstance(RngIfc rng){
+    public final GammaRV newInstance(RNStreamIfc rng){
         return new GammaRV(this.getShape(), this.getScale(), rng);
     }
 

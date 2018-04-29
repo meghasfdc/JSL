@@ -16,8 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RngIfc;
-
 public interface NewAntitheticInstanceIfc {
 
     /**

@@ -19,7 +19,7 @@ package jsl.utilities.random.sp;
 import jsl.utilities.random.AbstractRandom;
 import jsl.utilities.random.distributions.Bernoulli;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.Statistic;
 
 /** Represents a two state Markov chain
@@ -57,10 +57,10 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
     }
 
     public TwoStateMarkovChain(int initialState, double p11, double p01) {
-        this(initialState, p11, p01, RNStreamFactory.getDefault().getStream());
+        this(initialState, p11, p01, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public TwoStateMarkovChain(int initialState, double p11, double p01, RngIfc rng) {
+    public TwoStateMarkovChain(int initialState, double p11, double p01, RNStreamIfc rng) {
         setInitialState(initialState);
         setProbabilities(p11, p01, rng);
         reset();
@@ -89,10 +89,10 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
     }
 
     public void setProbabilities(double p11, double p01) {
-        setProbabilities(p11, p01, RNStreamFactory.getDefault().getStream());
+        setProbabilities(p11, p01, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public void setProbabilities(double p11, double p01, RngIfc rng) {
+    public void setProbabilities(double p11, double p01, RNStreamIfc rng) {
         if ((p11 < 0.0) || (p11 > 1.0)) {
             throw new IllegalArgumentException("P11 must be [0,1]");
         }
@@ -218,7 +218,7 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
      * @return
      */
     @Override
-    public TwoStateMarkovChain newInstance(RngIfc rng) {
+    public TwoStateMarkovChain newInstance(RNStreamIfc rng) {
         return (new TwoStateMarkovChain(getInitialState(), getP11(), getP01(), rng));
     }
 

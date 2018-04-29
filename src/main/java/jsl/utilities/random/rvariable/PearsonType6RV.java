@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Pearson Type 6(alpha1, alpha2, beta) random variable
@@ -29,10 +29,10 @@ public final class PearsonType6RV extends AbstractRVariable {
     private final double myBeta;
 
     public PearsonType6RV(double alpha1, double alpha2, double beta){
-        this(alpha1, alpha2, beta, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, beta, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public PearsonType6RV(double alpha1, double alpha2, double beta, RngIfc rng){
+    public PearsonType6RV(double alpha1, double alpha2, double beta, RNStreamIfc rng){
         super(rng);
         if (alpha1 <= 0.0) {
             throw new IllegalArgumentException("The 1st shape parameter must be > 0.0");
@@ -53,7 +53,7 @@ public final class PearsonType6RV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final PearsonType6RV newInstance(RngIfc rng){
+    public final PearsonType6RV newInstance(RNStreamIfc rng){
         return new PearsonType6RV(getAlpha1(), getAlpha2(), myBeta, rng);
     }
 

@@ -18,7 +18,7 @@ package jsl.utilities.random.rvariable;
 
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc {
 
@@ -27,9 +27,9 @@ abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc
     /**
      * myRNG provides a reference to the underlying stream of random numbers
      */
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
-    public AbstractMVRVariable(RngIfc rng) {
+    public AbstractMVRVariable(RNStreamIfc rng) {
         myIdentity = new Identity();
         setRandomNumberGenerator(rng);
     }
@@ -55,7 +55,7 @@ abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc
      *
      * @return the underlying random number source
      */
-    public final RngIfc getRandomNumberGenerator() {
+    public final RNStreamIfc getRandomNumberGenerator() {
         return (myRNG);
     }
 
@@ -64,7 +64,7 @@ abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc
      *
      * @param rng the reference to the random number generator, must not be null
      */
-    public final void setRandomNumberGenerator(RngIfc rng) {
+    public final void setRandomNumberGenerator(RNStreamIfc rng) {
         if (rng == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }

@@ -18,7 +18,7 @@ package jsl.utilities.random.rvariable;
 
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import java.util.Objects;
 
 /**
@@ -34,7 +34,7 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
     /**
      * myRNG provides a reference to the underlying stream of random numbers
      */
-    protected final RngIfc myRNG;
+    protected final RNStreamIfc myRNG;
 
     /**
      *
@@ -42,7 +42,7 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
      * @throws NullPointerException if rng is null
      *
      */
-    public AbstractRVariable(RngIfc rng) {
+    public AbstractRVariable(RNStreamIfc rng) {
         myIdentity = new Identity();
         myRNG = Objects.requireNonNull(rng,"RngIfc rng must be non-null" );
         myPrevValue = Double.NaN;

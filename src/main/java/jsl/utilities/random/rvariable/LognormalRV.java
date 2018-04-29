@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Lognormal(mean, variance). The mean and variance are for the lognormal random variables
@@ -29,10 +29,10 @@ public final class LognormalRV extends AbstractRVariable {
     private final double myVar;
 
     public LognormalRV(double mean, double variance){
-        this(mean, variance, RNStreamFactory.getDefault().getStream());
+        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public LognormalRV(double mean, double variance, RngIfc rng){
+    public LognormalRV(double mean, double variance, RNStreamIfc rng){
         super(rng);
         if (mean <= 0) {
             throw new IllegalArgumentException("Mean must be positive");
@@ -50,7 +50,7 @@ public final class LognormalRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final LognormalRV newInstance(RngIfc rng){
+    public final LognormalRV newInstance(RNStreamIfc rng){
         return new LognormalRV(this.myMean, this.myVar, rng);
     }
 

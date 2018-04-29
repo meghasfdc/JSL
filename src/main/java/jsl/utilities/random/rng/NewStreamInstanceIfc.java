@@ -27,7 +27,7 @@ public interface NewStreamInstanceIfc {
      *
      * @return
      */
-    RngIfc newInstance();
+    RNStreamIfc newInstance();
 
     /** Returns a clone of the stream that
      *  has exactly the same state
@@ -35,5 +35,5 @@ public interface NewStreamInstanceIfc {
      * @param name
      * @return
      */
-    RngIfc newInstance(String name);
+    RNStreamIfc newInstance(String name);
 }

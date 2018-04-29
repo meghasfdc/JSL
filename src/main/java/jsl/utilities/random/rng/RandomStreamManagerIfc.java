@@ -39,7 +39,7 @@ public interface RandomStreamManagerIfc extends RandomStreamIfc{
      * @param o
      * @return
      */
-    int indexOf(RandomStreamIfc o);
+    int indexOf(RNStreamIfc o);
 
     /** Gets the stream at the supplied index
      *
@@ -53,6 +53,6 @@ public interface RandomStreamManagerIfc extends RandomStreamIfc{
      * @param o
      * @return
      */
-    boolean contains(RandomStreamIfc o);
+    boolean contains(RNStreamIfc o);
 
 }

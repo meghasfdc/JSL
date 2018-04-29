@@ -18,7 +18,7 @@ package jsl.utilities.random.distributions;
 import java.util.*;
 import jsl.utilities.math.*;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.reporting.JSL;
 
 /**
@@ -51,7 +51,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
      * provide probabilities and their values.
      */
     public DEmpiricalPMF() {
-        this(RNStreamFactory.getDefault().getStream());
+        this(RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -60,7 +60,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
      *
      * @param rng RngIfc
      */
-    public DEmpiricalPMF(RngIfc rng) {
+    public DEmpiricalPMF(RNStreamIfc rng) {
         super(rng);
         myProbabilityPoints = new LinkedList<ProbPoint>();
         myTotalProb = 0.0;
@@ -77,7 +77,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
      * @param arrayProb An array holding the value, probability pairs.
      */
     public DEmpiricalPMF(double[] arrayProb) {
-        this(RNStreamFactory.getDefault().getStream());
+        this(RNStreamFactory.getDefaultFactory().getStream());
         setParameters(arrayProb);
         checkTotalProb();
     }
@@ -93,7 +93,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
      * @param arrayProb An array holding the value, probability pairs.
      * @param rng
      */
-    public DEmpiricalPMF(double[] arrayProb, RngIfc rng) {
+    public DEmpiricalPMF(double[] arrayProb, RNStreamIfc rng) {
         this(rng);
         setParameters(arrayProb);
         checkTotalProb();
@@ -162,7 +162,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
      * @return
      */
     @Override
-    public final DEmpiricalPMF newInstance(RngIfc rng) {
+    public final DEmpiricalPMF newInstance(RNStreamIfc rng) {
         return (new DEmpiricalPMF(getParameters(), rng));
     }
 
@@ -174,7 +174,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
      */
     @Override
     public final DEmpiricalPMF newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 

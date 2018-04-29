@@ -18,8 +18,12 @@ package jsl.utilities.random.rvariable;
 
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.PreviousValueIfc;
+import jsl.utilities.controls.Controls;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.rng.*;
+
+import java.util.function.DoubleSupplier;
+import java.util.stream.DoubleStream;
 
 /**
  * An interface for defining random variables. The methods sample() and getValue() gets a new
@@ -32,7 +36,7 @@ import jsl.utilities.random.rng.*;
  * The preferred approach to creating random variables is to sub-class AbstractRVariable.
  */
 public interface RVariableIfc extends GetValueIfc, RandomStreamIfc,
-        SampleIfc, NewAntitheticInstanceIfc, PreviousValueIfc {
+        SampleIfc, NewAntitheticInstanceIfc, PreviousValueIfc, DoubleSupplier {
 
     /**
      * @return returns a sampled values
@@ -42,16 +46,33 @@ public interface RVariableIfc extends GetValueIfc, RandomStreamIfc,
     }
 
     /**
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
-    RVariableIfc newInstance(RngIfc rng);
+    RVariableIfc newInstance(RNStreamIfc rng);
 
     /**
-     * @return a new instance with same parameter value
+     * @return a new instance with same parameter value, with a different stream
      */
     default RVariableIfc newInstance() {
-        return newInstance(RNStreamFactory.getDefault().getStream());
+        return newInstance(JSLRandom.getRNStream());
     }
 
+    /** This method facilitates turning instances of RVariableIfc into Java DoubleStream
+     * for use in the Stream API
+     *
+     * @return the generated random number using sample()
+     */
+    @Override
+    default double getAsDouble() {
+        return sample();
+    }
+
+    /** Turns the doubles into a DoubleStream for the Stream API
+     *
+     * @return  a DoubleStream representation of the random variable
+     */
+    default DoubleStream asDoubleStream(){
+        return DoubleStream.generate(this);
+    }
 }

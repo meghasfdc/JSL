@@ -16,7 +16,7 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Represents a Mixed translated Poisson random variable
  * 
@@ -38,7 +38,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
     double[] parameter;
 
     public MTP() {
-        this(0.5, 0.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(0.5, 0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs an MTP with mixing probabilities 1-mixProb and mixProb with shifts of
@@ -48,7 +48,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      * @param rate
      */
     public MTP(double mixProb, double shift, double rate) {
-        this(mixProb, shift, rate, RNStreamFactory.getDefault().getStream());
+        this(mixProb, shift, rate, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs an MTP using the supplied parameters
@@ -58,7 +58,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      * @param rate
      * @param rng
      */
-    public MTP(double mixProb, double shift, double rate, RngIfc rng) {
+    public MTP(double mixProb, double shift, double rate, RNStreamIfc rng) {
         super(rng);
         myMixProb1 = mixProb;
         myMixProb2 = 1 - myMixProb1;
@@ -79,7 +79,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      */
     public MTP(double[] parameters) {
         this(parameters[0], parameters[1], parameters[2],
-                RNStreamFactory.getDefault().getStream());
+                RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs an MTP with array of parameters
@@ -91,7 +91,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      * @param parameters
      * @param rng
      */
-    public MTP(double[] parameters, RngIfc rng) {
+    public MTP(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], parameters[2], rng);
     }
 
@@ -109,7 +109,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      * @param rng
      * @return
      */
-    public final MTP newInstance(RngIfc rng) {
+    public final MTP newInstance(RNStreamIfc rng) {
         return (new MTP(getParameters(), rng));
     }
 
@@ -119,7 +119,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      * @return
      */
     public final MTP newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 

@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GeometricRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -46,7 +46,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      *
      */
     public Geometric() {
-        this(0.5, RNStreamFactory.getDefault().getStream());
+        this(0.5, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -55,7 +55,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      * @param parameters
      */
     public Geometric(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -64,7 +64,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      * @param parameters
      * @param rng
      */
-    public Geometric(double[] parameters, RngIfc rng) {
+    public Geometric(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], rng);
     }
 
@@ -72,7 +72,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      * @param prob, the probability of success
      */
     public Geometric(double prob) {
-        this(prob, RNStreamFactory.getDefault().getStream());
+        this(prob, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Geometric using the supplied success probability
@@ -81,7 +81,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      * @param prob
      * @param rng
      */
-    public Geometric(double prob, RngIfc rng) {
+    public Geometric(double prob, RNStreamIfc rng) {
         super(rng);
         setProbabilityOfSuccess(prob);
     }
@@ -102,7 +102,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      * @return
      */
     @Override
-    public final Geometric newInstance(RngIfc rng) {
+    public final Geometric newInstance(RNStreamIfc rng) {
         return (new Geometric(getParameters(), rng));
     }
 
@@ -113,7 +113,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      */
     @Override
     public final Geometric newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -280,7 +280,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new GeometricRV(myProbSuccess, rng);
     }
 }

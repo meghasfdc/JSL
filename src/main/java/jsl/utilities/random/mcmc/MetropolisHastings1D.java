@@ -22,7 +22,7 @@ import jsl.observers.ObserverIfc;
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -62,7 +62,7 @@ public class MetropolisHastings1D implements RandomStreamIfc, ObservableIfc {
     /**
      * myRNG provides a reference to the underlying stream of random numbers
      */
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
     /**
      *
@@ -84,7 +84,7 @@ public class MetropolisHastings1D implements RandomStreamIfc, ObservableIfc {
         myProposalFun = proposalFun;
         myAcceptanceStat = new Statistic("Acceptance Statistics");
         myObservedStat = new Statistic("Observed Value Statistics");
-        myRNG = RNStreamFactory.getDefault().getStream();
+        myRNG = RNStreamFactory.getDefaultFactory().getStream();
         myObservableComponent = new ObservableComponent();
     }
 
@@ -314,7 +314,7 @@ public class MetropolisHastings1D implements RandomStreamIfc, ObservableIfc {
      *
      * @param RNG the underlying random number generator for the process
      */
-    public final void setRNG(RngIfc RNG) {
+    public final void setRNG(RNStreamIfc RNG) {
         if (RNG == null){
             throw new IllegalArgumentException("The random number generator interface was null!");
         }

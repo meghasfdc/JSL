@@ -27,6 +27,7 @@ import java.util.function.Predicate;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * The Queue class provides the ability to hold entities (QObjects) within the
@@ -1246,7 +1247,7 @@ public class Queue<T extends QObject> extends ModelElement implements
         private boolean myResetStartStreamOption = true;
         private boolean myResetNextSubStreamOption = true;
         private int myNext;
-        private final RNStreamFactory.RNStream myStream = RNStreamFactory.getDefault().getStream();
+        private final RNStreamIfc myStream = RNStreamFactory.getDefaultFactory().getStream();
 
         @Override
         protected void add(T qObject) {

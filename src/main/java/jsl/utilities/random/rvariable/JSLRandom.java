@@ -16,6 +16,7 @@
 package jsl.utilities.random.rvariable;
 
 import java.util.List;
+import java.util.stream.DoubleStream;
 
 import jsl.utilities.math.JSLMath;
 
@@ -25,16 +26,16 @@ import static jsl.utilities.random.distributions.Normal.stdNormalInvCDF;
 
 import jsl.utilities.random.distributions.*;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * The purpose of this class is to facilitate random variate generation from
  * various distributions through a set of static class methods.
  * <p>
  * Each method marked rXXXX will generate random variates from the named
- * distribution. The user has the option of supplying a RngIfc as the source of
- * the randomness. Methods that do not have a RngIfc parameter use,
- * RNStreamFactory.getDefaultStream() as the source of randomness.
+ * distribution. The user has the option of supplying a RNStreamIfc as the source of
+ * the randomness. Methods that do not have a RNStreamIfc parameter use,
+ * getRNStream() as the source of randomness.
  *
  * Also provides a number of methods for sampling with and without replacement
  * from arrays and lists as well as creating permutations of arrays and lists.
@@ -48,11 +49,28 @@ public class JSLRandom {
     private JSLRandom(){}
 
     /**
+     * 
+     * @return gets a new stream of pseudo random numbers from the default random
+     * number stream factory
+     */
+    public static RNStreamIfc getRNStream(){
+        return RNStreamFactory.getDefaultFactory().getStream();
+    }
+
+    /**
+     *
+     * @return returns a new stream using the Stream API
+     */
+    public static DoubleStream getDoubleStream(){
+        return getRNStream().asDoubleStream();
+    }
+
+    /**
      * @param pSuccess the probability of success
      * @return the random value
      */
     public static double rBernoulli(double pSuccess) {
-        return rBernoulli(pSuccess, RNStreamFactory.getDefaultStream());
+        return rBernoulli(pSuccess, getRNStream());
     }
 
     /**
@@ -60,7 +78,7 @@ public class JSLRandom {
      * @param rng      the RngIfc
      * @return the random value
      */
-    public static double rBernoulli(double pSuccess, RngIfc rng) {
+    public static double rBernoulli(double pSuccess, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -81,7 +99,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rBinomial(double pSuccess, int nTrials) {
-        return rBinomial(pSuccess, nTrials, RNStreamFactory.getDefaultStream());
+        return rBinomial(pSuccess, nTrials, getRNStream());
     }
 
     /**
@@ -90,7 +108,7 @@ public class JSLRandom {
      * @param rng      the RngIfc
      * @return the random value
      */
-    public static int rBinomial(double pSuccess, int nTrials, RngIfc rng) {
+    public static int rBinomial(double pSuccess, int nTrials, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -109,7 +127,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rPoisson(double mean) {
-        return rPoisson(mean, RNStreamFactory.getDefaultStream());
+        return rPoisson(mean, getRNStream());
     }
 
     /**
@@ -117,7 +135,7 @@ public class JSLRandom {
      * @param rng the RngIfc
      * @return the random value
      */
-    public static int rPoisson(double mean, RngIfc rng) {
+    public static int rPoisson(double mean, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -132,7 +150,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rDUniform(int minimum, int maximum) {
-        return rDUniform(minimum, maximum, RNStreamFactory.getDefaultStream());
+        return rDUniform(minimum, maximum, getRNStream());
     }
 
     /**
@@ -143,7 +161,7 @@ public class JSLRandom {
      * @param rng     the RngIfc
      * @return the random value
      */
-    public static int rDUniform(int minimum, int maximum, RngIfc rng) {
+    public static int rDUniform(int minimum, int maximum, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -155,7 +173,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rGeometric(double pSuccess) {
-        return rGeometric(pSuccess, RNStreamFactory.getDefaultStream());
+        return rGeometric(pSuccess, getRNStream());
 
     }
 
@@ -164,7 +182,7 @@ public class JSLRandom {
      * @param rng      the RngIfc
      * @return the random value
      */
-    public static int rGeometric(double pSuccess, RngIfc rng) {
+    public static int rGeometric(double pSuccess, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -181,7 +199,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rNegBinomial(double pSuccess, double rSuccesses) {
-        return rNegBinomial(pSuccess, rSuccesses, RNStreamFactory.getDefaultStream());
+        return rNegBinomial(pSuccess, rSuccesses, getRNStream());
     }
 
     /**
@@ -190,7 +208,7 @@ public class JSLRandom {
      * @param rng        the RngIfc
      * @return the random value
      */
-    public static int rNegBinomial(double pSuccess, double rSuccesses, RngIfc rng) {
+    public static int rNegBinomial(double pSuccess, double rSuccesses, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -205,7 +223,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rUniform(double minimum, double maximum) {
-        return rUniform(minimum, maximum, RNStreamFactory.getDefaultStream());
+        return rUniform(minimum, maximum, getRNStream());
     }
 
     /**
@@ -216,7 +234,7 @@ public class JSLRandom {
      * @param rng     the RngIfc
      * @return the random value
      */
-    public static double rUniform(double minimum, double maximum, RngIfc rng) {
+    public static double rUniform(double minimum, double maximum, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -234,7 +252,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rNormal(double mean, double variance) {
-        return rNormal(mean, variance, RNStreamFactory.getDefaultStream());
+        return rNormal(mean, variance, getRNStream());
     }
 
     /**
@@ -243,7 +261,7 @@ public class JSLRandom {
      * @param rng      the RngIfc
      * @return the random value
      */
-    public static double rNormal(double mean, double variance, RngIfc rng) {
+    public static double rNormal(double mean, double variance, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -262,7 +280,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rLogNormal(double mean, double variance) {
-        return rLogNormal(mean, variance, RNStreamFactory.getDefaultStream());
+        return rLogNormal(mean, variance, getRNStream());
     }
 
     /**
@@ -271,7 +289,7 @@ public class JSLRandom {
      * @param rng      the RngIfc
      * @return the random value
      */
-    public static double rLogNormal(double mean, double variance, RngIfc rng) {
+    public static double rLogNormal(double mean, double variance, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -297,7 +315,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rWeibull(double shape, double scale) {
-        return rWeibull(shape, scale, RNStreamFactory.getDefaultStream());
+        return rWeibull(shape, scale, getRNStream());
     }
 
     /**
@@ -306,7 +324,7 @@ public class JSLRandom {
      * @param rng   the RngIfc
      * @return the random value
      */
-    public static double rWeibull(double shape, double scale, RngIfc rng) {
+    public static double rWeibull(double shape, double scale, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -325,7 +343,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rExponential(double mean) {
-        return rExponential(mean, RNStreamFactory.getDefaultStream());
+        return rExponential(mean, getRNStream());
     }
 
     /**
@@ -333,7 +351,7 @@ public class JSLRandom {
      * @param rng  the RngIfc
      * @return the random value
      */
-    public static double rExponential(double mean, RngIfc rng) {
+    public static double rExponential(double mean, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -353,7 +371,7 @@ public class JSLRandom {
      */
     public static double rJohnsonB(double alpha1, double alpha2,
                                          double min, double max) {
-        return rJohnsonB(alpha1, alpha2, min, max, RNStreamFactory.getDefaultStream());
+        return rJohnsonB(alpha1, alpha2, min, max, getRNStream());
     }
 
     /**
@@ -365,7 +383,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rJohnsonB(double alpha1, double alpha2,
-                                         double min, double max, RngIfc rng) {
+                                         double min, double max, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -389,7 +407,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rLogLogistic(double shape, double scale) {
-        return rLogLogistic(shape, scale, RNStreamFactory.getDefaultStream());
+        return rLogLogistic(shape, scale, getRNStream());
     }
 
     /**
@@ -398,7 +416,7 @@ public class JSLRandom {
      * @param rng   the RngIfc
      * @return the generated value
      */
-    public static double rLogLogistic(double shape, double scale, RngIfc rng) {
+    public static double rLogLogistic(double shape, double scale, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -421,7 +439,7 @@ public class JSLRandom {
      */
     public static double rTriangular(double min, double mode,
                                            double max) {
-        return rTriangular(min, mode, max, RNStreamFactory.getDefaultStream());
+        return rTriangular(min, mode, max, getRNStream());
     }
 
     /**
@@ -432,7 +450,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rTriangular(double min, double mode,
-                                           double max, RngIfc rng) {
+                                           double max, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -473,7 +491,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rGamma(double shape, double scale) {
-        return rGamma(shape, scale, RNStreamFactory.getDefaultStream());
+        return rGamma(shape, scale, getRNStream());
     }
 
     /**
@@ -482,7 +500,7 @@ public class JSLRandom {
      * @param rng   the RngIfc
      * @return the generated value
      */
-    public static double rGamma(double shape, double scale, RngIfc rng) {
+    public static double rGamma(double shape, double scale, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -528,7 +546,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rChiSquared(double dof) {
-        return rChiSquared(dof, RNStreamFactory.getDefaultStream());
+        return rChiSquared(dof, getRNStream());
     }
 
     /**
@@ -536,7 +554,7 @@ public class JSLRandom {
      * @param rng the RngIfc
      * @return the random value
      */
-    public static double rChiSquared(double dof, RngIfc rng) {
+    public static double rChiSquared(double dof, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -552,7 +570,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rPearsonType5(double shape, double scale) {
-        return rPearsonType5(shape, scale, RNStreamFactory.getDefaultStream());
+        return rPearsonType5(shape, scale, getRNStream());
     }
 
     /**
@@ -561,7 +579,7 @@ public class JSLRandom {
      * @param rng   the RngIfc
      * @return the generated value
      */
-    public static double rPearsonType5(double shape, double scale, RngIfc rng) {
+    public static double rPearsonType5(double shape, double scale, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -588,7 +606,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rBeta(double alpha1, double alpha2) {
-        return rBeta(alpha1, alpha2, RNStreamFactory.getDefaultStream());
+        return rBeta(alpha1, alpha2, getRNStream());
     }
 
     /**
@@ -599,7 +617,7 @@ public class JSLRandom {
      * @param rng    the RngIfc
      * @return the random value
      */
-    public static double rBeta(double alpha1, double alpha2, RngIfc rng) {
+    public static double rBeta(double alpha1, double alpha2, RNStreamIfc rng) {
         if (myBeta == null) {
             myBeta = new Beta(alpha1, alpha2, rng);
         }
@@ -619,7 +637,7 @@ public class JSLRandom {
      */
     public static double rBetaG(double alpha1, double alpha2,
                                       double minimum, double maximum) {
-        return rBetaG(alpha1, alpha2, minimum, maximum, RNStreamFactory.getDefaultStream());
+        return rBetaG(alpha1, alpha2, minimum, maximum, getRNStream());
     }
 
     /**
@@ -633,7 +651,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rBetaG(double alpha1, double alpha2,
-                                      double minimum, double maximum, RngIfc rng) {
+                                      double minimum, double maximum, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -655,7 +673,7 @@ public class JSLRandom {
      */
     public static double rPearsonType6(double alpha1, double alpha2,
                                              double beta) {
-        return rPearsonType6(alpha1, alpha2, beta, RNStreamFactory.getDefaultStream());
+        return rPearsonType6(alpha1, alpha2, beta, getRNStream());
     }
 
     /**
@@ -668,7 +686,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rPearsonType6(double alpha1, double alpha2,
-                                             double beta, RngIfc rng) {
+                                             double beta, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -687,7 +705,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rLaplace(double mean, double scale) {
-        return rLaplace(mean, scale, RNStreamFactory.getDefaultStream());
+        return rLaplace(mean, scale, getRNStream());
     }
 
     /**
@@ -698,7 +716,7 @@ public class JSLRandom {
      * @param rng   the RngIfc
      * @return the random value
      */
-    public static double rLaplace(double mean, double scale, RngIfc rng) {
+    public static double rLaplace(double mean, double scale, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -717,7 +735,7 @@ public class JSLRandom {
      * @return
      */
     public static int randomlySelect(int[] array) {
-        return randomlySelect(array, RNStreamFactory.getDefaultStream());
+        return randomlySelect(array, getRNStream());
     }
 
     /**
@@ -727,7 +745,7 @@ public class JSLRandom {
      * @param rng   the source of randomness
      * @return
      */
-    public static int randomlySelect(int[] array, RngIfc rng) {
+    public static int randomlySelect(int[] array, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -748,7 +766,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static double randomlySelect(double[] array) {
-        return randomlySelect(array, RNStreamFactory.getDefaultStream());
+        return randomlySelect(array, getRNStream());
     }
 
     /**
@@ -758,7 +776,7 @@ public class JSLRandom {
      * @param rng   the source of randomness
      * @return the randomly selected value
      */
-    public static double randomlySelect(double[] array, RngIfc rng) {
+    public static double randomlySelect(double[] array, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -781,7 +799,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static double randomlySelect(double[] array, double[] cdf) {
-        return randomlySelect(array, cdf, RNStreamFactory.getDefaultStream());
+        return randomlySelect(array, cdf, getRNStream());
     }
 
     /**
@@ -793,7 +811,7 @@ public class JSLRandom {
      * @param rng   the source of randomness
      * @return the randomly selected value
      */
-    public  static double randomlySelect(double[] array, double[] cdf, RngIfc rng) {
+    public  static double randomlySelect(double[] array, double[] cdf, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -834,7 +852,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static int randomlySelect(int[] array, double[] cdf) {
-        return randomlySelect(array, cdf, RNStreamFactory.getDefaultStream());
+        return randomlySelect(array, cdf, getRNStream());
     }
 
     /**
@@ -846,7 +864,7 @@ public class JSLRandom {
      * @param rng   the source of randomness
      * @return the randomly selected value
      */
-    public static int randomlySelect(int[] array, double[] cdf, RngIfc rng) {
+    public static int randomlySelect(int[] array, double[] cdf, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -888,7 +906,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static <T> T randomlySelect(List<T> list, double[] cdf) {
-        return randomlySelect(list, cdf, RNStreamFactory.getDefaultStream());
+        return randomlySelect(list, cdf, getRNStream());
     }
 
     /**
@@ -901,7 +919,7 @@ public class JSLRandom {
      * @param rng  the source of randomness
      * @return the randomly selected value
      */
-    public static <T> T randomlySelect(List<T> list, double[] cdf, RngIfc rng) {
+    public static <T> T randomlySelect(List<T> list, double[] cdf, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -967,7 +985,7 @@ public class JSLRandom {
      * @return the randomly selected element
      */
     public static <T> T randomlySelect(List<T> list) {
-        return randomlySelect(list, RNStreamFactory.getDefaultStream());
+        return randomlySelect(list, getRNStream());
     }
 
     /**
@@ -978,7 +996,7 @@ public class JSLRandom {
      * @param rng  the source of randomness
      * @return the randomly selected element
      */
-    public static <T> T randomlySelect(List<T> list, RngIfc rng) {
+    public static <T> T randomlySelect(List<T> list, RNStreamIfc rng) {
         if (list == null) {
             throw new IllegalArgumentException("The supplied list was null");
         }
@@ -1004,7 +1022,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static void permutation(double[] x) {
-        permutation(x, RNStreamFactory.getDefaultStream());
+        permutation(x, getRNStream());
     }
 
     /**
@@ -1014,7 +1032,7 @@ public class JSLRandom {
      * @param x the array
      * @param rng the source of randomness
      */
-    public static void permutation(double[] x, RngIfc rng) {
+    public static void permutation(double[] x, RNStreamIfc rng) {
         sampleWithoutReplacement(x, x.length, rng);
     }
 
@@ -1027,7 +1045,7 @@ public class JSLRandom {
      * @param sampleSize the size of the generate
      */
     public static void sampleWithoutReplacement(double[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, RNStreamFactory.getDefaultStream());
+        sampleWithoutReplacement(x, sampleSize, getRNStream());
     }
 
     /**
@@ -1038,7 +1056,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      * @param rng the source of randomness
      */
-    public static void sampleWithoutReplacement(double[] x, int sampleSize, RngIfc rng) {
+    public static void sampleWithoutReplacement(double[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -1064,7 +1082,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static void permutation(int[] x) {
-        permutation(x, RNStreamFactory.getDefaultStream());
+        permutation(x, getRNStream());
     }
 
     /**
@@ -1074,7 +1092,7 @@ public class JSLRandom {
      * @param x the array
      * @param rng the source of randomness
      */
-    public static void permutation(int[] x, RngIfc rng) {
+    public static void permutation(int[] x, RNStreamIfc rng) {
         sampleWithoutReplacement(x, x.length, rng);
     }
 
@@ -1087,7 +1105,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      */
     public static void sampleWithoutReplacement(int[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, RNStreamFactory.getDefaultStream());
+        sampleWithoutReplacement(x, sampleSize, getRNStream());
     }
 
     /**
@@ -1098,7 +1116,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      * @param rng the source of randomness
      */
-    public static void sampleWithoutReplacement(int[] x, int sampleSize, RngIfc rng) {
+    public static void sampleWithoutReplacement(int[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -1124,7 +1142,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static void permutation(boolean[] x) {
-        permutation(x, RNStreamFactory.getDefaultStream());
+        permutation(x, getRNStream());
     }
 
     /**
@@ -1134,7 +1152,7 @@ public class JSLRandom {
      * @param x the array
      * @param rng the source of randomness
      */
-    public static void permutation(boolean[] x, RngIfc rng) {
+    public static void permutation(boolean[] x, RNStreamIfc rng) {
         sampleWithoutReplacement(x, x.length, rng);
     }
 
@@ -1147,7 +1165,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      */
     public static void sampleWithoutReplacement(boolean[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, RNStreamFactory.getDefaultStream());
+        sampleWithoutReplacement(x, sampleSize, getRNStream());
     }
 
     /**
@@ -1158,7 +1176,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      * @param rng the source of randomness
      */
-    public static void sampleWithoutReplacement(boolean[] x, int sampleSize, RngIfc rng) {
+    public static void sampleWithoutReplacement(boolean[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -1184,7 +1202,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static <T> void permutation(T[] x) {
-        permutation(x, RNStreamFactory.getDefaultStream());
+        permutation(x, getRNStream());
     }
 
     /**
@@ -1194,7 +1212,7 @@ public class JSLRandom {
      * @param x the array
      * @param rng the source of randomness
      */
-    public static <T> void permutation(T[] x, RngIfc rng) {
+    public static <T> void permutation(T[] x, RNStreamIfc rng) {
         sampleWithoutReplacement(x, x.length, rng);
     }
 
@@ -1207,7 +1225,7 @@ public class JSLRandom {
      * @param sampleSize the source of randomness
      */
     public static <T> void sampleWithoutReplacement(T[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, RNStreamFactory.getDefaultStream());
+        sampleWithoutReplacement(x, sampleSize, getRNStream());
     }
 
     /**
@@ -1218,7 +1236,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      * @param rng the source of randomness
      */
-    public static <T> void sampleWithoutReplacement(T[] x, int sampleSize, RngIfc rng) {
+    public static <T> void sampleWithoutReplacement(T[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -1245,7 +1263,7 @@ public class JSLRandom {
      * @param x the list
      */
     public static <T> void permutation(List<T> x) {
-        permutation(x, RNStreamFactory.getDefaultStream());
+        permutation(x, getRNStream());
     }
 
     /**
@@ -1256,7 +1274,7 @@ public class JSLRandom {
      * @param x the list
      * @param rng the source of randomness
      */
-    public static <T> void permutation(List<T> x, RngIfc rng) {
+    public static <T> void permutation(List<T> x, RNStreamIfc rng) {
         sampleWithoutReplacement(x, x.size(), rng);
     }
 
@@ -1270,7 +1288,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      */
     public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, RNStreamFactory.getDefaultStream());
+        sampleWithoutReplacement(x, sampleSize, getRNStream());
     }
 
     /**
@@ -1282,7 +1300,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      * @param rng the source of randomness
      */
-    public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize, RngIfc rng) {
+    public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }

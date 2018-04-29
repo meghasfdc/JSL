@@ -24,7 +24,7 @@ import java.util.Map;
 
 import jsl.utilities.random.distributions.DEmpiricalPMF;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 public class DEmpiricalList<T> implements RElementIfc<T> {
 
@@ -33,16 +33,16 @@ public class DEmpiricalList<T> implements RElementIfc<T> {
     protected DEmpiricalPMF myPDF;
 
     public DEmpiricalList() {
-        this(RNStreamFactory.getDefault().getStream());
+        this(RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public DEmpiricalList(RngIfc rng) {
+    public DEmpiricalList(RNStreamIfc rng) {
         super();
         myElements = new ArrayList<T>();
         myPDF = new DEmpiricalPMF(rng);
     }
 
-    public DEmpiricalList(List<T> elements, double[] prob, RngIfc rng) {
+    public DEmpiricalList(List<T> elements, double[] prob, RNStreamIfc rng) {
         this(rng);
         if (elements == null) {
             throw new IllegalArgumentException("The list of elements was null");

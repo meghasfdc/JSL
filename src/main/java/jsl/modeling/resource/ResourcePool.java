@@ -28,7 +28,7 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.observers.ModelElementObserver;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * A ResourcePool represents a list of ResourceUnits from which
@@ -61,7 +61,7 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     protected TimeWeighted myNumFailed;
     protected TimeWeighted myNumInactive;
     private final boolean myPoolStatOption;
-    private RngIfc myRNG;
+    private RNStreamIfc myRNG;
     protected boolean myResetStartStreamOption;
     protected boolean myResetNextSubStreamOption;
 
@@ -454,9 +454,9 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
      *
      * @return the underlying source of randomness for this model element
      */
-    public RngIfc getRandomness() {
+    public RNStreamIfc getRandomness() {
         if (myRNG == null) {
-            myRNG = RNStreamFactory.getDefault().getStream();
+            myRNG = RNStreamFactory.getDefaultFactory().getStream();
         }
         return myRNG;
     }

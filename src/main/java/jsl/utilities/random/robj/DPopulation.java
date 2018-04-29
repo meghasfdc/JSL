@@ -15,14 +15,12 @@
  */
 package jsl.utilities.random.robj;
 
-import java.util.HashMap;
-
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 
 /** A DPopulation is a population of doubles that can be sampled from and permuted.
@@ -43,7 +41,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      */
     protected String myName;
 
-    private RngIfc myRNG;
+    private RNStreamIfc myRNG;
 
     private double[] myElements;
 
@@ -52,14 +50,14 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      * @param elements
      */
     public DPopulation(double[] elements) {
-        this(elements, RNStreamFactory.getDefault().getStream(), null);
+        this(elements, RNStreamFactory.getDefaultFactory().getStream(), null);
     }
 
     /**
      * @param elements
      * @param rng
      */
-    public DPopulation(double[] elements, RngIfc rng) {
+    public DPopulation(double[] elements, RNStreamIfc rng) {
         this(elements, rng, null);
     }
 
@@ -68,7 +66,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      * @param rng
      * @param name
      */
-    public DPopulation(double[] elements, RngIfc rng, String name) {
+    public DPopulation(double[] elements, RNStreamIfc rng, String name) {
         setId();
         setName(name);
         setRandomNumberGenerator(rng);
@@ -124,7 +122,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      * @return
      */
     @Override
-    public final DPopulation newInstance(RngIfc rng) {
+    public final DPopulation newInstance(RNStreamIfc rng) {
         return (new DPopulation(getParameters(), rng));
     }
 
@@ -279,7 +277,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      *
      * @return
      */
-    public final RngIfc getRandomNumberGenerator() {
+    public final RNStreamIfc getRandomNumberGenerator() {
         return (myRNG);
     }
 
@@ -287,7 +285,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      * Throws a NullPointerException if rng is null
      * @param rng the reference to the random number generator
      */
-    public final void setRandomNumberGenerator(RngIfc rng) {
+    public final void setRandomNumberGenerator(RNStreamIfc rng) {
         if (rng == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }

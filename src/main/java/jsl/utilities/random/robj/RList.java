@@ -23,17 +23,17 @@ import java.util.List;
 import java.util.ListIterator;
 import jsl.utilities.random.rng.RNStreamFactory;
 
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 abstract public class RList<T> implements RListIfc<T> {
 
     protected List<T> myElements;
 
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
     public RList() {
         myElements = new ArrayList<T>();
-        myRNG = RNStreamFactory.getDefault().getStream();
+        myRNG = RNStreamFactory.getDefaultFactory().getStream();
     }
 
     /** The object cannot be null, but it can be added more than once

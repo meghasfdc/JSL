@@ -17,19 +17,21 @@
 
 package jsl.utilities.random.rng;
 
-
-/** Represents a random number generator with streams
+/**
+ * Represents a random number generator with streams
  *
  * @author rossetti
  */
-public interface RngIfc extends RandU01Ifc, RandomStreamIfc,
+public interface RNStreamIfc extends RandU01Ifc, RandomStreamIfc,
         NewStreamInstanceIfc, GetAntitheticStreamIfc {
 
-   /** Returns a (pseudo)random number from the discrete uniform distribution
-    * over the integers {i, i + 1, . . . , j }, using this stream. Calls randU01 once.
-    * @param i start of range
-    * @param j end of range
-    * @return The integer pseudo random number
-    */   
-   public int randInt(int i, int j);
+    /**
+     * Returns a (pseudo)random number from the discrete uniform distribution
+     * over the integers {i, i + 1, . . . , j }, using this stream. Calls randU01 once.
+     *
+     * @param i start of range
+     * @param j end of range
+     * @return The integer pseudo random number
+     */
+    int randInt(int i, int j);
 }

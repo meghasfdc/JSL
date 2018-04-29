@@ -19,10 +19,9 @@ package jsl.utilities.random.mcmc;
 import jsl.observers.ObservableComponent;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
-import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.Statistic;
 
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class MetropolisHastingsMV implements RandomStreamIfc, ObservableIfc {
     /**
      * myRNG provides a reference to the underlying stream of random numbers
      */
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
     /**
      *
@@ -95,7 +94,7 @@ public class MetropolisHastingsMV implements RandomStreamIfc, ObservableIfc {
         for(int i=0;i<myInitialX.length;i++){
             myObservedStatList.add(new Statistic("X:" + (i+1)));
         }
-        myRNG = RNStreamFactory.getDefault().getStream();
+        myRNG = RNStreamFactory.getDefaultFactory().getStream();
         myObservableComponent = new ObservableComponent();
     }
 
@@ -332,7 +331,7 @@ public class MetropolisHastingsMV implements RandomStreamIfc, ObservableIfc {
      *
      * @param RNG the underlying random number generator for the process
      */
-    public final void setRNG(RngIfc RNG) {
+    public final void setRNG(RNStreamIfc RNG) {
         if (RNG == null){
             throw new IllegalArgumentException("The random number generator interface was null!");
         }

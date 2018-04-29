@@ -23,6 +23,7 @@ package ex.randomnumbers;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamFactory.RNStream;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticXY;
 
@@ -44,15 +45,15 @@ public class UseRNG {
         RNStreamFactory f1 = new RNStreamFactory();
 
         // get the first stream from the factory
-        RNStream f1s1 = f1.getStream();
-        
-        RNStream f1s2 = f1.getStream();
+        RNStreamIfc f1s1 = f1.getStream();
+
+        RNStreamIfc f1s2 = f1.getStream();
 
         // make another factory, the factories are identical
         RNStreamFactory f2 = new RNStreamFactory();
 
         // thus the first streams returned are identical
-        RNStream f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.getStream();
 
         for (int i = 0; i < 10; i++) {
             System.out.println("f1s1 = " + f1s1.randU01() + " f2s1 = " + f2s1.randU01());
@@ -87,13 +88,13 @@ public class UseRNG {
         RNStreamFactory f1 = new RNStreamFactory();
 
         // get the first stream from the factory
-        RNStream f1s1 = f1.getStream();
+        RNStreamIfc f1s1 = f1.getStream();
 
         // make another factory, the factories are identical
         RNStreamFactory f2 = new RNStreamFactory();
 
         // thus the first streams returned are identical
-        RNStream f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.getStream();
         
         // now tell the stream to produce antithetic random numbers
         // f2s1 and f1s1 are now antithetic to each other
@@ -126,14 +127,14 @@ public class UseRNG {
     public static void test1() {
         // TODO code application logic here
         System.out.println("My first Java print satement");
-        RNStream defaultStream = RNStreamFactory.getDefaultStream();
+        RNStreamIfc defaultStream = RNStreamFactory.getDefaultStream();
 
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + defaultStream.randU01());
         }
 
         RNStreamFactory f = new RNStreamFactory();
-        RNStream s1 = f.getStream();
+        RNStreamIfc s1 = f.getStream();
         System.out.println("Stream 1");
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + s1.randU01());
@@ -150,7 +151,7 @@ public class UseRNG {
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + s1.randU01());
         }
-        RNStream s2 = f.getStream();
+        RNStreamIfc s2 = f.getStream();
         System.out.println("Sream 2");
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + s2.randU01());

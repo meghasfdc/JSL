@@ -22,8 +22,8 @@ package jsl.utilities.random.rng;
  */
 public interface GetAntitheticStreamIfc {
 
-    RngIfc newAntitheticInstance(String name);
+    RNStreamIfc newAntitheticInstance(String name);
 
-    RngIfc newAntitheticInstance();
+    RNStreamIfc newAntitheticInstance();
     
 }

@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.NegativeBinomialRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -53,7 +53,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * Constructs a NegativeBinomial with n=1, p=0.5
      */
     public NegativeBinomial() {
-        this(0.5, 1, RNStreamFactory.getDefault().getStream());
+        this(0.5, 1, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -63,7 +63,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * should be the desired number of successes
      */
     public NegativeBinomial(double[] parameter) {
-        this(parameter[0], (int) parameter[1], RNStreamFactory.getDefault().getStream());
+        this(parameter[0], (int) parameter[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -73,7 +73,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * should be the desired number of successes
      * @param rng
      */
-    public NegativeBinomial(double[] parameter, RngIfc rng) {
+    public NegativeBinomial(double[] parameter, RNStreamIfc rng) {
         this(parameter[0], (int) parameter[1], rng);
     }
 
@@ -85,7 +85,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * @param numSuccess The desired number of successes
      */
     public NegativeBinomial(double prob, double numSuccess) {
-        this(prob, numSuccess, RNStreamFactory.getDefault().getStream());
+        this(prob, numSuccess, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -96,7 +96,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * @param numSuccess The desired number of successes
      * @param rng A RngIfc
      */
-    public NegativeBinomial(double prob, double numSuccess, RngIfc rng) {
+    public NegativeBinomial(double prob, double numSuccess, RNStreamIfc rng) {
         super(rng);
         setParameters(prob, numSuccess);
     }
@@ -137,7 +137,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * @return the NegativeBinomial
      */
     @Override
-    public final NegativeBinomial newInstance(RngIfc rng) {
+    public final NegativeBinomial newInstance(RNStreamIfc rng) {
         return (new NegativeBinomial(getParameters(), rng));
     }
 
@@ -148,7 +148,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      */
     @Override
     public final NegativeBinomial newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -900,7 +900,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new NegativeBinomialRV(myProbSuccess,myDesiredNumSuccesses, rng);
     }
 }

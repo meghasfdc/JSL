@@ -17,13 +17,13 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 public interface GetRVariableIfc {
 
-    RVariableIfc getRandomVariable(RngIfc rng);
+    RVariableIfc getRandomVariable(RNStreamIfc rng);
 
     default RVariableIfc getRandomVariable(){
-        return getRandomVariable(RNStreamFactory.getDefault().getStream());
+        return getRandomVariable(RNStreamFactory.getDefaultFactory().getStream());
     }
 }

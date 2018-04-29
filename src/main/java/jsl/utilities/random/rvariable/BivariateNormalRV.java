@@ -15,11 +15,9 @@
  */
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Allows for the generation of bivariate normal
  *  random variables
@@ -42,13 +40,13 @@ public class BivariateNormalRV extends AbstractMVRVariable{
      *
      */
     public BivariateNormalRV() {
-        this(0.0, 1.0, 0.0, 1.0, 0.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, 0.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a standard bivariate normal with no correlation
      *
      */
-    public BivariateNormalRV(RngIfc rng) {
+    public BivariateNormalRV(RNStreamIfc rng) {
         this(0.0, 1.0, 0.0, 1.0, 0.0, rng);
     }
 
@@ -61,7 +59,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
      * @param rho
      */
     public BivariateNormalRV(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefault().getStream());
+        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a bivariate normal with the provided parameters
@@ -73,7 +71,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
      * @param rho
      * @param rng
      */
-    public BivariateNormalRV(double mean1, double var1, double mean2, double var2, double rho, RngIfc rng) {
+    public BivariateNormalRV(double mean1, double var1, double mean2, double var2, double rho, RNStreamIfc rng) {
         super(rng);
         if (var1 <= 0) {
             throw new IllegalArgumentException("The first variance was <=0");
@@ -160,7 +158,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
     }
 
     @Override
-    public final MVRVariableIfc newInstance(RngIfc rng) {
+    public final MVRVariableIfc newInstance(RNStreamIfc rng) {
         return new BivariateNormalRV(myMu1, myVar1, myMu2, myVar2, myRho, rng);
     }
 }

@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.robj.DPopulation;
 
 /**
@@ -28,10 +28,10 @@ public final class EmpiricalRV extends AbstractRVariable {
     private final DPopulation myPop;
 
     public EmpiricalRV(double[] data){
-        this(data, RNStreamFactory.getDefault().getStream());
+        this(data, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public EmpiricalRV(double [] data, RngIfc rng) {
+    public EmpiricalRV(double [] data, RNStreamIfc rng) {
         super(rng);
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
@@ -46,7 +46,7 @@ public final class EmpiricalRV extends AbstractRVariable {
     }
 
     @Override
-    public RVariableIfc newInstance(RngIfc rng) {
+    public RVariableIfc newInstance(RNStreamIfc rng) {
         return new EmpiricalRV(myPop.getParameters(), myRNG);
     }
 

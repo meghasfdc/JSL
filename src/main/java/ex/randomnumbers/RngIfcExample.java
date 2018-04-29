@@ -21,7 +21,7 @@
 package ex.randomnumbers;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *
@@ -33,9 +33,9 @@ public class RngIfcExample {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        RNStreamFactory f = RNStreamFactory.getDefault();
-        RngIfc g1 = f.getStream();
-        RngIfc g2 = f.getStream();
+        RNStreamFactory f = RNStreamFactory.getDefaultFactory();
+        RNStreamIfc g1 = f.getStream();
+        RNStreamIfc g2 = f.getStream();
         System.out.println("Two different streams from the same factory.");
         System.out.println("Note that they produce different random numbers");
         double u1;

@@ -23,5 +23,5 @@ public interface SetRngIfc {
      *
      * @param rng the reference to the random number generator, must not be null
      */
-    void setRandomNumberGenerator(RngIfc rng);
+    void setRandomNumberGenerator(RNStreamIfc rng);
 }

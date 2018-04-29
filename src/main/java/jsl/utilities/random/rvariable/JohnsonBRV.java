@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  JohnsonB(alpha1, alpha2, min, max) random variable
@@ -33,10 +33,10 @@ public final class JohnsonBRV extends AbstractRVariable {
     private final double myMax;
 
     public JohnsonBRV(double alpha1, double alpha2, double min, double max){
-        this(alpha1, alpha2, min, max, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, min, max, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public JohnsonBRV(double alpha1, double alpha2, double min, double max, RngIfc rng){
+    public JohnsonBRV(double alpha1, double alpha2, double min, double max, RNStreamIfc rng){
         super(rng);
         if (alpha2 <= 0) {
             throw new IllegalArgumentException("alpha2 must be > 0");
@@ -56,7 +56,7 @@ public final class JohnsonBRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final JohnsonBRV newInstance(RngIfc rng){
+    public final JohnsonBRV newInstance(RNStreamIfc rng){
         return new JohnsonBRV(getAlpha1(), getAlpha2(), myMin, myMax, rng);
     }
 

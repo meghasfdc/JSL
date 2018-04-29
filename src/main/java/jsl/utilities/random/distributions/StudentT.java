@@ -22,7 +22,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** The Student T distribution
  *  
@@ -53,7 +53,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
     /** Constructs a StudentT distribution with 1.0 degree of freedom
      */
     public StudentT() {
-        this(1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a StudentT distribution with
@@ -61,7 +61,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the degrees of freedom
      */
     public StudentT(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a StudentT distribution with
@@ -69,7 +69,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the v
      * @param rng
      */
-    public StudentT(double[] parameters, RngIfc rng) {
+    public StudentT(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], rng);
     }
 
@@ -78,7 +78,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      * @param dof  degrees of freedom
      */
     public StudentT(double dof) {
-        this(dof, RNStreamFactory.getDefault().getStream());
+        this(dof, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a StudentT distribution dof degrees of freedom
@@ -86,7 +86,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      * @param dof  degrees of freedom
      * @param rng A RngIfc
      */
-    public StudentT(double dof, RngIfc rng) {
+    public StudentT(double dof, RNStreamIfc rng) {
         super(rng);
         setDegreesOfFreedom(dof);
     }
@@ -97,13 +97,13 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public final StudentT newInstance(RngIfc rng) {
+    public final StudentT newInstance(RNStreamIfc rng) {
         return (new StudentT(getParameters(), rng));
     }
 
     @Override
     public final StudentT newAntitheticInstance() {
-        RngIfc ac = myRNG.newAntitheticInstance();
+        RNStreamIfc ac = myRNG.newAntitheticInstance();
         return newInstance(ac);
     }
 

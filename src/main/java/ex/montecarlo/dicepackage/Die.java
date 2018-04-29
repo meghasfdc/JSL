@@ -17,14 +17,14 @@
 package ex.montecarlo.dicepackage;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamFactory.RNStream;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 
 public class Die implements RollIfc {
 
     private int myNumSides;
 
-    private RNStream myRNG;
+    private RNStreamIfc myRNG;
 
     public Die() {
         this(6);

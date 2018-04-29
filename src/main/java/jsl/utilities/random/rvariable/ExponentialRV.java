@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Exponential(mean) random variable
@@ -27,10 +27,10 @@ public final class ExponentialRV extends AbstractRVariable {
     private final double mean;
 
     public ExponentialRV(double mean){
-        this(mean, RNStreamFactory.getDefault().getStream());
+        this(mean, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public ExponentialRV(double mean, RngIfc rng){
+    public ExponentialRV(double mean, RNStreamIfc rng){
         super(rng);
         if (mean <= 0.0) {
             throw new IllegalArgumentException("Exponential mean must be > 0.0");
@@ -43,7 +43,7 @@ public final class ExponentialRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final ExponentialRV newInstance(RngIfc rng){
+    public final ExponentialRV newInstance(RNStreamIfc rng){
         return new ExponentialRV(this.mean, rng);
     }
 

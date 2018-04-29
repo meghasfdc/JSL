@@ -17,8 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
-import jsl.utilities.random.rvariable.AbstractRVariable;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -35,7 +34,7 @@ public class Exponential extends Distribution implements
     /** Constructs a exponential random variable with mean 1.0
      */
     public Exponential() {
-        this(1.0, RNStreamFactory.getDefault().getStream());
+        this(1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a exponential random variable where parameter[0] is the
@@ -43,7 +42,7 @@ public class Exponential extends Distribution implements
      * @param parameters A array containing the mean of the distribution, must be &gt; 0.0
      */
     public Exponential(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a exponential random variable where parameter[0] is the
@@ -51,7 +50,7 @@ public class Exponential extends Distribution implements
      * @param parameters A array containing the mean of the distribution, must be &gt; 0.0
      * @param rng
      */
-    public Exponential(double[] parameters, RngIfc rng) {
+    public Exponential(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], rng);
     }
 
@@ -60,7 +59,7 @@ public class Exponential extends Distribution implements
      * @param mean The mean of the distribution, , must be &gt; 0.0
      */
     public Exponential(double mean) {
-        this(mean, RNStreamFactory.getDefault().getStream());
+        this(mean, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a exponential random variable where mean is the
@@ -68,7 +67,7 @@ public class Exponential extends Distribution implements
      * @param mean The mean of the distribution, , must be &gt; 0.0
      * @param rng 
      */
-    public Exponential(double mean, RngIfc rng) {
+    public Exponential(double mean, RNStreamIfc rng) {
         super(rng);
         setMean(mean);
     }
@@ -79,13 +78,13 @@ public class Exponential extends Distribution implements
     }
 
     @Override
-    public final Exponential newInstance(RngIfc rng) {
+    public final Exponential newInstance(RNStreamIfc rng) {
         return (new Exponential(getParameters(), rng));
     }
 
     @Override
     public final Exponential newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -184,7 +183,7 @@ public class Exponential extends Distribution implements
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng){
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng){
         return new ExponentialRV(getMean(), rng);
     }
 

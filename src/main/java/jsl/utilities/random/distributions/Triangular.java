@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.TriangularRV;
@@ -52,7 +52,7 @@ public class Triangular extends Distribution implements
      * min = 0.0, mode = 0.0, and max = 1.0
      */
     public Triangular() {
-        this(0.0, 0.0, 1.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Triangular distribution with
@@ -60,7 +60,7 @@ public class Triangular extends Distribution implements
      * @param parameters The array of parameters
      */
     public Triangular(double[] parameters) {
-        this(parameters[0], parameters[1], parameters[2], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], parameters[1], parameters[2], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Triangular distribution with
@@ -68,7 +68,7 @@ public class Triangular extends Distribution implements
      * @param parameters The array of parameters
      * @param rng
      */
-    public Triangular(double[] parameters, RngIfc rng) {
+    public Triangular(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], parameters[2], rng);
     }
 
@@ -79,7 +79,7 @@ public class Triangular extends Distribution implements
      * @param max The maximum value of the distribution
      */
     public Triangular(double min, double mode, double max) {
-        this(min, mode, max, RNStreamFactory.getDefault().getStream());
+        this(min, mode, max, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Triangular distribution with min, mode, and max
@@ -89,7 +89,7 @@ public class Triangular extends Distribution implements
      * @param max The maximum value of the distribution
      * @param rng A RngIfc
      */
-    public Triangular(double min, double mode, double max, RngIfc rng) {
+    public Triangular(double min, double mode, double max, RNStreamIfc rng) {
         super(rng);
         setParameters(min, mode, max);
     }
@@ -110,7 +110,7 @@ public class Triangular extends Distribution implements
      * @return
      */
     @Override
-    public final Triangular newInstance(RngIfc rng) {
+    public final Triangular newInstance(RNStreamIfc rng) {
         return (new Triangular(getParameters(), rng));
     }
 
@@ -121,7 +121,7 @@ public class Triangular extends Distribution implements
      */
     @Override
     public final Triangular newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -376,7 +376,7 @@ public class Triangular extends Distribution implements
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new TriangularRV(myMin, myMode, myMax, rng);
     }
 }

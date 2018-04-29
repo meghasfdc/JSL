@@ -25,5 +25,5 @@ public interface GetValueIfc {
     /** This method simply returns the value.
      * @return The value.
      */    
-    public double getValue();
+    double getValue();
 }

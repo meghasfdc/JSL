@@ -18,10 +18,8 @@ package jsl.utilities.random.sp;
 import jsl.utilities.random.AbstractRandom;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.random.distributions.Geometric;
 import jsl.utilities.random.distributions.ShiftedGeometric;
-import jsl.utilities.random.rng.RngIfc;
-import jsl.utilities.reporting.JSL;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -213,7 +211,7 @@ public class BatchOnOffProcess extends AbstractRandom {
        /* (non-Javadoc)
      * @see jsl.utilities.random.RandomIfc#newInstance()
      */
-    public RandomIfc newInstance(RngIfc rng) {
+    public RandomIfc newInstance(RNStreamIfc rng) {
         BatchOnOffProcess b = new BatchOnOffProcess();
         b.myInitialState = myInitialState;
         b.myInitFlag = myInitFlag;

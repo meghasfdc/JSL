@@ -18,7 +18,7 @@ package jsl.utilities.random;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.NewInstanceIfc;
 import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *
@@ -31,7 +31,7 @@ public interface RandomIfc extends ParametersIfc, GetValueIfc, RandomStreamIfc, 
      * @return a new instance
      */
     @Override
-    public RandomIfc newInstance();
+    RandomIfc newInstance();
 
     /** Returns a new instance of the random source with the same parameters
      *  but using the supplied random number stream
@@ -39,5 +39,5 @@ public interface RandomIfc extends ParametersIfc, GetValueIfc, RandomStreamIfc, 
      * @param rng the stream to use
      * @return the new instance
      */
-    public RandomIfc newInstance(RngIfc rng);
+    RandomIfc newInstance(RNStreamIfc rng);
 }

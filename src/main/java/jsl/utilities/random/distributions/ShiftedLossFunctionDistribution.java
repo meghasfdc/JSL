@@ -16,7 +16,7 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * @author rossetti
@@ -30,7 +30,7 @@ public class ShiftedLossFunctionDistribution extends ShiftedDistribution
      * @param shift
      */
     public ShiftedLossFunctionDistribution(LossFunctionDistributionIfc distribution, double shift) {
-        this(distribution, shift, RNStreamFactory.getDefault().getStream());
+        this(distribution, shift, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -38,7 +38,7 @@ public class ShiftedLossFunctionDistribution extends ShiftedDistribution
      * @param shift
      * @param rng
      */
-    public ShiftedLossFunctionDistribution(LossFunctionDistributionIfc distribution, double shift, RngIfc rng) {
+    public ShiftedLossFunctionDistribution(LossFunctionDistributionIfc distribution, double shift, RNStreamIfc rng) {
         super((DistributionIfc) distribution, shift, rng);
     }
 

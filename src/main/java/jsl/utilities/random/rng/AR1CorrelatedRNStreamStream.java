@@ -28,33 +28,33 @@ import java.util.Objects;
  * may not necessarily meet this correlation, due to
  * the correlation matching problem.
  */
-public class AR1CorrelatedRngStream implements RngIfc {
+public class AR1CorrelatedRNStreamStream implements RNStreamIfc {
 
     private AR1NormalRV myAR1;
 
     private double myPrevU;
 
-    private final RngIfc myRNG;
+    private final RNStreamIfc myRNG;
 
     /**
      *
      */
-    public AR1CorrelatedRngStream() {
-        this(0.0, RNStreamFactory.getDefault().getStream());
+    public AR1CorrelatedRNStreamStream() {
+        this(0.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
      * @param correlation the correlation, must be within [-1,1]
      */
-    public AR1CorrelatedRngStream(double correlation) {
-        this(correlation, RNStreamFactory.getDefault().getStream());
+    public AR1CorrelatedRNStreamStream(double correlation) {
+        this(correlation, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
      * @param correlation the correlation, must be within [-1,1]
      * @param rng the underlying source of randomness
      */
-    public AR1CorrelatedRngStream(double correlation, RngIfc rng) {
+    public AR1CorrelatedRNStreamStream(double correlation, RNStreamIfc rng) {
         Objects.requireNonNull(rng, "The supplied RngIfc was null");
         myAR1 = new AR1NormalRV(0.0, 1.0, correlation, rng);
         myRNG = rng;
@@ -127,26 +127,26 @@ public class AR1CorrelatedRngStream implements RngIfc {
     }
 
     @Override
-    public RngIfc newInstance() {
+    public RNStreamIfc newInstance() {
         return newInstance(null);
     }
 
     @Override
-    public RngIfc newInstance(String name) {
-        RngIfc c = myRNG.newInstance(name);
+    public RNStreamIfc newInstance(String name) {
+        RNStreamIfc c = myRNG.newInstance(name);
         double r = getLag1Correlation();
-        return new AR1CorrelatedRngStream(r, c);
+        return new AR1CorrelatedRNStreamStream(r, c);
     }
 
     @Override
-    public RngIfc newAntitheticInstance(String name) {
-        RngIfc c = myRNG.newAntitheticInstance(name);
+    public RNStreamIfc newAntitheticInstance(String name) {
+        RNStreamIfc c = myRNG.newAntitheticInstance(name);
         double r = getLag1Correlation();
-        return new AR1CorrelatedRngStream(r, c);
+        return new AR1CorrelatedRNStreamStream(r, c);
     }
 
     @Override
-    public RngIfc newAntitheticInstance() {
+    public RNStreamIfc newAntitheticInstance() {
         return newAntitheticInstance(null);
     }
 }

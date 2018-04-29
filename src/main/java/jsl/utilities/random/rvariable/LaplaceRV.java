@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Normal(mean, variance)
@@ -29,10 +29,10 @@ public final class LaplaceRV extends AbstractRVariable {
     private final double myScale;
 
     public LaplaceRV(double mean, double scale){
-        this(mean, scale, RNStreamFactory.getDefault().getStream());
+        this(mean, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public LaplaceRV(double mean, double scale, RngIfc rng){
+    public LaplaceRV(double mean, double scale, RNStreamIfc rng){
         super(rng);
         myMean = mean;
         if (scale <= 0) {
@@ -46,7 +46,7 @@ public final class LaplaceRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final LaplaceRV newInstance(RngIfc rng){
+    public final LaplaceRV newInstance(RNStreamIfc rng){
         return new LaplaceRV(this.myMean, this.myScale, rng);
     }
 

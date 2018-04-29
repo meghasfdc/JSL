@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 import java.util.Arrays;
 
@@ -41,7 +41,7 @@ public final class DEmpiricalRV extends AbstractRVariable {
      * array
      */
     public DEmpiricalRV(double[] values, double[] cdf){
-        this(values, cdf, RNStreamFactory.getDefault().getStream());
+        this(values, cdf, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -52,7 +52,7 @@ public final class DEmpiricalRV extends AbstractRVariable {
      * array
      * @param rng the source of randomness
      */
-    public DEmpiricalRV(double[] values, double[] cdf, RngIfc rng){
+    public DEmpiricalRV(double[] values, double[] cdf, RNStreamIfc rng){
         super(rng);
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
@@ -78,7 +78,7 @@ public final class DEmpiricalRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final DEmpiricalRV newInstance(RngIfc rng){
+    public final DEmpiricalRV newInstance(RNStreamIfc rng){
         return new DEmpiricalRV(this.myValues, this.myCDF, rng);
     }
 

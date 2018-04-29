@@ -24,6 +24,7 @@ package test.random;
 import java.util.Arrays;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.DEmpiricalCDF;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rng.RNStreamFactory;
 import org.junit.After;
@@ -74,7 +75,7 @@ public class TestDEmpirical {
 
         assertTrue(JSLMath.compareArrays(makePairs, pp) == true);
 
-        RNStreamFactory.RNStream defaultStream = RNStreamFactory.getDefaultStream();
+        RNStreamIfc defaultStream = RNStreamFactory.getDefaultStream();
 
         DEmpiricalCDF d = new DEmpiricalCDF(pp, defaultStream);
 

@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Triangularmin, mode, max) random variable
@@ -31,10 +31,10 @@ public final class TriangularRV extends AbstractRVariable {
     private final double myMode;
 
     public TriangularRV(double min, double mode, double max){
-        this(min, mode, max, RNStreamFactory.getDefault().getStream());
+        this(min, mode, max, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public TriangularRV(double min, double mode, double max, RngIfc rng){
+    public TriangularRV(double min, double mode, double max, RNStreamIfc rng){
         super(rng);
         if (min > mode) {
             throw new IllegalArgumentException("min must be <= mode");
@@ -58,7 +58,7 @@ public final class TriangularRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final TriangularRV newInstance(RngIfc rng){
+    public final TriangularRV newInstance(RNStreamIfc rng){
         return new TriangularRV(myMin, myMode, myMax, rng);
     }
 

@@ -22,7 +22,7 @@ package jsl.utilities.random.sp;
 
 import jsl.utilities.random.distributions.DEmpiricalPMF;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.IntegerFrequency;
 
 /**
@@ -42,7 +42,7 @@ public class DMarkovChain {
     /**
      * myRNG provides a reference to the underlying stream of random numbers
      */
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
     /**
      *
@@ -50,7 +50,7 @@ public class DMarkovChain {
      * @param prob
      */
     public DMarkovChain(int initialState, double[][] prob) {
-        this(initialState, prob, RNStreamFactory.getDefault().getStream());
+        this(initialState, prob, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /**
@@ -59,7 +59,7 @@ public class DMarkovChain {
      * @param prob
      * @param rng
      */
-    public DMarkovChain(int initialState, double[][] prob, RngIfc rng) {
+    public DMarkovChain(int initialState, double[][] prob, RNStreamIfc rng) {
         setProbabilities(prob, rng);
         setInitialState(initialState);
         reset();
@@ -70,7 +70,7 @@ public class DMarkovChain {
      * @param prob
      * @param rng
      */
-    protected final void setProbabilities(double[][] prob, RngIfc rng) {
+    protected final void setProbabilities(double[][] prob, RNStreamIfc rng) {
         setRandomNumberGenerator(rng);
         myMaxState = prob.length;
         myStateProb = new DEmpiricalPMF[prob.length];
@@ -122,7 +122,7 @@ public class DMarkovChain {
         return myState;
     }
 
-    public final RngIfc getRandomNumberGenerator() {
+    public final RNStreamIfc getRandomNumberGenerator() {
         return (myRNG);
     }
 
@@ -132,7 +132,7 @@ public class DMarkovChain {
      *
      * @param rng the reference to the random number generator
      */
-    public final void setRandomNumberGenerator(RngIfc rng) {
+    public final void setRandomNumberGenerator(RNStreamIfc rng) {
         if (rng == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }

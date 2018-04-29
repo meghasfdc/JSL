@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Chi-Squared(degrees of freedom) random variable
@@ -27,10 +27,10 @@ public final class ChiSquaredRV extends AbstractRVariable {
     private final double dof;
 
     public ChiSquaredRV(double dof){
-        this(dof, RNStreamFactory.getDefault().getStream());
+        this(dof, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public ChiSquaredRV(double dof, RngIfc rng){
+    public ChiSquaredRV(double dof, RNStreamIfc rng){
         super(rng);
         if (dof <= 0.0) {
             throw new IllegalArgumentException("Chi-Squared degrees of freedom must be > 0.0");
@@ -43,7 +43,7 @@ public final class ChiSquaredRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final ChiSquaredRV newInstance(RngIfc rng){
+    public final ChiSquaredRV newInstance(RNStreamIfc rng){
         return new ChiSquaredRV(this.dof, rng);
     }
 

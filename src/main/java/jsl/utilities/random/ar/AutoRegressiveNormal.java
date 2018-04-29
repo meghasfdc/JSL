@@ -15,15 +15,13 @@
  */
 package jsl.utilities.random.ar;
 
-import java.util.HashMap;
-
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *
@@ -58,7 +56,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
      * @param coefficients an array of the coefficients for the AR process
      */
     public AutoRegressiveNormal(double[] coefficients) {
-        this(0.0, 1.0, coefficients, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, coefficients, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs AutoRegressiveNormal given the array of parameter coefficients
@@ -71,7 +69,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
      * @param coefficients an array of the coefficients for the AR process
      */
     public AutoRegressiveNormal(double mean, double variance, double[] coefficients) {
-        this(mean, variance, coefficients, RNStreamFactory.getDefault().getStream());
+        this(mean, variance, coefficients, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs AutoRegressiveNormal given the array of parameter coefficients
@@ -84,7 +82,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
      * @param coefficients an array of the coefficients for the AR process
      * @param rng a RngIfc
      */
-    public AutoRegressiveNormal(double mean, double variance, double[] coefficients, RngIfc rng) {
+    public AutoRegressiveNormal(double mean, double variance, double[] coefficients, RNStreamIfc rng) {
         this(mean, variance, coefficients, rng, null);
     }
 
@@ -99,7 +97,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
      * @param rng a RngIfc
      * @param name
      */
-    public AutoRegressiveNormal(double mean, double variance, double[] coefficients, RngIfc rng, String name) {
+    public AutoRegressiveNormal(double mean, double variance, double[] coefficients, RNStreamIfc rng, String name) {
         setId();
         setName(name);
         myErrors = new Normal(mean, variance, rng);
@@ -139,7 +137,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
     }
 
     @Override
-    public final AutoRegressiveNormal newInstance(RngIfc rng) {
+    public final AutoRegressiveNormal newInstance(RNStreamIfc rng) {
         return (new AutoRegressiveNormal(getMeanOfErrors(), getVarianceOfErrors(), getCoefficients(), rng));
     }
 
@@ -147,7 +145,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
      *
      * @return
      */
-    public final RngIfc getRandomNumberGenerator() {
+    public final RNStreamIfc getRandomNumberGenerator() {
         return myErrors.getRandomNumberGenerator();
     }
 

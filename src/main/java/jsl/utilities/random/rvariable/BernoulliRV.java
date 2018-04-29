@@ -16,8 +16,9 @@
 
 package jsl.utilities.random.rvariable;
 
+import jsl.utilities.controls.Controls;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Bernoulli(probability of success) random variable
@@ -27,10 +28,10 @@ public final class BernoulliRV extends AbstractRVariable {
     private final double myProbSuccess;
 
     public BernoulliRV(double prob){
-        this(prob, RNStreamFactory.getDefault().getStream());
+        this(prob, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public BernoulliRV(double prob, RngIfc rng){
+    public BernoulliRV(double prob, RNStreamIfc rng){
         super(rng);
         if ((prob < 0.0) || (prob > 1.0)) {
             throw new IllegalArgumentException("Probability must be [0,1]");
@@ -43,7 +44,7 @@ public final class BernoulliRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final BernoulliRV newInstance(RngIfc rng){
+    public final BernoulliRV newInstance(RNStreamIfc rng){
         return new BernoulliRV(this.myProbSuccess, rng);
     }
 

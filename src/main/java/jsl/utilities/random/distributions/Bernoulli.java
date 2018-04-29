@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.BernoulliRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -40,7 +40,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      *
      */
     public Bernoulli() {
-        this(0.5, RNStreamFactory.getDefault().getStream());
+        this(0.5, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a probability distribution with the default
@@ -49,7 +49,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      * @param parameters should be an array with parameter[0]=p
      */
     public Bernoulli(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a probability distribution
@@ -57,7 +57,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      * @param parameters should be an array with parameter[0]=p
      * @param rng
      */
-    public Bernoulli(double[] parameters, RngIfc rng) {
+    public Bernoulli(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], rng);
     }
 
@@ -67,7 +67,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      * @param prob is the success probability
      */
     public Bernoulli(double prob) {
-        this(prob, RNStreamFactory.getDefault().getStream());
+        this(prob, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a probability distribution with the default
@@ -76,7 +76,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      * @param prob is the success probability
      * @param rng a class that implements the RngIfc
      */
-    public Bernoulli(double prob, RngIfc rng) {
+    public Bernoulli(double prob, RNStreamIfc rng) {
         super(rng);
         setProbabilityOfSuccess(prob);
     }
@@ -97,7 +97,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      * @return
      */
     @Override
-    public final Bernoulli newInstance(RngIfc rng) {
+    public final Bernoulli newInstance(RNStreamIfc rng) {
         return (new Bernoulli(getParameters(), rng));
     }
 
@@ -108,7 +108,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
      */
     @Override
     public final Bernoulli newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -284,7 +284,7 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new BernoulliRV(myProbSuccess, rng);
     }
 }

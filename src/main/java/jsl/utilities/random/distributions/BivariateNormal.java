@@ -18,7 +18,7 @@ package jsl.utilities.random.distributions;
 import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Allows for the generation of bivariate normal
  *  random variables
@@ -27,7 +27,7 @@ import jsl.utilities.random.rng.RngIfc;
  */
 public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
 
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
     protected double myMu1;
 
@@ -43,13 +43,13 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      *
      */
     public BivariateNormal() {
-        this(0.0, 1.0, 0.0, 1.0, 0.0, RNStreamFactory.getDefault().getStream());
+        this(0.0, 1.0, 0.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a standard bivariate normal with no correlation
      *
      */
-    public BivariateNormal(RngIfc rng) {
+    public BivariateNormal(RNStreamIfc rng) {
         this(0.0, 1.0, 0.0, 1.0, 0.0, rng);
     }
 
@@ -62,7 +62,7 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      * @param rho
      */
     public BivariateNormal(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefault().getStream());
+        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Interprets the array of parameters as the parameters
@@ -75,7 +75,7 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      * @param param
      */
     public BivariateNormal(double[] param) {
-        this(param[0], param[1], param[2], param[3], param[4], RNStreamFactory.getDefault().getStream());
+        this(param[0], param[1], param[2], param[3], param[4], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Interprets the array of parameters as the parameters
@@ -88,7 +88,7 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      * @param param
      * @param rng
      */
-    public BivariateNormal(double[] param, RngIfc rng) {
+    public BivariateNormal(double[] param, RNStreamIfc rng) {
         this(param[0], param[1], param[2], param[3], param[4], rng);
     }
 
@@ -101,7 +101,7 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      * @param rho
      * @param rng
      */
-    public BivariateNormal(double mean1, double var1, double mean2, double var2, double rho, RngIfc rng) {
+    public BivariateNormal(double mean1, double var1, double mean2, double var2, double rho, RNStreamIfc rng) {
         setParameters(mean1, var1, mean2, var2, rho);
         setRandomNumberGenerator(rng);
     }
@@ -264,7 +264,7 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      *
      * @return
      */
-    public RngIfc getRandomNumberGenerator() {
+    public RNStreamIfc getRandomNumberGenerator() {
         return (myRNG);
     }
 
@@ -272,7 +272,7 @@ public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
      * Throws a NullPointerException if rng is null
      * @param rng the reference to the random number generator
      */
-    public void setRandomNumberGenerator(RngIfc rng) {
+    public void setRandomNumberGenerator(RNStreamIfc rng) {
         if (rng == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }

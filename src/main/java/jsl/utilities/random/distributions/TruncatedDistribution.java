@@ -16,7 +16,7 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  */
@@ -61,7 +61,7 @@ public class TruncatedDistribution extends Distribution {
      * @param rng
      */
     public TruncatedDistribution(DistributionIfc distribution, double cdfLL, double cdfUL,
-            double truncLL, double truncUL, RngIfc rng) {
+            double truncLL, double truncUL, RNStreamIfc rng) {
         super(rng);
         setDistribution(distribution, cdfLL, cdfUL, truncLL, truncUL);
     }
@@ -81,7 +81,7 @@ public class TruncatedDistribution extends Distribution {
      *
      * @return
      */
-    public final TruncatedDistribution newInstance(RngIfc rng) {
+    public final TruncatedDistribution newInstance(RNStreamIfc rng) {
         DistributionIfc d = (DistributionIfc) myDistribution.newInstance();
         return (new TruncatedDistribution(d, myCDFLL, myCDFUL, myLowerLimit, myUpperLimit, rng));
     }
@@ -92,7 +92,7 @@ public class TruncatedDistribution extends Distribution {
      * @return
      */
     public final TruncatedDistribution newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 

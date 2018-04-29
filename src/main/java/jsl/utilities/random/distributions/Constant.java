@@ -16,7 +16,7 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * Constructs a degenerate distribution with all probability at the provided
@@ -73,7 +73,7 @@ public class Constant extends Distribution implements DiscreteDistributionIfc {
      * @param value the value for the constant
      * @param rng a RngIfc (pointless in this case since it is never used)
      */
-    public Constant(double value, RngIfc rng) {
+    public Constant(double value, RNStreamIfc rng) {
         super(rng);
         myValue = value;
     }
@@ -98,7 +98,7 @@ public class Constant extends Distribution implements DiscreteDistributionIfc {
      * @return
      */
     @Override
-    public Constant newInstance(RngIfc rng) {
+    public Constant newInstance(RNStreamIfc rng) {
         return (newInstance());
     }
 

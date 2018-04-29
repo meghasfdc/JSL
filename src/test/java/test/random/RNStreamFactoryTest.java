@@ -27,7 +27,7 @@ import jsl.utilities.random.distributions.Exponential;
 import java.util.Arrays;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamFactory.RNStream;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -54,21 +54,21 @@ public class RNStreamFactoryTest {
         System.out.println();
         System.out.println(Arrays.toString(f.getFactorySeed()));
 
-        RNStream g1 = f.getStream("g1");
+        RNStream g1 = (RNStream)f.getStream("g1");
 
         System.out.println(g1);
 
         System.out.println();
         System.out.println(Arrays.toString(f.getFactorySeed()));
 
-        RNStream g2 = f.getStream("g2");
+        RNStream g2 = (RNStream)f.getStream("g2");
 
         System.out.println(g2);
 
         System.out.println();
         System.out.println(Arrays.toString(f.getFactorySeed()));
 
-        RNStream g3 = f.getStream("g3");
+        RNStream g3 = (RNStream)f.getStream("g3");
 
         sum = g2.randU01() + g3.randU01();
 
@@ -128,8 +128,8 @@ public class RNStreamFactoryTest {
         long[] germe = {1, 1, 1, 1, 1, 1};
         f.setFactorySeed(germe);
 
-        RNStream[] gar = {f.getStream("Poisson"), f.getStream("Laplace"),
-            f.getStream("Galois"), f.getStream("Cantor")};
+        RNStream[] gar = {(RNStream)f.getStream("Poisson"), (RNStream)f.getStream("Laplace"),
+                (RNStream)f.getStream("Galois"), (RNStream)f.getStream("Cantor")};
         for (i = 0; i < 4; i++) {
             sum += gar[i].randU01();
         }
@@ -172,9 +172,9 @@ public class RNStreamFactoryTest {
         int i;
         double sum = 0.0;
 
-        RNStream g1 = f.getStream("g1");
-        RNStream g2 = f.getStream("g2");
-        RNStream g3 = f.getStream("g3");
+        RNStream g1 = (RNStream)f.getStream("g1");
+        RNStream g2 = (RNStream)f.getStream("g2");
+        RNStream g3 = (RNStream)f.getStream("g3");
 
         System.out.println("Initial states of g1, g2, and g3:\n");
         g1.printState();
@@ -289,8 +289,8 @@ public class RNStreamFactoryTest {
         f.setFactorySeed(germe);
 
         System.out.println("\nDeclare an array of 4 named streams and write their full state\n");
-        RNStream[] gar = {f.getStream("Poisson"), f.getStream("Laplace"),
-            f.getStream("Galois"), f.getStream("Cantor")};
+        RNStream[] gar = {(RNStream)f.getStream("Poisson"), (RNStream)f.getStream("Laplace"),
+                (RNStream)f.getStream("Galois"), (RNStream)f.getStream("Cantor")};
         for (i = 0; i < 4; i++) {
             gar[i].printStateFull();
         }
@@ -317,8 +317,8 @@ public class RNStreamFactoryTest {
 
     @Test
     public void test3() {
-        RngIfc g1 = f.getStream();
-        RngIfc g2 = f.getStream();
+        RNStreamIfc g1 = f.getStream();
+        RNStreamIfc g2 = f.getStream();
         System.out.println("Two different streams from the same factory.");
         System.out.println("Note that they produce different random numbers");
         double s1 = 0;
@@ -414,7 +414,7 @@ public class RNStreamFactoryTest {
 
         System.out.println();
         System.out.println("Creating the 1st stream");
-        RNStream g1 = f.getStream("g1");
+        RNStream g1 = (RNStream)f.getStream("g1");
 
         System.out.println(g1);
         System.out.println();
@@ -425,7 +425,7 @@ public class RNStreamFactoryTest {
         System.out.println();
         System.out.println("Creating the 2nd stream");
 
-        RNStream g2 = f.getStream("g2");
+        RNStream g2 = (RNStream)f.getStream("g2");
 
         System.out.println(g2);
 
@@ -439,8 +439,8 @@ public class RNStreamFactoryTest {
         RNStreamFactory f1 = new RNStreamFactory("f1");
         RNStreamFactory f2 = new RNStreamFactory("f2");
 
-        RngIfc g1f1 = f1.getStream("g1 from f1");
-        RngIfc g1f2 = f2.getStream("g1 from f2");
+        RNStreamIfc g1f1 = f1.getStream("g1 from f1");
+        RNStreamIfc g1f2 = f2.getStream("g1 from f2");
 
         System.out.println();
         System.out.println("**********************************************");
@@ -472,8 +472,8 @@ public class RNStreamFactoryTest {
         System.out.println("**********************************************");
         System.out.println("Test 6");
         System.out.println("Make and print the default stream factory");
-        RNStreamFactory.getDefault().resetFactorySeed();
-        System.out.println(RNStreamFactory.getDefault());
+        RNStreamFactory.getDefaultFactory().resetFactorySeed();
+        System.out.println(RNStreamFactory.getDefaultFactory());
 
         List<Exponential> list1 = new ArrayList<Exponential>();
         Exponential e;
@@ -502,7 +502,7 @@ public class RNStreamFactoryTest {
 
         System.out.println("Changing the default factory");
         RNStreamFactory.setDefaultFactory(f1);
-        System.out.println(RNStreamFactory.getDefault());
+        System.out.println(RNStreamFactory.getDefaultFactory());
 
         List<Exponential> list2 = new ArrayList<Exponential>();
         System.out.println("Making some Exponentials using new default factory");
@@ -542,7 +542,7 @@ public class RNStreamFactoryTest {
         RNStreamFactory fc = f1.newInstance();
         System.out.println(fc);
         System.out.println("Make a stream from f1");
-        RngIfc rngf1 = f1.getStream();
+        RNStreamIfc rngf1 = f1.getStream();
         System.out.println(rngf1);
         System.out.println("Generate 5 numbers from rngf1");
         for (int i = 1; i <= 5; i++) {
@@ -565,7 +565,7 @@ public class RNStreamFactoryTest {
         RNStreamFactory f1 = new RNStreamFactory("f1");
         System.out.println(f1);
         System.out.println("Make a stream from f1");
-        RNStreamFactory.RNStream rngf1 = f1.getStream();
+        RNStreamFactory.RNStream rngf1 = (RNStream)f1.getStream();
         System.out.println(rngf1);
         System.out.println("Generate 5 numbers from rngf1");
         for (int i = 1; i <= 5; i++) {
@@ -598,7 +598,7 @@ public class RNStreamFactoryTest {
         RNStreamFactory f1 = new RNStreamFactory("f1");
         System.out.println(f1);
         System.out.println("Make a stream from f1");
-        RNStreamFactory.RNStream rngf1 = f1.getStream();
+        RNStreamFactory.RNStream rngf1 = (RNStream)f1.getStream();
         System.out.println(rngf1);
         System.out.println("Generate 5 numbers from rngf1");
         for (int i = 1; i <= 5; i++) {

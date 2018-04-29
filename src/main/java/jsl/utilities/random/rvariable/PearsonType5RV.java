@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Pearson Type 5(shape, scale) random variable
@@ -28,10 +28,10 @@ public final class PearsonType5RV extends AbstractRVariable {
     private final double myScale;
 
     public PearsonType5RV(double shape, double scale){
-        this(shape, scale, RNStreamFactory.getDefault().getStream());
+        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public PearsonType5RV(double shape, double scale, RngIfc rng){
+    public PearsonType5RV(double shape, double scale, RNStreamIfc rng){
         super(rng);
         if (shape <= 0) {
             throw new IllegalArgumentException("Shape parameter must be positive");
@@ -48,7 +48,7 @@ public final class PearsonType5RV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final PearsonType5RV newInstance(RngIfc rng){
+    public final PearsonType5RV newInstance(RNStreamIfc rng){
         return new PearsonType5RV(this.getShape(), this.getScale(), rng);
     }
 

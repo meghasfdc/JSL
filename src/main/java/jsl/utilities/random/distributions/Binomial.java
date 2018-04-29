@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.BinomialRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -60,7 +60,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** Constructs a Binomial with n=1, p=0.5
      */
     public Binomial() {
-        this(0.5, 1, RNStreamFactory.getDefault().getStream());
+        this(0.5, 1, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Binomial using the supplied parameters
@@ -69,7 +69,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * the number of trials
      */
     public Binomial(double[] parameters) {
-        this(parameters[0], (int) parameters[1], RNStreamFactory.getDefault().getStream());
+        this(parameters[0], (int) parameters[1], RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a Binomial using the supplied parameters
@@ -78,7 +78,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * the number of trials
      * @param rng
      */
-    public Binomial(double[] parameters, RngIfc rng) {
+    public Binomial(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], (int) parameters[1], rng);
     }
 
@@ -88,7 +88,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param numTrials The number of trials
      */
     public Binomial(double prob, int numTrials) {
-        this(prob, numTrials, RNStreamFactory.getDefault().getStream());
+        this(prob, numTrials, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Constructs a binomial with p probability of success
@@ -97,7 +97,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param numTrials The number of trials
      * @param rng
      */
-    public Binomial(double prob, int numTrials, RngIfc rng) {
+    public Binomial(double prob, int numTrials, RNStreamIfc rng) {
         super(rng);
         setProbabilityOfSuccess(prob);
         setNumberOfTrials(numTrials);
@@ -139,7 +139,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @return
      */
     @Override
-    public final Binomial newInstance(RngIfc rng) {
+    public final Binomial newInstance(RNStreamIfc rng) {
         return (new Binomial(getParameters(), rng));
     }
 
@@ -150,7 +150,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      */
     @Override
     public final Binomial newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -914,7 +914,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new BinomialRV(myProbSuccess, myNumTrials, rng);
     }
 }

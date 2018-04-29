@@ -192,3 +192,7 @@ gradle/wrapper/gradle-wrapper\.jar
 \.idea/misc\.xml
 
 \.idea/inspectionProfiles/Project_Default\.xml
+
+JSL\.iml
+
+\.idea/modules\.xml

@@ -17,7 +17,7 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *  Binomial(probability of success, number of trials)
@@ -29,10 +29,10 @@ public final class BinomialRV extends AbstractRVariable {
     private int myNumTrials;
 
     public BinomialRV(double prob, int numTrials){
-        this(prob, numTrials, RNStreamFactory.getDefault().getStream());
+        this(prob, numTrials, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public BinomialRV(double prob, int numTrials, RngIfc rng){
+    public BinomialRV(double prob, int numTrials, RNStreamIfc rng){
         super(rng);
         if ((prob < 0.0) || (prob > 1.0)) {
             throw new IllegalArgumentException("Success Probability must be [0,1]");
@@ -49,7 +49,7 @@ public final class BinomialRV extends AbstractRVariable {
      * @param rng the RngIfc to use
      * @return a new instance with same parameter value
      */
-    public final BinomialRV newInstance(RngIfc rng){
+    public final BinomialRV newInstance(RNStreamIfc rng){
         return new BinomialRV(this.myProbSuccess, this.myNumTrials, rng);
     }
 

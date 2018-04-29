@@ -17,16 +17,39 @@ package jsl.utilities.random.rng;
 
 import jsl.utilities.random.GetAntitheticValueIfc;
 
-public interface RandU01Ifc extends GetAntitheticValueIfc {
+import java.util.function.DoubleSupplier;
+import java.util.stream.DoubleStream;
 
-    /** Returns a pseudo-random uniformly distributed number
+public interface RandU01Ifc extends GetAntitheticValueIfc, DoubleSupplier {
+
+    /**
+     * Returns a pseudo-random uniformly distributed number
+     *
      * @return the random number
      */
     double randU01();
 
-    /** The previous U(0,1) generated (returned) by randU01()
+    /**
+     * The previous U(0,1) generated (returned) by randU01()
      *
      * @return
      */
     double getPrevU01();
+
+    /**
+     *
+     * @return the generated random number using randU01()
+     */
+    @Override
+    default double getAsDouble() {
+        return randU01();
+    }
+
+    /** Turns the doubles into a DoubleStream for the Stream API
+     *
+     * @return
+     */
+    default DoubleStream asDoubleStream(){
+        return DoubleStream.generate(this);
+    }
 }

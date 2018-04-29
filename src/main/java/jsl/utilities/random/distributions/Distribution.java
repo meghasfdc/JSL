@@ -19,7 +19,7 @@ import jsl.utilities.Interval;
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.AbstractRandom;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.rootfinding.BisectionRootFinder;
 
 /**
@@ -46,10 +46,10 @@ public abstract class Distribution extends AbstractRandom implements Distributio
     /**
      * myRNG provides a reference to the underlying stream of random numbers
      */
-    protected RngIfc myRNG;
+    protected RNStreamIfc myRNG;
 
     public Distribution() {
-        this(RNStreamFactory.getDefault().getStream(), null);
+        this(RNStreamFactory.getDefaultFactory().getStream(), null);
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class Distribution extends AbstractRandom implements Distributio
      *
      * @param rng class that implements the RngIfc @returns a valid Distribution
      */
-    public Distribution(RngIfc rng) {
+    public Distribution(RNStreamIfc rng) {
         this(rng, null);
     }
 
@@ -67,7 +67,7 @@ public abstract class Distribution extends AbstractRandom implements Distributio
      * @param rng a class that implements the RngIfc
      * @param name a String name @returns a valid Distribution
      */
-    public Distribution(RngIfc rng, String name) {
+    public Distribution(RNStreamIfc rng, String name) {
         super(name);
         setRandomNumberGenerator(rng);
     }
@@ -149,7 +149,7 @@ public abstract class Distribution extends AbstractRandom implements Distributio
      * @return
      */
     @Override
-    abstract public Distribution newInstance(RngIfc rng);
+    abstract public Distribution newInstance(RNStreamIfc rng);
 
     /**
      * Returns a new instance that will supply values based on antithetic U(0,1)
@@ -160,7 +160,7 @@ public abstract class Distribution extends AbstractRandom implements Distributio
     abstract public Distribution newAntitheticInstance();
 
     @Override
-    public RngIfc getRandomNumberGenerator() {
+    public RNStreamIfc getRandomNumberGenerator() {
         return (myRNG);
     }
 
@@ -170,7 +170,7 @@ public abstract class Distribution extends AbstractRandom implements Distributio
      *
      * @param rng the reference to the random number generator
      */
-    public final void setRandomNumberGenerator(RngIfc rng) {
+    public final void setRandomNumberGenerator(RNStreamIfc rng) {
         if (rng == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }

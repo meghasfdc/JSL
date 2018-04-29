@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RngIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.PearsonType6RV;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -48,7 +48,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      *
      */
     public PearsonType6() {
-        this(RNStreamFactory.getDefault().getStream());
+        this(RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates a PearsonTypeVI distribution with
@@ -58,7 +58,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      *
      * @param rng
      */
-    public PearsonType6(RngIfc rng) {
+    public PearsonType6(RNStreamIfc rng) {
         this(2.0, 3.0, 1.0, rng);
     }
 
@@ -69,7 +69,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      * @param beta
      */
     public PearsonType6(double alpha1, double alpha2, double beta) {
-        this(alpha1, alpha2, beta, RNStreamFactory.getDefault().getStream());
+        this(alpha1, alpha2, beta, RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates a PearsonTypeVI distribution
@@ -82,7 +82,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      */
     public PearsonType6(double[] parameters) {
         this(parameters[0], parameters[1], parameters[2],
-                RNStreamFactory.getDefault().getStream());
+                RNStreamFactory.getDefaultFactory().getStream());
     }
 
     /** Creates a PearsonTypeVI distribution
@@ -93,7 +93,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      * @param parameters
      * @param rng
      */
-    public PearsonType6(double[] parameters, RngIfc rng) {
+    public PearsonType6(double[] parameters, RNStreamIfc rng) {
         this(parameters[0], parameters[1], parameters[2], rng);
     }
 
@@ -104,7 +104,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      * @param beta scale
      * @param rng
      */
-    public PearsonType6(double alpha1, double alpha2, double beta, RngIfc rng) {
+    public PearsonType6(double alpha1, double alpha2, double beta, RNStreamIfc rng) {
         super(rng);
         setParameters(alpha1, alpha2, beta);
     }
@@ -125,7 +125,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      * @return
      */
     @Override
-    public final PearsonType6 newInstance(RngIfc rng) {
+    public final PearsonType6 newInstance(RNStreamIfc rng) {
         return (new PearsonType6(getParameters(), rng));
     }
 
@@ -136,7 +136,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
      */
     @Override
     public final PearsonType6 newAntitheticInstance() {
-        RngIfc a = myRNG.newAntitheticInstance();
+        RNStreamIfc a = myRNG.newAntitheticInstance();
         return newInstance(a);
     }
 
@@ -269,7 +269,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
     }
 
     @Override
-    public final RVariableIfc getRandomVariable(RngIfc rng) {
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         return new PearsonType6RV(myAlpha1, myAlpha2, myBeta, rng);
     }
 }

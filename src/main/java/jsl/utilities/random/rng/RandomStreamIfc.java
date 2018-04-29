@@ -26,28 +26,28 @@ public interface RandomStreamIfc {
      * stream. This is the same location in the stream as assigned when the RNG
      * was created and initialized.
      */
-    public void resetStartStream();
+    void resetStartStream();
 
     /**
      * Resets the position of the RNG at the start of the current substream
      */
-    public void resetStartSubstream();
+    void resetStartSubstream();
 
     /**
      * Positions the RNG at the beginning of its next substream
      */
-    public void advanceToNextSubstream();
+    void advanceToNextSubstream();
 
     /**
      * Tells the stream to start producing antithetic variates
      *
      * @param flag true means that it produces antithetic variates.
      */
-    public void setAntitheticOption(boolean flag);
+    void setAntitheticOption(boolean flag);
 
     /**
      *
      * @return true means on
      */
-    public boolean getAntitheticOption();
+    boolean getAntitheticOption();
 }

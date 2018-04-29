@@ -26,6 +26,7 @@ import jsl.utilities.random.distributions.DUniform;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.distributions.Uniform;
 import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  *
@@ -88,13 +89,13 @@ public class UseDistributionExample {
         RNStreamFactory f1 = new RNStreamFactory();
 
         // get the first stream from the factory
-        RNStreamFactory.RNStream f1s1 = f1.getStream();
+        RNStreamIfc f1s1 = f1.getStream();
 
         // make another factory, the factories are identical
         RNStreamFactory f2 = new RNStreamFactory();
 
         // thus the first streams returned are identical
-        RNStreamFactory.RNStream f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.getStream();
 
         // now tell the stream to produce antithetic random numbers
         // f2s1 and f1s1 are now antithetic to each other
