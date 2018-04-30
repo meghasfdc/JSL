@@ -105,4 +105,33 @@ public final class JohnsonBRV extends AbstractRVariable {
         double v = JSLRandom.rJohnsonB(myAlpha1, myAlpha2, myMin, myMax, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "alpha1" with default value 0.0,
+     * "alpha2" with default value 1.0,  "min" with default value 0.0 and "max" with
+     * default value 1.0
+     *
+     * @return a control for JohnsonB random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.JohnsonB) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("alpha1", 0.0);
+                addDoubleControl("alpha2", 1.0);
+                addDoubleControl("min", 0.0);
+                addDoubleControl("max", 1.0);
+                setName(RVariableIfc.RVType.JohnsonB.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double alpha1 = getDoubleControl("alpha1");
+                double alpha2 = getDoubleControl("alpha2");
+                double min = getDoubleControl("min");
+                double max = getDoubleControl("max");
+                return new JohnsonBRV(alpha1, alpha2, min, max, rnStream);
+            }
+        };
+    }
+
 }

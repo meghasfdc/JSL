@@ -79,4 +79,27 @@ public final class LaplaceRV extends AbstractRVariable {
         double v = JSLRandom.rLaplace(myMean, myScale, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "mean" with default value 0.0 and "scale" with
+     * default value 1.0
+     *
+     * @return a control for Laplace random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Laplace) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("mean", 0.0);
+                addDoubleControl("scale", 1.0);
+                setName(RVariableIfc.RVType.Laplace.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double scale = getDoubleControl("scale");
+                double mean = getDoubleControl("mean");
+                return new LaplaceRV(mean, scale, rnStream);
+            }
+        };
+    }
 }

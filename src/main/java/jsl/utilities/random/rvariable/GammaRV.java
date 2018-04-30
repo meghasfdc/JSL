@@ -72,4 +72,27 @@ public final class GammaRV extends AbstractRVariable {
         double v = myGamma.invCDF(myRNG.randU01());
         return v;
     }
+
+    /**
+     * The keys are "shape" with default value 1.0 and "scale" with
+     * default value 1.0
+     *
+     * @return a control for Gamma random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Gamma) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("shape", 1.0);
+                addDoubleControl("scale", 1.0);
+                setName(RVariableIfc.RVType.Gamma.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double scale = getDoubleControl("scale");
+                double shape = getDoubleControl("shape");
+                return new GammaRV(shape, scale, rnStream);
+            }
+        };
+    }
 }

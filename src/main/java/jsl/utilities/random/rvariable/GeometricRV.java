@@ -66,4 +66,25 @@ public final class GeometricRV extends AbstractRVariable {
         double v = JSLRandom.rGeometric(myProbSuccess, myRNG);
         return v;
     }
+
+    /**
+     * The key is "ProbOfSuccess", the default value is 0.5
+     *
+     * @return a control for Geometric random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Geometric) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("ProbOfSuccess", 0.5);
+                setName(RVariableIfc.RVType.Geometric.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double probOfSuccess = getDoubleControl("ProbOfSuccess");
+                return new GeometricRV(probOfSuccess, rnStream);
+            }
+        };
+    }
+
 }

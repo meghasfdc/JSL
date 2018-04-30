@@ -86,4 +86,27 @@ public final class NormalRV extends AbstractRVariable {
         double v = JSLRandom.rNormal(myMean, myVar, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "mean" with default value 0.0 and "variance" with
+     * default value 1.0
+     *
+     * @return a control for Normal random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Normal) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("mean", 0.0);
+                addDoubleControl("variance", 1.0);
+                setName(RVariableIfc.RVType.Normal.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double mean = getDoubleControl("mean");
+                double variance = getDoubleControl("variance");
+                return new NormalRV(mean, variance, rnStream);
+            }
+        };
+    }
 }

@@ -83,4 +83,28 @@ public final class LognormalRV extends AbstractRVariable {
         double v = JSLRandom.rLogNormal(myMean, myVar, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "mean" with default value 1.0 and "variance" with
+     * default value 1.0
+     *
+     * @return a control for Lognormal random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Lognormal) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("mean", 1.0);
+                addDoubleControl("variance", 1.0);
+                setName(RVariableIfc.RVType.Lognormal.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double mean = getDoubleControl("mean");
+                double variance = getDoubleControl("variance");
+                return new LognormalRV(mean, variance, rnStream);
+            }
+        };
+    }
+
 }

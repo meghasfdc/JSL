@@ -83,4 +83,29 @@ public final class PearsonType6RV extends AbstractRVariable {
         double v = JSLRandom.rPearsonType6(myAlpha1, myAlpha2, myBeta, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "alpha1" with default value 2.0 and "alpha2" with
+     * default value 3.0, and "beta" with default value 1.0
+     *
+     * @return a control for PearsonType6 random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.PearsonType6) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("alpha1", 2.0);
+                addDoubleControl("alpha2", 3.0);
+                addDoubleControl("beta", 1.0);
+                setName(RVariableIfc.RVType.PearsonType6.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double alpha1 = getDoubleControl("alpha1");
+                double alpha2 = getDoubleControl("alpha2");
+                double beta = getDoubleControl("beta");
+                return new PearsonType6RV(alpha1, alpha2, beta, rnStream);
+            }
+        };
+    }
 }

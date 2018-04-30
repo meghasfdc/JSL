@@ -67,4 +67,24 @@ public final class PoissonRV extends AbstractRVariable {
         double v = JSLRandom.rPoisson(mean, myRNG);
         return v;
     }
+
+    /**
+     * The key is "mean" with default value 1.0
+     *
+     * @return a control for Poisson random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Poisson) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("mean", 1.0);
+                setName(RVariableIfc.RVType.Poisson.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double mean = getDoubleControl("mean");
+                return new PoissonRV(mean, rnStream);
+            }
+        };
+    }
 }

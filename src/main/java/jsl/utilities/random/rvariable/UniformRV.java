@@ -76,4 +76,26 @@ public final class UniformRV extends AbstractRVariable {
         double v = JSLRandom.rUniform(min, max, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "min" with default value 0.0 and "max" with default value 1.0
+     *
+     * @return a control for Uniform random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Uniform) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("min", 0.0);
+                addDoubleControl("max", 1.0);
+                setName(RVariableIfc.RVType.Uniform.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream){
+                double min = getDoubleControl("min");
+                double max = getDoubleControl("max");
+                return new UniformRV(min, max, rnStream);
+            }
+        };
+    }
 }

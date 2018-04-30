@@ -79,4 +79,27 @@ public final class PearsonType5RV extends AbstractRVariable {
         double v = JSLRandom.rPearsonType5(myShape, myScale, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "shape" with default value 1.0 and "scale" with
+     * default value 1.0
+     *
+     * @return a control for PearsonType5 random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.PearsonType5) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("shape", 1.0);
+                addDoubleControl("scale", 1.0);
+                setName(RVariableIfc.RVType.PearsonType5.name());
+            }
+
+            public final RVariableIfc makePearsonType5(RNStreamIfc rnStream) {
+                double scale = getDoubleControl("scale");
+                double shape = getDoubleControl("shape");
+                return new PearsonType5RV(shape, scale, rnStream);
+            }
+        };
+    }
 }

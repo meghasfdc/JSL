@@ -67,4 +67,25 @@ public final class ChiSquaredRV extends AbstractRVariable {
         double v = JSLRandom.rChiSquared(dof, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "dof", the default value is 1.0
+     *
+     * @return a control for Chi-Squared random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.ChiSquared) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("dof", 1.0);
+                setName(RVariableIfc.RVType.ChiSquared.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double dof = getDoubleControl("dof");
+                return new ChiSquaredRV(dof, rnStream);
+            }
+        };
+    }
+
 }

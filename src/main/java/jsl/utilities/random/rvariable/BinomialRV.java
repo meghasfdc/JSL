@@ -80,4 +80,27 @@ public final class BinomialRV extends AbstractRVariable {
         double v = JSLRandom.rBinomial(myProbSuccess, myNumTrials, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "ProbOfSuccess", the default value is 0.5 and
+     * "NumTrials" with default value 2.
+     *
+     * @return a control for Binomial random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Binomial) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("ProbOfSuccess", 0.5);
+                addIntegerControl("NumTrials", 2);
+                setName(RVariableIfc.RVType.Binomial.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double probOfSuccess = getDoubleControl("ProbOfSuccess");
+                int numTrials = getIntegerControl("NumTrials");
+                return new BinomialRV(probOfSuccess, numTrials, rnStream);
+            }
+        };
+    }
 }

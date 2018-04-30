@@ -67,4 +67,24 @@ public final class ExponentialRV extends AbstractRVariable {
         double v = JSLRandom.rExponential(mean, myRNG);
         return v;
     }
+
+    /**
+     * The key is "mean" with default value 1.0
+     *
+     * @return a control for Exponential random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Exponential) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("mean", 1.0);
+                setName(RVariableIfc.RVType.Exponential.name());
+            }
+
+            public final RVariableIfc makeRVariabel(RNStreamIfc rnStream) {
+                double mean = getDoubleControl("mean");
+                return new ExponentialRV(mean, rnStream);
+            }
+        };
+    }
 }

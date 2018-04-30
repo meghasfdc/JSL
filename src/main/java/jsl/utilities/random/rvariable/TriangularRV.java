@@ -91,4 +91,29 @@ public final class TriangularRV extends AbstractRVariable {
         double v = JSLRandom.rTriangular(myMin, myMode, myMax, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "min" with default value 0.0 and "mode" with
+     * default value 0.5, and "max" with default value 1.0
+     *
+     * @return a control for Triangular random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Triangular) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("min", 0.0);
+                addDoubleControl("mode", 0.5);
+                addDoubleControl("max", 1.0);
+                setName(RVariableIfc.RVType.Triangular.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double mode = getDoubleControl("mode");
+                double min = getDoubleControl("min");
+                double max = getDoubleControl("max");
+                return new TriangularRV(min, mode, max, rnStream);
+            }
+        };
+    }
 }

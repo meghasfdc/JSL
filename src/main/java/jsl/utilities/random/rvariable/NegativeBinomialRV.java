@@ -85,4 +85,27 @@ public final class NegativeBinomialRV extends AbstractRVariable {
         double v = JSLRandom.rNegBinomial(myProbSuccess, myNumSuccesses, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "ProbOfSuccess", the default value is 0.5 and
+     * "NumSuccesses" with default value 1.
+     *
+     * @return a control for Negative Binomial random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.NegativeBinomial) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("ProbOfSuccess", 0.5);
+                addIntegerControl("NumSuccesses", 1);
+                setName(RVariableIfc.RVType.NegativeBinomial.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double probOfSuccess = getDoubleControl("ProbOfSuccess");
+                double numSuccesses = getDoubleControl("NumSuccesses");
+                return new NegativeBinomialRV(probOfSuccess, numSuccesses, rnStream);
+            }
+        };
+    }
 }

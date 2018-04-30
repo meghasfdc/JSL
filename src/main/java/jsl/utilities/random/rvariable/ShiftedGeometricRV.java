@@ -66,4 +66,24 @@ public final class ShiftedGeometricRV extends AbstractRVariable {
         double v = 1.0 + JSLRandom.rGeometric(myProbSuccess, myRNG);
         return v;
     }
+
+    /**
+     * The key is "ProbOfSuccess", the default value is 0.5
+     *
+     * @return a control for ShiftedGeometric random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.ShiftedGeometric) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("ProbOfSuccess", 0.5);
+                setName(RVariableIfc.RVType.ShiftedGeometric.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double probOfSuccess = getDoubleControl("ProbOfSuccess");
+                return new ShiftedGeometricRV(probOfSuccess, rnStream);
+            }
+        };
+    }
 }

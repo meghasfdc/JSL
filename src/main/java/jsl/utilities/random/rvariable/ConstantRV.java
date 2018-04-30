@@ -133,4 +133,24 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
     public final RVariableIfc newAntitheticInstance() {
         return new ConstantRV(this.value);
     }
+
+    /**
+     * The keys are "value", the default value is 1.0
+     *
+     * @return a control for Constant random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Constant) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("value", 1.0);
+                setName(RVariableIfc.RVType.Constant.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                Double value = getDoubleControl("value");
+                return new ConstantRV(value);
+            }
+        };
+    }
 }

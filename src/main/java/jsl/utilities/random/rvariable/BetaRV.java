@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.controls.Controls;
 import jsl.utilities.random.distributions.Beta;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
@@ -74,6 +73,29 @@ public final class BetaRV extends AbstractRVariable {
     protected final double generate() {
         double v = myBeta.invCDF(myRNG.randU01());
         return v;
+    }
+
+    /**
+     * The keys are "alpha1", the default value is 1.0 and
+     * "alpha2" with default value 1.0.
+     *
+     * @return a control for Beta random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Beta) {
+            @Override
+            protected final void fillControls() {
+                addDoubleControl("alpha1", 1.0);
+                addDoubleControl("alpha2", 1.0);
+                setName(RVariableIfc.RVType.Beta.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double alpha1 = getDoubleControl("alpha1");
+                double alpha2 = getDoubleControl("alpha2");
+                return new BetaRV(alpha1, alpha2, rnStream);
+            }
+        };
     }
     
 }

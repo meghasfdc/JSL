@@ -76,4 +76,27 @@ public final class DUniformRV extends AbstractRVariable {
         double v = JSLRandom.rDUniform(min, max, myRNG);
         return v;
     }
+
+    /**
+     * The keys are "min" with default value 0 and "max" with
+     * default value 1
+     *
+     * @return a control for DUniform random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.DUniform) {
+            @Override
+            protected final void fillControls() {
+                addIntegerControl("min", 0);
+                addIntegerControl("max", 1);
+                setName(RVariableIfc.RVType.DUniform.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                int min = getIntegerControl("min");
+                int max = getIntegerControl("max");
+                return new DUniformRV(min, max, rnStream);
+            }
+        };
+    }
 }
