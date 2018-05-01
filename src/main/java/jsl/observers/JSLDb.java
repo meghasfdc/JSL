@@ -1042,7 +1042,7 @@ public class JSLDb {
      * @param tableName the name of the table to display
      */
     public final void displayTableAsCSV(String tableName) {
-        myDb.displayTableAsCSV(tableName);
+        myDb.printTableAsCSV(tableName);
     }
 
     /**
@@ -1061,7 +1061,7 @@ public class JSLDb {
      * @param tableName the name of the table to write
      */
     public final void displayTableAsText(String tableName) {
-        myDb.displayTableAsText(tableName);
+        myDb.printTableAsText(tableName);
     }
 
     /**
@@ -1077,7 +1077,7 @@ public class JSLDb {
      * Displays all the user defined tables as text on the console
      */
     public final void displayAllTablesAsText() {
-        myDb.displayAllTablesAsText();
+        myDb.printAllTablesAsText();
     }
 
     /**

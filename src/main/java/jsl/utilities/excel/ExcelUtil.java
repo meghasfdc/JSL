@@ -21,7 +21,7 @@
  */
 package jsl.utilities.excel;
 
-import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
+import jsl.utilities.dbutil.DatabaseIfc;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -68,7 +68,7 @@ public class ExcelUtil {
      *
      * @param db the database to read data from
      */
-    public static void runWriteDBAsExcelWorkbook(EmbeddedDerbyDatabase db) {
+    public static void runWriteDBAsExcelWorkbook(DatabaseIfc db) {
         runWriteDBAsExcelWorkbook(db, null);
     }
 
@@ -79,7 +79,7 @@ public class ExcelUtil {
      * @param db             the database to read data from
      * @param pathToWorkbook the name of the workbook that is to be made
      */
-    public static void runWriteDBAsExcelWorkbook(EmbeddedDerbyDatabase db, Path pathToWorkbook) {
+    public static void runWriteDBAsExcelWorkbook(DatabaseIfc db, Path pathToWorkbook) {
         try {
             writeDBAsExcelWorkbook(db, pathToWorkbook);
         } catch (FileNotFoundException ex) {
@@ -99,7 +99,7 @@ public class ExcelUtil {
      * @param db             the database to write to
      * @param tableNames     the names of the sheets and tables in the order that needs to be written
      */
-    public static void runWriteWorkbookToDatabase(Path pathToWorkbook, EmbeddedDerbyDatabase db,
+    public static void runWriteWorkbookToDatabase(Path pathToWorkbook, DatabaseIfc db,
                                                   List<String> tableNames) {
         runWriteWorkbookToDatabase(pathToWorkbook, true, db, tableNames);
     }
@@ -112,7 +112,7 @@ public class ExcelUtil {
      * @param db             the database to write to
      * @param tableNames     the names of the sheets and tables in the order that needs to be written
      */
-    public static void runWriteWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, EmbeddedDerbyDatabase db,
+    public static void runWriteWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, DatabaseIfc db,
                                                   List<String> tableNames) {
         try {
             writeWorkbookToDatabase(pathToWorkbook, skipFirstRow, db, tableNames);
@@ -133,7 +133,7 @@ public class ExcelUtil {
      * @param db the database to read data from
      * @throws IOException           io exception
      */
-    public static void writeDBAsExcelWorkbook(EmbeddedDerbyDatabase db)
+    public static void writeDBAsExcelWorkbook(DatabaseIfc db)
             throws IOException {
         writeDBAsExcelWorkbook(db, null);
     }
@@ -148,7 +148,7 @@ public class ExcelUtil {
      * @param pathToWorkbook the name of the workbook that was made
      * @throws IOException           io exception
      */
-    public static void writeDBAsExcelWorkbook(EmbeddedDerbyDatabase db, Path pathToWorkbook)
+    public static void writeDBAsExcelWorkbook(DatabaseIfc db, Path pathToWorkbook)
             throws IOException {
         //  if null make the name of the workbook the same as the database name
         if (pathToWorkbook == null) {
@@ -181,7 +181,7 @@ public class ExcelUtil {
      * @throws IOException            an io exception
      * @throws InvalidFormatException if the workbook has an invalid format
      */
-    public static void writeWorkbookToDatabase(Path pathToWorkbook, EmbeddedDerbyDatabase db,
+    public static void writeWorkbookToDatabase(Path pathToWorkbook, DatabaseIfc db,
                                                List<String> tableNames) throws IOException, InvalidFormatException {
         writeWorkbookToDatabase(pathToWorkbook, true, db, tableNames);
     }
@@ -198,7 +198,7 @@ public class ExcelUtil {
      * @throws IOException            an io exception
      * @throws InvalidFormatException if the workbook has an invalid format
      */
-    public static void writeWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, EmbeddedDerbyDatabase db,
+    public static void writeWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, DatabaseIfc db,
                                                List<String> tableNames) throws IOException, InvalidFormatException {
         if (pathToWorkbook == null) {
             throw new IllegalArgumentException("The path to the workbook was null");
@@ -223,7 +223,7 @@ public class ExcelUtil {
      * @param tableNames the names of the sheets and tables in the order that needs to be written
      * @throws IOException an io exception
      */
-    public static void writeWorkbookToDatabase(XSSFWorkbook wb, EmbeddedDerbyDatabase db,
+    public static void writeWorkbookToDatabase(XSSFWorkbook wb, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
         writeWorkbookToDatabase(wb, true, db, tableNames);
     }
@@ -239,7 +239,7 @@ public class ExcelUtil {
      * @param tableNames   the names of the sheets and tables in the order that needs to be written
      * @throws IOException an io exception
      */
-    public static void writeWorkbookToDatabase(XSSFWorkbook wb, boolean skipFirstRow, EmbeddedDerbyDatabase db,
+    public static void writeWorkbookToDatabase(XSSFWorkbook wb, boolean skipFirstRow, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
         if (wb == null) {
             throw new IllegalArgumentException("The workbook was null");
@@ -270,7 +270,7 @@ public class ExcelUtil {
      * @param db    the database containing the table
      * @throws IOException an io exception
      */
-    public static void writeSheetToTable(Sheet sheet, EmbeddedDerbyDatabase db) throws IOException {
+    public static void writeSheetToTable(Sheet sheet, DatabaseIfc db) throws IOException {
         writeSheetToTable(sheet, true, null, db);
     }
 
@@ -282,7 +282,7 @@ public class ExcelUtil {
      * @param db        the database containing the table
      * @throws IOException an io exception
      */
-    public static void writeSheetToTable(Sheet sheet, String tableName, EmbeddedDerbyDatabase db) throws IOException {
+    public static void writeSheetToTable(Sheet sheet, String tableName, DatabaseIfc db) throws IOException {
         writeSheetToTable(sheet, true, tableName, db);
     }
 
@@ -293,7 +293,7 @@ public class ExcelUtil {
      * @param db           the database containing the table
      * @throws IOException an io exception
      */
-    public static void writeSheetToTable(Sheet sheet, boolean skipFirstRow, String tableName, EmbeddedDerbyDatabase db) throws IOException {
+    public static void writeSheetToTable(Sheet sheet, boolean skipFirstRow, String tableName, DatabaseIfc db) throws IOException {
         if (sheet == null) {
             throw new IllegalArgumentException("The Sheet was null");
         }
@@ -441,7 +441,7 @@ public class ExcelUtil {
      * @param tableName the table to read from
      * @param sheet     the Excel sheet to write to
      */
-    public static void writeTableAsExcelSheet(EmbeddedDerbyDatabase db, String tableName, Sheet sheet) {
+    public static void writeTableAsExcelSheet(DatabaseIfc db, String tableName, Sheet sheet) {
         if (db == null) {
             throw new IllegalArgumentException("The database was null");
         }

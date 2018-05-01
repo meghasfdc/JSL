@@ -81,7 +81,7 @@ public final class ExponentialRV extends AbstractRVariable {
                 setName(RVariableIfc.RVType.Exponential.name());
             }
 
-            public final RVariableIfc makeRVariabel(RNStreamIfc rnStream) {
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
                 double mean = getDoubleControl("mean");
                 return new ExponentialRV(mean, rnStream);
             }

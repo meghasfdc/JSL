@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author rossetti
  */
-public class EmbeddedDerbyDatabase {
+public class EmbeddedDerbyDatabase implements DatabaseIfc {
 
     public enum LineOption {
         COMMENT, CONTINUED, END
@@ -426,6 +426,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @return the name
      */
+    @Override
     public final String getName() {
         return myDbName;
     }
@@ -439,6 +440,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @return the URL
      */
+    @Override
     public final String getURL() {
         return myConnURL;
     }
@@ -470,6 +472,7 @@ public class EmbeddedDerbyDatabase {
      * @return the meta data about the database
      * @throws SQLException an sql exception
      */
+    @Override
     public final DatabaseMetaData getDatabaseMetaData() throws SQLException {
         return myConnection.getMetaData();
     }
@@ -477,6 +480,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the schema name for the database (if defined)
      */
+    @Override
     public final String getDBSchemaName() {
         return myDbSchemaName;
     }
@@ -484,6 +488,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the sql dialect for the database.  Here should be derby
      */
+    @Override
     public final SQLDialect getSQLDialect() {
         return mySQLDialect;
     }
@@ -491,6 +496,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the path to the tables only script
      */
+    @Override
     public final Path getCreationScriptPath() {
         return myCreationScriptPath;
     }
@@ -500,6 +506,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param path
      */
+    @Override
     public void setCreationScriptPath(Path path) {
         myCreationScriptPath = path;
     }
@@ -507,6 +514,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the path to the tables only script
      */
+    @Override
     public final Path getTablesOnlyScriptPath() {
         return myTableScriptPath;
     }
@@ -516,6 +524,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param path
      */
+    @Override
     public void setTablesOnlyScriptPath(Path path) {
         myTableScriptPath = path;
     }
@@ -523,6 +532,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the path to the insertion script
      */
+    @Override
     public final Path getInsertionScriptPath() {
         return myInsertionScriptPath;
     }
@@ -532,6 +542,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param path
      */
+    @Override
     public void setInsertionScriptPath(Path path) {
         myInsertionScriptPath = path;
     }
@@ -541,6 +552,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param path
      */
+    @Override
     public void setAlterScriptPath(Path path) {
         myAlterScriptPath = path;
     }
@@ -550,6 +562,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param path
      */
+    @Override
     public void setExcelInsertPath(Path path) {
         myExcelInsertPath = path;
     }
@@ -557,6 +570,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the path to the Excel workbook that holds data for inserts
      */
+    @Override
     public Path getExcelInsertPath() {
         return myExcelInsertPath;
     }
@@ -564,6 +578,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the path to a script that can alter the database
      */
+    @Override
     public Path getAlterScriptPath() {
         return myAlterScriptPath;
     }
@@ -571,6 +586,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a list of table names in the order that they must be truncated. May be empty.
      */
+    @Override
     public List<String> getTruncateTableOrder() {
         return Collections.unmodifiableList(myTruncateTableOrder);
     }
@@ -578,6 +594,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a list of table names in the order that they must be inserted. May be empty
      */
+    @Override
     public List<String> getInsertTableOrder() {
         return Collections.unmodifiableList(myInsertTableOrder);
     }
@@ -585,6 +602,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a list of strings representing the creation commands for the database. May be empty.
      */
+    @Override
     public List<String> getCreateCommands() {
         return Collections.unmodifiableList(myTableCommands);
     }
@@ -592,6 +610,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a list of strings representing the insertion commands for the database. May be empty.
      */
+    @Override
     public List<String> getInsertCommands() {
         return Collections.unmodifiableList(myInsertCommands);
     }
@@ -599,6 +618,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a list of strings representing the insertion commands for the database. May be empty.
      */
+    @Override
     public List<String> getAlterCommands() {
         return Collections.unmodifiableList(myAlterCommands);
     }
@@ -606,6 +626,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @param tableNames the names of the tables in the order needed for truncation
      */
+    @Override
     public final void setTruncateTableOrder(List<String> tableNames) {
         if (tableNames == null) {
             throw new IllegalArgumentException("The truncate table name array must not be null");
@@ -617,6 +638,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @param tableNames the names of the tables in the order needed for insertion
      */
+    @Override
     public final void setInsertTableOrder(List<String> tableNames) {
         if (tableNames == null) {
             throw new IllegalArgumentException("The truncate table name array must not be null");
@@ -629,6 +651,7 @@ public class EmbeddedDerbyDatabase {
      * @param pathToScript sets and executes the commands in the script for creating only tables in the database
      * @return true if all commands executed
      */
+    @Override
     public final boolean executeCreateTablesOnlyScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The creation script path must not be null");
@@ -647,6 +670,7 @@ public class EmbeddedDerbyDatabase {
      * @param pathToScript sets and executes the commands in the script for creating the database
      * @return true if all commands executed
      */
+    @Override
     public final boolean executeCreationScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The creation script path must not be null");
@@ -665,6 +689,7 @@ public class EmbeddedDerbyDatabase {
      * @param pathToScript sets and executes the commands in the script for inserting data into the database
      * @return true if all commands executed
      */
+    @Override
     public final boolean executeInsertionScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The insertion script path must not be null");
@@ -683,6 +708,7 @@ public class EmbeddedDerbyDatabase {
      * @param pathToScript sets and executes the commands in the script for altering the database
      * @return true if all commands executed
      */
+    @Override
     public final boolean executeAlterScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The alter script path must not be null");
@@ -702,6 +728,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @return a list of the names of the tables as strings
      */
+    @Override
     public List<String> getTableNames() {
         List<Table<?>> tables = getTables();
         List<String> list = new ArrayList<>();
@@ -731,6 +758,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the use defined schema (as opposed to the system defined schema)
      */
+    @Override
     public Schema getUserSchema() {
         return getSchema(getDBSchemaName());
     }
@@ -739,6 +767,7 @@ public class EmbeddedDerbyDatabase {
      * @param tableName the name to get the Table for
      * @return the jooq Table associated with the supplied name
      */
+    @Override
     public Table<? extends Record> getTable(String tableName) {
         return getUserSchema().getTable(tableName);
     }
@@ -747,6 +776,7 @@ public class EmbeddedDerbyDatabase {
      * @param table the table to check
      * @return true if the databased contains the supplied table
      */
+    @Override
     public boolean containsTable(Table<?> table) {
         return getUserSchema().getTables().contains(table);
     }
@@ -754,6 +784,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a list of jooq Tables in the user schema
      */
+    @Override
     public List<Table<?>> getTables() {
         return getUserSchema().getTables();
     }
@@ -763,6 +794,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @return true if it exists
      */
+    @Override
     public boolean hasTables() {
         return (!getTables().isEmpty());
     }
@@ -773,6 +805,7 @@ public class EmbeddedDerbyDatabase {
      * @param table a string representing the name of the table
      * @return true if it exists
      */
+    @Override
     public boolean tableExists(String table) {
         return (getTable(table) != null);
     }
@@ -781,6 +814,7 @@ public class EmbeddedDerbyDatabase {
      * @param tableName the name of the table to write
      * @param out       the output file for the writing
      */
+    @Override
     public void writeTableAsCSV(String tableName, PrintWriter out) {
         if (!tableExists(tableName)) {
             logger.trace("Table: {} does not exist in database schema {}", tableName, getUserSchema());
@@ -795,7 +829,8 @@ public class EmbeddedDerbyDatabase {
      *
      * @param tableName the name of the table to display
      */
-    public void displayTableAsCSV(String tableName) {
+    @Override
+    public void printTableAsCSV(String tableName) {
         writeTableAsCSV(tableName, new PrintWriter(System.out));
     }
 
@@ -805,6 +840,7 @@ public class EmbeddedDerbyDatabase {
      * @param tableName the name of the table to write
      * @param out       the output file to write to
      */
+    @Override
     public void writeTableAsText(String tableName, PrintWriter out) {
         if (!tableExists(tableName)) {
             logger.trace("Table: {} does not exist in database schema {}", tableName, getUserSchema());
@@ -820,7 +856,8 @@ public class EmbeddedDerbyDatabase {
      *
      * @param tableName the name of the table to write
      */
-    public void displayTableAsText(String tableName) {
+    @Override
+    public void printTableAsText(String tableName) {
         writeTableAsText(tableName, new PrintWriter(System.out));
     }
 
@@ -829,6 +866,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param out the place to write to
      */
+    @Override
     public void writeAllTablesAsText(PrintWriter out) {
         List<Table<?>> tables = getTables();
         for (Table table : tables) {
@@ -841,7 +879,8 @@ public class EmbeddedDerbyDatabase {
     /**
      * Displays all the user defined tables as text on the console
      */
-    public void displayAllTablesAsText() {
+    @Override
+    public void printAllTablesAsText() {
         writeAllTablesAsText(new PrintWriter(System.out));
     }
 
@@ -864,6 +903,7 @@ public class EmbeddedDerbyDatabase {
      * @param tableName the name of the table to get all records from
      * @return a jooq result holding all of the records from the table
      */
+    @Override
     public Result<Record> selectAll(String tableName) {
         if (!tableExists(tableName)) {
             return null;
@@ -875,6 +915,7 @@ public class EmbeddedDerbyDatabase {
      * @param table the table to check
      * @return true if the table has no data in the result
      */
+    @Override
     public boolean isTableEmpty(String table) {
         Result<Record> selectAll = selectAll(table);
         if (selectAll == null) {
@@ -898,6 +939,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return true if at least one table has data
      */
+    @Override
     public boolean hasData() {
         return areAllTablesEmpty() != true;
     }
@@ -905,6 +947,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return true if all tables are empty
      */
+    @Override
     public boolean areAllTablesEmpty() {
         List<Table<?>> tables = getTables();
         boolean result = true;
@@ -923,6 +966,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param pathToOutPutDirectory
      */
+    @Override
     public void writeAllTablesAsCSV(Path pathToOutPutDirectory) throws IOException {
 
         Files.createDirectories(pathToOutPutDirectory);
@@ -944,6 +988,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return a jooq Parser for parsing queries on the database
      */
+    @Override
     public Parser getParser() {
         return getDSLContext().parser();
     }
@@ -951,6 +996,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * @return the jooq DSLContext for the database
      */
+    @Override
     public DSLContext getDSLContext() {
         if (myExecuteLoggingSettings == null){
             return DSL.using(getConnection(), getSQLDialect());
@@ -962,6 +1008,7 @@ public class EmbeddedDerbyDatabase {
     /**
      *  Turns on JooQ Default execute SQL logging
      */
+    @Override
     public final void turnOffJooQDefaultExecutionLogging(){
         myExecuteLoggingSettings = new Settings().withExecuteLogging(false);
     }
@@ -969,6 +1016,7 @@ public class EmbeddedDerbyDatabase {
     /**
      *  Turns off JooQ Default execute SQL logging
      */
+    @Override
     public final void turnOnJooQDefaultExecutionLogging(){
         myExecuteLoggingSettings = null;
     }
@@ -1018,7 +1066,8 @@ public class EmbeddedDerbyDatabase {
     /**
      * Displays the DDL queries needed to define and create the database on the console
      */
-    public void displayJOOQDDLQueries() {
+    @Override
+    public void printJOOQDDLQueries() {
         writeJOOQDDLQueries(new PrintWriter(System.out));
     }
 
@@ -1046,19 +1095,20 @@ public class EmbeddedDerbyDatabase {
      * @param tableName the name of the table to generate insert statements for
      * @return the insert statements as a string
      */
-    public String getInserQueries(String tableName) {
+    @Override
+    public String getInsertQueries(String tableName) {
         Table<? extends Record> table = getTable(tableName);
         if (table == null) {
             return null;
         }
-        return getInserQueries(table);
+        return getInsertQueries(table);
     }
 
     /**
      * @param table the table to generate the insert statements for
      * @return the insert statements as a string
      */
-    protected String getInserQueries(Table<? extends Record> table) {
+    protected String getInsertQueries(Table<? extends Record> table) {
         if (table == null) {
             throw new IllegalArgumentException("The supplied tabel was null");
         }
@@ -1075,7 +1125,8 @@ public class EmbeddedDerbyDatabase {
      *
      * @param tableName the name of the table for the insert statements
      */
-    public void displayInsertQueries(String tableName) {
+    @Override
+    public void printInsertQueries(String tableName) {
         writeInsertQueries(tableName, new PrintWriter(System.out));
     }
 
@@ -1085,6 +1136,7 @@ public class EmbeddedDerbyDatabase {
      * @param tableName the name of the table for the insert statements
      * @param out       the file to write to
      */
+    @Override
     public void writeInsertQueries(String tableName, PrintWriter out) {
         if (!tableExists(tableName)) {
             logger.trace("Table: {} does not exist in database schema {}", tableName, getUserSchema());
@@ -1115,7 +1167,8 @@ public class EmbeddedDerbyDatabase {
     /**
      * Displays all the insert statements for the database on the console
      */
-    public void displayAllTablesAsInsertQueries() {
+    @Override
+    public void printAllTablesAsInsertQueries() {
         writeAllTablesAsInsertQueries(new PrintWriter(System.out));
     }
 
@@ -1124,6 +1177,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param out the place to write the queries
      */
+    @Override
     public void writeAllTablesAsInsertQueries(PrintWriter out) {
         List<Table<?>> tables = getTables();
         for (Table t : tables) {
@@ -1135,7 +1189,8 @@ public class EmbeddedDerbyDatabase {
      * Displays all the insert statements for the database on the console
      * in the order specfied by defined insertion order
      */
-    public void displayAllTablesAsInsertQueriesUsingInsertOrder() {
+    @Override
+    public void printAllTablesAsInsertQueriesUsingInsertOrder() {
         writeAllTablesAsInsertQueriesUsingInsertOrder(new PrintWriter(System.out));
     }
 
@@ -1144,6 +1199,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param out the place to write the queries
      */
+    @Override
     public void writeAllTablesAsInsertQueriesUsingInsertOrder(PrintWriter out) {
         List<String> insertTableOrder = getInsertTableOrder();
         for (String name : insertTableOrder) {
@@ -1154,6 +1210,7 @@ public class EmbeddedDerbyDatabase {
     /**
      * Writes all the tables to an Excel workbook, uses name of database, uses the working directory
      */
+    @Override
     public void writeDbToExcelWorkbook() throws IOException {
         writeDbToExcelWorkbook(null, null);
     }
@@ -1163,6 +1220,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
+    @Override
     public void writeDbToExcelWorkbook(Path wbDirectory) throws IOException {
         writeDbToExcelWorkbook(null, wbDirectory);
     }
@@ -1172,6 +1230,7 @@ public class EmbeddedDerbyDatabase {
      *
      * @param wbName name of the workbook, if null uses name of database
      */
+    @Override
     public void writeDbToExcelWorkbook(String wbName) throws IOException {
         writeDbToExcelWorkbook(wbName, null);
     }
@@ -1182,6 +1241,7 @@ public class EmbeddedDerbyDatabase {
      * @param wbName      name of the workbook, if null uses name of database
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
+    @Override
     public void writeDbToExcelWorkbook(String wbName, Path wbDirectory) throws IOException {
         if (wbName == null) {
             wbName = getName();
@@ -1202,6 +1262,7 @@ public class EmbeddedDerbyDatabase {
      * @param cmd the command
      * @return true if the command executed
      */
+    @Override
     public final boolean executeCommand(String cmd) throws SQLException {
         Statement statement = null;
         boolean flag = false;
@@ -1232,6 +1293,7 @@ public class EmbeddedDerbyDatabase {
      * @param cmds the commands
      * @return true if all commands were executed
      */
+    @Override
     public final boolean executeCommands(List<String> cmds) {
         boolean flag = true;
         try {
@@ -1265,6 +1327,7 @@ public class EmbeddedDerbyDatabase {
      * @param path the path
      * @return
      */
+    @Override
     public final boolean executeScript(Path path) throws IOException {
         if (path == null) {
             throw new IllegalArgumentException("The script path must not be null");
@@ -1285,6 +1348,7 @@ public class EmbeddedDerbyDatabase {
      * @throws SQLException thrown if the derby commands fail
      * @throws IOException thrown if the system file copy commands fail
      */
+    @Override
     public final void copyDb(String dupName, Path directory) throws SQLException, IOException {
         if (dupName == null) {
             throw new IllegalArgumentException("The duplicate's name must not be null!");

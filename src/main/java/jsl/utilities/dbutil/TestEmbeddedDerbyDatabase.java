@@ -47,7 +47,7 @@ public class TestEmbeddedDerbyDatabase {
 //        createExcelWorkbookFromDB("CreateWithStructureAndDataViaInsertsWithConstraintsDB");
         //duplicateDatabaseTest("FullSPDB");
         Path directory = dbDir.resolve("Clones");
-        EmbeddedDerbyDatabase.connectDb("FullSPDBDUPLICATE",directory).connect().displayAllTablesAsText();
+        EmbeddedDerbyDatabase.connectDb("FullSPDBDUPLICATE",directory).connect().printAllTablesAsText();
     }
 
 //    public static void testDuplication() throws IOException,
@@ -57,7 +57,7 @@ public class TestEmbeddedDerbyDatabase {
 //
 //        EmbeddedDerbyDatabase sp_duplicate = db.duplicate("SP_Duplicate");
 //        System.out.println("Printing the duplicate:");
-//        sp_duplicate.displayAllTablesAsText();
+//        sp_duplicate.printAllTablesAsText();
 //    }
 
     public static EmbeddedDerbyDatabase createEmptyDb(String name) throws IOException,
@@ -65,7 +65,7 @@ public class TestEmbeddedDerbyDatabase {
         FileUtils.deleteDirectory(dbDir.resolve(name).toFile());
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(name, dbDir).connect();
         System.out.println("Printing empty database:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
         return db;
     }
 
@@ -76,7 +76,7 @@ public class TestEmbeddedDerbyDatabase {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(name, dbDir)
                 .withCreationScript(createScript).connect();
         System.out.println("Printing full database:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
         return db;
     }
 
@@ -86,7 +86,7 @@ public class TestEmbeddedDerbyDatabase {
         Path tablesScript = dbScriptsDir.resolve("SPDatabase_Tables.sql");
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(name, dbDir).withTables(tablesScript).connect();
         System.out.println("Printing empty database:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
         return db;
     }
 
@@ -100,7 +100,7 @@ public class TestEmbeddedDerbyDatabase {
                 .withInsertData(insertScript)
                 .connect();
         System.out.println("Printing inserted database:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
         return db;
     }
 
@@ -116,7 +116,7 @@ public class TestEmbeddedDerbyDatabase {
                 .withConstraints(alterScript)
                 .connect();
         System.out.println("Printing inserted database:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
 
         System.out.println();
         System.out.println("Printing alter command");
@@ -124,7 +124,7 @@ public class TestEmbeddedDerbyDatabase {
         System.out.println();
 
         System.out.println("Printing jooq DDL queries");
-        db.displayJOOQDDLQueries();
+        db.printJOOQDDLQueries();
         System.out.println("As of Jan 26, 2018: JOOQ is missing the unique index constraints.");
         return db;
     }
@@ -133,7 +133,7 @@ public class TestEmbeddedDerbyDatabase {
             SQLException, InvalidFormatException {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb(name, dbDir).connect();
         System.out.println("Printing the connected database:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
         return db;
     }
 
@@ -151,7 +151,7 @@ public class TestEmbeddedDerbyDatabase {
                 .withConstraints(alterScript)
                 .connect();
         System.out.println("Printing inserted database from Excel:");
-        db.displayAllTablesAsText();
+        db.printAllTablesAsText();
         return db;
     }
 

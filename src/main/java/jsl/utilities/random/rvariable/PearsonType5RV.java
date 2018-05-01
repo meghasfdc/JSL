@@ -95,7 +95,7 @@ public final class PearsonType5RV extends AbstractRVariable {
                 setName(RVariableIfc.RVType.PearsonType5.name());
             }
 
-            public final RVariableIfc makePearsonType5(RNStreamIfc rnStream) {
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
                 double scale = getDoubleControl("scale");
                 double shape = getDoubleControl("shape");
                 return new PearsonType5RV(shape, scale, rnStream);
