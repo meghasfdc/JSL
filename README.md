@@ -29,6 +29,10 @@ Within IntelliJ
 
 11) Try to run a class that has main(), e.g. ex.statistics.TestStatistic
 
+You don't need to use version control. You can simply download the repository zip
+file and unzip it. Then, open it up in IntelliJ in the same way as above by following 
+steps 4-11.
+
 If you are using NetBeans, then do the following:
 
 1) Make sure that you have installed the Gradle plugin for NetBeans.  Follow 
