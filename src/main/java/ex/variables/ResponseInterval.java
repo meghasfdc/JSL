@@ -157,7 +157,7 @@ public class ResponseInterval extends SchedulingElement {
      * @param startTime must not be infinite
      */
     public final void setStartTime(double startTime) {
-        if (startTime == Double.POSITIVE_INFINITY) {
+        if (Double.isInfinite(startTime)) {
             throw new IllegalArgumentException("The start time cannot be infinity");
         }
         myStartTime = startTime;
@@ -184,11 +184,11 @@ public class ResponseInterval extends SchedulingElement {
      * @param duration must be finite and positive
      */
     protected final void setDuration(double duration) {
-        if (duration == Double.POSITIVE_INFINITY) {
+        if (Double.isInfinite(duration)) {
             throw new IllegalArgumentException("The duration must be finite.");
         }
         if (duration <= 0) {
-            throw new IllegalArgumentException("The durationt must be > 0.");
+            throw new IllegalArgumentException("The duration must be > 0.");
         }
         myDuration = duration;
     }

@@ -37,6 +37,7 @@ public class ScheduleTest {
      */
     public static void main(String[] args) {
         Simulation sim = new Simulation("Test Schedule");
+        sim.setDbOption(false);
         Model model = sim.getModel();
         Schedule s = new Schedule.Builder(model).startTime(10).length(100).build();
         s.addItem(0.0, 5);

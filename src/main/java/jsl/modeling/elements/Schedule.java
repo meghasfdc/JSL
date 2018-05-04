@@ -37,7 +37,7 @@ import jsl.modeling.SchedulingElement;
  *  the simulation that the schedule is to start. The default start time is zero (at the beginning of the simulation).
  *
  *  A Schedule as a length (or duration) that represents the total time associated with the schedule. After this
- *  time has elapsed the entier schedule can repeat if the repeat option is on. The default length of a schedule
+ *  time has elapsed the entire schedule can repeat if the repeat option is on. The default length of a schedule
  *  is infinite.  The total or maximum duration of scheduled items cannot exceed the schedule duration if it is finite.
  *
  *  A Schedule has a repeat flag that controls whether or not it will repeat after its duration has elapsed. The
@@ -349,14 +349,25 @@ public class Schedule extends SchedulingElement {
     }
 
     /**
+     * Adds an item to the schedule with priority JSLEvent.DEFAULT_PRIORITY and
+     * default start time of 0.0 (i.e. when the schedule starts)
+     *
+     * @param duration the duration of the item
+     * @return the created ScheduleItem
+     */
+    public ScheduleItem addItem(double duration) {
+        return addItem(0.0, duration, getItemStartEventPriority(), null);
+    }
+
+    /**
      * Adds an item to the schedule with priority JSLEvent.DEFAULT_PRIORITY
      *
      * @param startTime the time past the start of the schedule to start the
      * item
      * @param duration the duration of the item
-     * @return
+     * @return the created ScheduleItem
      */
-    public boolean addItem(double startTime, double duration) {
+    public ScheduleItem addItem(double startTime, double duration) {
         return addItem(startTime, duration, getItemStartEventPriority(), null);
     }
 
@@ -368,9 +379,9 @@ public class Schedule extends SchedulingElement {
      * @param duration the duration of the item
      * @param priority the priority, among items, if items start at the same
      * time
-     * @return
+     * @return the created ScheduleItem
      */
-    public boolean addItem(double startTime, double duration, int priority) {
+    public ScheduleItem addItem(double startTime, double duration, int priority) {
         return addItem(startTime, duration, priority, null);
     }
 
@@ -382,9 +393,9 @@ public class Schedule extends SchedulingElement {
      * item
      * @param duration the duration of the item
      * @param message a message or datum to attach to the item
-     * @return
+     * @return the created ScheduleItem
      */
-    public <T> boolean addItem(double startTime, double duration, T message) {
+    public <T> ScheduleItem<T> addItem(double startTime, double duration, T message) {
         return addItem(startTime, duration, getItemStartEventPriority(), message);
     }
 
@@ -398,10 +409,10 @@ public class Schedule extends SchedulingElement {
      * @param priority the priority, (among items) if items start at the same
      * time
      * @param message a message or datum to attach to the item
-     * @return
+     * @return the created ScheduleItem
      */
-    public <T> boolean addItem(double startTime, double duration, int priority, T message) {
-        ScheduleItem aItem = new ScheduleItem(startTime, duration, priority, message);
+    public <T> ScheduleItem<T> addItem(double startTime, double duration, int priority, T message) {
+        ScheduleItem<T> aItem = new ScheduleItem(startTime, duration, priority, message);
 
         if (aItem.getEndTime() > getInitialStartTime() + getScheduleLength()) {
             throw new IllegalArgumentException("The item's end time is past the schedule's end.");
@@ -409,12 +420,14 @@ public class Schedule extends SchedulingElement {
 
         // nothing in the list, just add to beginning
         if (myItems.isEmpty()) {
-            return myItems.add(aItem);
+            myItems.add(aItem);
+            return aItem;
         }
         // might as well check for worse case, if larger than the largest
         // then put it at the end and return
         if (aItem.compareTo(myItems.get(myItems.size() - 1)) >= 0) {
-            return myItems.add(aItem);
+            myItems.add(aItem);
+            return aItem;
         }
 
         // now iterate through the list
@@ -423,10 +436,10 @@ public class Schedule extends SchedulingElement {
                 // next() move the iterator forward, if it is < what was returned by next(), then it
                 // must be inserted at the previous index
                 myItems.add(i.previousIndex(), aItem);
-                return true;
+                break;
             }
         }
-        return false;
+        return aItem;
     }
 
     @Override
