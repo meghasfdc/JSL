@@ -254,10 +254,10 @@ public class ExcelUtil {
         for (String tableName : tableNames) {
             XSSFSheet sheet = wb.getSheet(tableName);
             if (sheet == null){
-                logger.trace("Skipping table {} no corresponding sheet in workbook", tableName);
+                logger.debug("Skipping table {} no corresponding sheet in workbook", tableName);
                 continue;
             }
-            logger.trace("Attempting to write sheet to table {}", tableName);
+            logger.debug("Attempting to write sheet to table {}", tableName);
             writeSheetToTable(sheet, skipFirstRow, tableName, db);
         }
     }
@@ -309,7 +309,7 @@ public class ExcelUtil {
 
         final Table<? extends Record> table = db.getTable(tableName);
         final Field<?>[] fields = table.fields();
-        logger.trace("Processing sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getName());
+        logger.debug("Processing sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getName());
         final List<Object[]> lists = readSheetAsListOfObjects(sheet, fields, skipFirstRow);
         db.getDSLContext().loadInto(table).batchAll().loadArrays(lists.iterator()).fields(fields).execute();
     }
