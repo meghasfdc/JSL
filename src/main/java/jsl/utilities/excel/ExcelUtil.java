@@ -155,10 +155,12 @@ public class ExcelUtil {
             Path currentDir = Paths.get(".");
             pathToWorkbook = currentDir.resolve(db.getName() + ".xlsx");
         }
+        logger.debug("Writing database {} to Excel workbook {}.", db.getName(), pathToWorkbook);
         List<String> tables = db.getTableNames();
         XSSFWorkbook workbook = new XSSFWorkbook();
         for (String tableName : tables) {
             Sheet sheet = workbook.createSheet(tableName);
+            logger.debug("Writing table {} to Excel sheet.", tableName);
             writeTableAsExcelSheet(db, tableName, sheet);
         }
 
@@ -417,7 +419,7 @@ public class ExcelUtil {
         }
         switch (cell.getCellTypeEnum()) {
             case STRING:
-                return cell.getStringCellValue();
+                return cell.getStringCellValue().trim();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
@@ -510,7 +512,7 @@ public class ExcelUtil {
         if (object == null) {
             // nothing to write
         } else if (object instanceof String) {
-            cell.setCellValue((String) object);
+            cell.setCellValue((String) ((String) object).trim());
         } else if (object instanceof Boolean) {
             cell.setCellValue((Boolean) object);
         } else if (object instanceof Integer) {
@@ -525,14 +527,30 @@ public class ExcelUtil {
         } else if (object instanceof Long) {
             Long x = (Long) object;
             cell.setCellValue(x.doubleValue());
+        } else if (object instanceof Short){
+            Short x = (Short)object;
+            cell.setCellValue(x.doubleValue());
         } else if (object instanceof java.sql.Date) {
             java.sql.Date x = (java.sql.Date) object;
             cell.setCellValue(x);
+            Workbook wb = cell.getSheet().getWorkbook();
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat("m/d/yy"));
+            cell.setCellStyle(cellStyle);
         } else if (object instanceof java.sql.Time) {
             java.sql.Time x = (java.sql.Time) object;
             cell.setCellValue(x);
+            Workbook wb = cell.getSheet().getWorkbook();
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat("h:mm:ss AM/PM"));
+            cell.setCellStyle(cellStyle);
         } else {
-            throw new ClassCastException("Could not cast database type to Excel type");
+            logger.error("Could not cast type {} to Excel type.", object.getClass().getName());
+            throw new ClassCastException("Could not cast database type to Excel type: " + object.getClass().getName() );
         }
     }
 
