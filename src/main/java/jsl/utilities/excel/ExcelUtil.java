@@ -208,9 +208,11 @@ public class ExcelUtil {
         File file = pathToWorkbook.toFile();
         OPCPackage pkg = OPCPackage.open(file);
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
+        logger.debug("Writing workbook {} to database {}",  pathToWorkbook, db.getName());
         writeWorkbookToDatabase(wb, skipFirstRow, db, tableNames);
         //wb.close();
         pkg.close();
+        logger.debug("Completed writing workbook {} to database {}",  pathToWorkbook, db.getName());
     }
 
     /**
@@ -259,7 +261,6 @@ public class ExcelUtil {
                 logger.debug("Skipping table {} no corresponding sheet in workbook", tableName);
                 continue;
             }
-            logger.debug("Attempting to write sheet to table {}", tableName);
             writeSheetToTable(sheet, skipFirstRow, tableName, db);
         }
     }
@@ -311,9 +312,10 @@ public class ExcelUtil {
 
         final Table<? extends Record> table = db.getTable(tableName);
         final Field<?>[] fields = table.fields();
-        logger.debug("Processing sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getName());
+        logger.debug("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getName());
         final List<Object[]> lists = readSheetAsListOfObjects(sheet, fields, skipFirstRow);
         db.getDSLContext().loadInto(table).batchAll().loadArrays(lists.iterator()).fields(fields).execute();
+        logger.debug("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getName());
     }
 
     /**
