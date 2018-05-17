@@ -25,6 +25,8 @@ import ex.queueing.DriverLicenseBureauWithQ;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.SimulationReporter;
+import jsl.modeling.elements.variable.ResponseInterval;
+import jsl.modeling.elements.variable.ResponseSchedule;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 
@@ -45,19 +47,28 @@ public class TestIntervalSchedule {
         new DriverLicenseBureauWithQ(m);
         ResponseVariable rs = m.getResponseVariable("System Time");
         TimeWeighted tw = m.getTimeWeighted("NS");
-        ResponseSchedule sched = new ResponseSchedule(m);
+        //ResponseSchedule sched = new ResponseSchedule(m, 5.0);
+        ResponseSchedule sched = new ResponseSchedule(m, 0.0);
         //sched.addConsecutiveIntervals(2, 5, "Interval");
-        sched.addConsecutiveIntervals(2, 5);
+        sched.addIntervals(5.0, 2, 5);
         sched.addResponseToAllIntervals(rs);
         sched.addResponseToAllIntervals(tw);
-        sched.setStartTime(5.0);
-        sched.setScheduleRepeatFlag(true);
-        
+       // sched.setStartTime(5.0);
+        //sched.setScheduleRepeatFlag(true);
+        sched.setScheduleRepeatFlag(false);
+
+        ResponseInterval ri = new ResponseInterval(m, 1.0, "Hourly");
+        ri.setRepeatFlag(true);
+        ri.setStartTime(0.0);
+        ri.addResponseToInterval(rs);
+        ri.addResponseToInterval(tw);
+
         System.out.println(sched);
         sim.setNumberOfReplications(2);
+        //sim.setLengthOfReplication(20.0);
         sim.setLengthOfReplication(20.0);
         sim.setLengthOfWarmUp(5);
-
+        //sim.setLengthOfWarmUp(1000);
         SimulationReporter r = sim.makeSimulationReporter();
 
         //System.out.println(sim);

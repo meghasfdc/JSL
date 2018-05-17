@@ -19,7 +19,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ex.variables;
+package jsl.modeling.elements.variable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,10 +27,8 @@ import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
-import jsl.modeling.elements.variable.Counter;
 import jsl.observers.ModelElementObserver;
 import jsl.utilities.statistic.WeightedStatisticIfc;
-import jsl.modeling.elements.variable.ResponseVariable;
 
 /**
  * This class represents an interval of time over which statistical collection
@@ -38,10 +36,22 @@ import jsl.modeling.elements.variable.ResponseVariable;
  * time and a duration. The duration must be finite and greater than zero.
  *
  * Simulation responses in the form of instances of ResponseVariable,
- * TimeWeighted, and Counter should be added to the interval for observation.
+ * TimeWeighted, and Counter can be added to the interval for observation.
  * New responses are created and associated with each of the supplied responses.
  * The new responses collect observations associated with the supplied responses
- * only during the specified interval.
+ * only during the specified interval. In the case of response variables or
+ * time weighted variables, the average response during the interval is observed.
+ * In the case of counters, the total count during the interval is observed.
+ *
+ * If the interval is not associated with a ResponseSchedule, the interval may
+ * be repeated. In which case, the statistics are collected across the
+ * intervals. A repeated interval starts immediately after the previous
+ * duration. Note that for ResponseVariables that are observed, if there
+ * are no observations during the interval then the average response during
+ * the interval is undefined (and thus not observed). Therefore interval
+ * statistics for ResponseVariables are conditional on the occurrence of at least
+ * one observation.  This is most relevant when the interval is repeated because
+ * intervals with no observations are not tabulated.
  *
  * @author rossetti
  */
@@ -49,14 +59,16 @@ public class ResponseInterval extends SchedulingElement {
 
     /**
      * Need to ensure that start event happens after schedule start
+     * and after warm up event
      */
-    public final int START_EVENT_PRIORITY = 15;
+    //public final int START_EVENT_PRIORITY = 15;
+    public final int START_EVENT_PRIORITY = JSLEvent.DEFAULT_WARMUP_EVENT_PRIORITY + 1;
 
     /**
      * Need to ensure that end event happens before schedule end
      */
-    public final int END_EVENT_PRIORITY = 5;
-
+    //public final int END_EVENT_PRIORITY = 5;
+    public final int END_EVENT_PRIORITY = START_EVENT_PRIORITY - 5;
     /**
      * The action that represents the start of the interval
      */
@@ -123,6 +135,13 @@ public class ResponseInterval extends SchedulingElement {
      */
     protected double myStartTime;
 
+    /**
+     * The  repeat flag controls whether or not the interval will
+     * repeat after its duration has elapsed.  The default is
+     * false.
+     */
+    protected boolean myRepeatFlag = false;
+
     protected ResponseSchedule myResponseSchedule;
 
     /**
@@ -151,6 +170,24 @@ public class ResponseInterval extends SchedulingElement {
     }
 
     /**
+     * Sets whether or not the interval will repeat after it reaches it length
+     *
+     * @param flag true means repeats
+     */
+    public final void setRepeatFlag(boolean flag) {
+        myRepeatFlag = flag;
+    }
+
+    /**
+     * Returns whether or not the interval will repeat after it completes its duration
+     *
+     * @return true means it repeats
+     */
+    public final boolean getRepeatFlag() {
+        return myRepeatFlag;
+    }
+
+    /**
      * Specifies when the interval is to start. If negative, then the interval
      * will not be started
      *
@@ -165,7 +202,7 @@ public class ResponseInterval extends SchedulingElement {
 
     /**
      *
-     * @return the time to start the schedule
+     * @return the time to start the interval
      */
     public final double getStartTime() {
         return myStartTime;
@@ -275,8 +312,8 @@ public class ResponseInterval extends SchedulingElement {
 
     @Override
     protected void initialize() {
-//        System.out.println("In ResponseInterval: initialize()");
-//        System.out.println("getStartTime() = " + getStartTime());
+        //System.out.println("In ResponseInterval: initialize()");
+        //System.out.println("getStartTime() = " + getStartTime());
         super.initialize();
         if (getStartTime() >= 0.0) {
             scheduleInterval(getStartTime());
@@ -285,11 +322,17 @@ public class ResponseInterval extends SchedulingElement {
 
     @Override
     protected void afterReplication() {
-//        System.out.println("In ResponseInterval: afterReplication()");
+        //System.out.println("In ResponseInterval: afterReplication()");
         super.afterReplication();
         myTimeLastStarted = 0.0;
         myTimeLastEnded = 0.0;
         cancelInterval();
+        for(IntervalData d: myResponses.values()){
+            d.reset();
+        }
+        for(IntervalData d: myCounters.values()){
+            d.reset();
+        }
     }
 
     /**
@@ -298,9 +341,9 @@ public class ResponseInterval extends SchedulingElement {
      * @param startTime the time to start the interval
      */
     protected final void scheduleInterval(double startTime) {
-//        System.out.println("In ResponseInterval: scheduleInterval()");
-//        System.out.println(" > Interval: " + getStringLabel());
-//        System.out.println(" > scheduling interval to start at " + (getTime() + startTime));
+        //System.out.println("In ResponseInterval: scheduleInterval()");
+        //System.out.println(" > Interval: " + getStringLabel());
+        //System.out.println(" > scheduling interval to start at " + (getTime() + startTime));
         if (isScheduled()) {
             throw new IllegalStateException("Attempted to schedule an already scheduled interval");
         }
@@ -324,30 +367,40 @@ public class ResponseInterval extends SchedulingElement {
         myEndEvent = null;
     }
 
+    /**
+     * Includes the model name, the id, the model element name, the parent name, and parent id
+     *
+     * @return a string representing the model element
+     */
+    @Override
+    public String toString() {
+        return asString();
+    }
+
     @Override
     public String asString(){
         StringBuilder sb = new StringBuilder();
         sb.append("Interval: ");
         sb.append(getStringLabel());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("Start time: ");
         sb.append(getStartTime());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("Time last started: ");
         sb.append(getTimeLastStarted());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("Duration: ");
         sb.append(getDuration());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("Time last ended: ");
         sb.append(getTimeLastEnded());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("Is Scheduled: ");
         sb.append(isScheduled());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("#Responses: ");
         sb.append(myResponses.size());
-        sb.append(System.lineSeparator());
+        sb.append(", ");
         sb.append("#Counters: ");
         sb.append(myCounters.size());
 //        sb.append(System.lineSeparator());
@@ -365,15 +418,21 @@ public class ResponseInterval extends SchedulingElement {
         double mySumAtStart = 0.0;
         double mySumOfWeightsAtStart = 0.0;
         double myTotalAtStart = 0.0;
+
+        void reset(){
+            mySumAtStart = 0.0;
+            mySumOfWeightsAtStart = 0.0;
+            myTotalAtStart = 0.0;
+        }
     }
 
     private class StartIntervalAction implements EventActionIfc {
 
         @Override
         public void action(JSLEvent evt) {
-//            System.out.println("In StartIntervalAction: action()");
-//            System.out.println("Interval:" + getStringLabel());
-//            System.out.println(getTime() + " > capturing response data at start of interval");
+            //System.out.println("In StartIntervalAction: action()");
+            //System.out.println("Interval:" + getStringLabel());
+            //System.out.println(getTime() + " > capturing response data at start of interval");
             for (Map.Entry<ResponseVariable, IntervalData> entry : myResponses.entrySet()) {
                 myTimeLastStarted = getTime();
                 ResponseVariable key = entry.getKey();
@@ -388,7 +447,7 @@ public class ResponseInterval extends SchedulingElement {
                 IntervalData data = entry.getValue();
                 data.myTotalAtStart = key.getValue();
             }
-//            System.out.println(getTime() + " > scheduling interval to end at " + (getTime() + getDuration()));
+            //System.out.println(getTime() + " > scheduling interval to end at " + (getTime() + getDuration()));
             myEndEvent = scheduleEvent(myEndAction, getDuration(), END_EVENT_PRIORITY);
         }
 
@@ -398,9 +457,9 @@ public class ResponseInterval extends SchedulingElement {
 
         @Override
         public void action(JSLEvent evt) {
-//            System.out.println("In EndIntervalAction: action()");
-//            System.out.println("Interval:" + getStringLabel());
-//            System.out.println(getTime() + " > capturing response data at end of interval");
+            //System.out.println("In EndIntervalAction: action()");
+            //System.out.println("Interval:" + getStringLabel());
+            //System.out.println(getTime() + " > capturing response data at end of interval");
             for (Map.Entry<ResponseVariable, IntervalData> entry : myResponses.entrySet()) {
                 myTimeLastEnded = getTime();
                 ResponseVariable key = entry.getKey();
@@ -423,6 +482,24 @@ public class ResponseInterval extends SchedulingElement {
 
             if (myResponseSchedule != null) {
                 myResponseSchedule.responseIntervalEnded(ResponseInterval.this);
+            } else {
+                // not on a schedule, check if it can repeat
+                if (getRepeatFlag()){
+//                    for (Map.Entry<ResponseVariable, IntervalData> entry : myResponses.entrySet()) {
+//                        ResponseVariable key = entry.getKey();
+//                        IntervalData data = entry.getValue();
+//                        WeightedStatisticIfc w = key.getWithinReplicationStatistic();
+//                        double sum = w.getWeightedSum() - data.mySumAtStart;
+//                        double denom = w.getSumOfWeights() - data.mySumOfWeightsAtStart;
+//                        if (denom != 0.0) {
+//                            double avg = sum / denom;
+//                            data.myResponse.setValue(avg);
+//                            System.out.printf("%f> name = %s, value = %f %n", getTime(), entry.getKey().getName(), avg);
+//                        }
+//                    }
+                    myScheduledFlag = false;
+                    scheduleInterval(0.0);// schedule it to start again, right now
+                }
             }
         }
 

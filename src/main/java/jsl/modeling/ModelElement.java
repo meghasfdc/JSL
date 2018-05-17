@@ -1996,6 +1996,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * This method should be overridden by subclasses that need actions
      * performed when a model element is removed from a model
      */
+    //@Deprecated
     protected void removedFromModel() {
     }
 
@@ -2583,6 +2584,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * client attempts to use this method, via code that is iterating the list a
      * concurrent modification exception will occur.
      */
+   // @Deprecated
     public final void removeFromModel() {
         if (getSimulation().isRunning()){
             StringBuilder sb = new StringBuilder();
@@ -2649,6 +2651,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * @param modelElement the model element to be removed.
      * @return True indicates that the remove was successful.
      */
+    //@Deprecated
     private boolean removeModelElement(ModelElement modelElement) {
 
         if (modelElement == null) {

@@ -29,52 +29,42 @@ import jsl.utilities.statistic.WeightedStatistic;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
 /**
- *
  * @author rossetti
  */
 public class TimedIntervalResponse extends ModelElement {
 
     /**
      * The within interval statistics for the response variable
-     *
      */
     protected WeightedStatistic myWithinIntervalStats;
-    
+
     /**
-     *  the response that is being observed
+     * the response that is being observed
      */
     protected ResponseVariable myObservedResponse;
-    
-    /** For collected across interval statistics
-     * 
+
+    /**
+     * For collected across interval statistics
      */
     protected ResponseVariable myAcrossIntervalResponse;
-    
+
     private ResponseObserver myResponseObserver;
 
-    public TimedIntervalResponse(ModelElement parent, double interval) {
-        this(parent, interval, null);
+    public TimedIntervalResponse(ResponseVariable observedResponse, double interval) {
+        this(observedResponse, interval, null);
     }
 
-    public TimedIntervalResponse(ModelElement parent, double interval, String name) {
-        super(parent, name);
+    public TimedIntervalResponse(ResponseVariable observedResponse, double interval, String name) {
+        super(observedResponse, name);
+        myObservedResponse = observedResponse;
+        myAcrossIntervalResponse = new ResponseVariable(this, observedResponse.getName() + ":Interval");
+        myResponseObserver = new ResponseObserver();
+        observedResponse.addObserver(myResponseObserver);
         setTimedUpdateInterval(interval);
         myWithinIntervalStats = new WeightedStatistic();
-        myResponseObserver = new ResponseObserver();
     }
 
-    public void setResponse(ResponseVariable rv){
-        if (rv == null){
-            throw new IllegalArgumentException("The response to observe was null");
-        }
-        if (myObservedResponse == null){
-            myObservedResponse = rv;
-            myAcrossIntervalResponse = new ResponseVariable(this, rv.getName()+":Interval");
-            rv.addObserver(myResponseObserver);
-        }
-    }
-    
-        @Override
+    @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
         myWithinIntervalStats.reset();
@@ -85,7 +75,7 @@ public class TimedIntervalResponse extends ModelElement {
         super.beforeReplication();
         myWithinIntervalStats.reset();
     }
-    
+
     @Override
     protected void timedUpdate() {
         // collect across timed update statistics
@@ -135,7 +125,7 @@ public class TimedIntervalResponse extends ModelElement {
         protected void update(ModelElement m, Object arg) {
             // observe the actual values of the response
             double value;
-            if (myObservedResponse instanceof ResponseVariable){
+            if (myObservedResponse instanceof ResponseVariable) {
                 value = myObservedResponse.getValue();
             } else {
                 value = myObservedResponse.getPreviousValue();
