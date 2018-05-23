@@ -118,13 +118,19 @@ public class Histogram extends AbstractStatistic {
      */
     public Histogram(double firstBinLL, int numBins, double binWidth, String name, double[] values) {
         super(name);
-        myStatistic = new Statistic();
+        if( Double.isInfinite(firstBinLL)){
+            throw new IllegalArgumentException("The lower limit of the range cannot be infinite.");
+        }
+        if( Double.isInfinite(binWidth)){
+            throw new IllegalArgumentException("The bin width cannot be infinite.");
+        }
         if (numBins <= 0) {
             throw new IllegalArgumentException("The number of bins must be > 0");
         }
         if (binWidth <= 0.0) {
             throw new IllegalArgumentException("The width of the bins must be > 0.0");
         }
+        myStatistic = new Statistic();
         myNumBins = numBins;
         myFirstBinLL = firstBinLL;
         myBinWidth = binWidth;
@@ -181,6 +187,12 @@ public class Histogram extends AbstractStatistic {
      * @return  
      */
     public static Histogram makeHistogram(double lowerLimit, double upperLimit, int numBins, String name, double[] values) {
+        if( Double.isInfinite(lowerLimit)){
+            throw new IllegalArgumentException("The lower limit of the range cannot be infinite.");
+        }
+        if( Double.isInfinite(upperLimit)){
+            throw new IllegalArgumentException("The upper limit of the range cannot be infinite.");
+        }
         if (lowerLimit >= upperLimit) {
             throw new IllegalArgumentException("The lower limit must be < the upper limit of the range");
         }
@@ -499,27 +511,49 @@ public class Histogram extends AbstractStatistic {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Histogram: ").append(getName()).append("\n");
-        sb.append("-------------------------------------\n");
-        sb.append("Number of bins = ").append(myNumBins).append("\n");
-        sb.append("Bin width = ").append(myBinWidth).append("\n");
-        sb.append("First bin starts at = ").append(myFirstBinLL).append("\n");
-        sb.append("Last bin ends at = ").append(myLastBinUL).append("\n");
-        sb.append("Under flow count = ").append(myUnderFlowCount).append("\n");
-        sb.append("Over flow count = ").append(myOverFlowCount).append("\n");
+        sb.append("Histogram: ").append(getName());
+        sb.append(System.lineSeparator());
+        sb.append("-------------------------------------");
+        sb.append(System.lineSeparator());
+        sb.append("Number of bins = ").append(myNumBins);
+        sb.append(System.lineSeparator());
+        sb.append("Bin width = ").append(myBinWidth);
+        sb.append(System.lineSeparator());
+        sb.append("First bin starts at = ").append(myFirstBinLL);
+        sb.append(System.lineSeparator());
+        sb.append("Last bin ends at = ").append(myLastBinUL);
+        sb.append(System.lineSeparator());
+        sb.append("Under flow count = ").append(myUnderFlowCount);
+        sb.append(System.lineSeparator());
+        sb.append("Over flow count = ").append(myOverFlowCount);
+        sb.append(System.lineSeparator());
         double n = getCount();
-        sb.append("Total bin count = ").append(n).append("\n");
-        sb.append("Total count = ").append(getTotalCount()).append("\n");
-        sb.append("-------------------------------------\n");
-        sb.append("Bin \t Range \t Count \t\t tc \t\t p \t\t cp\n");
+        sb.append("Total bin count = ").append(n);
+        sb.append(System.lineSeparator());
+        sb.append("Total count = ").append(getTotalCount());
+        sb.append(System.lineSeparator());
+        sb.append("-------------------------------------");
+        sb.append(System.lineSeparator());
+        sb.append(String.format("%3s %-12s %-5s %-5s %-5s %-6s", "Bin", "Range", "Count", "Total", "Prob", "CumProb"));
+        sb.append(System.lineSeparator());
+//        sb.append("Bin \t Range \t Count \t\t tc \t\t p \t\t cp\n");
         double tc = 0.0;
         for (int i = 1; i <= myNumBins; i++) {
             double LL = myFirstBinLL + (i - 1) * myBinWidth;
             double UL = LL + myBinWidth;
             double c = getBinCount(i);
             tc = tc + c;
-            sb.append(i).append("\t" + "[").append(LL).append(",").append(UL).append(")\t").append(c).append("\t").append(tc).append("\t").append(c / n).append("\t").append(tc / n).append("\n");
+            String s = String.format("%3d [%4.2f,%4.2f) %5.1f %5.1f %5f %6f %n",i,LL, UL, c, tc, (c/n), (tc/n));
+            sb.append(s);
         }
+
+//        for (int i = 1; i <= myNumBins; i++) {
+//            double LL = myFirstBinLL + (i - 1) * myBinWidth;
+//            double UL = LL + myBinWidth;
+//            double c = getBinCount(i);
+//            tc = tc + c;
+//            sb.append(i).append("\t" + "[").append(LL).append(",").append(UL).append(")\t").append(c).append("\t").append(tc).append("\t").append(c / n).append("\t").append(tc / n).append("\n");
+//        }
         sb.append("-------------------------------------\n");
         sb.append("Statistics on data collected within bins:\n");
         sb.append("-------------------------------------\n");
@@ -666,7 +700,8 @@ public class Histogram extends AbstractStatistic {
 
         @Override
         public String toString() {
-            String s = "[" + lowerLimit + "," + upperLimit + ") = " + count;
+            String s = String.format("[%3.2f,%3.2f) = %d", lowerLimit, upperLimit, count);
+           // String s = "[" + lowerLimit + "," + upperLimit + ") = " + count;
             return (s);
         }
     }

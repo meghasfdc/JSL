@@ -232,12 +232,25 @@ public class ResponseInterval extends SchedulingElement {
 
     /**
      * Adds a ResponseVariable to the interval for data collection over the
-     * interval
+     * interval. By default, interval empty statistics are not collected.
      *
      * @param theResponse the response to collect interval statistics on
      * @return a ResponseVariable for the interval
      */
     public ResponseVariable addResponseToInterval(ResponseVariable theResponse) {
+        return addResponseToInterval(theResponse, false);
+    }
+    /**
+     * Adds a ResponseVariable to the interval for data collection over the
+     * interval
+     *
+     * @param theResponse the response to collect interval statistics on
+     * @param intervalEmptyStatOption true means include statistics on whether
+     *                                the interval is empty when observed
+     * @return a ResponseVariable for the interval
+     */
+    public ResponseVariable addResponseToInterval(ResponseVariable theResponse,
+                                                  boolean intervalEmptyStatOption) {
         if (theResponse == null) {
             throw new IllegalArgumentException("The supplied response was null.");
         }
@@ -248,6 +261,11 @@ public class ResponseInterval extends SchedulingElement {
                 theResponse.getName() + ":" + getStringLabel());
         IntervalData data = new IntervalData();
         data.myResponse = rv;
+        if (intervalEmptyStatOption){
+            ResponseVariable rv2 = new ResponseVariable(this,
+                    theResponse.getName() + ":" + getStringLabel()+":P(Empty)");
+            data.myEmptyResponse = rv2;
+        }
         myResponses.put(theResponse, data);
         theResponse.addObserver(myObserver);
         return rv;
@@ -415,14 +433,17 @@ public class ResponseInterval extends SchedulingElement {
     class IntervalData {
 
         ResponseVariable myResponse;
+        ResponseVariable myEmptyResponse;
         double mySumAtStart = 0.0;
         double mySumOfWeightsAtStart = 0.0;
         double myTotalAtStart = 0.0;
+        double myNumObsAtStart = 0.0;
 
         void reset(){
             mySumAtStart = 0.0;
             mySumOfWeightsAtStart = 0.0;
             myTotalAtStart = 0.0;
+            myNumObsAtStart = 0.0;
         }
     }
 
@@ -440,6 +461,7 @@ public class ResponseInterval extends SchedulingElement {
                 WeightedStatisticIfc w = key.getWithinReplicationStatistic();
                 data.mySumAtStart = w.getWeightedSum();
                 data.mySumOfWeightsAtStart = w.getSumOfWeights();
+                data.myNumObsAtStart = w.getCount();
             }
 
             for (Map.Entry<Counter, IntervalData> entry : myCounters.entrySet()) {
@@ -467,6 +489,10 @@ public class ResponseInterval extends SchedulingElement {
                 WeightedStatisticIfc w = key.getWithinReplicationStatistic();
                 double sum = w.getWeightedSum() - data.mySumAtStart;
                 double denom = w.getSumOfWeights() - data.mySumOfWeightsAtStart;
+                double numObs = w.getCount() - data.myNumObsAtStart;
+                if (data.myEmptyResponse != null){
+                    data.myEmptyResponse.setValue((numObs==0.0));
+                }
                 if (denom != 0.0) {
                     double avg = sum / denom;
                     data.myResponse.setValue(avg);

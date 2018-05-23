@@ -60,8 +60,8 @@ public class TestIntervalSchedule {
         ResponseInterval ri = new ResponseInterval(m, 1.0, "Hourly");
         ri.setRepeatFlag(true);
         ri.setStartTime(0.0);
-        ri.addResponseToInterval(rs);
-        ri.addResponseToInterval(tw);
+        ri.addResponseToInterval(rs, true);
+        ri.addResponseToInterval(tw, true);
 
         System.out.println(sched);
         sim.setNumberOfReplications(2);
