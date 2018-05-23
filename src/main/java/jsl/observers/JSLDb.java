@@ -198,8 +198,8 @@ public class JSLDb {
     /**
      * @return the current simulation run record or null
      */
-    protected SimulationRunRecord getCurrentSimRunRecord() {
-        return myCurrentSimRunRecord;
+    public Optional<SimulationRunRecord> getCurrentSimRunRecord() {
+        return Optional.ofNullable(myCurrentSimRunRecord);
     }
 
     /**
@@ -218,8 +218,9 @@ public class JSLDb {
     /**
      * @return the current simulation run record id, the last inserted simulation run
      */
-    protected Integer getCurrentSimRunRecordId() {
-        return myCurrentSimRunRecord.getId();
+    public Optional<Integer> getCurrentSimRunRecordId() {
+        Integer id = myCurrentSimRunRecord.getId();
+        return Optional.ofNullable(id);
     }
 
     /**
@@ -231,7 +232,7 @@ public class JSLDb {
     protected void insertModelElements(List<ModelElement> elements) {
         List<ModelElementRecord> records = new ArrayList<>();
         for (ModelElement element : elements) {
-            ModelElementRecord modelElementRecord = newModelElementRecord(element, getCurrentSimRunRecordId());
+            ModelElementRecord modelElementRecord = newModelElementRecord(element, myCurrentSimRunRecord.getId());
             if (modelElementRecord != null) {
                 records.add(modelElementRecord);
             }
@@ -269,7 +270,7 @@ public class JSLDb {
         }
         List<WithinRepStatRecord> records = new ArrayList<>();
         for (ResponseVariable rv : responses) {
-            WithinRepStatRecord withinRepStatRecord = newWithinRepStatRecord(rv, getCurrentSimRunRecordId());
+            WithinRepStatRecord withinRepStatRecord = newWithinRepStatRecord(rv, myCurrentSimRunRecord.getId());
             if (withinRepStatRecord != null) {
                 records.add(withinRepStatRecord);
             }
@@ -335,7 +336,7 @@ public class JSLDb {
         }
         List<WithinRepCounterStatRecord> records = new ArrayList<>();
         for (Counter c : counters) {
-            WithinRepCounterStatRecord statRecord = newWithinRepCounterStatRecord(c, getCurrentSimRunRecordId());
+            WithinRepCounterStatRecord statRecord = newWithinRepCounterStatRecord(c, myCurrentSimRunRecord.getId());
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -377,7 +378,7 @@ public class JSLDb {
         List<AcrossRepStatRecord> records = new ArrayList<>();
         for (ResponseVariable rv : responses) {
             StatisticAccessorIfc s = rv.getAcrossReplicationStatistic();
-            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(rv.getName(), getCurrentSimRunRecordId(), s);
+            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(rv.getName(), myCurrentSimRunRecord.getId(), s);
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -397,7 +398,7 @@ public class JSLDb {
         List<AcrossRepStatRecord> records = new ArrayList<>();
         for (Counter counter : counters) {
             StatisticAccessorIfc s = counter.getAcrossReplicationStatistic();
-            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(counter.getName(), getCurrentSimRunRecordId(), s);
+            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(counter.getName(), myCurrentSimRunRecord.getId(), s);
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -505,7 +506,7 @@ public class JSLDb {
         for(Map.Entry<ResponseVariable, BatchStatistic> entry: bmap.entrySet()){
             ResponseVariable rv = entry.getKey();
             BatchStatistic bs = entry.getValue();
-            BatchStatRecord batchStatRecord = newBatchStatRecord(rv, getCurrentSimRunRecordId(), bs);
+            BatchStatRecord batchStatRecord = newBatchStatRecord(rv, myCurrentSimRunRecord.getId(), bs);
             if (batchStatRecord != null){
                 records.add(batchStatRecord);
             }
@@ -526,7 +527,7 @@ public class JSLDb {
         for(Map.Entry<TimeWeighted, BatchStatistic> entry: bmap.entrySet()){
             TimeWeighted tw = entry.getKey();
             BatchStatistic bs = entry.getValue();
-            BatchStatRecord batchStatRecord = newBatchStatRecord(tw, getCurrentSimRunRecordId(), bs);
+            BatchStatRecord batchStatRecord = newBatchStatRecord(tw, myCurrentSimRunRecord.getId(), bs);
             if (batchStatRecord != null){
                 records.add(batchStatRecord);
             }
@@ -939,7 +940,7 @@ public class JSLDb {
     public final Result<AcrossRepStatRecord> getAcrossRepStatRecordsForCurrentSimulation() {
         Result<AcrossRepStatRecord> acrossRepStatRecords = myDb.getDSLContext()
                 .selectFrom(ACROSS_REP_STAT)
-                .where(ACROSS_REP_STAT.SIM_RUN_ID_FK.eq(getCurrentSimRunRecordId()))
+                .where(ACROSS_REP_STAT.SIM_RUN_ID_FK.eq(myCurrentSimRunRecord.getId()))
                 .orderBy(ACROSS_REP_STAT.SIM_RUN_ID_FK,
                         ACROSS_REP_STAT.ID,
                         ACROSS_REP_STAT.MODEL_ELEMENT_NAME,
