@@ -25,6 +25,7 @@ import jsl.modeling.Simulation;
 import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
 import jsl.utilities.jsldbsrc.tables.records.*;
 import jsl.utilities.reporting.JSL;
@@ -80,7 +81,8 @@ public class JSLDb {
         }
     }
 
-    protected final EmbeddedDerbyDatabase myDb;
+    //protected final EmbeddedDerbyDatabase myDb;
+    protected final DatabaseIfc myDb;
 
     protected SimulationRunRecord myCurrentSimRunRecord;
     private String tblName;
@@ -967,9 +969,9 @@ public class JSLDb {
         return myDb.getName();
     }
 
-    public final Path getDirectory() {
-        return myDb.getDirectory();
-    }
+//    public final Path getDirectory() {
+//        return myDb.getDirectory();
+//    }
 
     /**
      * A URL representation of the embedded database
@@ -980,12 +982,12 @@ public class JSLDb {
         return myDb.getURL();
     }
 
-    /**
-     * @return the path representation for the database
-     */
-    public final Path getDBPath() {
-        return myDb.getDBPath();
-    }
+//    /**
+//     * @return the path representation for the database
+//     */
+//    public final Path getDBPath() {
+//        return myDb.getDBPath();
+//    }
 
     /**
      * @return the sql dialect for the database.  Here should be derby
