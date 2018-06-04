@@ -440,7 +440,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @return the URL
      */
-    @Override
     public final String getURL() {
         return myConnURL;
     }
@@ -480,7 +479,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return the schema name for the database (if defined)
      */
-    @Override
     public final String getDBSchemaName() {
         return myDbSchemaName;
     }
@@ -496,7 +494,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return the path to the tables only script
      */
-    @Override
     public final Path getCreationScriptPath() {
         return myCreationScriptPath;
     }
@@ -506,7 +503,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @param path
      */
-    @Override
     public void setCreationScriptPath(Path path) {
         myCreationScriptPath = path;
     }
@@ -514,7 +510,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return the path to the tables only script
      */
-    @Override
     public final Path getTablesOnlyScriptPath() {
         return myTableScriptPath;
     }
@@ -524,7 +519,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @param path
      */
-    @Override
     public void setTablesOnlyScriptPath(Path path) {
         myTableScriptPath = path;
     }
@@ -532,7 +526,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return the path to the insertion script
      */
-    @Override
     public final Path getInsertionScriptPath() {
         return myInsertionScriptPath;
     }
@@ -542,7 +535,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @param path
      */
-    @Override
     public void setInsertionScriptPath(Path path) {
         myInsertionScriptPath = path;
     }
@@ -552,7 +544,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @param path
      */
-    @Override
     public void setAlterScriptPath(Path path) {
         myAlterScriptPath = path;
     }
@@ -562,7 +553,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @param path
      */
-    @Override
     public void setExcelInsertPath(Path path) {
         myExcelInsertPath = path;
     }
@@ -570,7 +560,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return the path to the Excel workbook that holds data for inserts
      */
-    @Override
     public Path getExcelInsertPath() {
         return myExcelInsertPath;
     }
@@ -578,7 +567,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return the path to a script that can alter the database
      */
-    @Override
     public Path getAlterScriptPath() {
         return myAlterScriptPath;
     }
@@ -586,7 +574,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return a list of table names in the order that they must be truncated. May be empty.
      */
-    @Override
     public List<String> getTruncateTableOrder() {
         return Collections.unmodifiableList(myTruncateTableOrder);
     }
@@ -594,7 +581,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return a list of table names in the order that they must be inserted. May be empty
      */
-    @Override
     public List<String> getInsertTableOrder() {
         return Collections.unmodifiableList(myInsertTableOrder);
     }
@@ -602,7 +588,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return a list of strings representing the creation commands for the database. May be empty.
      */
-    @Override
     public List<String> getCreateCommands() {
         return Collections.unmodifiableList(myTableCommands);
     }
@@ -610,7 +595,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return a list of strings representing the insertion commands for the database. May be empty.
      */
-    @Override
     public List<String> getInsertCommands() {
         return Collections.unmodifiableList(myInsertCommands);
     }
@@ -618,7 +602,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return a list of strings representing the insertion commands for the database. May be empty.
      */
-    @Override
     public List<String> getAlterCommands() {
         return Collections.unmodifiableList(myAlterCommands);
     }
@@ -626,7 +609,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @param tableNames the names of the tables in the order needed for truncation
      */
-    @Override
     public final void setTruncateTableOrder(List<String> tableNames) {
         if (tableNames == null) {
             throw new IllegalArgumentException("The truncate table name array must not be null");
@@ -638,7 +620,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @param tableNames the names of the tables in the order needed for insertion
      */
-    @Override
     public final void setInsertTableOrder(List<String> tableNames) {
         if (tableNames == null) {
             throw new IllegalArgumentException("The truncate table name array must not be null");
@@ -651,7 +632,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param pathToScript sets and executes the commands in the script for creating only tables in the database
      * @return true if all commands executed
      */
-    @Override
     public final boolean executeCreateTablesOnlyScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The creation script path must not be null");
@@ -670,7 +650,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param pathToScript sets and executes the commands in the script for creating the database
      * @return true if all commands executed
      */
-    @Override
     public final boolean executeCreationScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The creation script path must not be null");
@@ -689,7 +668,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param pathToScript sets and executes the commands in the script for inserting data into the database
      * @return true if all commands executed
      */
-    @Override
     public final boolean executeInsertionScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The insertion script path must not be null");
@@ -708,7 +686,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param pathToScript sets and executes the commands in the script for altering the database
      * @return true if all commands executed
      */
-    @Override
     public final boolean executeAlterScript(Path pathToScript) throws IOException {
         if (pathToScript == null) {
             throw new IllegalArgumentException("The alter script path must not be null");
@@ -988,7 +965,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * @return a jooq Parser for parsing queries on the database
      */
-    @Override
     public Parser getParser() {
         return getDSLContext().parser();
     }
@@ -1066,7 +1042,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * Displays the DDL queries needed to define and create the database on the console
      */
-    @Override
     public void printJOOQDDLQueries() {
         writeJOOQDDLQueries(new PrintWriter(System.out));
     }
@@ -1189,7 +1164,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * Displays all the insert statements for the database on the console
      * in the order specfied by defined insertion order
      */
-    @Override
     public void printAllTablesAsInsertQueriesUsingInsertOrder() {
         writeAllTablesAsInsertQueriesUsingInsertOrder(new PrintWriter(System.out));
     }
@@ -1199,7 +1173,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      *
      * @param out the place to write the queries
      */
-    @Override
     public void writeAllTablesAsInsertQueriesUsingInsertOrder(PrintWriter out) {
         List<String> insertTableOrder = getInsertTableOrder();
         for (String name : insertTableOrder) {
@@ -1348,7 +1321,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @throws SQLException thrown if the derby commands fail
      * @throws IOException thrown if the system file copy commands fail
      */
-    @Override
     public final void copyDb(String dupName, Path directory) throws SQLException, IOException {
         if (dupName == null) {
             throw new IllegalArgumentException("The duplicate's name must not be null!");

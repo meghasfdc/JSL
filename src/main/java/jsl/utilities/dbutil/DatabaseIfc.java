@@ -28,55 +28,9 @@ import java.util.List;
 public interface DatabaseIfc {
     String getName();
 
-    String getURL();
-
     DatabaseMetaData getDatabaseMetaData() throws SQLException;
 
-    String getDBSchemaName();
-
     SQLDialect getSQLDialect();
-
-    Path getCreationScriptPath();
-
-    void setCreationScriptPath(Path path);
-
-    Path getTablesOnlyScriptPath();
-
-    void setTablesOnlyScriptPath(Path path);
-
-    Path getInsertionScriptPath();
-
-    void setInsertionScriptPath(Path path);
-
-    void setAlterScriptPath(Path path);
-
-    void setExcelInsertPath(Path path);
-
-    Path getExcelInsertPath();
-
-    Path getAlterScriptPath();
-
-    List<String> getTruncateTableOrder();
-
-    List<String> getInsertTableOrder();
-
-    List<String> getCreateCommands();
-
-    List<String> getInsertCommands();
-
-    List<String> getAlterCommands();
-
-    void setTruncateTableOrder(List<String> tableNames);
-
-    void setInsertTableOrder(List<String> tableNames);
-
-    boolean executeCreateTablesOnlyScript(Path pathToScript) throws IOException;
-
-    boolean executeCreationScript(Path pathToScript) throws IOException;
-
-    boolean executeInsertionScript(Path pathToScript) throws IOException;
-
-    boolean executeAlterScript(Path pathToScript) throws IOException;
 
     List<String> getTableNames();
 
@@ -114,15 +68,11 @@ public interface DatabaseIfc {
 
     void writeAllTablesAsCSV(Path pathToOutPutDirectory) throws IOException;
 
-    Parser getParser();
-
     DSLContext getDSLContext();
 
     void turnOffJooQDefaultExecutionLogging();
 
     void turnOnJooQDefaultExecutionLogging();
-
-    void printJOOQDDLQueries();
 
     String getInsertQueries(String tableName);
 
@@ -133,10 +83,6 @@ public interface DatabaseIfc {
     void printAllTablesAsInsertQueries();
 
     void writeAllTablesAsInsertQueries(PrintWriter out);
-
-    void printAllTablesAsInsertQueriesUsingInsertOrder();
-
-    void writeAllTablesAsInsertQueriesUsingInsertOrder(PrintWriter out);
 
     void writeDbToExcelWorkbook() throws IOException;
 
@@ -151,6 +97,4 @@ public interface DatabaseIfc {
     boolean executeCommands(List<String> cmds);
 
     boolean executeScript(Path path) throws IOException;
-
-    void copyDb(String dupName, Path directory) throws SQLException, IOException;
 }
