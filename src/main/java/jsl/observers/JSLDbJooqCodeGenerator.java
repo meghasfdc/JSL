@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Manuel D. Rossetti, manuelrossetti@gmail.com
+ * Copyright (c) 2018. Manuel D. Rossetti, rossetti@uark.edu
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package jsl.observers;
 
+import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
 import jsl.utilities.reporting.JSL;
 import org.apache.commons.io.FileUtils;
@@ -67,7 +68,7 @@ public class JSLDbJooqCodeGenerator {
         System.out.println("Created database: " + dbName);
         Path dbPath = dbDir.resolve(dbName);
         System.out.println("Running code generation.");
-        EmbeddedDerbyDatabase.runJooQCodeGeneration(dbPath,"src/main/java", "jsl.utilities.jsldbsrc");
+        DatabaseIfc.runJooQCodeGeneration(dbPath,"src/main/java", "jsl.utilities.jsldbsrc");
         System.out.println("Completed code generation.");
         System.out.println("Deleting the database");
         FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
