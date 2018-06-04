@@ -973,14 +973,14 @@ public class JSLDb {
 //        return myDb.getDirectory();
 //    }
 
-    /**
-     * A URL representation of the embedded database
-     *
-     * @return the URL
-     */
-    public final String getURL() {
-        return myDb.getURL();
-    }
+//    /**
+//     * A URL representation of the embedded database
+//     *
+//     * @return the URL
+//     */
+//    public final String getURL() {
+//        return myDb.getURL();
+//    }
 
 //    /**
 //     * @return the path representation for the database
@@ -996,12 +996,12 @@ public class JSLDb {
         return myDb.getSQLDialect();
     }
 
-    /**
-     * @return the path to the tables only script
-     */
-    public final Path getCreationScriptPath() {
-        return myDb.getCreationScriptPath();
-    }
+//    /**
+//     * @return the path to the tables only script
+//     */
+//    public final Path getCreationScriptPath() {
+//        return myDb.getCreationScriptPath();
+//    }
 
     /**
      * Returns the names of the tables in the current database
