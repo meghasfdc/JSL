@@ -19,6 +19,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
 import jsl.utilities.random.distributions.Gamma;
 
 /**
@@ -204,10 +206,10 @@ public final class JSLMath {
      * Compares two numbers a and b and checks if they are within the default
      * numerical precision of each other.
      *
-     * @return boolean	true if the difference between a and b is less than the
-     * default numerical precision
      * @param a double
      * @param b double
+     * @return boolean    true if the difference between a and b is less than the
+     * default numerical precision
      */
     public final static boolean equal(double a, double b) {
         return equal(a, b, getDefaultNumericalPrecision());
@@ -217,11 +219,11 @@ public final class JSLMath {
      * Compares two numbers a and b and checks if they are within the supplied
      * precision of each other.
      *
-     * @return boolean	true if the relative difference between a and b is less
-     * than precision
-     * @param a double
-     * @param b double
+     * @param a         double
+     * @param b         double
      * @param precision double
+     * @return boolean    true if the relative difference between a and b is less
+     * than precision
      */
     public final static boolean equal(double a, double b, double precision) {
         double norm = Math.max(Math.abs(a), Math.abs(b));
@@ -379,9 +381,9 @@ public final class JSLMath {
     /**
      * Round the specified value upward to the next scale value.
      *
-     * @param value the value to be rounded.
+     * @param value         the value to be rounded.
      * @param integerValued fag specified whether integer scale are used,
-     * otherwise double scale is used.
+     *                      otherwise double scale is used.
      * @return a number rounded upward to the next scale value.
      */
     public final static double roundToScale(double value, boolean integerValued) {
@@ -406,7 +408,7 @@ public final class JSLMath {
                 return scaleValues[n] * exponent;
             }
         }
-        return exponent;	// Should never reach here
+        return exponent;    // Should never reach here
     }
 
     /**
@@ -525,7 +527,6 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param x
      * @return the minimum value in the array
      */
@@ -553,7 +554,6 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param x
      * @return the maximum value in the array
      */
@@ -581,7 +581,6 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param x
      * @return the minimum value in the array
      */
@@ -609,7 +608,6 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param x
      * @return the maximum value in the array
      */
@@ -637,7 +635,6 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param x
      * @return the minimum value in the array
      */
@@ -665,7 +662,6 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param x
      * @return the maximum value in the array
      */
@@ -675,7 +671,6 @@ public final class JSLMath {
 
     /**
      * Copies all but element index of array fromA into array toB
-     *
      *
      * @param index index of element to leave out, must be 0 to fromA.length-1
      * @param fromA array to copy from, must not be null
@@ -688,10 +683,9 @@ public final class JSLMath {
     /**
      * Copies all but element index of array fromA into array toB
      *
-     *
      * @param index index of element to leave out, must be 0 to fromA.length-1
      * @param fromA array to copy from, must not be null
-     * @param toB array to copy to, must be length fromA.length - 1
+     * @param toB   array to copy to, must be length fromA.length - 1
      * @return a reference to the array toB
      */
     public static double[] copyWithout(int index, double[] fromA, double[] toB) {
@@ -724,58 +718,124 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param a the array to add the constant to
      * @param c the constant to add to each element
      * @return the transformed array
      */
-    public static double[] addConstant(double[] a, double c){
+    public static double[] addConstant(double[] a, double c) {
         if (a == null) {
             throw new IllegalArgumentException("The array was null.");
         }
-        for(int i=0; i<a.length; i++){
+        for (int i = 0; i < a.length; i++) {
             a[i] = a[i] + c;
         }
         return a;
     }
 
     /**
-     *
      * @param a the array to add the constant to
      * @param c the constant to subtract from each element
      * @return the transformed array
      */
-    public static double[] subtractConstant(double[] a, double c){
+    public static double[] subtractConstant(double[] a, double c) {
         return addConstant(a, -c);
     }
 
     /**
-     *
      * @param a the array to multiply the constant by
      * @param c the constant to multiply against each element
      * @return the transformed array
      */
-    public static double[] multiplyConstant(double[] a, double c){
+    public static double[] multiplyConstant(double[] a, double c) {
         if (a == null) {
             throw new IllegalArgumentException("The array was null.");
         }
-        for(int i=0; i<a.length; i++){
-            a[i] = a[i]*c;
+        for (int i = 0; i < a.length; i++) {
+            a[i] = a[i] * c;
         }
         return a;
     }
 
     /**
-     *
      * @param a the array to divide the constant by
      * @param c the constant to divide each element, cannot be zero
      * @return the transformed array
      */
-    public static double[] divideConstant(double[] a, double c){
-        if (c == 0.0){
+    public static double[] divideConstant(double[] a, double c) {
+        if (c == 0.0) {
             throw new IllegalArgumentException("Cannot divide by zero");
         }
-        return multiplyConstant(a, 1.0/c);
+        return multiplyConstant(a, 1.0 / c);
+    }
+
+    /**
+     * Multiplies the arrays element by element. Arrays must have same length and must not be null.
+     *
+     * @param a the first array
+     * @param b the second array
+     * @return the array containing a[i]*b[i]
+     */
+    public static double[] multiplyElements(double[] a, double[] b) {
+        Objects.requireNonNull(a, "Array a was null");
+        Objects.requireNonNull(b, "Array b was null");
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("The array lengths must match");
+        }
+        double[] c = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            c[i] = a[i] * b[i];
+        }
+        return c;
+    }
+
+    /**
+     * The array must not be null
+     *
+     * @param array the input array
+     * @return the sum of the squares of the elements of the array
+     */
+    public static double getSumSquares(double[] array) {
+        Objects.requireNonNull(array, "The array was null");
+        double sum = 0.0;
+        for (double v : array) {
+            sum = sum + v * v;
+        }
+        return sum;
+    }
+
+    /**
+     * The array must have non-negative elements and not be null
+     *
+     * @param array the input array
+     * @return the sum of the square roots of the elements of the array
+     */
+    public static double getSumSquareRoots(double[] array) {
+        Objects.requireNonNull(array, "The array was null");
+        double sum = 0.0;
+        for (double v : array) {
+            sum = sum + Math.sqrt(v);
+        }
+        return sum;
+    }
+
+    /**
+     * Adds the arrays element by element. Arrays must have same length and must not be null.
+     *
+     * @param a the first array
+     * @param b the second array
+     * @return the array containing a[i]+b[i]
+     */
+    public static double[] addElements(double[] a, double[] b) {
+        Objects.requireNonNull(a, "Array a was null");
+        Objects.requireNonNull(b, "Array b was null");
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("The array lengths must match");
+        }
+        double[] c = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            c[i] = a[i] + b[i];
+        }
+        return c;
     }
 
     /**
@@ -784,10 +844,10 @@ public final class JSLMath {
      * <p>
      * Usage: getElements(objects, String.class);
      *
-     * @param <T> the type of the element to search for
-     * @param objects the list that can hold anything
+     * @param <T>         the type of the element to search for
+     * @param objects     the list that can hold anything
      * @param targetClass the class type to find in the list, should be same as
-     * T
+     *                    T
      * @return a list that holds the items of the targetClass
      */
     public static <T> List<T> getElements(List objects, Class<T> targetClass) {
@@ -807,10 +867,9 @@ public final class JSLMath {
      * Returns a count of the elements that are of the same type as the target
      * class.
      *
-     *
-     * @param objects the list that can hold anything
+     * @param objects     the list that can hold anything
      * @param targetClass the class type to find in the list, should be same as
-     * T
+     *                    T
      * @return a list that holds the items of the targetClass
      */
     public static int countElements(List objects, Class targetClass) {
@@ -824,8 +883,7 @@ public final class JSLMath {
     }
 
     /**
-     *
-     * @param first the first array
+     * @param first  the first array
      * @param second the second array
      * @return true if all elements are equal
      */

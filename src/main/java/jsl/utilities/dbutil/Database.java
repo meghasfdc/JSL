@@ -76,6 +76,7 @@ public class Database implements DatabaseIfc {
             DbLogger.error("The supplied userSchema name {} was not in the database.", userSchemaName);
             throw new DataAccessException("The supplied userSchema name was not in the database: " + userSchemaName);
         }
+        turnOffJooQDefaultExecutionLogging();
     }
 
     /**
