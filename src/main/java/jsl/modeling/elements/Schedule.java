@@ -47,7 +47,8 @@ import jsl.modeling.SchedulingElement;
  *  is only relevant if the repeat flag is true and the schedule duration is finite. If there is only one cycle, it is
  *  the time that the schedule started.
  *
- *  A builder is used to configure the schedule and then items are added to the schedule.
+ *  A builder is used to configure the schedule and then items are added to the schedule. If no items are added
+ *  to the schedule, then there will still be an event to start the schedule.
  *
  *  To make a Schedule useful, instances of the ScheduleChangeListenerIfc interface should be added to
  *  listen for changes in the schedule.  Instances of ScheduleChangeListenerIfc are notified in the order
