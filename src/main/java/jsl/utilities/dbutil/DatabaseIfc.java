@@ -389,7 +389,7 @@ public interface DatabaseIfc {
      * Writes the insert queries associated with the supplied table to the PrintWriter
      *
      * @param tableName the name of the table
-     * @out the PrintWriter to write to
+     * @param out the PrintWriter to write to
      */
     default void writeInsertQueries(String tableName, PrintWriter out) {
         if (!tableExists(tableName)) {
