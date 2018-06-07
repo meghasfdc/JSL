@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Manuel D. Rossetti, manuelrossetti@gmail.com
+ * Copyright (c) 2018. Manuel D. Rossetti, rossetti@uark.edu
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@ public class JSL {
     private static StringBuilder BLANKS = new StringBuilder("            ");
 
     static {
+        System.setProperty("org.jooq.no-logo", "true");
         File d = new File("jslMessages");
         d.mkdir();
 
