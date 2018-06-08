@@ -86,14 +86,14 @@ public interface WeightedStatisticIfc extends IdentityIfc, GetCSVStatisticIfc {
     /**
      * Gets the last observed data point
      *
-     * @return A double representing the last observations
+     * @return A double representing the last observed observation
      */
     public double getLastValue();
 
     /**
      * Gets the last observed weight
      *
-     * @return A double representing the last weight
+     * @return A double representing the last observed weight
      */
     public double getLastWeight();
 }

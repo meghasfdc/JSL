@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
 import jsl.modeling.elements.Schedule;
@@ -41,9 +42,11 @@ import jsl.utilities.random.rng.RNStreamIfc;
  * If no selection rule is supplied the pool selects the first idle resource
  * by default.
  * <p>
- * Statistics on the number of units idle, busy, failed, and inactive within
- * the pool can be collected by specifying the pool statistics option, which
- * is true by default.
+ * Statistics on the number of units idle and busy are automatically collected.
+ * Statistics on number inactive and number failed in
+ * the pool can be collected by specifying the statistics option, which
+ * is false by default. Inactive and failure statistics will be collected
+ * regardless of whether or not the units in the pool can be failed or inactive.
  * <p>
  * Sub-classes may override the methods unitbecameIdle(), unitbecameBusy(),
  * unitFailed(), unitBecameInactive() in order to react to state
@@ -69,8 +72,8 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
      * Statistics option is false by default
      *
      * @param parent the parent model element
-     * @param units a list of ResourceUnits. Must not contain nulls and
-     * must not contain duplicates
+     * @param units  a list of ResourceUnits. Must not contain nulls and
+     *               must not contain duplicates
      */
     public ResourcePool(ModelElement parent, List<ResourceUnit> units) {
         this(parent, units, false, null);
@@ -80,55 +83,49 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
      * Statistics option is false by default
      *
      * @param parent the parent model element
-     * @param units a list of ResourceUnits. Must not contain nulls and
-     * must not contain duplicates
-     * @param name the name of the pool
+     * @param units  a list of ResourceUnits. Must not contain nulls and
+     *               must not contain duplicates
+     * @param name   the name of the pool
      */
     public ResourcePool(ModelElement parent, List<ResourceUnit> units, String name) {
         this(parent, units, false, name);
     }
 
     /**
-     *
-     * @param parent the parent model element
-     * @param units a list of ResourceUnits. Must not contain nulls and
-     * must not contain duplicates
-     * @param poolStatOption true means collect the statistics
+     * @param parent     the parent model element
+     * @param units      a list of ResourceUnits. Must not contain nulls and
+     *                   must not contain duplicates
+     * @param statOption true means collect statistics on inactive and failure states
      */
     public ResourcePool(ModelElement parent, List<ResourceUnit> units,
-            boolean poolStatOption) {
-        this(parent, units, poolStatOption, null);
+                        boolean statOption) {
+        this(parent, units, statOption, null);
     }
 
     /**
-     *
-     * @param parent the parent model element
-     * @param units a list of ResourceUnits. Must not contain nulls and
-     * must not contain duplicates
-     * @param poolStatOption true means collect more detailed statistics
-     * @param name the name of the pool
+     * @param parent     the parent model element
+     * @param units      a list of ResourceUnits. Must not contain nulls and
+     *                   must not contain duplicates
+     * @param statOption true means collect statistics on inactive and failure states
+     * @param name       the name of the pool
      */
     public ResourcePool(ModelElement parent, List<ResourceUnit> units,
-            boolean poolStatOption, String name) {
+                        boolean statOption, String name) {
         super(parent, name);
         myRUObserver = new ResourceUnitObserver();
         myResources = new LinkedList<>();
         addAll(units);
-        myPoolStatOption = poolStatOption;
+        myNumBusy = new TimeWeighted(this, getName() + ":NumBusy");
+        myNumIdle = new TimeWeighted(this, getName() + ":NumIdle");
+        myPoolStatOption = statOption;
         if (myPoolStatOption == true) {
-            myNumBusy = new TimeWeighted(this, getName() + ":NumBusy");
-            myNumIdle = new TimeWeighted(this, getName() + ":NumIdle");
-            if (hasFailureElements()) {
-                myNumFailed = new TimeWeighted(this, getName() + ":NumFailed");
-            }
-            if (isUsingSchedule()) {
-                myNumInactive = new TimeWeighted(this, getName() + ":NumInactive");
-            }
+            myNumFailed = new TimeWeighted(this, getName() + ":NumFailed");
+            myNumInactive = new TimeWeighted(this, getName() + ":NumInactive");
         }
     }
 
+
     /**
-     *
      * @return number of units in the pool
      */
     public final int getNumUnits() {
@@ -136,7 +133,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if at least one unit is idle
      */
     public final boolean hasIdleUnits() {
@@ -144,7 +140,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if at least one unit is busy
      */
     public final boolean hasBusyUnits() {
@@ -152,7 +147,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if at least one unit is failed
      */
     public final boolean hasFailedUnits() {
@@ -160,7 +154,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if all units are idle
      */
     public final boolean hasAllUnitsIdle() {
@@ -168,7 +161,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if all units are busy
      */
     public final boolean hasAllUnitsBusy() {
@@ -176,7 +168,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if all units are failed
      */
     public final boolean hasAllUnitsFailed() {
@@ -184,7 +175,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if all units are inactive
      */
     public final boolean hasAllUnitsInactive() {
@@ -192,7 +182,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if at least one unit is inactive
      */
     public final boolean hasInactiveUnits() {
@@ -200,7 +189,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return the number of currently idle units
      */
     public final int getNumIdle() {
@@ -214,7 +202,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return the number of currently busy units
      */
     public final int getNumBusy() {
@@ -228,7 +215,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return the number of currently failed units
      */
     public final int getNumFailed() {
@@ -242,7 +228,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return the number of currently inactive units
      */
     public final int getNumInactive() {
@@ -256,7 +241,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if ALL units in the pool have true for their failure delay
      * option. That is, all units allow failures to be delayed.
      */
@@ -271,7 +255,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if ALL units in the pool have true for their inactive period
      * option. That is, all units allows their inactive periods to be delayed
      */
@@ -286,7 +269,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if at least one unit in the pool uses a schedule
      */
     public final boolean isUsingSchedule() {
@@ -301,7 +283,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if at least one unit in the pool has failure elements
      */
     public final boolean hasFailureElements() {
@@ -334,7 +315,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return true if pooled statistics will be collected
      */
     public final boolean isPooledStatsOptionOn() {
@@ -342,7 +322,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @param unit the unit to test
      * @return true if in the pool
      */
@@ -351,33 +330,32 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return an unmodifiable list of the resource units
      */
     public final List<ResourceUnit> getUnits() {
         return Collections.unmodifiableList(myResources);
     }
 
-    /**  Tells all ResourceUnits in the pool that are not already using a Schedule
-     *   to use the supplied schedule
+    /**
+     * Tells all ResourceUnits in the pool that are not already using a Schedule
+     * to use the supplied schedule
      *
      * @param schedule the schedule to use
      */
-    public final void useSchedule(Schedule schedule){
-        if (schedule == null){
+    public final void useSchedule(Schedule schedule) {
+        if (schedule == null) {
             throw new IllegalArgumentException("The supplied Schedule was null");
         }
-        for(ResourceUnit unit: getUnits()){
-            if(!unit.isUsingSchedule()){
+        for (ResourceUnit unit : getUnits()) {
+            if (!unit.isUsingSchedule()) {
                 unit.useSchedule(schedule);
             }
         }
     }
 
     /**
-     *
      * @param units the list to add. Must not contain any nulls and must not
-     * have any units that are already in the pool.
+     *              have any units that are already in the pool.
      */
     protected final void addAll(List<ResourceUnit> units) {
         if (units == null) {
@@ -389,9 +367,8 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @param unit the unit to add. Must not be null. Must not already have been
-     * added
+     *             added
      * @return true if added
      */
     protected final boolean add(ResourceUnit unit) {
@@ -406,7 +383,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return an Optional with the rule
      */
     public Optional<ResourceUnitSelectionRuleIfc> getSelectionRule() {
@@ -414,7 +390,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @param rule the supplied rule, may be null
      */
     public void setSelectionRule(ResourceUnitSelectionRuleIfc rule) {
@@ -451,7 +426,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return the underlying source of randomness for this model element
      */
     public RNStreamIfc getRandomness() {
@@ -462,7 +436,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return returns a list of idle resource units. It may be empty
      */
     public List<ResourceUnit> findIdleResourceUnits() {
@@ -476,7 +449,6 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
-     *
      * @return the first idle resource found or null
      */
     public ResourceUnit findFirstIdle() {

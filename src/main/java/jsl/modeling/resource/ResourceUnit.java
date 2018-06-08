@@ -336,7 +336,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
             for (int i = 1; i <= numToBuild; i++) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(name).append(":").append(i).append(":");
+                sb.append(name).append(":").append(i);
                 ResourceUnit resourceUnit = new ResourceUnit(parent, sb.toString(),
                         autoStartFailuresFlag, failureDelayOption,
                         failuresQDiscipline, failureQStatOption,

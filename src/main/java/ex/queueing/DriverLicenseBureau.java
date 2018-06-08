@@ -190,7 +190,7 @@ public class DriverLicenseBureau extends SchedulingElement {
         new DriverLicenseBureau(m);
 
         // set the parameters of the experiment
-        sim.setNumberOfReplications(10);
+        sim.setNumberOfReplications(1);
         sim.setLengthOfReplication(200000.0);
         sim.setLengthOfWarmUp(50000.0);
 

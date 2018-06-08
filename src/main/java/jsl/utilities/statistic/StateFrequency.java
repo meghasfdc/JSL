@@ -80,7 +80,7 @@ public class StateFrequency implements IdentityIfc {
     }
 
     /**
-     *  Resets the statisical collection
+     *  Resets the statistical collection
      */
     public void reset() {
         myFreq.reset();
