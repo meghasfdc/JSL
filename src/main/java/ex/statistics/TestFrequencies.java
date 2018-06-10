@@ -19,6 +19,7 @@ package ex.statistics;
 import jsl.modeling.State;
 import jsl.utilities.random.rvariable.BinomialRV;
 import jsl.utilities.random.rvariable.JSLRandom;
+import jsl.utilities.random.sp.TwoStateMarkovChain;
 import jsl.utilities.statistic.IntegerFrequency;
 import jsl.utilities.statistic.StateFrequency;
 
@@ -30,7 +31,8 @@ public class TestFrequencies {
 
  //       testIntegerFrequency();
 
-        testStateFrequencies();
+        //testStateFrequencies();
+        testStateTransitions();
     }
 
     private static void testStateFrequencies() {
@@ -50,6 +52,18 @@ public class TestFrequencies {
         double[] sample = bn.sample(10000);
         f.collect(sample);
         System.out.println(f);
+    }
+
+    private static void testStateTransitions(){
+        TwoStateMarkovChain d = new TwoStateMarkovChain();
+        d.setProbabilities(0.9, 0.8);
+        StateFrequency sf = new StateFrequency(2);
+        List<State> states = sf.getStates();
+        for (int i = 1; i <= 20000; i++) {
+            int x = (int)d.getValue();
+            sf.collect(states.get(x));
+        }
+        System.out.println(sf);
     }
 
 }

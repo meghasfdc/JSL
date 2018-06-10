@@ -19,6 +19,7 @@ package jsl.modeling.elements.variable;
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.Table;
 import jsl.modeling.*;
+import jsl.modeling.IllegalStateException;
 import jsl.observers.ModelElementObserver;
 import jsl.utilities.Interval;
 import jsl.utilities.statistic.StateFrequency;
@@ -29,8 +30,8 @@ import java.util.List;
 import static jsl.utilities.reporting.JSL.D2FORMAT;
 
 /**
- *  Collects statistics on whether or not a specific level associated with a variable is
- *  maintained.
+ * Collects statistics on whether or not a specific level associated with a variable is
+ * maintained.
  */
 public class LevelResponse extends SchedulingElement {
 
@@ -62,6 +63,8 @@ public class LevelResponse extends SchedulingElement {
     private final ResponseVariable myTotalTimeBelow;
     private final ResponseVariable myMaxDistanceAbove;
     private final ResponseVariable myMaxDistanceBelow;
+//    private final TimeWeighted myAboveIndicator;
+//    private final TimeWeighted myBelowIndicator;
     // end of collected in replicationEnded()
     private final boolean myStatsOption;
     protected double myInitTime;
@@ -74,40 +77,36 @@ public class LevelResponse extends SchedulingElement {
     private boolean myIntervalStartedFlag;
 
     /**
-     *
      * @param variable the variable to observe
-     * @param level the level to associate with the variable
-     * @param name the name of the response
+     * @param level    the level to associate with the variable
+     * @param name     the name of the response
      */
     public LevelResponse(Variable variable, double level, String name) {
         this(variable, level, true, name);
     }
 
     /**
-     *
      * @param variable the variable to observe
-     * @param level the level to associate with the variable
+     * @param level    the level to associate with the variable
      */
     public LevelResponse(Variable variable, double level) {
         this(variable, level, true, null);
     }
 
     /**
-     *
      * @param variable the variable to observe
-     * @param level the level to associate with the variable
-     * @param stats whether or not detailed state change statistics are collected
+     * @param level    the level to associate with the variable
+     * @param stats    whether or not detailed state change statistics are collected
      */
     public LevelResponse(Variable variable, boolean stats, double level) {
         this(variable, level, stats, null);
     }
 
     /**
-     *
      * @param variable the variable to observe
-     * @param level the level to associate with the variable
-     * @param stats whether or not detailed state change statistics are collected
-     * @param name the name of the response
+     * @param level    the level to associate with the variable
+     * @param stats    whether or not detailed state change statistics are collected
+     * @param name     the name of the response
      */
     public LevelResponse(Variable variable, double level, boolean stats, String name) {
         super(variable, name);
@@ -136,6 +135,8 @@ public class LevelResponse extends SchedulingElement {
         myPctTimeBelow = new ResponseVariable(this, getName() + ":PctTimeBelow:" + D2FORMAT.format(level));
         myTotalTimeAbove = new ResponseVariable(this, getName() + ":TotalTimeAbove:" + D2FORMAT.format(level));
         myTotalTimeBelow = new ResponseVariable(this, getName() + ":TotalTimeBelow:" + D2FORMAT.format(level));
+//        myAboveIndicator = new TimeWeighted(this, getName() + ":P(Above):" + D2FORMAT.format(level));
+//        myBelowIndicator = new TimeWeighted(this, getName() + ":P(Below):" + D2FORMAT.format(level));
         myStatsOption = stats;
         if (stats) {
             myAvgTimeAbove = new ResponseVariable(this, getName() + ":AvgTimeAboveLimit:" + D2FORMAT.format(level));
@@ -182,7 +183,7 @@ public class LevelResponse extends SchedulingElement {
     }
 
     /**
-     *  Causes the cancellation of the observation interval events
+     * Causes the cancellation of the observation interval events
      */
     public void cancelObservationInterval() {
         if (myObservationIntervalStartEvent != null) {
@@ -232,22 +233,84 @@ public class LevelResponse extends SchedulingElement {
 
     private class TheObserver extends ModelElementObserver {
         @Override
+        protected void initialize(ModelElement m, Object arg) {
+           // variableInitialized();
+        }
+
+        @Override
+        protected void warmUp(ModelElement m, Object arg) {
+            //variableWarmedUp();
+        }
+
+        @Override
         protected void update(ModelElement m, Object arg) {
-            if (hasObservationInterval()) {
-                // has observation interval, only capture during the interval
-                if ((myIntervalStartedFlag == true) && (myIntervalEndedFlag == false)){
-                    // interval has started but not yet ended
-                    stateUpdate();
-                }
-            } else {
-                // no interval, always capture
-                stateUpdate();
-            }
+            variableUpdated();
+        }
+
+        @Override
+        protected void replicationEnded(ModelElement m, Object arg) {
+            variableReplicationEnded();
         }
     }
 
+    protected void variableUpdated() {
+        if (hasObservationInterval()) {
+            // has observation interval, only capture during the interval
+            if ((myIntervalStartedFlag == true) && (myIntervalEndedFlag == false)) {
+                // interval has started but not yet ended
+                stateUpdate();
+            }
+        } else {
+            // no interval, always capture
+            stateUpdate();
+        }
+    }
+
+    protected void stateUpdate() {
+        State nextState;
+        if (myVariable.getValue() >= myLevel) {
+//            myAboveIndicator.setValue(1.0);
+//            myBelowIndicator.setValue(0.0);
+            myDistanceAbove.setValue(myVariable.getValue() - myLevel);
+            nextState = myAbove;
+        } else {
+            // below level
+//            myAboveIndicator.setValue(0.0);
+//            myBelowIndicator.setValue(1.0);
+            myDistanceBelow.setValue(myLevel - myVariable.getValue());
+            nextState = myBelow;
+        }
+        nextState.enter(getTime());
+        // now check if exit is required
+        if (myCurrentState != nextState) {
+            myCurrentState.exit(getTime());
+        }
+        myCurrentState = nextState;
+        myStateFreq.collect(myCurrentState);
+    }
+
+    /**
+     * This method should be overridden by subclasses that need actions
+     * performed to initialize prior to a replication. It is called once before
+     * each replication occurs if the model element wants initialization. It is
+     * called after beforeReplication() is called
+     */
     @Override
     protected void initialize() {
+        variableInitialized();
+    }
+
+    /**
+     * This method should be overridden by subclasses that need actions
+     * performed at the warm up event during each replication. It is called once
+     * during each replication if the model element reacts to warm up actions.
+     */
+    @Override
+    protected void warmUp() {
+        variableWarmedUp();
+    }
+
+    protected void variableInitialized() {
         myIntervalEndedFlag = false;
         myIntervalStartedFlag = false;
         myInitTime = getTime();
@@ -266,18 +329,12 @@ public class LevelResponse extends SchedulingElement {
         }
     }
 
-    /**
-     * This method should be overridden by subclasses that need actions
-     * performed at the warm up event during each replication. It is called once
-     * during each replication if the model element reacts to warm up actions.
-     */
-    @Override
-    protected void warmUp() {
+    protected void variableWarmedUp() {
         myInitTime = getTime();
         myAbove.initialize();
         myBelow.initialize();
         myStateFreq.reset();
-        if (myVariable.getPreviousValue() >= myLevel) {
+        if (myVariable.getValue() >= myLevel) {
             myCurrentState = myAbove;
         } else {
             myCurrentState = myBelow;
@@ -285,14 +342,9 @@ public class LevelResponse extends SchedulingElement {
         myCurrentState.enter(getTime());
     }
 
-    /**
-     * This method should be overridden by subclasses that need actions
-     * performed when the replication ends and prior to the calling of
-     * afterReplication() . It is called when each replication ends and can be
-     * used to collect data from the the model element, etc.
-     */
-    @Override
-    protected void replicationEnded() {
+    protected void variableReplicationEnded() {
+        myCurrentState.exit(getTime());
+        // need to get statistics to the end of the simulation, act like exiting current state
         myMaxDistanceAbove.setValue(myDistanceAbove.getWithinReplicationStatistic().getMax());
         myMaxDistanceBelow.setValue(myDistanceBelow.getWithinReplicationStatistic().getMax());
         if (myAbove.getSojournTimeStatistic().isPresent()) {
@@ -332,21 +384,5 @@ public class LevelResponse extends SchedulingElement {
         }
     }
 
-    protected void stateUpdate() {
-        State nextState;
-        if (myVariable.getPreviousValue() >= myLevel) {
-            myDistanceAbove.setValue(myVariable.getPreviousValue() - myLevel);
-            nextState = myAbove;
-        } else {
-            nextState = myBelow;
-            myDistanceBelow.setValue(myLevel - myVariable.getPreviousValue());
-        }
-        myStateFreq.collect(nextState);
-        if (myCurrentState != nextState) {
-            myCurrentState.exit(getTime());
-            nextState.enter(getTime());
-            myCurrentState = nextState;
-        }
-    }
 
 }

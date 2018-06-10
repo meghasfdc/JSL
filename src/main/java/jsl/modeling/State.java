@@ -284,7 +284,7 @@ public class State implements IdentityIfc, StateAccessorIfc {
         }
 
         if (myInStateIndicator == false) {
-            throw new IllegalStateException("Attempted to exit a state when not in the state");
+            throw new IllegalStateException("Attempted to exit a state when not in the state:" + this);
         }
 
         myNumTimesExited = myNumTimesExited + 1.0;

@@ -151,8 +151,14 @@ public class StateFrequency implements IdentityIfc {
         double total = myFreq.getTotalCount();
         if (total >=1) {
             for (int i = 0; i < myStates.size(); i++) {
+                double sum = 0.0;
                 for (int j = 0; j < myStates.size(); j++) {
-                    p[i][j] = myTransCnts[i][j]/total;
+                    sum = sum + myTransCnts[i][j];
+                }
+                if (sum >=1){
+                    for (int j = 0; j < myStates.size(); j++) {
+                        p[i][j] = myTransCnts[i][j]/sum;
+                    }
                 }
             }
         }
