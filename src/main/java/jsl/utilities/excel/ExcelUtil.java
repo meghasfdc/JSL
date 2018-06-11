@@ -51,6 +51,7 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -549,6 +550,16 @@ public class ExcelUtil {
             CreationHelper createHelper = wb.getCreationHelper();
             cellStyle.setDataFormat(
                     createHelper.createDataFormat().getFormat("h:mm:ss AM/PM"));
+            cell.setCellStyle(cellStyle);
+        } else if (object instanceof java.sql.Timestamp) {
+            java.sql.Timestamp x = (java.sql.Timestamp)object;
+            java.util.Date dateFromTimeStamp = Date.from(x.toInstant());
+            double excelDate = DateUtil.getExcelDate(dateFromTimeStamp);
+            cell.setCellValue(excelDate);
+            Workbook wb = cell.getSheet().getWorkbook();
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
             cell.setCellStyle(cellStyle);
         } else {
             logger.error("Could not cast type {} to Excel type.", object.getClass().getName());
