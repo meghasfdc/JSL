@@ -429,7 +429,7 @@ public class Counter extends Aggregatable implements CounterActionIfc, DefaultRe
      */
     public final StatisticAccessorIfc getAcrossReplicationStatistic() {
         if (myAcrossRepStat == null) {
-            myAcrossRepStat = new Statistic("AcrossRepStat:" + getName());
+            myAcrossRepStat = new Statistic(getName());
         }
         //return (myAcrossRepStat.newInstance());
         return myAcrossRepStat;
@@ -516,7 +516,7 @@ public class Counter extends Aggregatable implements CounterActionIfc, DefaultRe
      */
     public final void setAcrossReplicationStatisticName(String name) {
         if (myAcrossRepStat == null) {
-            myAcrossRepStat = new Statistic("AcrossRepStat:" + getName());
+            myAcrossRepStat = new Statistic();
         }
 
         myAcrossRepStat.setName(name);
@@ -579,7 +579,7 @@ public class Counter extends Aggregatable implements CounterActionIfc, DefaultRe
         if (e != null) {
             if (e.getNumberOfReplications() >= 1) {
                 if (myAcrossRepStat == null) {
-                    myAcrossRepStat = new Statistic("AcrossRepStat:" + getName());
+                    myAcrossRepStat = new Statistic(getName());
                 }
                 myAcrossRepStat.collect(getValue());
             }
