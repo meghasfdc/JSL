@@ -475,6 +475,9 @@ public interface DatabaseIfc {
         if (wbDirectory == null) {
             wbDirectory = Paths.get(".");
         }
+        if (!wbName.endsWith(".xlsx")){
+            wbName = wbName.concat(".xlsx");
+        }
         Path path = wbDirectory.resolve(wbName);
         ExcelUtil.writeDBAsExcelWorkbook(this, path);
 
