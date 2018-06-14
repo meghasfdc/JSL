@@ -121,36 +121,56 @@ public class LevelResponse extends SchedulingElement {
         List<State> list = myStateFreq.getStates();
         myAbove = list.get(0);
         myBelow = list.get(1);
-        myAbove.setName(getName() + ":+");
-        myBelow.setName(getName() + ":-");
+        myAbove.setName(myVariable.getName() + ":" + getName() + ":+");
+        myBelow.setName(myVariable.getName() + ":" + getName() + ":-");
         myAbove.turnOnSojournTimeCollection();
         myBelow.turnOnSojournTimeCollection();
         myVariable.addObserver(myObserver);
-        myDistanceAbove = new ResponseVariable(this, getName() + ":DistAboveLimit:" + D2FORMAT.format(level));
-        myDistanceBelow = new ResponseVariable(this, getName() + ":DistBelowLimit:" + D2FORMAT.format(level));
+        myDistanceAbove = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":DistAboveLimit:" + D2FORMAT.format(level));
+        myDistanceBelow = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":DistBelowLimit:" + D2FORMAT.format(level));
         // collected after the replication ends
-        myMaxDistanceAbove = new ResponseVariable(this, getName() + ":MaxDistAboveLimit:" + D2FORMAT.format(level));
-        myMaxDistanceBelow = new ResponseVariable(this, getName() + ":MaxDistBelowLimit:" + D2FORMAT.format(level));
-        myPctTimeAbove = new ResponseVariable(this, getName() + ":PctTimeAbove:" + D2FORMAT.format(level));
-        myPctTimeBelow = new ResponseVariable(this, getName() + ":PctTimeBelow:" + D2FORMAT.format(level));
-        myTotalTimeAbove = new ResponseVariable(this, getName() + ":TotalTimeAbove:" + D2FORMAT.format(level));
-        myTotalTimeBelow = new ResponseVariable(this, getName() + ":TotalTimeBelow:" + D2FORMAT.format(level));
+        myMaxDistanceAbove = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":MaxDistAboveLimit:" + D2FORMAT.format(level));
+        myMaxDistanceBelow = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":MaxDistBelowLimit:" + D2FORMAT.format(level));
+        myPctTimeAbove = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":PctTimeAbove:" + D2FORMAT.format(level));
+        myPctTimeBelow = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":PctTimeBelow:" + D2FORMAT.format(level));
+        myTotalTimeAbove = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":TotalTimeAbove:" + D2FORMAT.format(level));
+        myTotalTimeBelow = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":TotalTimeBelow:" + D2FORMAT.format(level));
 //        myAboveIndicator = new TimeWeighted(this, getName() + ":P(Above):" + D2FORMAT.format(level));
 //        myBelowIndicator = new TimeWeighted(this, getName() + ":P(Below):" + D2FORMAT.format(level));
         myStatsOption = stats;
         if (stats) {
-            myAvgTimeAbove = new ResponseVariable(this, getName() + ":AvgTimeAboveLimit:" + D2FORMAT.format(level));
-            myAvgTimeBelow = new ResponseVariable(this, getName() + ":AvgTimeBelowLimit:" + D2FORMAT.format(level));
-            myMaxTimeAbove = new ResponseVariable(this, getName() + ":MaxTimeAboveLimit:" + D2FORMAT.format(level));
-            myMaxTimeBelow = new ResponseVariable(this, getName() + ":MaxTimeBelowLimit:" + D2FORMAT.format(level));
-            myPAA = new ResponseVariable(this, getName() + ":P(AboveToAbove)");
-            myPAB = new ResponseVariable(this, getName() + ":P(AboveToBelow)");
-            myPBB = new ResponseVariable(this, getName() + ":P(BelowToBelow)");
-            myPBA = new ResponseVariable(this, getName() + ":P(BelowToAbove)");
-            myNAA = new ResponseVariable(this, getName() + ":#(AboveToAbove)");
-            myNAB = new ResponseVariable(this, getName() + ":#(AboveToBelow)");
-            myNBB = new ResponseVariable(this, getName() + ":#(BelowToBelow)");
-            myNBA = new ResponseVariable(this, getName() + ":#(BelowToAbove)");
+            myAvgTimeAbove = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":AvgTimeAboveLimit:" + D2FORMAT.format(level));
+            myAvgTimeBelow = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":AvgTimeBelowLimit:" + D2FORMAT.format(level));
+            myMaxTimeAbove = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":MaxTimeAboveLimit:" + D2FORMAT.format(level));
+            myMaxTimeBelow = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":MaxTimeBelowLimit:" + D2FORMAT.format(level));
+            myPAA = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":P(AboveToAbove)");
+            myPAB = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":P(AboveToBelow)");
+            myPBB = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":P(BelowToBelow)");
+            myPBA = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":P(BelowToAbove)");
+            myNAA = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":#(AboveToAbove)");
+            myNAB = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":#(AboveToBelow)");
+            myNBB = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":#(BelowToBelow)");
+            myNBA = new ResponseVariable(this,
+                    myVariable.getName() + ":" + getName() + ":#(BelowToAbove)");
         }
     }
 

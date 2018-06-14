@@ -26,11 +26,13 @@ import jsl.observers.ObserverIfc;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
+import java.util.Objects;
+
 /**
  *
  * @author rossetti
  */
-public class QueueResponse extends ModelElement implements QueueListenerIfc {
+public class QueueResponse implements QueueListenerIfc {
 
     private final Queue myQueue;
 
@@ -44,15 +46,12 @@ public class QueueResponse extends ModelElement implements QueueListenerIfc {
      */
     private final ResponseVariable myTimeInQ;
 
-    QueueResponse(Queue parent) {
-        this(parent, null);
-    }
-
-    QueueResponse(Queue parent, String name) {
-        super(parent, name);
-        myQueue = parent;
-        myNumInQ = new TimeWeighted(this, 0.0, myQueue.getName() + ":NumInQ");
-        myTimeInQ = new ResponseVariable(this, myQueue.getName() + ":TimeInQ");
+    QueueResponse(Queue queue) {
+        Objects.requireNonNull(queue, "The supplied Queue must not be null");
+//        super(parent, name);
+        myQueue = queue;
+        myNumInQ = new TimeWeighted(queue, 0.0, myQueue.getName() + ":NumInQ");
+        myTimeInQ = new ResponseVariable(queue, myQueue.getName() + ":TimeInQ");
     }
 
     @Override
