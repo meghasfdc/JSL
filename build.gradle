@@ -90,6 +90,14 @@ uploadArchives {
         }
     }
 }
+
+uploadShadow {
+    repositories {
+        flatDir {
+            dirs 'repos'
+        }
+    }
+}
 // exclude all tests from the build
 // comment this out if you want to run the tests
 test {
