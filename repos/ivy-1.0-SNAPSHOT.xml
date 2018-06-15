@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+  <info organisation="rossetti" module="JSL" revision="1.0-SNAPSHOT" status="integration" publication="20180615082611"/>
+  <configurations>
+    <conf name="api" visibility="private" extends="compile"/>
+    <conf name="apiElements" visibility="private" extends="api,runtime"/>
+    <conf name="archives" visibility="public"/>
+    <conf name="compile" visibility="private"/>
+    <conf name="compileClasspath" visibility="private" extends="compileOnly,implementation,shadow"/>
+    <conf name="compileOnly" visibility="private"/>
+    <conf name="default" visibility="public" extends="runtimeElements"/>
+    <conf name="implementation" visibility="private" extends="api,compile"/>
+    <conf name="runtime" visibility="private" extends="compile"/>
+    <conf name="runtimeClasspath" visibility="private" extends="implementation,runtime,runtimeOnly"/>
+    <conf name="runtimeElements" visibility="private" extends="implementation,runtime,runtimeOnly"/>
+    <conf name="runtimeOnly" visibility="private"/>
+    <conf name="shadow" visibility="public"/>
+    <conf name="testCompile" visibility="private" extends="compile"/>
+    <conf name="testCompileClasspath" visibility="private" extends="testCompileOnly,testImplementation"/>
+    <conf name="testCompileOnly" visibility="private"/>
+    <conf name="testImplementation" visibility="private" extends="implementation,testCompile"/>
+    <conf name="testRuntime" visibility="private" extends="runtime,testCompile"/>
+    <conf name="testRuntimeClasspath" visibility="private" extends="testImplementation,testRuntime,testRuntimeOnly"/>
+    <conf name="testRuntimeOnly" visibility="private" extends="runtimeOnly"/>
+  </configurations>
+  <publications>
+    <artifact name="JSL" type="jar" ext="jar" conf="apiElements,archives,runtime,runtimeElements"/>
+    <artifact name="JSL" type="jar" ext="jar" conf="shadow" m:classifier="all"/>
+  </publications>
+  <dependencies>
+    <dependency org="org.apache.commons" name="commons-math3" rev="3.6.1" conf="compile-&gt;default"/>
+    <dependency org="commons-io" name="commons-io" rev="2.6" conf="compile-&gt;default"/>
+    <dependency org="tech.tablesaw" name="tablesaw-core" rev="0.12.0" conf="compile-&gt;default"/>
+    <dependency org="tech.tablesaw" name="tablesaw-plot" rev="0.12.0" conf="compile-&gt;default"/>
+    <dependency org="tech.tablesaw" name="tablesaw-smile" rev="0.12.0" conf="compile-&gt;default"/>
+    <dependency org="com.google.guava" name="guava" rev="23.5-jre" conf="compile-&gt;default"/>
+    <dependency org="org.apache.derby" name="derby" rev="10.14.1.0" conf="compile-&gt;default"/>
+    <dependency org="org.apache.derby" name="derbyclient" rev="10.14.1.0" conf="compile-&gt;default"/>
+    <dependency org="org.jooq" name="jooq" rev="3.10.4" conf="compile-&gt;default"/>
+    <dependency org="org.jooq" name="jooq-meta" rev="3.10.4" conf="compile-&gt;default"/>
+    <dependency org="org.jooq" name="jooq-codegen" rev="3.10.4" conf="compile-&gt;default"/>
+    <dependency org="org.slf4j" name="slf4j-api" rev="1.7.25" conf="compile-&gt;default"/>
+    <dependency org="ch.qos.logback" name="logback-classic" rev="1.2.3" conf="compile-&gt;default"/>
+    <dependency org="ch.qos.logback" name="logback-core" rev="1.2.3" conf="compile-&gt;default"/>
+    <dependency org="org.apache.poi" name="poi" rev="3.17" conf="compile-&gt;default"/>
+    <dependency org="org.apache.poi" name="poi-ooxml" rev="3.17" conf="compile-&gt;default"/>
+    <dependency org="junit" name="junit" rev="4.12" conf="testCompile-&gt;default"/>
+  </dependencies>
+</ivy-module>
