@@ -324,7 +324,7 @@ abstract public class FailureElement extends SchedulingElement {
      * @param fn the failure notice
      */
     protected void failureNoticeCompleted(FailureNotice fn) {
-        JSL.out.println(getTime() + " > In FailureElement.failureNoticeCompleted() with " + fn);
+//        JSL.out.println(getTime() + " > In FailureElement.failureNoticeCompleted() with " + fn);
         setStateUp();
         resume();
     }
@@ -335,60 +335,60 @@ abstract public class FailureElement extends SchedulingElement {
      * sub-classes to specialize the behavior associated with a
      * state change on a ResourceUnit.
      */
-    protected void resourceUnitStateChange() {
-        if (myResourceUnit.isPreviousStateIdle()) {
-            if (myResourceUnit.isBusy()) {
+    protected void resourceUnitStateChange(ResourceUnit resourceUnit) {
+        if (resourceUnit.isPreviousStateIdle()) {
+            if (resourceUnit.isBusy()) {
                 //idle to busy
                 resourceUnitIdleToBusy();
-            } else if (myResourceUnit.isFailed()) {
+            } else if (resourceUnit.isFailed()) {
                 // idle to failed
                 resourceUnitIdleToFailed();
-            } else if (myResourceUnit.isInactive()) {
+            } else if (resourceUnit.isInactive()) {
                 // idle to inactive
                 resourceUnitIdleToInactive();
-            } else if (myResourceUnit.isIdle()) {
+            } else if (resourceUnit.isIdle()) {
                 // idle to idle, not possible
                 resourceUnitIdleToIdle();
             }
-        } else if (myResourceUnit.isPreviousStateInactive()) {
-            if (myResourceUnit.isBusy()) {
+        } else if (resourceUnit.isPreviousStateInactive()) {
+            if (resourceUnit.isBusy()) {
                 //inactive to busy
                 resourceUnitInactiveToBusy();
-            } else if (myResourceUnit.isFailed()) {
+            } else if (resourceUnit.isFailed()) {
                 // inactive to failed
                 resourceUnitInactiveToFailed();
-            } else if (myResourceUnit.isInactive()) {
+            } else if (resourceUnit.isInactive()) {
                 // inactive to inactive
                 resourceUnitInactiveToInactive();
-            } else if (myResourceUnit.isIdle()) {
+            } else if (resourceUnit.isIdle()) {
                 // inactive to idle
                 resourceUnitInactiveToIdle();
             }
-        } else if (myResourceUnit.isPreviousStateBusy()) {
-            if (myResourceUnit.isBusy()) {
+        } else if (resourceUnit.isPreviousStateBusy()) {
+            if (resourceUnit.isBusy()) {
                 //busy to busy
                 resourceUnitBusyToBusy();
-            } else if (myResourceUnit.isFailed()) {
+            } else if (resourceUnit.isFailed()) {
                 // busy to failed
                 resourceUnitBusyToFailed();
-            } else if (myResourceUnit.isInactive()) {
+            } else if (resourceUnit.isInactive()) {
                 // busy to inactive
                 resourceUnitBusyToInactive();
-            } else if (myResourceUnit.isIdle()) {
+            } else if (resourceUnit.isIdle()) {
                 // busy to idle
                 resourceUnitBusyToIdle();
             }
-        } else if (myResourceUnit.isPreviousStateFailed()) {
-            if (myResourceUnit.isBusy()) {
+        } else if (resourceUnit.isPreviousStateFailed()) {
+            if (resourceUnit.isBusy()) {
                 //failed to busy
                 resourceUnitFailedToBusy();
-            } else if (myResourceUnit.isFailed()) {
+            } else if (resourceUnit.isFailed()) {
                 // failed to failed
                 resourceUnitFailedToFailed();
-            } else if (myResourceUnit.isInactive()) {
+            } else if (resourceUnit.isInactive()) {
                 // failed to inactive
                 resourceUnitFailedToInactive();
-            } else if (myResourceUnit.isIdle()) {
+            } else if (resourceUnit.isIdle()) {
                 // failed to idle
                 resourceUnitFailedToIdle();
             }

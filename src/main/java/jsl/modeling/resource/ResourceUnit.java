@@ -47,8 +47,8 @@ import jsl.utilities.reporting.JSL;
  * prior to and starting at time zero, the resource is idle.
  * <p>
  * A ResourceUnit might have failures. If the failures that it permits can be
- * delayed if they occur while in the busy state, then the resource failure
- * option should be true
+ * delayed when they occur while in the busy state, then the resource failure
+ * option should be true.
  *
  * @author rossetti
  */
@@ -1067,10 +1067,18 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         notifyFailureElements();
     }
 
+    /**
+     *  Called from setState().  Notifies all attached FailureElements of the specifics
+     *  of the state change so that they may react to the change in state. The reason
+     *  that FailureElements are notified of the state change is to allow them to react
+     *  accordingly. For example, if the resource is failed, a failure element might not
+     *  accrue time toward failing again.  In other words, the failure mechanism may
+     *  depend on the state of the resource
+     */
     protected final void notifyFailureElements() {
         if (hasFailureElements()) {
             for (FailureElement fe : myFailureElements) {
-                fe.resourceUnitStateChange();
+                fe.resourceUnitStateChange(this);
             }
         }
     }
@@ -1459,7 +1467,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * pending period. If the incoming notice cannot be delayed, then it is
      * canceled.
      *
-     * @param notice
+     * @param notice the notice
      */
     protected void inactivateWhileFailed(InactivePeriodNotice notice) {
         if (notice.isDelayable()) {
@@ -1483,7 +1491,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * behavior is to cancel the current period and allow the new period to
      * proceed in full. The state remains inactive.
      *
-     * @param notice
+     * @param notice the notice
      */
     protected void inactivateWhileInactive(InactivePeriodNotice notice) {
         myCurrentInactivePeriodNotice.cancel();
@@ -1494,6 +1502,10 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                 myCurrentInactivePeriodNotice.getInactiveTime());
     }
 
+    /** Called from activateWhenInActive()
+     *
+     * @param notice the notice
+     */
     protected void activateWhenInactive(InactivePeriodNotice notice) {
         notice.complete();
         // first process any failures
@@ -1612,7 +1624,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     }
 
     /**
-     * Called internally when a Schedule notifies of an item (period) beginning
+     * Called from scheduledItemStarted() when a Schedule notifies of an item (period) beginning
      *
      * @param notice
      */
