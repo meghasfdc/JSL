@@ -520,8 +520,8 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
                 if (myResetInitialParametersFlag) {
                     myInitialRandomSource.setParameters(myInitialParameters);
                     if (myResetInitialParametersWarningFlag) {
-                        JSL.LOGGER.log(Level.WARNING, "The parameters for the random source of {0} were changed during the replication", getName());
-                        JSL.LOGGER.warning("The parameters were reset to the values available from the last call to setInitialRandomSource() for the next replication.");
+                        JSL.LOGGER.warn("The parameters for the random source of {0} were changed during the replication", getName());
+                        JSL.LOGGER.warn("The parameters were reset to the values available from the last call to setInitialRandomSource() for the next replication.");
                     }
                 }
             }

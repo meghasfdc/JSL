@@ -19,6 +19,7 @@ import jsl.modeling.JSLEvent;
 import jsl.modeling.elements.EventGenerator;
 import jsl.utilities.random.RandomIfc;
 import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.utilities.reporting.JSL;
 
 /**
  * A TimeBasedFailure uses time to determine the next failure. By default the
@@ -34,39 +35,25 @@ public class TimeBasedFailure extends FailureProcess {
 
     protected EventGenerator myFailureGenerator;
 
+    protected final ResourceUnit myResourceUnit;
+
     public TimeBasedFailure(ResourceUnit parent, RandomIfc repairTime,
             RandomIfc timeToFailure) {
         this(parent, repairTime, timeToFailure, false, null);
     }
 
-    public TimeBasedFailure(ResourceUnit parent, RandomIfc repairTime,
+    public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration,
             RandomIfc timeToFailure, boolean delayOption) {
-        this(parent, repairTime, timeToFailure, delayOption, null);
+        this(parent, failureDuration, timeToFailure, delayOption, null);
     }
 
-    public TimeBasedFailure(ResourceUnit parent, RandomIfc repairTime,
+    public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration,
             RandomIfc timeToFailure, boolean delayOption, String name) {
-        super(parent, repairTime, delayOption);
-
+        super(parent, failureDuration, delayOption);
+        myResourceUnit = parent;
         myFailureGenerator = new EventGenerator(this, new FailureAction(),
                 timeToFailure, timeToFailure);
         myFailureGenerator.setStartOnInitializeFlag(false);
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        if (getAutoFailuresFlag() == true) {
-            startFailureProcess();
-        }
-    }
-
-    /**
-     *
-     * @return true if the element is done failing
-     */
-    public final boolean isFailureProcessDone() {
-        return myFailureGenerator.isGeneratorDone();
     }
 
     /**
@@ -79,39 +66,63 @@ public class TimeBasedFailure extends FailureProcess {
     }
 
     @Override
-    public final boolean isStarted() {
-        return myFailureGenerator.isGeneratorStarted();
+    protected void failureNoticeActivated(FailureNotice fn) {
+        suspend();
     }
 
     @Override
-    public void startFailureProcess() {
-        if (isDown()) {
-            throw new IllegalStateException("Attempted to start the failure process when already failed.");
-        }
+    protected void failureNoticeDelayed(FailureNotice fn) {
+        suspend();
+    }
+
+    @Override
+    protected void failureNoticeIgnored(FailureNotice fn) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getTime());
+        sb.append(" > ");
+        sb.append(getName());
+        sb.append(" ignored FailureNotice ");
+        sb.append(fn.toString());
+        sb.append(System.lineSeparator());
+        JSL.LOGGER.warn(sb.toString());
+    }
+
+    @Override
+    protected void failureNoticeCompleted(FailureNotice fn) {
+        resume();
+    }
+
+    @Override
+    protected void startProcess() {
         double time = myFailureGenerator.getTimeBetweenEvents().getValue();
         myFailureGenerator.turnOnGenerator(time);
     }
 
     @Override
-    protected void stopFailureProcess() {
+    protected void suspendProcess() {
+        myFailureGenerator.suspend();
+    }
+
+    @Override
+    protected void stopProcess() {
         myFailureGenerator.turnOffGenerator();
     }
 
     @Override
-    protected void resume() {
+    protected void resumeProcess() {
         myFailureGenerator.resume();
     }
 
     @Override
-    protected void suspend() {
-        myFailureGenerator.suspend();
+    protected void signalFailure() {
+        myResourceUnit.receiveFailureNotice(createFailureNotice());
     }
 
     private class FailureAction implements EventGeneratorActionIfc {
 
         @Override
         public void generate(EventGenerator generator, JSLEvent event) {
-            sendFailureNoticeToResourceUnit();
+            fail();
         }
 
     }

@@ -73,7 +73,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private Request myPreemptedRequest;
     private ResourceState myCurrentState;
     private ResourceState myPrevState;
-    private List<FailureProcess> myFailureProcesses;
+//    private List<FailureProcess> myFailureProcesses;
     private Queue<FailureNotice> myFailureNoticeQ;
     private FailureNotice myCurrentFailureNotice;
     private InactivePeriodNotice myCurrentInactivePeriodNotice;
@@ -374,12 +374,12 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         // the state gets entered at the current time
         myCurrentState.enter(getTime());
         notifyUpdateObservers();
-        // if failures start automatically, start them
-        if (getAutoFailuresFlag() == true) {
-            for (FailureProcess fe : myFailureProcesses) {
-                fe.startFailureProcess();
-            }
-        }
+//        // if failures start automatically, start them
+//        if (getAutoFailuresFlag() == true) {
+//            for (FailureProcess fe : myFailureProcesses) {
+//                fe.startFailureProcess();
+//            }
+//        }
     }
 
     @Override

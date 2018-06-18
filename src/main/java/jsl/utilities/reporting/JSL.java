@@ -15,12 +15,16 @@
  */
 package jsl.utilities.reporting;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Desktop;
 import java.io.*;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
 import javax.swing.JOptionPane;
 
 /**
@@ -50,7 +54,7 @@ public class JSL {
     /**
      * for logging
      */
-    public static final Logger LOGGER = Logger.getLogger(JSL.class.getName());
+    public static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Can be used like System.out, but instead writes to a file
@@ -73,18 +77,18 @@ public class JSL {
         File d = new File("jslMessages");
         d.mkdir();
 
-        try {
-            File f = new File(d, "JSLLog.txt");
-            myFileHandler = new FileHandler(f.getAbsolutePath());
-
-//			myFileHandler.setFormatter(new SimpleFormatter());
-            myFileHandler.setFormatter(new LogFormatter());
-            // Send logger output to our FileHandler.
-            LOGGER.addHandler(myFileHandler);
-        } catch (IOException e) {
-            String str = "Error setting the FileHandler in JSL.LOGGER";
-            LOGGER.log(Level.SEVERE, str, e);
-        }
+//        try {
+//            File f = new File(d, "JSLLog.txt");
+//            myFileHandler = new FileHandler(f.getAbsolutePath());
+//
+////			myFileHandler.setFormatter(new SimpleFormatter());
+//            myFileHandler.setFormatter(new LogFormatter());
+//            // Send logger output to our FileHandler.
+//            LOGGER.addHandler(myFileHandler);
+//        } catch (IOException e) {
+//            String str = "Error setting the FileHandler in JSL.LOGGER";
+//            LOGGER.log(Level.SEVERE, str, e);
+//        }
 
         try {
             File d1 = new File("jslOutput");
@@ -94,14 +98,14 @@ public class JSL {
             myOut = out;
         } catch (IOException ex) {
             String str = "Problem opening jslOutput.txt";
-            LOGGER.log(Level.SEVERE, str, ex);
+            LOGGER.error(str, ex);
         }
 
         try {
             workingDirectory = System.getProperty("user.dir");
         } catch (SecurityException ex) {
             String str = "Access to system information denied";
-            LOGGER.log(Level.SEVERE, str, ex);
+            LOGGER.error(str, ex);
         }
 
     }
@@ -260,7 +264,7 @@ public class JSL {
             return new PrintWriter(new FileWriter(file), true);
         } catch (IOException ex) {
             String str = "Problem creating PrintWriter for " + file.getAbsolutePath();
-            LOGGER.log(Level.SEVERE, str, ex);
+            LOGGER.error( str, ex);
             return null;
         }
     }

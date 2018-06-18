@@ -15,7 +15,6 @@
  */
 package jsl.modeling.resource;
 
-import jsl.modeling.elements.resource.Resource;
 import jsl.modeling.queue.QObject;
 
 import java.util.Objects;
@@ -25,6 +24,18 @@ import java.util.Objects;
  * down due to a failure. The failure notice may be required to be immediate or
  * not. If not immediate, then the failure may be delayed until the resource
  * unit finishes its current activity.
+ *
+ * A FailureNotice has a well-defined state pattern.  When created, the notice
+ * is placed in the Created state. From the created state, the notice can
+ * become active, delayed, or ignored. If the notice is active, the failure is in
+ * process. After being active, the notice can only become completed.
+ * If the notice is delayed, the notice is waiting to become active.
+ * After being delayed, the notice can become active or be ignored.
+ * If the resource unit ignored the notice, then the notice is placed in the
+ * ignored state. The ignored state is terminal.  Once the notice finishes
+ * being active, it is placed in the completed state. The completed state
+ * is terminal.  The associated FailureProcess is notified when the
+ * notice enters these states. This allows FailureProcesses to react accordingly.
  *
  *
  * @author rossetti
@@ -95,9 +106,9 @@ public class FailureNotice extends QObject {
 
     /**
      *
-     * @return the associated FailureElement
+     * @return the associated FailureProcess
      */
-    public final FailureProcess getFailureElement() {
+    public final FailureProcess getFailureProcess() {
         return myFailureProcess;
     }
 
@@ -263,7 +274,7 @@ public class FailureNotice extends QObject {
     protected class IgnoredState extends FailureNoticeState {
 
         public IgnoredState() {
-            super("Completed");
+            super("Ignored");
         }
 
     }

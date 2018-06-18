@@ -15,79 +15,110 @@
  */
 package jsl.modeling.resource;
 
+import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.reporting.JSL;
 
-/**  A FailureProcess causes FailureNotices to be sent to ResourceUnits. By default the
+import java.util.Objects;
+
+/**
+ * A FailureProcess causes FailureNotices to be sent to ResourceUnits. By default the
  * failure process does not start automatically at time zero. The user can turn
  * on automatic starting of the failure process at time zero or use the
- * startFailureProcess() method. Once the failure process has been started it
+ * start() method. Once the failure process has been started it
  * cannot be started again. Once the failure process has been stopped, it cannot
- * be started again.
+ * be started again. A FailureProcess can be associated with 0 or more ResourceUnits.
+ * If no ResourceUnits are added to the FailureProcess then the process will operate
+ * but no resource units will receive FailureNotices.
+ *
+ * In the case of a FailureProcess sending failure notices to more than one ResourceUnit,
+ * it is up to implementors to appropriately handle the notifications that
+ * are received when the various failure notices transition through their states.
  *
  * @author rossetti
  */
 abstract public class FailureProcess extends SchedulingElement {
 
-    protected RandomIfc myFailureDuration;
+    private final CreatedState myCreatedState = new CreatedState();
+    private final RunningState myRunningState = new RunningState();
+    private final SuspendedState mySuspendedState = new SuspendedState();
+    private final StoppedState myStoppedState = new StoppedState();
 
-    protected RandomVariable myFailureDurationRV;
+    private final RandomVariable myFailureDurationRV;
 
-    protected final ResourceUnit myResourceUnit;
+    private boolean myAutoStartProcessOption;
 
-    private boolean myState;
+    private boolean myDelayOption;
 
-    protected boolean myAutoStartFailuresFlag;
+    private int myPriority;
 
-    protected boolean myDelayOption;
+    private FailureProcessState myProcessState;
 
-    protected int myPriority;
+//    protected final Set<ResourceUnit> myResourceUnits;
 
     /**
      * The delay option will be true
      *
-     * @param parent the associated ResourceUnit
+     * @param parent   the parent ModelElement
      * @param duration governs the duration of the FailureNotices
      */
-    public FailureProcess(ResourceUnit parent, RandomIfc duration) {
+    public FailureProcess(ModelElement parent, RandomIfc duration) {
         this(parent, duration, true, null);
     }
 
     /**
-     *
-     * @param parent the associated ResourceUnit
-     * @param duration governs the duration of the FailureNotices
+     * @param parent      the parent ModelElement
+     * @param duration    governs the duration of the FailureNotices
      * @param delayOption whether or not failure notices can be delayed if the
-     * resource is busy
+     *                    resource is busy
      */
-    public FailureProcess(ResourceUnit parent, RandomIfc duration,
+    public FailureProcess(ModelElement parent, RandomIfc duration,
                           boolean delayOption) {
         this(parent, duration, delayOption, null);
     }
 
     /**
-     *
-     * @param parent the associated ResourceUnit
-     * @param duration governs the duration of the FailureNotices
+     * @param parent      the parent ModelElement
+     * @param duration    governs the duration of the FailureNotices
      * @param delayOption whether or not failure notices can be delayed if the
-     * resource is busy
-     * @param name the name of the ResourceUnit
+     *                    resource is busy
+     * @param name        the name of the FailureProcess
      */
-    public FailureProcess(ResourceUnit parent, RandomIfc duration,
+    public FailureProcess(ModelElement parent, RandomIfc duration,
                           boolean delayOption, String name) {
         super(parent, name);
-        myResourceUnit = parent;
+        Objects.requireNonNull(duration, "The failure duration must not be null");
+        myFailureDurationRV = new RandomVariable(this, duration, getName() + ":Duration");
         myDelayOption = delayOption;
         myPriority = 1;
-        turnOffAutoFailures();
-        setStateUp();
-        setFailureNoticeDurationTimeInitialRandomSource(duration);
+        turnOffAutoStartProcess();
+        myProcessState = myCreatedState;
+//        myResourceUnits = new LinkedHashSet<>();
     }
 
+//    /**
+//     *
+//     * @param units the units to add, must not be null
+//     */
+//    public final void addResourceUnits(Collection<ResourceUnit> units){
+//        Objects.requireNonNull(units, "The collection was null");
+//        for(ResourceUnit ru: units){
+//            addResourceUnit(ru);
+//        }
+//    }
+//
+//    /**
+//     *
+//     * @param unit the unit to add, must not be null
+//     * @return true if added
+//     */
+//    public boolean addResourceUnit(ResourceUnit unit){
+//        Objects.requireNonNull(unit, "Cannot add a null resource unit");
+//        return myResourceUnits.add(unit);
+//    }
+
     /**
-     *
      * @return the priority of the generated FailureNotices
      */
     public final int getPriority() {
@@ -95,7 +126,6 @@ abstract public class FailureProcess extends SchedulingElement {
     }
 
     /**
-     *
      * @param priority the priority of the generated FailureNotices
      */
     public final void setPriority(int priority) {
@@ -112,61 +142,16 @@ abstract public class FailureProcess extends SchedulingElement {
         return myDelayOption;
     }
 
-    @Override
-    protected void initialize() {
-        super.initialize();
-        setStateUp();
-    }
-
     /**
-     *
-     * @return true if the process has an active failure
-     */
-    public final boolean isDown() {
-        return myState;
-    }
-
-    /**
-     *
-     * @return true if the process does not have an active failure
-     */
-    public final boolean isUp() {
-        return !myState;
-    }
-
-    /**
-     * Makes the element down
-     */
-    protected final void setStateDown() {
-        myState = true;
-    }
-
-    /**
-     * Makes the element up
-     */
-    protected final void setStateUp() {
-        myState = false;
-    }
-
-    /**
-     * Sets the down time distribution
+     * Sets the failure duration distribution
      *
      * @param d the distribution
      */
     public final void setFailureNoticeDurationTimeInitialRandomSource(RandomIfc d) {
         if (d == null) {
-            throw new IllegalArgumentException("Down time was null!");
+            throw new IllegalArgumentException("Failure duration was null!");
         }
-
-        myFailureDuration = d;
-
-        if (myFailureDurationRV == null) { // not made yet
-            myFailureDurationRV = new RandomVariable(this, myFailureDuration);
-        } else { // already had been made, and added to model
-            // just change the distribution
-            myFailureDurationRV.setInitialRandomSource(myFailureDuration);
-        }
-
+        myFailureDurationRV.setInitialRandomSource(d);
     }
 
     /**
@@ -175,39 +160,34 @@ abstract public class FailureProcess extends SchedulingElement {
      * @return true if failure process will start automatically upon
      * initialization
      */
-    public final boolean getAutoFailuresFlag() {
-        return myAutoStartFailuresFlag;
+    public final boolean getAutoStartProcessOption() {
+        return myAutoStartProcessOption;
     }
 
     /**
      * The failure process will not start automatically upon initialization
      */
-    public final void turnOffAutoFailures() {
-        myAutoStartFailuresFlag = false;
+    public final void turnOffAutoStartProcess() {
+        myAutoStartProcessOption = false;
     }
 
     /**
      * The failure process is started automatically upon initialization.
      */
-    public final void turnOnAutoFailures() {
-        myAutoStartFailuresFlag = true;
+    public final void turnOnAutoStartProcess() {
+        myAutoStartProcessOption = true;
     }
 
-    /**
-     * Causes the process to start being down, i.e. failed. When the process
-     * becomes down,
-     * the associated ResourceUnit is notified that a failure has occurred. by
-     * sending a FailureNotice to the ResourceUnit for processing based on the
-     * down time distribution.
-     * <p>
-     * Sends a FailureNotice to the ResourceUnit for processing
-     */
-    protected void sendFailureNoticeToResourceUnit() {
-        myResourceUnit.receiveFailureNotice(createFailureNotice());
+    @Override
+    protected void initialize() {
+        super.initialize();
+        myProcessState = myCreatedState;
+        if (getAutoStartProcessOption()){
+            start();
+        }
     }
 
-    /**
-     *
+    /** Should be used in implementations of sendFailureNotice()
      * @return creates a FailureNotice
      */
     protected final FailureNotice createFailureNotice() {
@@ -218,42 +198,46 @@ abstract public class FailureProcess extends SchedulingElement {
     }
 
     /**
-     * Stops the failure process. If the element is down, then no future
-     * failures should occur. If the element is up, then any failure mechanism
-     * should be canceled or stopped. Once the failure process is stopped, the
-     * element remains in the up state forever.
+     * Stops the failure process.  Once the failure process is stopped, the
+     * the process cannot be restarted. The process can be stopped from
+     *  the running or suspended states.
      */
-    abstract protected void stopFailureProcess();
+    public final void stop(){
+        myProcessState.stop();
+    }
 
     /**
      * Causes the failure process to start. If the failure process has already
      * been started then an IllegalStateException is thrown. The process must be
-     * in the up state to be able to schedule a failure. The failure process can
-     * only be started once per replication.
+     * started to be able to send failure notices. The failure process can
+     * only be started once per replication. The process can only be started
+     * from the created state.
      */
-    abstract public void startFailureProcess();
+     public final void start(){
+         myProcessState.start();
+     }
 
     /**
-     *
-     * @return true if the failure process has been started
-     */
-    abstract public boolean isStarted();
-
-    /**
-     * Tells the FailureElement to suspend the generation of FailureNotices.
+     * Tells the process to suspend the generation of FailureNotices.
      * Once suspended, resume() can be used to continue the generation
      * of FailureNotices. Suspending the generation of FailureNotices should
-     * cause no new FailureNotices to be sent to the ResourceUnit
+     * cause no new FailureNotices to be sent. The process can only
+     * be suspended from the running state.
      */
-    abstract protected void suspend();
+    public final void suspend(){
+        myProcessState.suspend();
+    }
 
     /**
-     * Tells the FailureElement to resume the generation of FailureNotices.
+     * Tells the process to resume the generation of FailureNotices.
      * Once resumed, suspend() can be used to pause the generation of new
      * FailureNotices. Resuming the generation of FailureNotices should
-     * allow the FailureElement to continue sending notices to the ResourceUnit.
+     * allow the process to continue sending notices if resumption of the
+     * process is permitted. The process can only be resumed from the suspended state.
      */
-    abstract protected void resume();
+    public final void resume(){
+        myProcessState.resume();
+    }
 
     /**
      * When a FailureNotice created by this FailureElement is made active,
@@ -261,36 +245,24 @@ abstract public class FailureProcess extends SchedulingElement {
      * FailureNotice.DelayedState when activate() is called.  A FailureNotice
      * is activated from ResourceUnit when scheduling the end of failure for the generated
      * FailureNotice using ResourceUnit's scheduleEndOfFailure(FailureNotice failureNotice).
-     * If the FailureNotice is not delayed then it is activated immediately upon failure.
+     * If the FailureNotice is not delayed then it is activated immediately upon
+     * the ResourceUnit receiving the failure notice.
      * If the FailureNotice is delayed, then after the delay it is activated
-     *
-     * This can be used to react to the notice
-     * becoming active. The default behavior is to suspend() the creation
-     * of future notices. In other words, while a ResourceUnit is handling
-     * a failure notice from this FailureElement additional notices will
-     * not be sent.
+     * This can be used to react to the notices
+     * becoming active.
      *
      * @param fn the failure notice
      */
-    protected void failureNoticeActivated(FailureNotice fn) {
-        setStateDown();
-        suspend();
-    }
+    abstract protected void failureNoticeActivated(FailureNotice fn);
 
     /**
      * When a FailureNotice created by this FailureElement is delayed,
      * this method is called. This can be used to react to the notice
-     * becoming delayed. The default behavior is to suspend() the production
-     * of future notices. In other words, while a ResourceUnit is handling
-     * a failure notice from this FailureElement additional notices will
-     * not be sent.
+     * becoming delayed.
      *
      * @param fn the failure notice
      */
-    protected void failureNoticeDelayed(FailureNotice fn) {
-        setStateDown();
-        suspend();
-    }
+    abstract protected void failureNoticeDelayed(FailureNotice fn);
 
     /**
      * When a FailureNotice created by this FailureElement is ignored,
@@ -300,30 +272,169 @@ abstract public class FailureProcess extends SchedulingElement {
      *
      * @param fn the failure notice
      */
-    protected void failureNoticeIgnored(FailureNotice fn) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getTime());
-        sb.append(" > ");
-        sb.append(getName());
-        sb.append(" ignored FailureNotice ");
-        sb.append(fn.toString());
-        sb.append(System.lineSeparator());
-        JSL.LOGGER.warning(sb.toString());
-    }
+    abstract protected void failureNoticeIgnored(FailureNotice fn);
+
+    /**
+     * Use this method to cause FailureNotices to be sent. This
+     * method properly checks the state of the process before sending.
+     *
+     */
+     protected final void fail(){
+         myProcessState.fail();
+     }
 
     /**
      * When a FailureNotice created by this FailureElement is completed,
      * this method is called. This can be used to react to the notice
-     * becoming completed. The default behavior is to resume the generation
-     * of failure notices
+     * becoming completed.
      *
      * @param fn the failure notice
      */
-    protected void failureNoticeCompleted(FailureNotice fn) {
-//        JSL.out.println(getTime() + " > In FailureElement.failureNoticeCompleted() with " + fn);
-        setStateUp();
-        resume();
+    abstract protected void failureNoticeCompleted(FailureNotice fn);
+
+    /**
+     * Performs the work to start the failure process
+     */
+    abstract protected void startProcess();
+
+    /**
+     * Performs work associated with suspending the process
+     */
+    abstract protected void suspendProcess();
+
+    /**
+     * Performs work associated with stopping the process
+     */
+    abstract protected void stopProcess();
+
+    /**
+     * Performs work to resume the process.
+     */
+    abstract protected void resumeProcess();
+
+    /**
+     * Implement this method signal ResourceUnits via FailureNotices
+     * This method is called by fail() which properly
+     * checks the state of the process before signalling
+     */
+    abstract protected void signalFailure();
+
+    /**
+     * @return true if the failure process is in the running state
+     */
+    public final boolean isRunning() {
+        return myProcessState == myRunningState;
     }
+
+    /**
+     * @return true if the failure process is in the created state
+     */
+    public final boolean isCreated() {
+        return myProcessState == myCreatedState;
+    }
+
+    /**
+     * @return true if the failure process is in the suspended state
+     */
+    public final boolean isSuspended() {
+        return myProcessState == mySuspendedState;
+    }
+
+    /**
+     * @return true if the failure process is in the running state
+     */
+    public final boolean isStopped() {
+        return myProcessState == myStoppedState;
+    }
+
+    private class FailureProcessState {
+        protected final String myName;
+
+        private FailureProcessState(String name) {
+            myName = name;
+        }
+
+        protected void fail() {
+            throw new IllegalStateException("Tried to fail from an illegal state: " + myName);
+        }
+
+        protected void start() {
+            throw new IllegalStateException("Tried to start from an illegal state: " + myName);
+        }
+
+        protected void suspend() {
+            throw new IllegalStateException("Tried to suspend from an illegal state: " + myName);
+        }
+
+        protected void resume() {
+            throw new IllegalStateException("Tried to resume from an illegal state: " + myName);
+        }
+
+        protected void stop() {
+            throw new IllegalStateException("Tried to stop from an illegal state: " + myName);
+        }
+
+    }
+
+    private final class CreatedState extends FailureProcessState {
+
+        private CreatedState() {
+            super("Created");
+        }
+
+        protected void start() {
+            myProcessState = myRunningState;
+            startProcess();
+        }
+
+    }
+
+    private final class RunningState extends FailureProcessState {
+
+        private RunningState() {
+            super("Running");
+        }
+
+        protected void fail() {
+            signalFailure();
+        }
+
+        protected void suspend() {
+            myProcessState = mySuspendedState;
+            suspendProcess();
+        }
+
+        protected void stop() {
+            myProcessState = myStoppedState;
+            stopProcess();
+        }
+
+    }
+
+    private final class SuspendedState extends FailureProcessState {
+
+        private SuspendedState() {
+            super("Suspended");
+        }
+
+        protected void resume() {
+            myProcessState = myRunningState;
+            resumeProcess();
+        }
+
+        protected void stop() {
+            myProcessState = myStoppedState;
+            stopProcess();
+        }
+    }
+
+    private final class StoppedState extends FailureProcessState {
+
+        private StoppedState() {
+            super("Stopped");
+        }
+    }
+
 
     /**
      * This method is called by ResourceUnit when a state change has

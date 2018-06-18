@@ -560,7 +560,7 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
                 sb.append("without an end event scheduled.\n");
                 sb.append("There was no maximum real-clock execution time specified. \n");
                 sb.append("The user is responsible for ensuring that the Executive is stopped.\n");
-                JSL.LOGGER.warning(sb.toString());
+                JSL.LOGGER.warn(sb.toString());
                 System.out.flush();
             }
         }
@@ -795,7 +795,7 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
                     sb.append(sim);
                 }
             }
-            JSL.LOGGER.severe(sb.toString());
+            JSL.LOGGER.error(sb.toString());
             throw e;
         }
 
@@ -827,7 +827,7 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
             sb.append("\n");
             sb.append("It is likely that the user scheduled the event in a ScheduleElement's constructor. \n");
             sb.append("Do not schedule events in a constructor.  Use the initialize() method instead.\n");
-            JSL.LOGGER.warning(sb.toString());
+            JSL.LOGGER.warn(sb.toString());
             System.out.flush();
         }
         if (e.isScheduled()) {

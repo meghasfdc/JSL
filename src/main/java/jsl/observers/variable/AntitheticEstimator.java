@@ -82,7 +82,7 @@ public class AntitheticEstimator extends ModelElementObserver {
             StringBuilder sb = new StringBuilder();
             sb.append("The antithetic option is not on. \n");
             sb.append("And there were AntitheticEstimator instances used.");
-            JSL.LOGGER.warning(sb.toString());
+            JSL.LOGGER.warn(sb.toString());
         }
     }
 
