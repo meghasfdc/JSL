@@ -35,7 +35,6 @@ import jsl.modeling.resource.Request.PreemptionRule;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.reporting.JSL;
 
 /**
  * A ResourceUnit is a single unit of a resource. A resource is something that
@@ -74,8 +73,8 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private Request myPreemptedRequest;
     private ResourceState myCurrentState;
     private ResourceState myPrevState;
-    private List<FailureElement> myFailureElements;
-    private Queue<FailureNotice> myFailures;
+    private List<FailureProcess> myFailureProcesses;
+    private Queue<FailureNotice> myFailureNoticeQ;
     private FailureNotice myCurrentFailureNotice;
     private InactivePeriodNotice myCurrentInactivePeriodNotice;
     private InactivePeriodNotice myPendingInactivePeriodNotice;
@@ -377,7 +376,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         notifyUpdateObservers();
         // if failures start automatically, start them
         if (getAutoFailuresFlag() == true) {
-            for (FailureElement fe : myFailureElements) {
+            for (FailureProcess fe : myFailureProcesses) {
                 fe.startFailureProcess();
             }
         }
@@ -433,7 +432,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      *
      * @param fe the element to add, must not be null, and must not have already been added
      */
-    public void addFailureElement(FailureElement fe) {
+    public void addFailureElement(FailureProcess fe) {
         if (fe == null){
             throw new IllegalArgumentException("The supplied FailureElement was null");
         }
@@ -441,16 +440,16 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
             throw new IllegalArgumentException("Attempted to add a FailureElement "
                     + "that is inconsistent with ResourceUnit failure delay option");
         }
-        if (myFailureElements == null) {
-            myFailureElements = new ArrayList<>();
-            myFailures = new Queue<>(this, getName() + ":FailureQ",
+        if (myFailureProcesses == null) {
+            myFailureProcesses = new ArrayList<>();
+            myFailureNoticeQ = new Queue<>(this, getName() + ":FailureQ",
                     myFailureQDiscipline, myFailureQStatOption);
             myEndDownTimeAction = new EndDownTimeAction();
         }
-        if (myFailureElements.contains(fe)){
+        if (myFailureProcesses.contains(fe)){
             throw new IllegalArgumentException("The supplied FailureElement was already added to the ResourceUnit");
         }
-        myFailureElements.add(fe);
+        myFailureProcesses.add(fe);
     }
 
     /**
@@ -553,7 +552,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @return true if FailureElements have been added to the unit
      */
     public final boolean hasFailureElements() {
-        return myFailureElements != null;
+        return myFailureProcesses != null;
     }
 
     /**
@@ -1049,6 +1048,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @param failure the notice
      */
     void receiveFailureNotice(FailureNotice failure) {
+        failure.setResourceUnit(this);
         myCurrentState.fail(failure);
     }
 
@@ -1077,7 +1077,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      */
     protected final void notifyFailureElements() {
         if (hasFailureElements()) {
-            for (FailureElement fe : myFailureElements) {
+            for (FailureProcess fe : myFailureProcesses) {
                 fe.resourceUnitStateChange(this);
             }
         }
@@ -1109,7 +1109,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
         if (isFailureNoticeWaiting() && isInactivePeriodPending()) {
             // compare them, whichever has smallest creation time gets processed next
-            FailureNotice nextFailure = myFailures.peekNext();
+            FailureNotice nextFailure = myFailureNoticeQ.peekNext();
             if (nextFailure.getCreateTime() <= getNextInactivePeriodNotice().getCreateTime()) {
                 processNextFailureNotice();
             } else {
@@ -1196,10 +1196,10 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @return true if there is a failure notice that needs processing
      */
     public final boolean isFailureNoticeWaiting() {
-        if (myFailures == null) {
+        if (myFailureNoticeQ == null) {
             return false;
         }
-        return myFailures.peekNext() != null;
+        return myFailureNoticeQ.peekNext() != null;
     }
 
     /**
@@ -1290,7 +1290,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         if (!hasFailureElements()) {
             return null;
         }
-        return myFailures.removeNext();
+        return myFailureNoticeQ.removeNext();
     }
 
     /**
@@ -1343,7 +1343,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         myCurrentFailureNotice.activate();
         setState(myFailedState);
         myCurrentDownTimeEvent = scheduleEvent(myEndDownTimeAction,
-                myCurrentFailureNotice.getDownTime());
+                myCurrentFailureNotice.getDuration());
     }
 
     /**
@@ -1388,7 +1388,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      */
     protected void enqueueIncomingFailureNotice(FailureNotice failureNotice) {
         failureNotice.delay();
-        myFailures.enqueue(failureNotice);
+        myFailureNoticeQ.enqueue(failureNotice);
     }
 
     /**

@@ -30,7 +30,7 @@ import jsl.modeling.elements.EventGeneratorActionIfc;
  *
  * @author rossetti
  */
-public class TimeBasedFailure extends FailureElement {
+public class TimeBasedFailure extends FailureProcess {
 
     protected EventGenerator myFailureGenerator;
 
@@ -90,11 +90,6 @@ public class TimeBasedFailure extends FailureElement {
         }
         double time = myFailureGenerator.getTimeBetweenEvents().getValue();
         myFailureGenerator.turnOnGenerator(time);
-    }
-
-    @Override
-    protected void repairAction() {
-        setStateUp();
     }
 
     @Override

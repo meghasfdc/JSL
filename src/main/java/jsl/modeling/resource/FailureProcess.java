@@ -20,15 +20,20 @@ import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.reporting.JSL;
 
-/**
+/**  A FailureProcess causes FailureNotices to be sent to ResourceUnits. By default the
+ * failure process does not start automatically at time zero. The user can turn
+ * on automatic starting of the failure process at time zero or use the
+ * startFailureProcess() method. Once the failure process has been started it
+ * cannot be started again. Once the failure process has been stopped, it cannot
+ * be started again.
  *
  * @author rossetti
  */
-abstract public class FailureElement extends SchedulingElement {
+abstract public class FailureProcess extends SchedulingElement {
 
-    protected RandomIfc myRepairTime;
+    protected RandomIfc myFailureDuration;
 
-    protected RandomVariable myRepairTimeRV;
+    protected RandomVariable myFailureDurationRV;
 
     protected final ResourceUnit myResourceUnit;
 
@@ -40,47 +45,45 @@ abstract public class FailureElement extends SchedulingElement {
 
     protected int myPriority;
 
-    protected FailureNotice myLastNotice;
-
     /**
      * The delay option will be true
      *
      * @param parent the associated ResourceUnit
-     * @param repairTime governs the time that the element indicates down
+     * @param duration governs the duration of the FailureNotices
      */
-    public FailureElement(ResourceUnit parent, RandomIfc repairTime) {
-        this(parent, repairTime, true, null);
+    public FailureProcess(ResourceUnit parent, RandomIfc duration) {
+        this(parent, duration, true, null);
     }
 
     /**
      *
      * @param parent the associated ResourceUnit
-     * @param repairTime governs the time that the element indicates down
+     * @param duration governs the duration of the FailureNotices
      * @param delayOption whether or not failure notices can be delayed if the
      * resource is busy
      */
-    public FailureElement(ResourceUnit parent, RandomIfc repairTime,
-            boolean delayOption) {
-        this(parent, repairTime, delayOption, null);
+    public FailureProcess(ResourceUnit parent, RandomIfc duration,
+                          boolean delayOption) {
+        this(parent, duration, delayOption, null);
     }
 
     /**
      *
      * @param parent the associated ResourceUnit
-     * @param repairTime governs the time that the element indicates down
+     * @param duration governs the duration of the FailureNotices
      * @param delayOption whether or not failure notices can be delayed if the
      * resource is busy
      * @param name the name of the ResourceUnit
      */
-    public FailureElement(ResourceUnit parent, RandomIfc repairTime,
-            boolean delayOption, String name) {
+    public FailureProcess(ResourceUnit parent, RandomIfc duration,
+                          boolean delayOption, String name) {
         super(parent, name);
         myResourceUnit = parent;
         myDelayOption = delayOption;
         myPriority = 1;
         turnOffAutoFailures();
         setStateUp();
-        setRepairTimeInitialRandomSource(repairTime);
+        setFailureNoticeDurationTimeInitialRandomSource(duration);
     }
 
     /**
@@ -103,7 +106,7 @@ abstract public class FailureElement extends SchedulingElement {
      * The default option is true
      *
      * @return returns true if the FailureNotices made by this FailureElement
-     * can be delayed if the ResourceUnit is busy
+     * can be delayed if the ResourceUnit it is sent to is busy
      */
     public final boolean getFailureDelayOption() {
         return myDelayOption;
@@ -117,7 +120,7 @@ abstract public class FailureElement extends SchedulingElement {
 
     /**
      *
-     * @return true if the element is down
+     * @return true if the process has an active failure
      */
     public final boolean isDown() {
         return myState;
@@ -125,7 +128,7 @@ abstract public class FailureElement extends SchedulingElement {
 
     /**
      *
-     * @return true if the element is up
+     * @return true if the process does not have an active failure
      */
     public final boolean isUp() {
         return !myState;
@@ -150,18 +153,18 @@ abstract public class FailureElement extends SchedulingElement {
      *
      * @param d the distribution
      */
-    public final void setRepairTimeInitialRandomSource(RandomIfc d) {
+    public final void setFailureNoticeDurationTimeInitialRandomSource(RandomIfc d) {
         if (d == null) {
             throw new IllegalArgumentException("Down time was null!");
         }
 
-        myRepairTime = d;
+        myFailureDuration = d;
 
-        if (myRepairTimeRV == null) { // not made yet
-            myRepairTimeRV = new RandomVariable(this, myRepairTime);
+        if (myFailureDurationRV == null) { // not made yet
+            myFailureDurationRV = new RandomVariable(this, myFailureDuration);
         } else { // already had been made, and added to model
             // just change the distribution
-            myRepairTimeRV.setInitialRandomSource(myRepairTime);
+            myFailureDurationRV.setInitialRandomSource(myFailureDuration);
         }
 
     }
@@ -191,7 +194,7 @@ abstract public class FailureElement extends SchedulingElement {
     }
 
     /**
-     * Causes the element to start being down, i.e. failed. When the element
+     * Causes the process to start being down, i.e. failed. When the process
      * becomes down,
      * the associated ResourceUnit is notified that a failure has occurred. by
      * sending a FailureNotice to the ResourceUnit for processing based on the
@@ -204,29 +207,15 @@ abstract public class FailureElement extends SchedulingElement {
     }
 
     /**
-     * 
-     * @return the last FailureNotice sent by this element
-     */
-    protected final FailureNotice getLastFailureNotice() {
-        return myLastNotice;
-    }
-
-    /**
      *
      * @return creates a FailureNotice
      */
     protected final FailureNotice createFailureNotice() {
-        double t = myRepairTimeRV.getValue();
-        myLastNotice = new FailureNotice(this, t, myDelayOption);
-        myLastNotice.setPriority(getPriority());
-        return myLastNotice;
+        double t = myFailureDurationRV.getValue();
+        FailureNotice fn = new FailureNotice(this, t, myDelayOption);
+        fn.setPriority(getPriority());
+        return fn;
     }
-
-    /**
-     * Specifies what to do when the element is repaired
-     * <p>
-     */
-    abstract protected void repairAction(); //TODO is this needed
 
     /**
      * Stops the failure process. If the element is down, then no future
@@ -268,7 +257,14 @@ abstract public class FailureElement extends SchedulingElement {
 
     /**
      * When a FailureNotice created by this FailureElement is made active,
-     * this method is called. This can be used to react to the notice
+     * this method is called. Called from FailureNotice.CreatedState or
+     * FailureNotice.DelayedState when activate() is called.  A FailureNotice
+     * is activated from ResourceUnit when scheduling the end of failure for the generated
+     * FailureNotice using ResourceUnit's scheduleEndOfFailure(FailureNotice failureNotice).
+     * If the FailureNotice is not delayed then it is activated immediately upon failure.
+     * If the FailureNotice is delayed, then after the delay it is activated
+     *
+     * This can be used to react to the notice
      * becoming active. The default behavior is to suspend() the creation
      * of future notices. In other words, while a ResourceUnit is handling
      * a failure notice from this FailureElement additional notices will
@@ -339,123 +335,123 @@ abstract public class FailureElement extends SchedulingElement {
         if (resourceUnit.isPreviousStateIdle()) {
             if (resourceUnit.isBusy()) {
                 //idle to busy
-                resourceUnitIdleToBusy();
+                resourceUnitIdleToBusy(resourceUnit);
             } else if (resourceUnit.isFailed()) {
                 // idle to failed
-                resourceUnitIdleToFailed();
+                resourceUnitIdleToFailed(resourceUnit);
             } else if (resourceUnit.isInactive()) {
                 // idle to inactive
-                resourceUnitIdleToInactive();
+                resourceUnitIdleToInactive(resourceUnit);
             } else if (resourceUnit.isIdle()) {
                 // idle to idle, not possible
-                resourceUnitIdleToIdle();
+                resourceUnitIdleToIdle(resourceUnit);
             }
         } else if (resourceUnit.isPreviousStateInactive()) {
             if (resourceUnit.isBusy()) {
                 //inactive to busy
-                resourceUnitInactiveToBusy();
+                resourceUnitInactiveToBusy(resourceUnit);
             } else if (resourceUnit.isFailed()) {
                 // inactive to failed
-                resourceUnitInactiveToFailed();
+                resourceUnitInactiveToFailed(resourceUnit);
             } else if (resourceUnit.isInactive()) {
                 // inactive to inactive
-                resourceUnitInactiveToInactive();
+                resourceUnitInactiveToInactive(resourceUnit);
             } else if (resourceUnit.isIdle()) {
                 // inactive to idle
-                resourceUnitInactiveToIdle();
+                resourceUnitInactiveToIdle(resourceUnit);
             }
         } else if (resourceUnit.isPreviousStateBusy()) {
             if (resourceUnit.isBusy()) {
                 //busy to busy
-                resourceUnitBusyToBusy();
+                resourceUnitBusyToBusy(resourceUnit);
             } else if (resourceUnit.isFailed()) {
                 // busy to failed
-                resourceUnitBusyToFailed();
+                resourceUnitBusyToFailed(resourceUnit);
             } else if (resourceUnit.isInactive()) {
                 // busy to inactive
-                resourceUnitBusyToInactive();
+                resourceUnitBusyToInactive(resourceUnit);
             } else if (resourceUnit.isIdle()) {
                 // busy to idle
-                resourceUnitBusyToIdle();
+                resourceUnitBusyToIdle(resourceUnit);
             }
         } else if (resourceUnit.isPreviousStateFailed()) {
             if (resourceUnit.isBusy()) {
                 //failed to busy
-                resourceUnitFailedToBusy();
+                resourceUnitFailedToBusy(resourceUnit);
             } else if (resourceUnit.isFailed()) {
                 // failed to failed
-                resourceUnitFailedToFailed();
+                resourceUnitFailedToFailed(resourceUnit);
             } else if (resourceUnit.isInactive()) {
                 // failed to inactive
-                resourceUnitFailedToInactive();
+                resourceUnitFailedToInactive(resourceUnit);
             } else if (resourceUnit.isIdle()) {
                 // failed to idle
-                resourceUnitFailedToIdle();
+                resourceUnitFailedToIdle(resourceUnit);
             }
         }
     }
 
-    protected void resourceUnitInactiveToIdle() {
+    protected void resourceUnitInactiveToIdle(ResourceUnit resourceUnit) {
 //     JSL.out.println(getTime() + " > transition from Inactive to Idle");
     }
 
-    protected void resourceUnitInactiveToInactive() {
+    protected void resourceUnitInactiveToInactive(ResourceUnit resourceUnit) {
 //     JSL.out.println(getTime() + " > transition from Inactive to Inactive");
     }
 
-    protected void resourceUnitInactiveToFailed() {
+    protected void resourceUnitInactiveToFailed(ResourceUnit resourceUnit) {
 //    JSL.out.println(getTime() + " > transition from Inactive to Failed");
     }
 
-    protected void resourceUnitInactiveToBusy() {
+    protected void resourceUnitInactiveToBusy(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Inactive to Busy");
     }
 
-    protected void resourceUnitBusyToBusy() {
+    protected void resourceUnitBusyToBusy(ResourceUnit resourceUnit) {
 //        System.out.println(getTime() + " > transition from Busy to Busy");
     }
 
-    protected void resourceUnitBusyToFailed() {
+    protected void resourceUnitBusyToFailed(ResourceUnit resourceUnit) {
 //      JSL.out.println(getTime() + " > transition from Busy to Failed");
     }
 
-    protected void resourceUnitBusyToInactive() {
+    protected void resourceUnitBusyToInactive(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Busy to Inactive");
     }
 
-    protected void resourceUnitBusyToIdle() {
+    protected void resourceUnitBusyToIdle(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Busy to Idle");
     }
 
-    protected void resourceUnitFailedToBusy() {
+    protected void resourceUnitFailedToBusy(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Failed to Busy");
     }
 
-    protected void resourceUnitFailedToFailed() {
+    protected void resourceUnitFailedToFailed(ResourceUnit resourceUnit) {
 //    JSL.out.println(getTime() + " > transition from Failed to Failed");
     }
 
-    protected void resourceUnitFailedToInactive() {
+    protected void resourceUnitFailedToInactive(ResourceUnit resourceUnit) {
 //      JSL.out.println(getTime() + " > transition from Failed to Inactive");
     }
 
-    protected void resourceUnitFailedToIdle() {
+    protected void resourceUnitFailedToIdle(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Failed to Idle");
     }
 
-    protected void resourceUnitIdleToBusy() {
+    protected void resourceUnitIdleToBusy(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Idle to Busy");
     }
 
-    protected void resourceUnitIdleToFailed() {
+    protected void resourceUnitIdleToFailed(ResourceUnit resourceUnit) {
 //       JSL.out.println(getTime() + " > transition from Idle to Failed");
     }
 
-    protected void resourceUnitIdleToInactive() {
+    protected void resourceUnitIdleToInactive(ResourceUnit resourceUnit) {
 //        JSL.out.println(getTime() + " > transition from Idle to Inactive");
     }
 
-    protected void resourceUnitIdleToIdle() {
+    protected void resourceUnitIdleToIdle(ResourceUnit resourceUnit) {
 //       JSL.out.println(getTime() + " > transition from Idle to Idle");
     }
 }
