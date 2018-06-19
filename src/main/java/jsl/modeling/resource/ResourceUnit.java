@@ -58,13 +58,14 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private final ResourceState myFailedState = new Failed();
     private final ResourceState myInactiveState = new Inactive();
 
-    private double myStartTime;
-    private final boolean myAutoStartFailuresFlag;
+    private double myStartTime;//TODO not sure why this is needed
+//    private final boolean myAutoStartFailuresFlag;
+    private final boolean myAllowFailuresFlag;
     private final Queue<Request> myRequestQ;
     private final boolean myFailureDelayOption;
     private final boolean myInactivePeriodDelayOption;
-    private final Discipline myFailureQDiscipline;
-    private final boolean myFailureQStatOption;
+//    private final Discipline myFailureQDiscipline;
+//    private final boolean myFailureQStatOption;
     private final EndRequestUsageAction myEndRequestUsageAction = new EndRequestUsageAction();
     private EndDownTimeAction myEndDownTimeAction;
 
@@ -101,38 +102,39 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
     /**
      * It is highly recommended that the Resource.Builder class be used to
-     * construction ResourceUnits. This generic public method is available
+     * construct ResourceUnits. This generic public method is available
      * primarily to simplify sub-classing
      *
      * @param parent the model element parent
      * @param name the name
-     * @param autoStartFailuresFlag whether to start failures automatically
+     * @param allowFailuresFlag whether or not failures are allowed
      * @param failureDelayOption whether failures can delay
      * @param failuresQDiscipline the discipline for failures
      * @param failureQStatOption whether failure enterWaitingState statistics
-     * are
-     * collected
+     * are collected
      * @param requestQCancelStatOption whether request statistics are collected
      * when the request is canceled
      * @param inactivePeriodDelayOption whether inactive periods can delay
-     * @param stateStatOption whether statistics are collected on resource
-     * states
+     * @param stateStatOption whether statistics are collected on resource states
      * @param requestStatOption whether request statistics are collected
      * @param requestQDiscipline the enterWaitingState discipline for requests
      * @param requestQStatsOption whether enterWaitingState statistics are
      * collected
      */
     public ResourceUnit(ModelElement parent, String name,
-            boolean autoStartFailuresFlag, boolean failureDelayOption,
+            boolean allowFailuresFlag, boolean failureDelayOption,
             Discipline failuresQDiscipline, boolean failureQStatOption,
             boolean requestQCancelStatOption, boolean inactivePeriodDelayOption,
             boolean stateStatOption, boolean requestStatOption,
             Discipline requestQDiscipline, boolean requestQStatsOption) {
         super(parent, name);
-        myAutoStartFailuresFlag = autoStartFailuresFlag;
+        myAllowFailuresFlag = allowFailuresFlag;
         myFailureDelayOption = failureDelayOption;
-        myFailureQDiscipline = failuresQDiscipline;
-        myFailureQStatOption = failureQStatOption;
+        if (myAllowFailuresFlag){
+            myFailureNoticeQ = new Queue<>(this, getName() + ":FailureQ",
+                    failuresQDiscipline, failureQStatOption);
+            myEndDownTimeAction = new EndDownTimeAction();
+        }
         myRequestQCancelStatOption = requestQCancelStatOption;
         myInactivePeriodDelayOption = inactivePeriodDelayOption;
         myCollectStateStats = stateStatOption;
@@ -140,6 +142,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         myRequestQ = new Queue<>(this, getName() + ":RequestQ",
                 requestQDiscipline, requestQStatsOption);
         myUtil = new ResponseVariable(this, getName() + ":PTimeBusy");
+
         if (getCollectStateStatsOption()) {
             myFailedProp = new ResponseVariable(this, getName() + ":PTimeFailed");
             myInactiveProp = new ResponseVariable(this, getName() + ":PTimeInactive");
@@ -163,7 +166,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
         private final ModelElement parent;
         private String name = null;
-        private boolean autoStartFailuresFlag = false;
+        private boolean allowFailuresFlag = false;
         private boolean failureDelayOption = false;
         private boolean inactivePeriodDelayOption = false;
         private Discipline requestQDiscipline = Discipline.FIFO;
@@ -197,8 +200,8 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
          *
          * @return the Builder
          */
-        public Builder autoStartFailures() {
-            autoStartFailuresFlag = true;
+        public Builder allowFailures() {
+            allowFailuresFlag = true;
             return this;
         }
 
@@ -313,7 +316,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
          */
         public ResourceUnit build() {
             return new ResourceUnit(parent, name,
-                    autoStartFailuresFlag, failureDelayOption,
+                    allowFailuresFlag, failureDelayOption,
                     failuresQDiscipline, failureQStatOption,
                     requestQCancelStatOption, inactivePeriodDelayOption,
                     stateStatOption, requestStatOption,
@@ -337,7 +340,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                 StringBuilder sb = new StringBuilder();
                 sb.append(name).append(":").append(i);
                 ResourceUnit resourceUnit = new ResourceUnit(parent, sb.toString(),
-                        autoStartFailuresFlag, failureDelayOption,
+                        allowFailuresFlag, failureDelayOption,
                         failuresQDiscipline, failureQStatOption,
                         requestQCancelStatOption, inactivePeriodDelayOption,
                         stateStatOption, requestStatOption,
@@ -347,6 +350,35 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
             return list;
         }
     }
+
+//    public static interface BuilderIfc extends BuildStepIfc {
+//
+//    }
+//
+//    public static interface BuildStepIfc {
+//        ResourceUnit build();
+//        List<ResourceUnit> build(int numToBuild);
+//    }
+//
+//
+//    public static interface AllowFailuresIfc {
+//        ConfigureFailuresIfc allowFailures();
+//    }
+//
+//    public static interface ConfigureFailuresIfc {
+//        OptionalStepsIfc allowFailuresToDelay();
+//        OptionalStepsIfc failureQueueDiscipline(Discipline discipline);
+//        OptionalStepsIfc collectFailureQStats();
+//    }
+//
+//    public static interface OptionalStepsIfc extends BuildStepIfc {
+//        OptionalStepsIfc name(String name);
+//        OptionalStepsIfc collectRequestQStats();
+//        OptionalStepsIfc requestQueueDiscipline(Discipline discipline);
+//        OptionalStepsIfc collectStateStatistics();
+//        OptionalStepsIfc collectCanceledRequestQStatistics();
+//        OptionalStepsIfc allowInactivePeriodsToDelay();
+//    }
 
     @Override
     protected void initialize() {
@@ -408,49 +440,49 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         }
     }
 
-    /**
-     * Creates and adds a TimeBasedFailure to the ResourceUnit. Will throw an
-     * IllegalArgumentException if the failure delay option of the
-     * FailureElement is inconsistent with that permitted by the unit
-     *
-     * @param repairTime the time to spend down
-     * @param timeToFail the time between failures
-     * @param delayOption true if the failures are allowed to be delayed
-     * @return
-     */
-    public TimeBasedFailure addTimeBasedFailure(RandomIfc repairTime,
-            RandomIfc timeToFail, boolean delayOption) {
-        TimeBasedFailure tbf = new TimeBasedFailure(this, repairTime,
-                timeToFail, delayOption);
-        addFailureElement(tbf);
-        return tbf;
-    }
+//    /**
+//     * Creates and adds a TimeBasedFailure to the ResourceUnit. Will throw an
+//     * IllegalArgumentException if the failure delay option of the
+//     * FailureElement is inconsistent with that permitted by the unit
+//     *
+//     * @param repairTime the time to spend down
+//     * @param timeToFail the time between failures
+//     * @param delayOption true if the failures are allowed to be delayed
+//     * @return
+//     */
+//    public TimeBasedFailure addTimeBasedFailure(RandomIfc repairTime,
+//            RandomIfc timeToFail, boolean delayOption) {
+//        TimeBasedFailure tbf = new TimeBasedFailure(this, repairTime,
+//                timeToFail, delayOption);
+//        addFailureElement(tbf);
+//        return tbf;
+//    }
 
-    /**
-     * Will throw an IllegalArgumentException if the failure delay option of the
-     * FailureElement is inconsistent with that permitted by the unit
-     *
-     * @param fe the element to add, must not be null, and must not have already been added
-     */
-    public void addFailureElement(FailureProcess fe) {
-        if (fe == null){
-            throw new IllegalArgumentException("The supplied FailureElement was null");
-        }
-        if (fe.getFailureDelayOption() != getFailureDelayOption()) {
-            throw new IllegalArgumentException("Attempted to add a FailureElement "
-                    + "that is inconsistent with ResourceUnit failure delay option");
-        }
-        if (myFailureProcesses == null) {
-            myFailureProcesses = new ArrayList<>();
-            myFailureNoticeQ = new Queue<>(this, getName() + ":FailureQ",
-                    myFailureQDiscipline, myFailureQStatOption);
-            myEndDownTimeAction = new EndDownTimeAction();
-        }
-        if (myFailureProcesses.contains(fe)){
-            throw new IllegalArgumentException("The supplied FailureElement was already added to the ResourceUnit");
-        }
-        myFailureProcesses.add(fe);
-    }
+//    /**
+//     * Will throw an IllegalArgumentException if the failure delay option of the
+//     * FailureElement is inconsistent with that permitted by the unit
+//     *
+//     * @param fe the element to add, must not be null, and must not have already been added
+//     */
+//    public void addFailureElement(FailureProcess fe) {
+//        if (fe == null){
+//            throw new IllegalArgumentException("The supplied FailureElement was null");
+//        }
+//        if (fe.getFailureDelayOption() != getFailureDelayOption()) {
+//            throw new IllegalArgumentException("Attempted to add a FailureElement "
+//                    + "that is inconsistent with ResourceUnit failure delay option");
+//        }
+//        if (myFailureProcesses == null) {
+//            myFailureProcesses = new ArrayList<>();
+//            myFailureNoticeQ = new Queue<>(this, getName() + ":FailureQ",
+//                    myFailureQDiscipline, myFailureQStatOption);
+//            myEndDownTimeAction = new EndDownTimeAction();
+//        }
+//        if (myFailureProcesses.contains(fe)){
+//            throw new IllegalArgumentException("The supplied FailureElement was already added to the ResourceUnit");
+//        }
+//        myFailureProcesses.add(fe);
+//    }
 
     /**
      *
@@ -1824,7 +1856,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                 myRequestQ.remove(request, getRequestQCancelStatOption());
                 request.exitWaitingState(myRequestQ, getTime());
             }
-            request.becomeCanceled(myStartTime);
+            request.becomeCanceled(myStartTime);//TODO why
         }
 
         @Override
@@ -1855,7 +1887,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                 myRequestQ.remove(request, getRequestQCancelStatOption());
                 request.exitWaitingState(myRequestQ, getTime());
             }
-            request.becomeCanceled(myStartTime);
+            request.becomeCanceled(myStartTime);//TODO why?
         }
 
         @Override
