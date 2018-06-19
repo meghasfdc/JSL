@@ -28,7 +28,7 @@ public class TestLogger {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-       JSL.LOGGER.warning("stuff");
+       JSL.LOGGER.warn("stuff");
     }
 
 }

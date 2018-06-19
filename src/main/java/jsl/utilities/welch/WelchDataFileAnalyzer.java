@@ -142,7 +142,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
             myData = new RandomAccessFile(myDataFile, "r");
         } catch (IOException ex) {
             String str = "Problem creating RandomAccessFile for " + myDataFile.getAbsolutePath();
-            LOGGER.log(Level.SEVERE, str, ex);
+            LOGGER.error(str, ex);
         }
         myMinObsCount = JSLMath.getMin(myObsCounts);
         myAcrossRepStat = new Statistic();

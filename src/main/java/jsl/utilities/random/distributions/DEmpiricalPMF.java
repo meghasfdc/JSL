@@ -333,7 +333,7 @@ public class DEmpiricalPMF extends Distribution implements DiscreteDistributionI
     public final void addProbabilityPoint(double value, double probability) {
 
         if (probability == 0.0) {
-            JSL.LOGGER.warning("Attempted to add a probability point " + value + " with zero probability");
+            JSL.LOGGER.warn("Attempted to add a probability point " + value + " with zero probability");
             return;
         }
 

@@ -318,7 +318,7 @@ public class TWBatchingElement extends SchedulingElement {
             StringBuilder sb = new StringBuilder();
             sb.append("The number of initial batches < 10\n");
             sb.append("is not recommended for batching time-based variables\n");
-            JSL.LOGGER.warning(sb.toString());
+            JSL.LOGGER.warn(sb.toString());
             System.out.flush();
         }
         myNumTWBatches = numBatches;

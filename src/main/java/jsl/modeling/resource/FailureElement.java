@@ -312,7 +312,7 @@ abstract public class FailureElement extends SchedulingElement {
         sb.append(" ignored FailureNotice ");
         sb.append(fn.toString());
         sb.append(System.lineSeparator());
-        JSL.LOGGER.warning(sb.toString());
+        JSL.LOGGER.warn(sb.toString());
     }
 
     /**

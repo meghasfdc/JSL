@@ -1139,7 +1139,7 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
                         sb.append("The experiment has an infinite horizon.\n");
                         sb.append("There was no maximum real-clock execution time specified. \n");
                         sb.append("The user is responsible for ensuring that the Executive is stopped.\n");
-                        JSL.LOGGER.warning(sb.toString());
+                        JSL.LOGGER.warn(sb.toString());
                         System.out.flush();
                     }
                 }

@@ -111,7 +111,7 @@ public class WelchDataFileCollector extends ModelElementObserver {
             myData = new RandomAccessFile(myDataFile, "rw");
         } catch (IOException ex) {
             String str = "Problem creating RandomAccessFile for " + myDataFile.getAbsolutePath();
-            LOGGER.log(Level.SEVERE, str, ex);
+            LOGGER.error(str, ex);
         }
     }
 

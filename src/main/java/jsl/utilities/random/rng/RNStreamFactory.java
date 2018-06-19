@@ -480,22 +480,22 @@ public class RNStreamFactory extends Identity {
         int i;
         for (i = 0; i < 3; ++i) {
             if (seed[i] >= m1 || seed[i] < 0) {
-                JSL.LOGGER.warning("ERROR: Seed[" + i + "], Seed is not set.\n");
+                JSL.LOGGER.warn("ERROR: Seed[" + i + "], Seed is not set.\n");
                 return -1;
             }
         }
         for (i = 3; i < 6; ++i) {
             if (seed[i] >= m2 || seed[i] < 0) {
-                JSL.LOGGER.warning("ERROR: Seed[" + i + "], Seed is not set.\n");
+                JSL.LOGGER.warn("ERROR: Seed[" + i + "], Seed is not set.\n");
                 return -1;
             }
         }
         if (seed[0] == 0 && seed[1] == 0 && seed[2] == 0) {
-            JSL.LOGGER.warning("ERROR: First 3 seeds = 0.\n");
+            JSL.LOGGER.warn("ERROR: First 3 seeds = 0.\n");
             return -1;
         }
         if (seed[3] == 0 && seed[4] == 0 && seed[5] == 0) {
-            JSL.LOGGER.warning("ERROR: Last 3 seeds = 0.\n");
+            JSL.LOGGER.warn("ERROR: Last 3 seeds = 0.\n");
             return -1;
         }
         return 0;
@@ -963,14 +963,14 @@ public class RNStreamFactory extends Identity {
                 do {
                     u = U01d();
                     if (JSLMath.equal(u, 1.0, machinePrecision) || JSLMath.equal(u, 0.0, machinePrecision)) {
-                        JSL.LOGGER.log(Level.WARNING, "randU01() machine precision check problem: u = {0}", u);
+                        JSL.LOGGER.warn("randU01() machine precision check problem: u = {0}", u);
                     }
                 } while (JSLMath.equal(u, 1.0, machinePrecision) || JSLMath.equal(u, 0.0, machinePrecision));
             } else {
                 do {
                     u = U01();
                     if (JSLMath.equal(u, 1.0, machinePrecision) || JSLMath.equal(u, 0.0, machinePrecision)) {
-                        JSL.LOGGER.log(Level.WARNING, "randU01() machine precision check problem: u = {0}", u);
+                        JSL.LOGGER.warn("randU01() machine precision check problem: u = {0}", u);
                     }
                 } while (JSLMath.equal(u, 1.0, machinePrecision) || JSLMath.equal(u, 0.0, machinePrecision));
             }
