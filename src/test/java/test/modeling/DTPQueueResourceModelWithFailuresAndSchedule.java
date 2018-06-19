@@ -65,7 +65,7 @@ public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElem
         myResource = new ResourceUnit.Builder(this)
                 .name("Server")
                 .collectRequestQStats()
-                .autoStartFailures().allowInactivePeriodsToDelay()
+                .allowInactivePeriodsToDelay()
                 .allowFailuresToDelay()
                 .collectStateStatistics()
                 .collectRequestStatistics()
@@ -79,7 +79,7 @@ public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElem
 
         //Constant c1 = new Constant(0.5);
         Constant c1 = new Constant(100.0);
-        myResource.addTimeBasedFailure(Constant.TWO, c1, true);
+        myResource.addTimeBasedFailure(Constant.TWO, c1);
         //       myResource.addTimeBasedFailure(Constant.TWO, c1, false);
         // myResource = new ResourceUnit.Builder(this).name("Server").build();
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");

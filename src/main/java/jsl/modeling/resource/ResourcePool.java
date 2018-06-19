@@ -289,7 +289,7 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
         boolean option = false;
 
         for (ResourceUnit ru : myResources) {
-            if (ru.hasFailureElements()) {
+            if (ru.hasFailureProcesses()) {
                 return true;
             }
         }

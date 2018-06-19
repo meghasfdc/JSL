@@ -26,18 +26,15 @@ import jsl.modeling.Simulation;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.modeling.resource.*;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
-import jsl.modeling.resource.Request;
 import jsl.modeling.resource.Request.PreemptionRule;
-import jsl.modeling.resource.RequestReactorAdapter;
-import jsl.modeling.resource.ResourceUnit;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Constant;
 import jsl.utilities.reporting.JSL;
-import jsl.modeling.resource.RequestReactorIfc;
 
 public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
@@ -67,14 +64,14 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         myResource = new ResourceUnit.Builder(this)
                 .name("Server")
                 .collectRequestQStats()
-                .autoStartFailures()
                 .allowFailuresToDelay()
                 .collectStateStatistics()
                 .build();
 
         //Constant c1 = new Constant(0.5);
         Constant c1 = new Constant(3.0);
-        myResource.addTimeBasedFailure(Constant.TWO, c1, true);
+        TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1);
+        timeBasedFailure.turnOnAutoStartProcess();
         // myResource = new ResourceUnit.Builder(this).name("Server").build();
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
