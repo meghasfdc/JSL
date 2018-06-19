@@ -71,7 +71,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         //Constant c1 = new Constant(0.5);
         Constant c1 = new Constant(3.0);
         TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1);
-        timeBasedFailure.turnOnAutoStartProcess();
+        FailureEvent fe = new FailureEvent(myResource, 6, 5);
         // myResource = new ResourceUnit.Builder(this).name("Server").build();
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
@@ -242,9 +242,9 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         driveThroughPharmacy.setServiceRS(new Exponential(3.0));
 
         // set the parameters of the experiment
-        sim.setNumberOfReplications(30);
-        sim.setLengthOfReplication(20000.0);
-        sim.setLengthOfWarmUp(5000.0);
+        sim.setNumberOfReplications(2);
+        sim.setLengthOfReplication(20.0);
+        sim.setLengthOfWarmUp(5.0);
 //        sim.setNumberOfReplications(2);
 //        sim.setLengthOfReplication(30.0);
 //        sim.setLengthOfWarmUp(5000.0);

@@ -92,6 +92,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private Counter myNumPreemptions;
     private Counter myTotalPreemptTime;
     private Counter myNumCompleted;
+    private Counter myNumFailures;
     private ResponseVariable myPreemptProb;
     private ResponseVariable myPreemptTime;
 
@@ -399,18 +400,34 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     }
 
     /**
+     * Creates and adds a TimeBasedFailure to the ResourceUnit. The failure
+     * process will start automatically when the replication is initialized.
+     *
+     * @param failureDuration  the time to spend down
+     * @param timeToFail  the time between failures
+     * @return the TimeBasedFailure
+     */
+    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFail){
+        return addTimeBasedFailure(failureDuration, timeToFail, true);
+    }
+
+
+    /**
      * Creates and adds a TimeBasedFailure to the ResourceUnit. Will throw an
      * IllegalArgumentException if the failure delay option of the
      * FailureProcess is inconsistent with that permitted by the unit
      *
      * @param failureDuration  the time to spend down
      * @param timeToFail  the time between failures
-     * @return
+     * @param autoStartFlag tells the time based failure to start automatically if true
+     * @return the TimeBasedFailure
      */
-    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration,
-                                                RandomIfc timeToFail) {
-        TimeBasedFailure tbf = new TimeBasedFailure(this, failureDuration,
-                timeToFail, getFailureDelayOption());
+    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFail,
+                                                boolean autoStartFlag) {
+        TimeBasedFailure tbf = new TimeBasedFailure(this, failureDuration, timeToFail);
+        if (autoStartFlag){
+            tbf.turnOnAutoStartProcess();
+        }
         return tbf;
     }
 
@@ -426,6 +443,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
             myFailures = new Queue<>(this, getName() + ":FailureQ",
                     myFailureQDiscipline, myFailureQStatOption);
             myEndDownTimeAction = new EndDownTimeAction();
+            myNumFailures = new Counter(this, getName() + ":NumFailures");
         }
         myFailureProcesses.add(failureProcess);
     }
@@ -1281,6 +1299,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     protected void scheduleEndOfFailure(FailureNotice failureNotice) {
         myCurrentFailureNotice = failureNotice;
         myCurrentFailureNotice.activate();
+        myNumFailures.increment();
         setState(myFailedState);
         myCurrentDownTimeEvent = scheduleEvent(myEndDownTimeAction,
                 myCurrentFailureNotice.getDuration());

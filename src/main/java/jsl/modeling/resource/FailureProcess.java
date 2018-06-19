@@ -15,7 +15,7 @@
  */
 package jsl.modeling.resource;
 
-import jsl.modeling.ModelElement;
+import jsl.modeling.JSLEvent;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
@@ -24,9 +24,9 @@ import java.util.Objects;
 
 /**
  * A FailureProcess causes FailureNotices to be sent to a ResourceUnit. By default the
- * failure process does not start automatically at time zero. The user can turn
- * on automatic starting of the failure process at time zero or use the
- * start() method. Once the failure process has been started it
+ * failure process start automatically at time zero. The user can turn
+ * off automatic starting of the failure process at time zero by use
+ * of the turnOffAutoStartProcess().  Once the failure process has been started it
  * cannot be started again. Once the failure process has been stopped, it cannot
  * be started again. A FailureProcess is associated with one ResourceUnit.
  *
@@ -44,55 +44,30 @@ abstract public class FailureProcess extends SchedulingElement {
     private final RandomVariable myFailureDurationRV;
 
     private boolean myAutoStartProcessOption;
-
-    private boolean myDelayOption;
-
     private int myPriority;
-
     private FailureProcessState myProcessState;
-
     protected final ResourceUnit myResourceUnit;
 
+
     /**
-     * The delay option will be true
-     *
-     * @param resourceUnit   the resourceUnit ModelElement
-     * @param duration governs the duration of the FailureNotices
+     * @param resourceUnit      the resourceUnit
+     * @param duration    governs the duration of the FailureNotices
      */
     public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration) {
-        this(resourceUnit, duration, true, null);
+        this(resourceUnit, duration, null);
     }
 
     /**
      * @param resourceUnit      the resourceUnit
      * @param duration    governs the duration of the FailureNotices
-     * @param delayOption whether or not failure notices can be delayed if the
-     *                    resource is busy
-     */
-    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration,
-                          boolean delayOption) {
-        this(resourceUnit, duration, delayOption, null);
-    }
-
-    /**
-     * @param resourceUnit      the resourceUnit
-     * @param duration    governs the duration of the FailureNotices
-     * @param delayOption whether or not failure notices can be delayed if the
-     *                    resource is busy
      * @param name        the name of the FailureProcess
      */
-    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration,
-                          boolean delayOption, String name) {
+    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration, String name) {
         super(resourceUnit, name);
-        if (delayOption != resourceUnit.getFailureDelayOption()) {
-            throw new IllegalArgumentException("Attempted to add a FailureProcess "
-                    + "that is inconsistent with ResourceUnit failure delay option");
-        }
         Objects.requireNonNull(duration, "The failure duration must not be null");
         myFailureDurationRV = new RandomVariable(this, duration, getName() + ":Duration");
-        myDelayOption = delayOption;
-        myPriority = 1;
-        turnOffAutoStartProcess();
+        myPriority = JSLEvent.DEFAULT_PRIORITY;
+        turnOnAutoStartProcess();
         myProcessState = myCreatedState;
         myResourceUnit = resourceUnit;
         myResourceUnit.addFailureProcess(this);
@@ -119,7 +94,7 @@ abstract public class FailureProcess extends SchedulingElement {
      * can be delayed if the ResourceUnit it is sent to is busy
      */
     public final boolean getFailureDelayOption() {
-        return myDelayOption;
+        return myResourceUnit.getFailureDelayOption();
     }
 
     /**
@@ -174,7 +149,7 @@ abstract public class FailureProcess extends SchedulingElement {
      */
     protected final FailureNotice createFailureNotice() {
         double t = myFailureDurationRV.getValue();
-        FailureNotice fn = new FailureNotice(this, t, myDelayOption);
+        FailureNotice fn = new FailureNotice(this, t, getFailureDelayOption());
         fn.setPriority(getPriority());
         return fn;
     }
@@ -306,7 +281,9 @@ abstract public class FailureProcess extends SchedulingElement {
      * This method is called by fail() which properly
      * checks the state of the process before signalling
      */
-    abstract protected void signalFailure();
+    protected void signalFailure() {
+        myResourceUnit.receiveFailureNotice(createFailureNotice());
+    }
 
     /**
      * @return true if the failure process is in the running state
@@ -421,6 +398,11 @@ abstract public class FailureProcess extends SchedulingElement {
             myProcessState = myStoppedState;
             stopProcess();
         }
+
+        @Override
+        protected void suspend(){
+
+        }
     }
 
     private final class StoppedState extends FailureProcessState {
@@ -437,7 +419,7 @@ abstract public class FailureProcess extends SchedulingElement {
      * sub-classes to specialize the behavior associated with a
      * state change on a ResourceUnit.
      */
-    protected void resourceUnitStateChange() {
+    protected final void resourceUnitStateChange() {
         if (myResourceUnit.isPreviousStateIdle()) {
             if (myResourceUnit.isBusy()) {
                 //idle to busy

@@ -25,7 +25,7 @@ import jsl.utilities.reporting.JSL;
  * A TimeBasedFailure uses time to determine the next failure. By default the
  * failure process does not start automatically at time zero. The user can turn
  * on automatic starting of the failure process at time zero or use the
- * startFailureProcess() method. Once the failure process has been started it
+ * start() method. Once the failure process has been started it
  * cannot be started again. Once the failure process has been stopped, it cannot
  * be started again.
  *
@@ -37,19 +37,13 @@ public class TimeBasedFailure extends FailureProcess {
 
     protected final ResourceUnit myResourceUnit;
 
-    public TimeBasedFailure(ResourceUnit parent, RandomIfc repairTime,
-            RandomIfc timeToFailure) {
-        this(parent, repairTime, timeToFailure, false, null);
+    public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration, RandomIfc timeToFailure) {
+        this(parent, failureDuration, timeToFailure, null);
     }
 
     public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration,
-            RandomIfc timeToFailure, boolean delayOption) {
-        this(parent, failureDuration, timeToFailure, delayOption, null);
-    }
-
-    public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration,
-            RandomIfc timeToFailure, boolean delayOption, String name) {
-        super(parent, failureDuration, delayOption);
+            RandomIfc timeToFailure, String name) {
+        super(parent, failureDuration);
         myResourceUnit = parent;
         myFailureGenerator = new EventGenerator(this, new FailureAction(),
                 timeToFailure, timeToFailure);
@@ -67,11 +61,13 @@ public class TimeBasedFailure extends FailureProcess {
 
     @Override
     protected void failureNoticeActivated(FailureNotice fn) {
+        //System.out.printf("%f > The time based failure %d was activated. %n", getTime(), fn.getId());
         suspend();
     }
 
     @Override
     protected void failureNoticeDelayed(FailureNotice fn) {
+        //System.out.printf("%f > The time based failure %d was delayed. %n", getTime(), fn.getId());
         suspend();
     }
 
@@ -89,6 +85,7 @@ public class TimeBasedFailure extends FailureProcess {
 
     @Override
     protected void failureNoticeCompleted(FailureNotice fn) {
+        //System.out.printf("%f > The time based failure %d was completed. %n", getTime(), fn.getId());
         resume();
     }
 
