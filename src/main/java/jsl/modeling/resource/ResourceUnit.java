@@ -399,16 +399,31 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         }
     }
 
+
+    /**
+     * Creates and adds a TimeBasedFailure to the ResourceUnit. The failure
+     * process will not start automatically
+     *
+     * @param failureDuration  the time to spend down
+     * @param timeBtwFailures the time between failures
+     * @return the TimeBasedFailure
+     */
+    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeBtwFailures){
+        return addTimeBasedFailure(failureDuration, null, timeBtwFailures, null);
+    }
+
     /**
      * Creates and adds a TimeBasedFailure to the ResourceUnit. The failure
      * process will start automatically when the replication is initialized.
      *
      * @param failureDuration  the time to spend down
-     * @param timeToFail  the time between failures
+     * @param timeToFirstFailure  the time of the first failure
+     * @param timeBtwFailures the time between failures
      * @return the TimeBasedFailure
      */
-    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFail){
-        return addTimeBasedFailure(failureDuration, timeToFail, true);
+    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFirstFailure,
+                                                RandomIfc timeBtwFailures){
+        return addTimeBasedFailure(failureDuration, timeToFirstFailure, timeBtwFailures, null);
     }
 
 
@@ -418,16 +433,15 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * FailureProcess is inconsistent with that permitted by the unit
      *
      * @param failureDuration  the time to spend down
-     * @param timeToFail  the time between failures
-     * @param autoStartFlag tells the time based failure to start automatically if true
+     * @param timeToFirstFailure  the time of the first failure
+     * @param timeBtwFailures the time between failures
+     * @param name the name of the failures
      * @return the TimeBasedFailure
      */
-    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFail,
-                                                boolean autoStartFlag) {
-        TimeBasedFailure tbf = new TimeBasedFailure(this, failureDuration, timeToFail);
-        if (autoStartFlag){
-            tbf.turnOnAutoStartProcess();
-        }
+    public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFirstFailure,
+                                                RandomIfc timeBtwFailures, String name) {
+        TimeBasedFailure tbf = new TimeBasedFailure(this, failureDuration, timeToFirstFailure,
+                timeBtwFailures, name);
         return tbf;
     }
 

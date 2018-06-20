@@ -36,12 +36,13 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
     </appender>
 
     <root level="DEBUG">
         <!--<appender-ref ref="consoleAppender" />-->
         <appender-ref ref="FILE"/>
+        <appender-ref ref ="consoleAppender"/>
     </root>
 </configuration>

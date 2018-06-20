@@ -35,18 +35,17 @@ public class TimeBasedFailure extends FailureProcess {
 
     protected EventGenerator myFailureGenerator;
 
-    protected final ResourceUnit myResourceUnit;
-
-    public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration, RandomIfc timeToFailure) {
-        this(parent, failureDuration, timeToFailure, null);
+    public TimeBasedFailure(ResourceUnit resourceUnit, RandomIfc failureDuration,
+                            RandomIfc timeToFirstFailure, RandomIfc timeBtwFailures) {
+        this(resourceUnit, failureDuration, timeToFirstFailure, timeBtwFailures, null);
     }
 
-    public TimeBasedFailure(ResourceUnit parent, RandomIfc failureDuration,
-            RandomIfc timeToFailure, String name) {
-        super(parent, failureDuration);
-        myResourceUnit = parent;
+    public TimeBasedFailure(ResourceUnit resourceUnit, RandomIfc failureDuration,
+            RandomIfc timeToFirstFailure, RandomIfc timeBtwFailures, String name) {
+        super(resourceUnit, failureDuration, timeToFirstFailure, name);
         myFailureGenerator = new EventGenerator(this, new FailureAction(),
-                timeToFailure, timeToFailure);
+                timeToFirstFailure, timeBtwFailures, getName() + ":FailureGenerator");
+        // use the FailureProcess to start the generator
         myFailureGenerator.setStartOnInitializeFlag(false);
     }
 
@@ -55,19 +54,20 @@ public class TimeBasedFailure extends FailureProcess {
      *
      * @param tbf the time between failure
      */
-    public final void setTimeToFailureInitialRandomSource(RandomIfc tbf) {
+    public final void setTimeBetweenFailureEvents(RandomIfc tbf) {
         myFailureGenerator.setInitialTimeBetweenEvents(tbf);
     }
 
     @Override
     protected void failureNoticeActivated(FailureNotice fn) {
-        //System.out.printf("%f > The time based failure %d was activated. %n", getTime(), fn.getId());
+//        System.out.printf("%f > The time based failure %d was activated. %n", getTime(), fn.getId());
+        // can't fail again until after the resource is repaired (after the failure duration occurs)
         suspend();
     }
 
     @Override
     protected void failureNoticeDelayed(FailureNotice fn) {
-        //System.out.printf("%f > The time based failure %d was delayed. %n", getTime(), fn.getId());
+//        System.out.printf("%f > The time based failure %d was delayed. %n", getTime(), fn.getId());
         suspend();
     }
 
@@ -85,14 +85,8 @@ public class TimeBasedFailure extends FailureProcess {
 
     @Override
     protected void failureNoticeCompleted(FailureNotice fn) {
-        //System.out.printf("%f > The time based failure %d was completed. %n", getTime(), fn.getId());
+//        System.out.printf("%f > The time based failure %d was completed. %n", getTime(), fn.getId());
         resume();
-    }
-
-    @Override
-    protected void startProcess() {
-        double time = myFailureGenerator.getTimeBetweenEvents().getValue();
-        myFailureGenerator.turnOnGenerator(time);
     }
 
     @Override
@@ -108,11 +102,6 @@ public class TimeBasedFailure extends FailureProcess {
     @Override
     protected void resumeProcess() {
         myFailureGenerator.resume();
-    }
-
-    @Override
-    protected void signalFailure() {
-        myResourceUnit.receiveFailureNotice(createFailureNotice());
     }
 
     private class FailureAction implements EventGeneratorActionIfc {

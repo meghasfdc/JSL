@@ -15,7 +15,6 @@
  */
 package test.modeling;
 
-import java.util.Optional;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
@@ -70,9 +69,13 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
         //Constant c1 = new Constant(0.5);
         Constant c1 = new Constant(3.0);
-        TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1);
-        FailureEvent fe = new FailureEvent(myResource, 6, 5);
+        TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1, c1);
+        //SingleFailureEvent fe = new SingleFailureEvent(myResource, new Constant(5), new Constant(6));
         // myResource = new ResourceUnit.Builder(this).name("Server").build();
+        MultipleResourceUnitSingleFailureEvent mfe = new MultipleResourceUnitSingleFailureEvent(this,
+                new Constant(5), new Constant(6));
+        mfe.addResourceUnit(myResource);
+
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
         mySysTime = new ResponseVariable(this, "System Time");
@@ -94,35 +97,27 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         if (n < 0) {
             throw new IllegalArgumentException();
         }
-
         myNumPharmacists = n;
     }
 
     public final void setServiceRS(RandomIfc d) {
-
         if (d == null) {
             throw new IllegalArgumentException("Service Time RV was null!");
         }
-
         myServiceRS = d;
-
         if (myServiceRV == null) { // not made yet
             myServiceRV = new RandomVariable(this, myServiceRS, "Service RV");
         } else { // already had been made, and added to model
             // just change the distribution
             myServiceRV.setInitialRandomSource(myServiceRS);
         }
-
     }
 
     public final void setArrivalRS(RandomIfc d) {
-
         if (d == null) {
             throw new IllegalArgumentException("Arrival Time Distribution was null!");
         }
-
         myArrivalRS = d;
-
         if (myArrivalRV == null) { // not made yet
             myArrivalRV = new RandomVariable(this, myArrivalRS, "Arrival RV");
         } else { // already had been made, and added to model
@@ -135,6 +130,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
     protected void initialize() {
         super.initialize();
         // start the arrivals
+//        JSL.LOGGER.error("initialized");
         schedule(this::arrival).in(myArrivalRV).units();
     }
 
@@ -148,9 +144,8 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
                 .duration(myServiceRS)
                 .rule(PreemptionRule.RESUME)
                 .build();
-                
-         Request seize = myResource.seize(request);
 
+        Request seize = myResource.seize(request);
         schedule(this::arrival).in(myArrivalRV).units();
 
     }
@@ -172,19 +167,19 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
         @Override
         public void prepared(Request request) {
-            JSL.out.println(getTime() + "> Request " + request + " is prepared.");
+//            JSL.out.println(getTime() + "> Request " + request + " is prepared.");
         }
 
         @Override
         public void dequeued(Request request, Queue<Request> queue) {
-            myWaitingQ.remove((QObject)request.getAttachedObject());
-            JSL.out.println(getTime() + "> Request " + request + " exited queue.");
+            myWaitingQ.remove((QObject) request.getAttachedObject());
+//            JSL.out.println(getTime() + "> Request " + request + " exited queue.");
         }
 
         @Override
         public void enqueued(Request request, Queue<Request> queue) {
-            myWaitingQ.enqueue((QObject)request.getAttachedObject());
-            JSL.out.println(getTime() + "> Request " + request + " entered queue.");
+            myWaitingQ.enqueue((QObject) request.getAttachedObject());
+//            JSL.out.println(getTime() + "> Request " + request + " entered queue.");
         }
 
         @Override
@@ -198,7 +193,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
             if (request.isPreviousStateAllocated()) {
                 myNumBusy.decrement();
             }
-            JSL.out.println(getTime() + "> Request " + request + " was canceled.");
+//            JSL.out.println(getTime() + "> Request " + request + " was canceled.");
         }
 
         @Override
@@ -206,26 +201,26 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
             // if preempted the resource is no longer busy
             myNumBusy.decrement();
             myPreemptedRequest = request;
-            JSL.out.println(getTime() + "> Request " + request + " was preempted.");
+//            JSL.out.println(getTime() + "> Request " + request + " was preempted.");
         }
 
         @Override
         public void resumed(Request request) {
             myNumBusy.increment();
             myPreemptedRequest = null;
-            JSL.out.println(getTime() + "> Request " + request + " resumed using resource.");
+//            JSL.out.println(getTime() + "> Request " + request + " resumed using resource.");
         }
 
         @Override
         public void allocated(Request request) {
             myNumBusy.increment();
-            JSL.out.println(getTime() + "> Request " + request + " allocated resource.");
+//            JSL.out.println(getTime() + "> Request " + request + " allocated resource.");
         }
 
         @Override
         public void completed(Request request) {
             myNumBusy.decrement();
-            JSL.out.println(getTime() + "> Request " + request + " completed.");
+//            JSL.out.println(getTime() + "> Request " + request + " completed.");
             mySysTime.setValue(getTime() - request.getCreateTime());
             myNS.decrement(); // customer left system  
         }

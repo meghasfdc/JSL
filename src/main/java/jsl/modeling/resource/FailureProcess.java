@@ -18,20 +18,29 @@ package jsl.modeling.resource;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
+import jsl.utilities.GetValueIfc;
 import jsl.utilities.random.RandomIfc;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
- * A FailureProcess causes FailureNotices to be sent to a ResourceUnit. By default the
- * failure process start automatically at time zero. The user can turn
- * off automatic starting of the failure process at time zero by use
- * of the turnOffAutoStartProcess().  Once the failure process has been started it
- * cannot be started again. Once the failure process has been stopped, it cannot
- * be started again. A FailureProcess is associated with one ResourceUnit.
+ * A FailureProcess causes FailureNotices to be sent to a ResourceUnit. If
+ * the user supplies an initial starting time random variable then, it will
+ * be used to start the process at that time for each replication of the simulation. If
+ * no initial starting time random variable is supplied, then the process will
+ * not be started automatically and the user should use the start() methods to
+ * start the process at the appropriate time.  Starting the process causes
+ * the first failure to occur at the specified start time and to last for
+ * the provided duration.  When the process is started the first
+ * failure event is scheduled. If the process is not started then no first event is
+ * scheduled.  Implementors of sub-classes are responsible for suspending, resuming, and stopping the
+ * process by implementing the suspendProcess(), resumeProcess(), and stopProcess() methods.
  *
- * Will throw an IllegalArgumentException if the failure delay option of the
- * FailureProcess is inconsistent with that permitted by the ResourceUnit
+ * Once the failure process has been started it
+ * cannot be started again. Once the failure process has been stopped, it cannot
+ * be started again (until the next replication). A FailureProcess is associated with one ResourceUnit.
+ *
  * @author rossetti
  */
 abstract public class FailureProcess extends SchedulingElement {
@@ -42,32 +51,55 @@ abstract public class FailureProcess extends SchedulingElement {
     private final StoppedState myStoppedState = new StoppedState();
 
     private final RandomVariable myFailureDurationRV;
-
-    private boolean myAutoStartProcessOption;
+    private RandomVariable myInitialStartTimeRV;
     private int myPriority;
     private FailureProcessState myProcessState;
-    protected final ResourceUnit myResourceUnit;
+    private final ResourceUnit myResourceUnit;
+    private JSLEvent myStartEvent;
 
 
-    /**
-     * @param resourceUnit      the resourceUnit
-     * @param duration    governs the duration of the FailureNotices
+    /** The process will not be started automatically.
+     *
+     * @param resourceUnit the resourceUnit
+     * @param duration     governs the duration of the FailureNotices
      */
     public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration) {
-        this(resourceUnit, duration, null);
+        this(resourceUnit, duration, null, null);
+    }
+
+    /** The process will not be started automatically.
+     *
+     * @param resourceUnit the resourceUnit
+     * @param duration     governs the duration of the FailureNotices
+     */
+    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration, String name) {
+        this(resourceUnit, duration, null, name);
     }
 
     /**
-     * @param resourceUnit      the resourceUnit
-     * @param duration    governs the duration of the FailureNotices
-     * @param name        the name of the FailureProcess
+     * @param resourceUnit the resourceUnit, may not be null
+     * @param duration     governs the duration of the FailureNotices, may not be null
+     * @param initialStartTimeRV used to specify the time of the start of the process, if the process is
+     *                          to be started automatically at the beginning of each replication. May be null.
      */
-    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration, String name) {
+    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration, RandomIfc initialStartTimeRV) {
+        this(resourceUnit, duration, initialStartTimeRV, null);
+    }
+    /**
+     * @param resourceUnit the resourceUnit, may not be null
+     * @param duration     governs the duration of the FailureNotices, may not be null
+     * @param initialStartTimeRV used to specify the time of the start of the process, if the process is
+     *                          to be started automatically at the beginning of each replication. May be null.
+     * @param name         the name of the FailureProcess
+     */
+    public FailureProcess(ResourceUnit resourceUnit, RandomIfc duration, RandomIfc initialStartTimeRV, String name) {
         super(resourceUnit, name);
         Objects.requireNonNull(duration, "The failure duration must not be null");
         myFailureDurationRV = new RandomVariable(this, duration, getName() + ":Duration");
+        if (initialStartTimeRV != null) {
+            myInitialStartTimeRV = new RandomVariable(this, initialStartTimeRV, getName() + ":InitialStartTime");
+        }
         myPriority = JSLEvent.DEFAULT_PRIORITY;
-        turnOnAutoStartProcess();
         myProcessState = myCreatedState;
         myResourceUnit = resourceUnit;
         myResourceUnit.addFailureProcess(this);
@@ -116,21 +148,29 @@ abstract public class FailureProcess extends SchedulingElement {
      * initialization
      */
     public final boolean getAutoStartProcessOption() {
-        return myAutoStartProcessOption;
+        return myInitialStartTimeRV != null;
     }
 
-    /**
-     * The failure process will not start automatically upon initialization
+    /**  Setting an initial start time indicates to the failure process that it should
+     * automatically start using the supplied time at the beginning of each replication.
+     *
+     * @param startTime the time that the process should start at the beginning of each simulation
      */
-    public final void turnOffAutoStartProcess() {
-        myAutoStartProcessOption = false;
+    public final void setInitialStartTimeInitialRandomSource(RandomIfc startTime){
+        Objects.requireNonNull(startTime, "The supplied start time was null");
+        if (myInitialStartTimeRV == null){
+            myInitialStartTimeRV = new RandomVariable(this, startTime, getName() + ":InitialStartTime");
+        } else {
+            myInitialStartTimeRV.setInitialRandomSource(startTime);
+        }
     }
 
-    /**
-     * The failure process is started automatically upon initialization.
+    /** Since supplying an initial starting time is optional, it may be null.
+     *
+     * @return the random variable that represents the initial starting time
      */
-    public final void turnOnAutoStartProcess() {
-        myAutoStartProcessOption = true;
+    protected final Optional<RandomVariable> getInitialStartTimeRV(){
+        return Optional.ofNullable(myInitialStartTimeRV);
     }
 
     @Override
@@ -138,7 +178,7 @@ abstract public class FailureProcess extends SchedulingElement {
         super.initialize();
         myProcessState = myCreatedState;
         if (getAutoStartProcessOption()) {
-            start();
+            start(myInitialStartTimeRV);
         }
     }
 
@@ -154,6 +194,14 @@ abstract public class FailureProcess extends SchedulingElement {
         return fn;
     }
 
+    /**  If the process has not been started yet then the start event may be null
+     *
+     * @return the event that is scheduled to start the process
+     */
+    protected final Optional<JSLEvent> getStartEvent(){
+        return Optional.ofNullable(myStartEvent);
+    }
+
     /**
      * Stops the failure process.  Once the failure process is stopped, the
      * the process cannot be restarted. The process can be stopped from
@@ -164,14 +212,32 @@ abstract public class FailureProcess extends SchedulingElement {
     }
 
     /**
-     * Causes the failure process to start. If the failure process has already
-     * been started then an IllegalStateException is thrown. The process must be
+     * This method starts the process by scheduling the first event to occur at getTime() + time.
+     * <p>
+     * If the failure process has already been started then an IllegalStateException is thrown. The process must be
      * started to be able to send failure notices. The failure process can
      * only be started once per replication. The process can only be started
      * from the created state.
      */
+    public final void start(double time) {
+        myProcessState.start(time);
+    }
+
+    /**
+     * Start the process at the current time. In other words in getTime() + 0.0 into the future.
+     */
     public final void start() {
-        myProcessState.start();
+        start(0.0);
+    }
+
+    /**
+     * Causes the failure process to start at getTime() + value.getValue().
+     *
+     * @param value the GetValueIfc object that should be used get the value of the starting time
+     */
+    public final void start(GetValueIfc value) {
+        Objects.requireNonNull(value, "The supplied GetValueIfc was null");
+        start(value.getValue());
     }
 
     /**
@@ -197,10 +263,9 @@ abstract public class FailureProcess extends SchedulingElement {
     }
 
     /**
-     *
      * @return the resource unit attached to this failure process
      */
-    protected final ResourceUnit getResourceUnit(){
+    protected final ResourceUnit getResourceUnit() {
         return myResourceUnit;
     }
 
@@ -257,11 +322,6 @@ abstract public class FailureProcess extends SchedulingElement {
     abstract protected void failureNoticeCompleted(FailureNotice fn);
 
     /**
-     * Performs the work to start the failure process
-     */
-    abstract protected void startProcess();
-
-    /**
      * Performs work associated with suspending the process
      */
     abstract protected void suspendProcess();
@@ -313,6 +373,39 @@ abstract public class FailureProcess extends SchedulingElement {
         return myProcessState == myStoppedState;
     }
 
+    /**
+     * Performs the work to start the failure process. Schedules the first event
+     *
+     * @param time the time that the process should be scheduled to start, must be not be negative
+     */
+    protected final void scheduleStartOfProcess(double time) {
+        myStartEvent = schedule(this::startEvent).havingPriority(getPriority()).in(time).units();
+    }
+
+    private void startEvent(JSLEvent event){
+        fail();
+    }
+
+    /**
+     *  If the start event has been scheduled, then cancel it
+     */
+    protected final void cancelStartEvent(){
+        Optional<JSLEvent> startEvent = getStartEvent();
+        if (startEvent.isPresent()){
+            startEvent.get().setCanceledFlag(true);
+        }
+    }
+
+    protected final void unCancelStartEvent(){
+        Optional<JSLEvent> startEvent = getStartEvent();
+        if (startEvent.isPresent()){
+            JSLEvent event = startEvent.get();
+            if (event.isScheduled()){
+                event.setCanceledFlag(false);
+            }
+        }
+    }
+
     private class FailureProcessState {
         protected final String myName;
 
@@ -324,7 +417,7 @@ abstract public class FailureProcess extends SchedulingElement {
             throw new IllegalStateException("Tried to fail from an illegal state: " + myName);
         }
 
-        protected void start() {
+        protected void start(double time) {
             throw new IllegalStateException("Tried to start from an illegal state: " + myName);
         }
 
@@ -349,9 +442,12 @@ abstract public class FailureProcess extends SchedulingElement {
         }
 
         @Override
-        protected void start() {
+        protected void start(double time) {
+            if (time < 0.0) {
+                throw new IllegalArgumentException("The starting time was negative (must be >=0");
+            }
             myProcessState = myRunningState;
-            startProcess();
+            scheduleStartOfProcess(time);
         }
 
     }
@@ -400,7 +496,7 @@ abstract public class FailureProcess extends SchedulingElement {
         }
 
         @Override
-        protected void suspend(){
+        protected void suspend() {
 
         }
     }
