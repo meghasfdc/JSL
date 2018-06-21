@@ -39,24 +39,49 @@ public class SingleFailureEvent extends FailureProcess {
 
     private final Set<FailureEventListenerIfc> myFailureEventListeners;
 
+    /**
+     *
+     * @param resourceUnit the resource unit effected by the failure
+     * @param duration the duration of the failure
+     */
     public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration) {
         this(resourceUnit, duration, null, null);
     }
 
+    /**
+     *
+     * @param resourceUnit the resource unit effected by the failure
+     * @param duration the duration of the failure
+     * @param name the name of the model element
+     */
     public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration, String name) {
         this(resourceUnit, duration, null, name);
     }
+
+    /**
+     *
+     * @param resourceUnit the resource unit effected by the failure
+     * @param duration the duration of the failure
+     * @param initialStartTimeRV the time that the failure should start
+     */
     public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration, RandomIfc initialStartTimeRV) {
         this(resourceUnit, duration, initialStartTimeRV, null);
     }
 
+    /**
+     *
+     * @param resourceUnit the resource unit effected by the failure
+     * @param duration the duration of the failure
+     * @param initialStartTimeRV the time that the failure should start
+     * @param name the name of the model element
+     */
     public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration, RandomIfc initialStartTimeRV, String name) {
         super(resourceUnit, duration, initialStartTimeRV, name);
         setPriority(JSLEvent.DEFAULT_PRIORITY - 5);
         myFailureEventListeners = new LinkedHashSet<>();
     }
 
-    /** Adds a listener to react to failure event
+    /** Adds a listener to react to failureStarted event
      *
      * @param listener the listener to add
      */
@@ -79,19 +104,27 @@ public class SingleFailureEvent extends FailureProcess {
     }
 
     /**
-     *  Used internally to notify failure process listeners of state changes:
-     *  start, stop, failure, suspend, resume
+     *  Used internally to notify failure event listeners that the failure started
      */
-    protected final void notifyFailureEventListeners(){
+    protected final void notifyFailureEventListenersFailureStarted(){
         for(FailureEventListenerIfc fpl: myFailureEventListeners){
-            fpl.failure();
+            fpl.failureStarted();
+        }
+    }
+
+    /**
+     * Used internally to notify failure event listeners that the failure completed
+     */
+    protected final void notifyFailureEventListenersFailureCompleted(){
+        for(FailureEventListenerIfc fpl: myFailureEventListeners){
+            fpl.failureCompleted();
         }
     }
 
     @Override
     protected void failureNoticeActivated(FailureNotice fn) {
         // since it is a one time event notify the listeners of it
-        notifyFailureEventListeners();
+        notifyFailureEventListenersFailureStarted();
 //        System.out.printf("%f > The FailureEvent %d was activated. %n", getTime(), fn.getId());
     }
 
@@ -108,6 +141,7 @@ public class SingleFailureEvent extends FailureProcess {
 
     @Override
     protected void failureNoticeCompleted(FailureNotice fn) {
+        notifyFailureEventListenersFailureCompleted();
         // nothing to do because it is a one time event
 //        System.out.printf("%f > The FailureEvent %d was completed. %n", getTime(), fn.getId());
     }

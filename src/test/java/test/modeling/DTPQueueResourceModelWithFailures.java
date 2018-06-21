@@ -85,8 +85,13 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
     protected class FailureEventListener implements FailureEventListenerIfc{
 
         @Override
-        public void failure() {
-            System.out.println("The failure event occurred!");
+        public void failureStarted() {
+            System.out.println("The failureStarted event occurred!");
+        }
+
+        @Override
+        public void failureCompleted() {
+            System.out.println("The failureCompleted event occurred!");
         }
     }
 
