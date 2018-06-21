@@ -18,7 +18,7 @@ package jsl.modeling.resource;
 
 /**
  *  An interface to react to the start and completion of SingleFailureEvent
- * 
+ *
  */
 public interface FailureEventListenerIfc {
 
