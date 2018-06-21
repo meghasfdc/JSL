@@ -81,6 +81,15 @@ public class SingleFailureEvent extends FailureProcess {
         myFailureEventListeners = new LinkedHashSet<>();
     }
 
+    @Override
+    protected void initialize() {
+        //TODO need to set up the initial start time and the duration
+        super.initialize();
+    }
+
+    //TODO need to override getDurationValue() and getInitialStartTimeValue()
+    // so that one random value is used per replication
+
     /** Adds a listener to react to failureStarted event
      *
      * @param listener the listener to add

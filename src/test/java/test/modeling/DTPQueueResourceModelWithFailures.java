@@ -33,7 +33,6 @@ import jsl.modeling.queue.Queue;
 import jsl.modeling.resource.Request.PreemptionRule;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.reporting.JSL;
 
 public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
@@ -72,7 +71,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1, c1);
         //SingleFailureEvent fe = new SingleFailureEvent(myResource, new Constant(5), new Constant(6));
         // myResource = new ResourceUnit.Builder(this).name("Server").build();
-        MultipleResourceUnitSingleFailureEvent mfe = new MultipleResourceUnitSingleFailureEvent(this,
+        ResourceFailureEvent mfe = new ResourceFailureEvent(this,
                 new Constant(5), new Constant(6));
         mfe.addResourceUnit(myResource);
         mfe.addFailureEventListener(new FailureEventListener());

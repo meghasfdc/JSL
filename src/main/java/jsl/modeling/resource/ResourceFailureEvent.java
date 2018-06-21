@@ -38,7 +38,7 @@ import java.util.Set;
  * want to attach resource units and do not want the warning then use
  * setNoResourceUnitWarningOption(false)
  */
-public class MultipleResourceUnitSingleFailureEvent extends SchedulingElement {
+public class ResourceFailureEvent extends SchedulingElement {
 
     private RandomVariable myInitialStartTimeRV;
     private final RandomVariable myEventDurationRV;
@@ -59,8 +59,8 @@ public class MultipleResourceUnitSingleFailureEvent extends SchedulingElement {
      * @param eventDuration      the duration of the event
      * @param initialStartTimeRV the initial starting time for the event
      */
-    public MultipleResourceUnitSingleFailureEvent(ModelElement parent, RandomIfc eventDuration,
-                                                  RandomIfc initialStartTimeRV) {
+    public ResourceFailureEvent(ModelElement parent, RandomIfc eventDuration,
+                                RandomIfc initialStartTimeRV) {
         this(parent, eventDuration, initialStartTimeRV, null);
     }
 
@@ -70,8 +70,8 @@ public class MultipleResourceUnitSingleFailureEvent extends SchedulingElement {
      * @param initialStartTimeRV the initial starting time for the event
      * @param name               the name of model element
      */
-    public MultipleResourceUnitSingleFailureEvent(ModelElement parent, RandomIfc eventDuration,
-                                                  RandomIfc initialStartTimeRV, String name) {
+    public ResourceFailureEvent(ModelElement parent, RandomIfc eventDuration,
+                                RandomIfc initialStartTimeRV, String name) {
         super(parent, name);
         myEventDurationRV = new RandomVariable(this, eventDuration, getName() + ":EventDuration");
         myEventDuration = new Constant(myEventDurationRV.getValue());
@@ -85,6 +85,22 @@ public class MultipleResourceUnitSingleFailureEvent extends SchedulingElement {
         myStoppedFlag = false;
         mySuspendedFlag = false;
         myTurnOffNoResourceUnitWarning = true;
+    }
+
+    /**
+     *
+     * @return the time that the event will occur
+     */
+    public final double getEventTime(){
+        return myTimeToEvent.getValue();
+    }
+
+    /**
+     *
+     * @return the duration of the event for this replication
+     */
+    public final double getDuration(){
+        return myEventDuration.getValue();
     }
 
     /**
