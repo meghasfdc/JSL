@@ -21,8 +21,10 @@ import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.random.RandomIfc;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A FailureProcess causes FailureNotices to be sent to a ResourceUnit. If
@@ -56,6 +58,7 @@ abstract public class FailureProcess extends SchedulingElement {
     private FailureProcessState myProcessState;
     private final ResourceUnit myResourceUnit;
     private JSLEvent myStartEvent;
+    private final Set<FailureProcessListenerIfc> myFailureProcessListeners;
 
 
     /** The process will not be started automatically.
@@ -102,7 +105,30 @@ abstract public class FailureProcess extends SchedulingElement {
         myPriority = JSLEvent.DEFAULT_PRIORITY;
         myProcessState = myCreatedState;
         myResourceUnit = resourceUnit;
+        myFailureProcessListeners = new LinkedHashSet<>();
         myResourceUnit.addFailureProcess(this);
+    }
+
+    /** Adds a listener to react to FailureProcess state changes
+     *
+     * @param listener the listener to add
+     */
+    public final void addFailureProcessListener(FailureProcessListenerIfc listener){
+        if (listener == null){
+            return;
+        }
+        myFailureProcessListeners.add(listener);
+    }
+
+    /** Removes the listener from the FailureProcess
+     *
+     * @param listener the listener to remove
+     */
+    public final void removeFailureProcessListener(FailureProcessListenerIfc listener){
+        if (listener == null){
+            return;
+        }
+        myFailureProcessListeners.remove(listener);
     }
 
     /**
@@ -270,7 +296,7 @@ abstract public class FailureProcess extends SchedulingElement {
     }
 
     /**
-     * When a FailureNotice created by this FailureElement is made active,
+     * When a FailureNotice is made active,
      * this method is called. Called from FailureNotice.CreatedState or
      * FailureNotice.DelayedState when activate() is called.  A FailureNotice
      * is activated from ResourceUnit when scheduling the end of failure for the generated
@@ -279,14 +305,15 @@ abstract public class FailureProcess extends SchedulingElement {
      * the ResourceUnit receiving the failure notice.
      * If the FailureNotice is delayed, then after the delay it is activated
      * This can be used to react to the notices
-     * becoming active.
+     * becoming active.  A FailureNotice becoming active means that
+     * the failure has started (taking down the resource unit).
      *
      * @param fn the failure notice
      */
     abstract protected void failureNoticeActivated(FailureNotice fn);
 
     /**
-     * When a FailureNotice created by this FailureElement is delayed,
+     * When a FailureNotice is delayed,
      * this method is called. This can be used to react to the notice
      * becoming delayed.
      *
@@ -295,25 +322,16 @@ abstract public class FailureProcess extends SchedulingElement {
     abstract protected void failureNoticeDelayed(FailureNotice fn);
 
     /**
-     * When a FailureNotice created by this FailureElement is ignored,
+     * When a FailureNotice is ignored,
      * this method is called. This can be used to react to the notice
-     * becoming ignored. The default behavior is to do nothing and log
-     * a warning message
+     * becoming ignored.
      *
      * @param fn the failure notice
      */
     abstract protected void failureNoticeIgnored(FailureNotice fn);
 
     /**
-     * Use this method to cause FailureNotices to be sent. This
-     * method properly checks the state of the process before sending.
-     */
-    protected final void fail() {
-        myProcessState.fail();
-    }
-
-    /**
-     * When a FailureNotice created by this FailureElement is completed,
+     * When a FailureNotice is completed,
      * this method is called. This can be used to react to the notice
      * becoming completed.
      *
@@ -335,6 +353,46 @@ abstract public class FailureProcess extends SchedulingElement {
      * Performs work to resume the process.
      */
     abstract protected void resumeProcess();
+
+    /** Called by FailureNotice when its state changes
+     *
+     * @param fn
+     */
+    final void failureNoticeStateChange(FailureNotice fn){
+        if (fn.isActive()){
+            failureNoticeActivated(fn);
+            notifyFailureProcessListeners(fn);
+        } else if (fn.isDelayed()){
+            failureNoticeDelayed(fn);
+            notifyFailureProcessListeners(fn);
+        } else if (fn.isIgnored()){
+            failureNoticeIgnored(fn);
+            notifyFailureProcessListeners(fn);
+        } else if (fn.isCompleted()){
+            failureNoticeCompleted(fn);
+            notifyFailureProcessListeners(fn);
+        } else {
+            throw new IllegalStateException("Invalid FailureNotice state");
+        }
+    }
+
+    /**
+     *  Used internally to notify failure process listeners of state changes:
+     *  start, stop, failure, suspend, resume
+     */
+    protected final void notifyFailureProcessListeners(FailureNotice fn){
+        for(FailureProcessListenerIfc fpl: myFailureProcessListeners){
+            fpl.changed(this, fn);
+        }
+    }
+
+    /**
+     * Use this method to cause FailureNotices to be sent. This
+     * method properly checks the state of the process before sending.
+     */
+    protected final void fail() {
+        myProcessState.fail();
+    }
 
     /**
      * Implement this method signal ResourceUnits via FailureNotices
@@ -396,6 +454,9 @@ abstract public class FailureProcess extends SchedulingElement {
         }
     }
 
+    /**
+     *  Uncancels the start event
+     */
     protected final void unCancelStartEvent(){
         Optional<JSLEvent> startEvent = getStartEvent();
         if (startEvent.isPresent()){

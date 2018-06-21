@@ -28,6 +28,12 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ *  Models a single falure event that can effect many resource units.  If no
+ *  resource units are added using one of the addX() methods then nothing happens.
+ *  There must be resource units added for the event to occur because the purpose
+ *  of the even is to take the resource units down.
+ */
 public class MultipleResourceUnitSingleFailureEvent extends ModelElement {
 
     private RandomVariable myInitialStartTimeRV;
@@ -39,11 +45,25 @@ public class MultipleResourceUnitSingleFailureEvent extends ModelElement {
     private boolean mySuspendedFlag;
     private Constant myTimeToEvent;
     private Constant myEventDuration;
+    private SingleFailureEvent myFirstSingleFailureEvent;
 
+    /**
+     *
+     * @param parent a parent model element
+     * @param eventDuration the duration of the event
+     * @param initialStartTimeRV the initial starting time for the event
+     */
     public MultipleResourceUnitSingleFailureEvent(ModelElement parent, RandomIfc eventDuration, RandomIfc initialStartTimeRV) {
         this(parent, eventDuration, initialStartTimeRV, null);
     }
 
+    /**
+     *
+     * @param parent a parent model element
+     * @param eventDuration the duration of the event
+     * @param initialStartTimeRV the initial starting time for the event
+     * @param name the name of model element
+     */
     public MultipleResourceUnitSingleFailureEvent(ModelElement parent, RandomIfc eventDuration, RandomIfc initialStartTimeRV, String name) {
         super(parent, name);
         myEventDurationRV = new RandomVariable(this, eventDuration, getName() + ":EventDuration");
@@ -124,7 +144,7 @@ public class MultipleResourceUnitSingleFailureEvent extends ModelElement {
 
     /**
      *  If the failure process is suspended (and started and not stopped), then it is resumed.
-     *  This reschedules the failure event at getTime() +
+     *  This reschedules the failure event to the original failure event time.
      */
     public final void resume(){
         if (isSuspended() && isStarted() && !isStopped()){
@@ -185,6 +205,37 @@ public class MultipleResourceUnitSingleFailureEvent extends ModelElement {
             // no initial start time because controlled from within this class
             SingleFailureEvent fe = new SingleFailureEvent(resourceUnit, myEventDurationRV, name);
             myFailures.put(resourceUnit, fe);
+            if (myFailures.size() == 1){
+                myFirstSingleFailureEvent = fe;
+            }
+        }
+    }
+
+    /** Adds a listener to the first resource unit added to be notified when
+     * the failure event occurs. If no resource units are added, this method does nothing.
+     *
+     * @param listener the listener to add
+     */
+    public final void addFailureEventListener(FailureEventListenerIfc listener){
+        if (listener == null){
+            return;
+        }
+        if (myFirstSingleFailureEvent != null){
+            myFirstSingleFailureEvent.addFailureEventListener(listener);
+        }
+    }
+
+    /** Removes the listener from the first resource unit added. If no resource units
+     * have been added, this method does nothing.
+     *
+     * @param listener the listener to remove
+     */
+    public final void removeFailureEventListener(FailureEventListenerIfc listener){
+        if (listener == null){
+            return;
+        }
+        if (myFirstSingleFailureEvent != null){
+            myFirstSingleFailureEvent.removeFailureEventListener(listener);
         }
     }
 

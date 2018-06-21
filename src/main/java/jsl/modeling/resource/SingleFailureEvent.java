@@ -19,6 +19,9 @@ package jsl.modeling.resource;
 import jsl.modeling.JSLEvent;
 import jsl.utilities.random.RandomIfc;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 
 /**
  *  A FailureEvent models a one time failure process.  There is a time until the failure
@@ -34,6 +37,7 @@ import jsl.utilities.random.RandomIfc;
  */
 public class SingleFailureEvent extends FailureProcess {
 
+    private final Set<FailureEventListenerIfc> myFailureEventListeners;
 
     public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration) {
         this(resourceUnit, duration, null, null);
@@ -49,11 +53,45 @@ public class SingleFailureEvent extends FailureProcess {
     public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration, RandomIfc initialStartTimeRV, String name) {
         super(resourceUnit, duration, initialStartTimeRV, name);
         setPriority(JSLEvent.DEFAULT_PRIORITY - 5);
+        myFailureEventListeners = new LinkedHashSet<>();
+    }
+
+    /** Adds a listener to react to failure event
+     *
+     * @param listener the listener to add
+     */
+    public final void addFailureEventListener(FailureEventListenerIfc listener){
+        if (listener == null){
+            return;
+        }
+        myFailureEventListeners.add(listener);
+    }
+
+    /** Removes the listener from the event
+     *
+     * @param listener the listener to remove
+     */
+    public final void removeFailureEventListener(FailureEventListenerIfc listener){
+        if (listener == null){
+            return;
+        }
+        myFailureEventListeners.remove(listener);
+    }
+
+    /**
+     *  Used internally to notify failure process listeners of state changes:
+     *  start, stop, failure, suspend, resume
+     */
+    protected final void notifyFailureEventListeners(){
+        for(FailureEventListenerIfc fpl: myFailureEventListeners){
+            fpl.failure();
+        }
     }
 
     @Override
     protected void failureNoticeActivated(FailureNotice fn) {
-        // nothing to do because it is a one time event
+        // since it is a one time event notify the listeners of it
+        notifyFailureEventListeners();
 //        System.out.printf("%f > The FailureEvent %d was activated. %n", getTime(), fn.getId());
     }
 

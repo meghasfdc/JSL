@@ -125,7 +125,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in created state
      */
-    public final boolean isInCreatedState() {
+    public final boolean isCreated() {
         return myState == myCreatedState;
     }
 
@@ -133,7 +133,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in delayed state
      */
-    public final boolean isInDelayedState() {
+    public final boolean isDelayed() {
         return myState == myDelayedState;
     }
 
@@ -141,7 +141,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in ignored state
      */
-    public final boolean isInIgnoredState() {
+    public final boolean isIgnored() {
         return myState == myIgnoredState;
     }
 
@@ -149,7 +149,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in completed state
      */
-    public final boolean isInCompletedState() {
+    public final boolean isCompleted() {
         return myState == myCompletedState;
     }
 
@@ -157,7 +157,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in active state
      */
-    public final boolean isInActiveState() {
+    public final boolean isActive() {
         return myState == myActiveState;
     }
 
@@ -178,6 +178,11 @@ public class FailureNotice extends QObject {
 
     final void complete() {
         myState.complete();
+    }
+
+    protected final void setState(FailureNoticeState nextState){
+        myState = nextState;
+        myFailureProcess.failureNoticeStateChange(this);
     }
 
     protected class FailureNoticeState {
@@ -213,20 +218,17 @@ public class FailureNotice extends QObject {
 
         @Override
         protected void activate() {
-            myState = myActiveState;
-            myFailureProcess.failureNoticeActivated(FailureNotice.this);
+            setState(myActiveState);
         }
 
         @Override
         protected void delay() {
-            myState = myDelayedState;
-            myFailureProcess.failureNoticeDelayed(FailureNotice.this);
+            setState(myDelayedState);
         }
 
         @Override
         protected void ignore() {
-            myState = myIgnoredState;
-            myFailureProcess.failureNoticeIgnored(FailureNotice.this);
+            setState(myIgnoredState);
         }
     }
 
@@ -238,10 +240,8 @@ public class FailureNotice extends QObject {
 
         @Override
         protected void complete() {
-            myState = myCompletedState;
-            myFailureProcess.failureNoticeCompleted(FailureNotice.this);
+            setState(myCompletedState);
         }
-
     }
 
     protected class DelayedState extends FailureNoticeState {
@@ -252,14 +252,12 @@ public class FailureNotice extends QObject {
 
         @Override
         protected void activate() {
-            myState = myActiveState;
-            myFailureProcess.failureNoticeActivated(FailureNotice.this);
+            setState(myActiveState);
         }
 
         @Override
         protected void ignore() {
-            myState = myIgnoredState;
-            myFailureProcess.failureNoticeIgnored(FailureNotice.this);
+            setState(myIgnoredState);
         }
     }
 

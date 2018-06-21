@@ -75,10 +75,19 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         MultipleResourceUnitSingleFailureEvent mfe = new MultipleResourceUnitSingleFailureEvent(this,
                 new Constant(5), new Constant(6));
         mfe.addResourceUnit(myResource);
+        mfe.addFailureEventListener(new FailureEventListener());
 
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
         mySysTime = new ResponseVariable(this, "System Time");
+    }
+
+    protected class FailureEventListener implements FailureEventListenerIfc{
+
+        @Override
+        public void failure() {
+            System.out.println("The failure event occurred!");
+        }
     }
 
     public ResponseVariable getSystemTimeResponse() {
