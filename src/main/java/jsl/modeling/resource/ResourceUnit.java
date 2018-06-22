@@ -42,8 +42,7 @@ import jsl.utilities.random.distributions.Constant;
  * available for allocation due to failure. The resource is initialized to be idle.
  * Thus, prior to and starting at time zero, the resource is idle.
  * A ResourceUnit might have failures processes associated with it.
- * If the failures that it permits can be delayed when they occur while in the busy state,
- * then the resource failure option should be true.
+ * Failure processes must be consistent with the delay option of the resource.
  *
  * @author rossetti
  */
@@ -55,7 +54,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private final ResourceState myInactiveState = new Inactive();
 
     private double myStartTime;
-    //    private final boolean myAutoStartFailuresFlag;
     private final Queue<Request> myRequestQ;
     private final boolean myFailureDelayOption;
     private final boolean myInactivePeriodDelayOption;
@@ -124,7 +122,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                         boolean stateStatOption, boolean requestStatOption,
                         Discipline requestQDiscipline, boolean requestQStatsOption) {
         super(parent, name);
-//        myAutoStartFailuresFlag = autoStartFailuresFlag;
         myFailureDelayOption = failureDelayOption;
         myFailureQDiscipline = failuresQDiscipline;
         myFailureQStatOption = failureQStatOption;
@@ -158,7 +155,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
         private final ModelElement parent;
         private String name = null;
-        //        private boolean autoStartFailuresFlag = false;
         private boolean failureDelayOption = false;
         private boolean inactivePeriodDelayOption = false;
         private Discipline requestQDiscipline = Discipline.FIFO;
@@ -184,16 +180,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
             this.name = name;
             return this;
         }
-
-//        /**
-//         * Turn on auto starting of failures. Default is off.
-//         *
-//         * @return the Builder
-//         */
-//        public Builder autoStartFailures() {
-//            autoStartFailuresFlag = true;
-//            return this;
-//        }
 
         /**
          * Allow the failures to be delayed. Default is not delayed
@@ -365,12 +351,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         // the state gets entered at the current time
         myCurrentState.enter(getTime());
         notifyUpdateObservers();
-//        // if failures start automatically, start them
-//        if (getAutoFailuresFlag() == true) {
-//            for (FailureProcess fe : myFailureProcesses) {
-//                fe.startFailureProcess();
-//            }
-//        }
     }
 
     @Override
@@ -428,9 +408,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
 
     /**
-     * Creates and adds a TimeBasedFailure to the ResourceUnit. Will throw an
-     * IllegalArgumentException if the failure delay option of the
-     * FailureProcess is inconsistent with that permitted by the unit
+     * Creates and adds a TimeBasedFailure to the ResourceUnit.
      *
      * @param failureDuration  the time to spend down
      * @param timeToFirstFailure  the time of the first failure
@@ -440,9 +418,8 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      */
     public TimeBasedFailure addTimeBasedFailure(RandomIfc failureDuration, RandomIfc timeToFirstFailure,
                                                 RandomIfc timeBtwFailures, String name) {
-        TimeBasedFailure tbf = new TimeBasedFailure(this, failureDuration, timeToFirstFailure,
+        return new TimeBasedFailure(this, failureDuration, timeToFirstFailure,
                 timeBtwFailures, name);
-        return tbf;
     }
 
     /**
@@ -493,10 +470,8 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * The default is false
      *
-     * @return true means enterWaitingState statistics include statistics on
-     * requests
-     * that
-     * were canceled.
+     * @return true means enter waiting state statistics include statistics on
+     * requests that were canceled.
      */
     public final boolean getRequestQCancelStatOption() {
         return myRequestQCancelStatOption;
@@ -534,16 +509,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         return myInactivePeriodDelayOption;
     }
 
-//    /**
-//     * The default is false
-//     *
-//     * @return true if attached failure elements will start automatically upon
-//     * initialization
-//     */
-//    public final boolean getAutoFailuresFlag() {
-//        return myAutoStartFailuresFlag;
-//    }
-
     @Override
     public String asString() {
         String s = getName() + ": state = " + myCurrentState;
@@ -569,7 +534,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Checks to see if the resource is busy
      *
-     * @return
+     * @return true if current state is busy
      */
     public final boolean isBusy() {
         return (myCurrentState == myBusyState);
@@ -587,7 +552,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Checks to see if the resource is inactive
      *
-     * @return
+     * @return true if current state is inactive
      */
     public final boolean isInactive() {
         return (myCurrentState == myInactiveState);
@@ -605,7 +570,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Checks to see if the resource was busy
      *
-     * @return
+     * @return true if previous state was busy
      */
     public final boolean isPreviousStateBusy() {
         return (myPrevState == myBusyState);
@@ -623,7 +588,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Checks to see if the resource was inactive
      *
-     * @return
+     * @return true if previous state was inactive
      */
     public final boolean isPreviousStateInactive() {
         return (myPrevState == myInactiveState);
@@ -653,7 +618,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * method to combine request building and seizing.
      *
      * @param reactor the reactor to use
-     * @return
+     * @return the request
      */
     public final Request seize(RequestReactorIfc reactor) {
         return seize(reactor, null, null);
@@ -666,7 +631,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      *
      * @param reactor the reactor to use
      * @param time    the time duration for the request
-     * @return
+     * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, double time) {
         return seize(reactor, new Constant(time), null, null);
@@ -680,7 +645,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @param reactor the reactor to use
      * @param time    the time duration for the request
      * @param entity  the object associated with the request
-     * @return
+     * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, double time, Object entity) {
         return seize(reactor, new Constant(time), null, entity);
@@ -693,7 +658,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      *
      * @param reactor         the reactor to use
      * @param timeValueGetter the time duration for the request
-     * @return
+     * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, GetValueIfc timeValueGetter) {
         return seize(reactor, timeValueGetter, null, null);
@@ -707,7 +672,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @param reactor         the reactor to use
      * @param timeValueGetter the time duration for the request
      * @param entity          the object associated with the request
-     * @return
+     * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, GetValueIfc timeValueGetter,
                                Object entity) {
@@ -723,7 +688,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @param timeValueGetter the time duration for the request
      * @param rule            the rule
      * @param entity          the object associated with the request
-     * @return
+     * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, GetValueIfc timeValueGetter,
                                PreemptionRule rule, Object entity) {
@@ -746,7 +711,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * cannot be preempted and the resource unit does not permit its failures to
      * delay (i.e. they must preempt).
      *
-     * @param request a request made by this unit
+     * @param request a request made by this unit, must not be null
      * @return the request is returned to emphasize that the user may want to
      * check its state
      */
@@ -790,7 +755,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * Causes the resource to immediately finish the request. The request must
      * have been made by this resource. Called from Request
      *
-     * @param request
+     * @param request the request
      */
     protected final void release(Request request) {
         //JSL.out.println(getTime() + " > ResourceUnit.release(Request)");
@@ -872,10 +837,14 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         myRequestQ.setInitialDiscipline(discipline);
     }
 
-    public final int requestQsize() {
+    public final int requestQSize() {
         return myRequestQ.size();
     }
 
+    /**
+     *
+     * @return true if the request queue is empty
+     */
     public final boolean isRequestQEmpty() {
         return myRequestQ.isEmpty();
     }
@@ -1195,7 +1164,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
     /**
      * Processes the pending preemption
-     * <p>
      */
     protected void processPreemption() {
         if (!isPreemptionWaiting()) {
@@ -1211,7 +1179,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
     /**
      * Processes the next request
-     * <p>
      */
     protected void processNextRequest() {
         if (!isRequestWaiting()) {
@@ -1223,7 +1190,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
     /**
      * Processes the next failure notice
-     * <p>
      */
     protected void processNextFailureNotice() {
         if (!isFailureNoticeWaiting()) {
@@ -1238,7 +1204,6 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Checks if there are waiting inactive period notices and processes the
      * next one if there is one.
-     * <p>
      */
     protected void processNextInactiveNotice() {
         if (!isInactivePeriodPending()) {
@@ -1279,7 +1244,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * Collects statistics on requests after they have been completed, rejected,
      * or canceled.
      *
-     * @param request
+     * @param request the request
      */
     protected void collectFinalRequestStatistics(Request request) {
         if (getRequestStatisticsOption() == false) {
@@ -1308,7 +1273,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Places the unit in the failed state using the supplied failure notice
      *
-     * @param failureNotice
+     * @param failureNotice the notice
      */
     protected void scheduleEndOfFailure(FailureNotice failureNotice) {
         myCurrentFailureNotice = failureNotice;
@@ -1319,12 +1284,20 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                 myCurrentFailureNotice.getDuration());
     }
 
+    /** Returns the current down time event if it has been scheduled
+     *
+     * @return the event
+     */
+    protected final JSLEvent getCurrentDownTimeEvent(){
+        return myCurrentDownTimeEvent;
+    }
+
     /**
      * Causes the unit to become busy, makes the request the current request
      * that is being processed and schedules the ending of the processing of the
      * request
      *
-     * @param request
+     * @param request the request
      */
     protected void scheduleEndOfService(Request request) {
         setState(myBusyState);
@@ -1347,7 +1320,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Causes the request to wait in the request enterWaitingState
      *
-     * @param request
+     * @param request the request
      */
     protected void enqueueIncomingRequest(Request request) {
         myRequestQ.enqueue(request);
@@ -1357,7 +1330,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Causes an incoming failure notice to wait
      *
-     * @param failureNotice
+     * @param failureNotice the failure notice
      */
     protected void enqueueIncomingFailureNotice(FailureNotice failureNotice) {
         failureNotice.delay();
@@ -1390,9 +1363,25 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * default behavior has the failure delay if it can be delayed; otherwise,
      * it is ignored
      *
-     * @param notice
+     * @param notice the failure notice
      */
     protected void failedWhileInactive(FailureNotice notice) {
+        if (notice.isDelayable()) {
+            enqueueIncomingFailureNotice(notice);
+        } else {
+            notice.ignore();
+        }
+    }
+
+    /**
+     * Handles what to do if the resource is told to fail while already failed. The
+     * default behavior has the failure delay if it can be delayed; otherwise,
+     * it is ignored, i.e. if the resource gets a failure notice when
+     * it is already failed, the notice is ignored (unless the notices are allowed to be delayed).
+     *
+     * @param notice the failure notice
+     */
+    protected void failedWhileFailed(FailureNotice notice) {
         if (notice.isDelayable()) {
             enqueueIncomingFailureNotice(notice);
         } else {
@@ -1527,15 +1516,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * resumed.
      */
     protected void preemptResumableRequest() {
-        // need to note preempted request
-        myPreemptedRequest = myCurrentRequest;
-        myCurrentRequest.preempt(getTime());
-        // cancel the event of current request
-        if (myCurrentRequestEvent != null) {
-            myCurrentRequestEvent.setCanceledFlag(true);
-        }
-        myCurrentRequestEvent = null;
-        myCurrentRequest = null;
+        preemptRequest();
     }
 
     /**
@@ -1552,10 +1533,10 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     }
 
     /**
-     * Called from preemptCurrentRequest(). How to preempt a request that must
-     * be restarted.
+     *  Called from preemptRestartableRequest() and preemptResumableRequest()
+     *  because the behavior is currently the same.
      */
-    protected void preemptRestartableRequest() {
+    protected void preemptRequest(){
         // need to note preempted request
         myPreemptedRequest = myCurrentRequest;
         myCurrentRequest.preempt(getTime());
@@ -1565,6 +1546,14 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         }
         myCurrentRequestEvent = null;
         myCurrentRequest = null;
+    }
+
+    /**
+     * Called from preemptCurrentRequest(). How to preempt a request that must
+     * be restarted.
+     */
+    protected void preemptRestartableRequest() {
+        preemptRequest();
     }
 
     /**
@@ -1599,7 +1588,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Called from scheduledItemStarted() when a Schedule notifies of an item (period) beginning
      *
-     * @param notice
+     * @param notice the notice
      */
     protected void receiveInactivePeriodNotice(InactivePeriodNotice notice) {
         myCurrentState.inactivate(notice);
@@ -1743,7 +1732,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         protected void completeRequest(Request request) {
             // in busy state and told to finish the request
             // releasing a busy resource
-            //setState(myIdleState); //TODO NOT NEEDED because of check?
+            //setState(myIdleState); //NOT NEEDED because of check?
             myCurrentRequest = null;
             myCurrentRequestEvent = null;
             checkForWorkAfterRequestCompletion();
@@ -1777,9 +1766,8 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
 
         @Override
         protected void fail(FailureNotice failure) {
-            //in failed state and told to fail
-            // already failed, stay failed and enterWaitingState the notice
-            enqueueIncomingFailureNotice(failure);
+            //in failed state and told to fail, stay failed and handle it in the outer class
+            failedWhileFailed(failure);
         }
 
         @Override

@@ -28,7 +28,7 @@ import java.util.Objects;
  * A FailureNotice has a well-defined state pattern.  When created, the notice
  * is placed in the Created state. From the created state, the notice can
  * become active, delayed, or ignored. If the notice is active, the failure is in
- * process. After being active, the notice can only become completed.
+ * progress. After being active, the notice can only become completed.
  * If the notice is delayed, the notice is waiting to become active.
  * After being delayed, the notice can become active or be ignored.
  * If the resource unit ignored the notice, then the notice is placed in the

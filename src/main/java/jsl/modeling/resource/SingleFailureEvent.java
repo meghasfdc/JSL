@@ -16,13 +16,10 @@
 
 package jsl.modeling.resource;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 import jsl.modeling.JSLEvent;
-import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
 
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -41,8 +38,6 @@ import java.util.Set;
 public class SingleFailureEvent extends FailureProcess {
 
     private final Set<FailureEventListenerIfc> myFailureEventListeners;
-    private double myStartTime = Double.NaN;
-    private double myDuration;
 
     /**
      *
@@ -80,52 +75,11 @@ public class SingleFailureEvent extends FailureProcess {
      * @param initialStartTimeRV the time that the failure should start
      * @param name the name of the model element
      */
-    public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration, RandomIfc initialStartTimeRV, String name) {
+    public SingleFailureEvent(ResourceUnit resourceUnit, RandomIfc duration,
+                              RandomIfc initialStartTimeRV, String name) {
         super(resourceUnit, duration, initialStartTimeRV, name);
         setPriority(JSLEvent.DEFAULT_PRIORITY - 5);
         myFailureEventListeners = new LinkedHashSet<>();
-    }
-
-    @Override
-    protected void beforeReplication() {
-        //TODO need to set up the initial start time and the duration for the replication
-        setDurationValue(getFailureDurationRV().getValue());
-        Optional<RandomVariable> initialStartTime = this.getInitialStartTimeRV();
-        if (initialStartTime.isPresent()){
-            setInitialStartTimeValue(initialStartTime.get().getValue());
-        }
-    }
-
-    @Override
-    public double getDurationValue(){
-        return myDuration;
-    }
-
-    @Override
-    public double getInitialStartTimeValue(){
-        return myStartTime;
-    }
-
-    /**
-     *
-     * @param time the duration time of the failure
-     */
-    public void setDurationValue(double time){
-        if (time <= 0){
-            throw new IllegalArgumentException("The duration time must be > 0");
-        }
-        myDuration = time;
-    }
-
-    /**
-     *
-     * @param time the time for the start of the failure
-     */
-    public void setInitialStartTimeValue(double time){
-        if (time < 0){
-            throw new IllegalArgumentException("The initial time must be >= 0");
-        }
-        myStartTime = time;
     }
 
     // so that one random value is used per replication

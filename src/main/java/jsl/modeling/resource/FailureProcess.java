@@ -33,14 +33,14 @@ import java.util.Set;
  * no initial starting time random variable is supplied, then the process will
  * not be started automatically and the user should use the start() methods to
  * start the process at the appropriate time.  Starting the process causes
- * the first failure to occur at the specified start time and to last for
+ * the first failure to occur at the specified start time and for it to last for
  * the provided duration.  When the process is started the first
  * failure event is scheduled. If the process is not started then no first event is
  * scheduled.  Implementors of sub-classes are responsible for suspending, resuming, and stopping the
  * process by implementing the suspendProcess(), resumeProcess(), and stopProcess() methods.
  * <p>
  * Once the failure process has been started it
- * cannot be started again. Once the failure process has been stopped, it cannot
+ * cannot be started again (until the next replication). Once the failure process has been stopped, it cannot
  * be started again (until the next replication). A FailureProcess is associated with one ResourceUnit.
  *
  * @author rossetti
@@ -54,6 +54,7 @@ abstract public class FailureProcess extends SchedulingElement {
 
     private final RandomVariable myFailureDurationRV;
     private RandomVariable myInitialStartTimeRV;
+    private boolean myAutoStartOption;
     private int myPriority;
     private FailureProcessState myProcessState;
     private final ResourceUnit myResourceUnit;
@@ -103,7 +104,9 @@ abstract public class FailureProcess extends SchedulingElement {
         Objects.requireNonNull(duration, "The failure duration must not be null");
         myFailureDurationRV = new RandomVariable(this, duration, getName() + ":Duration");
         if (initialStartTimeRV != null) {
-            myInitialStartTimeRV = new RandomVariable(this, initialStartTimeRV, getName() + ":InitialStartTime");
+            turnOnAutoStartProcessOption(initialStartTimeRV);
+        } else {
+            turnOffAutoStartProcessOption();
         }
         myPriority = JSLEvent.DEFAULT_PRIORITY;
         myProcessState = myCreatedState;
@@ -179,22 +182,33 @@ abstract public class FailureProcess extends SchedulingElement {
      * initialization
      */
     public final boolean getAutoStartProcessOption() {
-        return myInitialStartTimeRV != null;
+        return myAutoStartOption;
+    }
+
+    /**
+     *  Causes the auto starting of the process to be turned off. This indicates that the process
+     *  should not use the initial start time if it was supplied.  Thus, a start time may be
+     *  supplied but not used.
+     */
+    public final void turnOffAutoStartProcessOption(){
+        myAutoStartOption = false;
     }
 
     /**
      * Setting an initial start time indicates to the failure process that it should
      * automatically start using the supplied time at the beginning of each replication.
      *
-     * @param startTime the time that the process should start at the beginning of each simulation
+     * @param startTime the time that the process should start at the beginning of each simulation, must not be
+     *                  null
      */
-    public final void setInitialStartTimeInitialRandomSource(RandomIfc startTime) {
+    public final void turnOnAutoStartProcessOption(RandomIfc startTime){
         Objects.requireNonNull(startTime, "The supplied start time was null");
         if (myInitialStartTimeRV == null) {
             myInitialStartTimeRV = new RandomVariable(this, startTime, getName() + ":InitialStartTime");
         } else {
             myInitialStartTimeRV.setInitialRandomSource(startTime);
         }
+        myAutoStartOption = true;
     }
 
     /**
@@ -214,11 +228,15 @@ abstract public class FailureProcess extends SchedulingElement {
         return myFailureDurationRV;
     }
 
-    /**
+    /** If the initial start time random variable is set then this method should return
+     *  the starting time of the event.  If the initial start time is not set, this method returns Double.NaN.
+     *  If the initial start time random variable is set, then this method is used when initializing
+     *  the failure process to set the start time of the process to the value returned from this method.
+     *
      * @return returns the value of the initial start time or Double.NaN if the initial start time
      * was not specified.
      */
-    public double getInitialStartTimeValue() {
+    public final double getInitialStartTimeValue() {
         if (myInitialStartTimeRV == null) {
             return Double.NaN;
         }
@@ -226,11 +244,12 @@ abstract public class FailureProcess extends SchedulingElement {
     }
 
     /**
-     * A convenience method for getting the value of the duration
+     * Used for getting the value of the duration within createFailureNotice(). All notices
+     * will use the values returned from this method
      *
      * @return the value of the duration, which may be random
      */
-    public double getDurationValue() {
+    public final double getDurationValue() {
         return myFailureDurationRV.getValue();
     }
 
@@ -239,7 +258,10 @@ abstract public class FailureProcess extends SchedulingElement {
         super.initialize();
         myProcessState = myCreatedState;
         if (getAutoStartProcessOption()) {
-            start(getInitialStartTimeValue());
+            double timeValue = getInitialStartTimeValue();
+            if (!Double.isNaN(timeValue)){
+                start(timeValue);
+            }
         }
     }
 
@@ -249,8 +271,7 @@ abstract public class FailureProcess extends SchedulingElement {
      * @return creates a FailureNotice
      */
     protected final FailureNotice createFailureNotice() {
-        double t = getDurationValue();
-        FailureNotice fn = new FailureNotice(this, t, getFailureDelayOption());
+        FailureNotice fn = new FailureNotice(this, getDurationValue(), getFailureDelayOption());
         fn.setPriority(getPriority());
         return fn;
     }

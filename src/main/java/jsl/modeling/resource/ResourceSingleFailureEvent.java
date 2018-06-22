@@ -24,7 +24,7 @@ import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.distributions.VConstant;
 import jsl.utilities.reporting.JSL;
 
 import java.util.Collection;
@@ -38,17 +38,16 @@ import java.util.Set;
  * want to attach resource units and do not want the warning then use
  * setNoResourceUnitWarningOption(false)
  */
-public class ResourceFailureEvent extends SchedulingElement {
+public class ResourceSingleFailureEvent extends SchedulingElement {
 
     private RandomVariable myInitialStartTimeRV;
     private final RandomVariable myEventDurationRV;
-    private boolean myAutoStartProcessOption;
     private final BiMap<ResourceUnit, SingleFailureEvent> myFailures;
     private boolean myStartedFlag;
     private boolean myStoppedFlag;
     private boolean mySuspendedFlag;
-    private Constant myTimeToEvent;
-    private Constant myEventDuration;
+    private double myTimeToEvent;
+    private final VConstant myEventDuration;
     private final Set<FailureEventListenerIfc> myFailureEventListeners;
     private JSLEvent myStartEvent;
     private JSLEvent myEndEvent;
@@ -59,8 +58,8 @@ public class ResourceFailureEvent extends SchedulingElement {
      * @param eventDuration      the duration of the event
      * @param initialStartTimeRV the initial starting time for the event
      */
-    public ResourceFailureEvent(ModelElement parent, RandomIfc eventDuration,
-                                RandomIfc initialStartTimeRV) {
+    public ResourceSingleFailureEvent(ModelElement parent, RandomIfc eventDuration,
+                                      RandomIfc initialStartTimeRV) {
         this(parent, eventDuration, initialStartTimeRV, null);
     }
 
@@ -70,14 +69,13 @@ public class ResourceFailureEvent extends SchedulingElement {
      * @param initialStartTimeRV the initial starting time for the event
      * @param name               the name of model element
      */
-    public ResourceFailureEvent(ModelElement parent, RandomIfc eventDuration,
-                                RandomIfc initialStartTimeRV, String name) {
+    public ResourceSingleFailureEvent(ModelElement parent, RandomIfc eventDuration,
+                                      RandomIfc initialStartTimeRV, String name) {
         super(parent, name);
         myEventDurationRV = new RandomVariable(this, eventDuration, getName() + ":EventDuration");
-        myEventDuration = new Constant(myEventDurationRV.getValue());
+        myEventDuration = new VConstant(0.0);
         if (initialStartTimeRV != null) {
             myInitialStartTimeRV = new RandomVariable(this, initialStartTimeRV, getName() + ":InitialStartTime");
-            myTimeToEvent = new Constant(myInitialStartTimeRV.getValue());
         }
         myFailureEventListeners = new LinkedHashSet<>();
         myFailures = HashBiMap.create();
@@ -87,17 +85,32 @@ public class ResourceFailureEvent extends SchedulingElement {
         myTurnOffNoResourceUnitWarning = true;
     }
 
-    //TODO need to fix so each replication can get a different start time and duration
-    //TODO need to ensure that all SingleFailureEvent instances use the same start time and duration
-    // each replication gets a different time
-    //TODO stop beforeReplication for each SingleFailureEvent
+    /**
+     *  Allows each replication to start at a different time and to have
+     *  a different failure duration.
+     */
+    @Override
+    protected void beforeReplication() {
+        super.beforeReplication();
+        // if it needs to be auto started, set the time
+        if (getAutoStartProcessOption()){
+            myTimeToEvent = myInitialStartTimeRV.getValue();
+        }
+        // set the event duration for the replication
+        myEventDuration.setValue(myEventDurationRV.getValue());
+        Set<SingleFailureEvent> singleFailureEventSet = myFailures.values();
+        // tell all SingleFailureEvent to use the same event duration value, for the replication
+        for (SingleFailureEvent sfe: singleFailureEventSet){
+            sfe.setFailureDurationTimeInitialRandomSource(myEventDuration);
+        }
+    }
 
     @Override
     protected void initialize() {
         super.initialize();
-        // call each SingleFailureEvent to set their start time and durations
         myStartedFlag = false;
         if (getAutoStartProcessOption()) {
+            // schedule the start and the end of the duration
             start(myTimeToEvent);
         }
     }
@@ -106,8 +119,8 @@ public class ResourceFailureEvent extends SchedulingElement {
      *
      * @return the time that the event will occur
      */
-    public final double getEventTime(){
-        return myTimeToEvent.getValue();
+    public final double getEventStartTime(){
+        return myTimeToEvent;
     }
 
     /**
@@ -205,12 +218,19 @@ public class ResourceFailureEvent extends SchedulingElement {
         }
     }
 
+    /** Schedules the failure event and the end of the failure
+     *
+     * @param time the time that the failure should occur
+     */
     protected final void scheduleFailure(double time) {
         myStartEvent = schedule(this::startEvent).havingPriority(JSLEvent.DEFAULT_PRIORITY - 7).in(time).units();
-        double endTime = time + myEventDuration.getValue();
+        double endTime = time + getDuration();
         myEndEvent = schedule(this::endEvent).havingPriority(JSLEvent.DEFAULT_PRIORITY + 1).in(endTime).units();
     }
 
+    /**
+     * Causes the single event to be canceled if it has not yet occurred.
+     */
     protected final void cancelFailure() {
         if (myStartEvent != null) {
             myStartEvent.setCanceledFlag(true);
@@ -237,12 +257,12 @@ public class ResourceFailureEvent extends SchedulingElement {
 
     /**
      * If the failure process is suspended (and started and not stopped), then it is resumed.
-     * This reschedules the failure event to the original failure event time.
+     * This reschedules the failure event to the original failure event time for the replication.
      */
     public final void resume() {
         if (isSuspended() && isStarted() && !isStopped()) {
             mySuspendedFlag = false;
-            scheduleFailure(myTimeToEvent.getValue());
+            scheduleFailure(myTimeToEvent);
             Set<SingleFailureEvent> singleFailureEvents = myFailures.values();
             for (SingleFailureEvent fe : singleFailureEvents) {
                 fe.resume();
@@ -346,9 +366,27 @@ public class ResourceFailureEvent extends SchedulingElement {
         }
     }
 
+    /** Subclasses can override this method to provide behavior when the event starts
+     * This method occurs before any associated resources start the failure and before
+     * any failure event listeners are notified of the start of the event
+     * @param event the event that started the failure
+     */
+    protected void failureStarted(JSLEvent event){
+
+    }
+
+    /** Subclasses can override this method to provide behavior after the failure ends
+     * This method occurs before any failure event listeners are notified of the end of the failure
+     * @param event the event that ended the failure
+     */
+    protected void failureEnded(JSLEvent event){
+
+    }
+
     private void startEvent(JSLEvent event) {
 //        System.out.printf("%f > starting the failure. %n", getTime());
         // the start of the failure, tell all to start immediately
+        failureStarted(event);
         Set<SingleFailureEvent> singleFailureEvents = myFailures.values();
         for (SingleFailureEvent fe : singleFailureEvents) {
             fe.start();
@@ -359,6 +397,7 @@ public class ResourceFailureEvent extends SchedulingElement {
     private void endEvent(JSLEvent event) {
         // the end of the failure
 //        System.out.printf("%f > ending the failure. %n", getTime());
+        failureEnded(event);
         notifyFailureEventListenersFailureCompleted();
     }
 }
