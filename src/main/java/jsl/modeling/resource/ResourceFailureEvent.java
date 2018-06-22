@@ -87,6 +87,21 @@ public class ResourceFailureEvent extends SchedulingElement {
         myTurnOffNoResourceUnitWarning = true;
     }
 
+    //TODO need to fix so each replication can get a different start time and duration
+    //TODO need to ensure that all SingleFailureEvent instances use the same start time and duration
+    // each replication gets a different time
+    //TODO stop beforeReplication for each SingleFailureEvent
+
+    @Override
+    protected void initialize() {
+        super.initialize();
+        // call each SingleFailureEvent to set their start time and durations
+        myStartedFlag = false;
+        if (getAutoStartProcessOption()) {
+            start(myTimeToEvent);
+        }
+    }
+
     /**
      *
      * @return the time that the event will occur
@@ -160,15 +175,6 @@ public class ResourceFailureEvent extends SchedulingElement {
             if (myFailures.isEmpty()) {
                 JSL.LOGGER.warn("In MultipleResourceUnitSingleFailureEvent: {} There were no resource units attached to the failure event.", getName());
             }
-        }
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        myStartedFlag = false;
-        if (getAutoStartProcessOption()) {
-            start(myTimeToEvent);
         }
     }
 

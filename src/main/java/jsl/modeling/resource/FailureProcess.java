@@ -202,7 +202,7 @@ abstract public class FailureProcess extends SchedulingElement {
      *
      * @return the random variable that computes the value of the initial start time (if present)
      */
-    protected final Optional<RandomVariable> getInitialStartTime() {
+    protected final Optional<RandomVariable> getInitialStartTimeRV() {
         return Optional.ofNullable(myInitialStartTimeRV);
     }
 
