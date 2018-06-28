@@ -15,7 +15,6 @@
  */
 package test.modeling;
 
-import java.util.Optional;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
@@ -26,18 +25,15 @@ import jsl.modeling.Simulation;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.modeling.resource.*;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
-import jsl.modeling.resource.Request;
 import jsl.modeling.resource.Request.PreemptionRule;
-import jsl.modeling.resource.RequestReactorAdapter;
-import jsl.modeling.resource.ResourceUnit;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.reporting.JSL;
-import jsl.modeling.resource.RequestReactorIfc;
+import jsl.utilities.random.distributions.Uniform;
 
 public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
@@ -67,18 +63,39 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         myResource = new ResourceUnit.Builder(this)
                 .name("Server")
                 .collectRequestQStats()
-                .autoStartFailures()
                 .allowFailuresToDelay()
                 .collectStateStatistics()
                 .build();
 
         //Constant c1 = new Constant(0.5);
         Constant c1 = new Constant(3.0);
-        myResource.addTimeBasedFailure(Constant.TWO, c1, true);
+        TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1, c1);
+        //SingleFailureEvent fe = new SingleFailureEvent(myResource, new Constant(5), new Constant(6));
         // myResource = new ResourceUnit.Builder(this).name("Server").build();
+//        RandomIfc duration = new Constant(5);
+//        RandomIfc timeToFailure = new Constant(6);
+        RandomIfc duration = new Uniform(4, 5);
+        RandomIfc timeToFailure = new Uniform(5, 7);
+        ResourceSingleFailureEvent mfe = new ResourceSingleFailureEvent(this, duration, timeToFailure);
+        mfe.addResourceUnit(myResource);
+        mfe.addFailureEventListener(new FailureEventListener());
+
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
         mySysTime = new ResponseVariable(this, "System Time");
+    }
+
+    protected class FailureEventListener implements FailureEventListenerIfc{
+
+        @Override
+        public void failureStarted() {
+            System.out.println("The failureStarted event occurred!");
+        }
+
+        @Override
+        public void failureCompleted() {
+            System.out.println("The failureCompleted event occurred!");
+        }
     }
 
     public ResponseVariable getSystemTimeResponse() {
@@ -97,35 +114,27 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         if (n < 0) {
             throw new IllegalArgumentException();
         }
-
         myNumPharmacists = n;
     }
 
     public final void setServiceRS(RandomIfc d) {
-
         if (d == null) {
             throw new IllegalArgumentException("Service Time RV was null!");
         }
-
         myServiceRS = d;
-
         if (myServiceRV == null) { // not made yet
             myServiceRV = new RandomVariable(this, myServiceRS, "Service RV");
         } else { // already had been made, and added to model
             // just change the distribution
             myServiceRV.setInitialRandomSource(myServiceRS);
         }
-
     }
 
     public final void setArrivalRS(RandomIfc d) {
-
         if (d == null) {
             throw new IllegalArgumentException("Arrival Time Distribution was null!");
         }
-
         myArrivalRS = d;
-
         if (myArrivalRV == null) { // not made yet
             myArrivalRV = new RandomVariable(this, myArrivalRS, "Arrival RV");
         } else { // already had been made, and added to model
@@ -138,6 +147,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
     protected void initialize() {
         super.initialize();
         // start the arrivals
+//        JSL.LOGGER.error("initialized");
         schedule(this::arrival).in(myArrivalRV).units();
     }
 
@@ -151,9 +161,8 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
                 .duration(myServiceRS)
                 .rule(PreemptionRule.RESUME)
                 .build();
-                
-         Request seize = myResource.seize(request);
 
+        Request seize = myResource.seize(request);
         schedule(this::arrival).in(myArrivalRV).units();
 
     }
@@ -175,19 +184,19 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
         @Override
         public void prepared(Request request) {
-            JSL.out.println(getTime() + "> Request " + request + " is prepared.");
+//            JSL.out.println(getTime() + "> Request " + request + " is prepared.");
         }
 
         @Override
         public void dequeued(Request request, Queue<Request> queue) {
-            myWaitingQ.remove((QObject)request.getAttachedObject());
-            JSL.out.println(getTime() + "> Request " + request + " exited queue.");
+            myWaitingQ.remove((QObject) request.getAttachedObject());
+//            JSL.out.println(getTime() + "> Request " + request + " exited queue.");
         }
 
         @Override
         public void enqueued(Request request, Queue<Request> queue) {
-            myWaitingQ.enqueue((QObject)request.getAttachedObject());
-            JSL.out.println(getTime() + "> Request " + request + " entered queue.");
+            myWaitingQ.enqueue((QObject) request.getAttachedObject());
+//            JSL.out.println(getTime() + "> Request " + request + " entered queue.");
         }
 
         @Override
@@ -201,7 +210,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
             if (request.isPreviousStateAllocated()) {
                 myNumBusy.decrement();
             }
-            JSL.out.println(getTime() + "> Request " + request + " was canceled.");
+//            JSL.out.println(getTime() + "> Request " + request + " was canceled.");
         }
 
         @Override
@@ -209,26 +218,26 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
             // if preempted the resource is no longer busy
             myNumBusy.decrement();
             myPreemptedRequest = request;
-            JSL.out.println(getTime() + "> Request " + request + " was preempted.");
+//            JSL.out.println(getTime() + "> Request " + request + " was preempted.");
         }
 
         @Override
         public void resumed(Request request) {
             myNumBusy.increment();
             myPreemptedRequest = null;
-            JSL.out.println(getTime() + "> Request " + request + " resumed using resource.");
+//            JSL.out.println(getTime() + "> Request " + request + " resumed using resource.");
         }
 
         @Override
         public void allocated(Request request) {
             myNumBusy.increment();
-            JSL.out.println(getTime() + "> Request " + request + " allocated resource.");
+//            JSL.out.println(getTime() + "> Request " + request + " allocated resource.");
         }
 
         @Override
         public void completed(Request request) {
             myNumBusy.decrement();
-            JSL.out.println(getTime() + "> Request " + request + " completed.");
+//            JSL.out.println(getTime() + "> Request " + request + " completed.");
             mySysTime.setValue(getTime() - request.getCreateTime());
             myNS.decrement(); // customer left system  
         }
@@ -245,9 +254,9 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         driveThroughPharmacy.setServiceRS(new Exponential(3.0));
 
         // set the parameters of the experiment
-        sim.setNumberOfReplications(30);
-        sim.setLengthOfReplication(20000.0);
-        sim.setLengthOfWarmUp(5000.0);
+        sim.setNumberOfReplications(2);
+        sim.setLengthOfReplication(20.0);
+        sim.setLengthOfWarmUp(5.0);
 //        sim.setNumberOfReplications(2);
 //        sim.setLengthOfReplication(30.0);
 //        sim.setLengthOfWarmUp(5000.0);

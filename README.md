@@ -17,7 +17,7 @@ Within IntelliJ
 
 5) Choose import project from external model, choose Gradle
 
-6) Uncheck “Create separate module per source set”, check create empty root directories
+6) Uncheck “Create separate module per source set”,  check create empty root directories
 
 7) Check “Use grade wrapper task configuration”
 
