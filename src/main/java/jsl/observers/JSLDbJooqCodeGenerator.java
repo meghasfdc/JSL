@@ -68,7 +68,7 @@ public class JSLDbJooqCodeGenerator {
         System.out.println("Created database: " + dbName);
         Path dbPath = dbDir.resolve(dbName);
         System.out.println("Running code generation.");
-        DatabaseIfc.runJooQCodeGeneration(dbPath,"src/main/java", "jsl.utilities.jsldbsrc");
+        DatabaseIfc.runJooQCodeGeneration(db.getConnection(),"src/main/java", "jsl.utilities.jsldbsrc");
         System.out.println("Completed code generation.");
         System.out.println("Deleting the database");
         FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());

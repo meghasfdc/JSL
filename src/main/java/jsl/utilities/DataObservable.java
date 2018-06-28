@@ -23,7 +23,7 @@ import jsl.utilities.reporting.JSL;
  * @author rossetti
  *
  */
-public abstract class DataSource extends Observable implements GetValueIfc, PreviousValueIfc,
+public abstract class DataObservable extends Observable implements GetValueIfc, PreviousValueIfc,
         IdentityIfc {
 
     //  ===========================================
@@ -68,14 +68,14 @@ public abstract class DataSource extends Observable implements GetValueIfc, Prev
     /**
      *
      */
-    public DataSource() {
+    public DataObservable() {
         this(null);
     }
 
     /**
      *
      */
-    public DataSource(String name) {
+    public DataObservable(String name) {
         setId();
         setName(name);
     }

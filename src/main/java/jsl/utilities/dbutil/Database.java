@@ -16,21 +16,13 @@
 
 package jsl.utilities.dbutil;
 
-import jsl.utilities.excel.ExcelUtil;
 import org.jooq.*;
 import org.jooq.conf.Settings;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.sql.DataSource;
 import java.util.Objects;
-import java.util.regex.Matcher;
 
 /**
  *  A concrete implementation of the DatabaseIfc interface.
@@ -50,9 +42,9 @@ public class Database implements DatabaseIfc {
 
     private final String myName;
     private final Schema myUserSchema;
-    private final Connection myConnection;
+    private final DataSource myDataSource;
     private final SQLDialect mySQLDialect;
-    private Settings myExecuteLoggingSettings;
+    private DSLContext myDSLContext;
 
     /**
      * @param dbName         a string representing the name of the database must not be null. This name
@@ -60,84 +52,51 @@ public class Database implements DatabaseIfc {
      *                       used for labeling purposes.
      * @param userSchemaName a string representing the name of the user or schema that holds
      *                       the user defined tables with the database. Must not be null
-     * @param connection     an active connection to the database, must not be null
+     * @param dataSource     the DataSource backing the database, must not be null
      * @param dialect        the SLQ dialect for this type of database, must not null, it obviously must
      *                       be consistent with the database referenced by the connection
      */
-    public Database(String dbName, String userSchemaName, Connection connection, SQLDialect dialect) {
+    public Database(String dbName, String userSchemaName, DataSource dataSource, SQLDialect dialect) {
         Objects.requireNonNull(dbName, "The database name was null");
         Objects.requireNonNull(userSchemaName, "The database user/schema was null");
-        Objects.requireNonNull(connection, "The database connection was null");
+        Objects.requireNonNull(dataSource, "The database source was null");
         Objects.requireNonNull(dialect, "The database dialect was null");
         myName = dbName;
-        myConnection = connection;
+        myDataSource = dataSource;
         mySQLDialect = dialect;
         myUserSchema = getSchema(userSchemaName);
         if (myUserSchema == null) {
             DbLogger.error("The supplied userSchema name {} was not in the database.", userSchemaName);
             throw new DataAccessException("The supplied userSchema name was not in the database: " + userSchemaName);
         }
-        turnOffJooQDefaultExecutionLogging();
+        myDSLContext = DSL.using(getDataSource(), getSQLDialect());
+        setJooQDefaultExecutionLoggingOption(false);
     }
 
-    /**
-     *
-     * @return a connection to the database
-     */
-    public final Connection getConnection(){
-        return myConnection;
+    @Override
+    public final DataSource getDataSource(){
+        return myDataSource;
     }
 
-    /**
-     * @return a label or name for the database
-     */
+    @Override
     public final String getName() {
         return myName;
     }
 
 
-
-    /**
-     * @return the sql dialect for the database.  Here should be derby
-     */
+    @Override
     public final SQLDialect getSQLDialect() {
         return mySQLDialect;
     }
 
-
-    /**
-     * The schema that holds the user defined tables within the database.
-     *
-     * @return the user defined schema (as opposed to the system defined schema)
-     */
+    @Override
     public Schema getUserSchema() {
         return myUserSchema;
     }
 
-    /**
-     * @return the jooq DSLContext for the database
-     */
+    @Override
     public DSLContext getDSLContext() {
-        if (myExecuteLoggingSettings == null) {
-            return DSL.using(getConnection(), getSQLDialect());
-        } else {
-            return DSL.using(getConnection(), getSQLDialect(), myExecuteLoggingSettings);
-        }
+        return myDSLContext;
     }
-
-    /**
-     * Turns on JooQ Default execute SQL logging
-     */
-    public final void turnOffJooQDefaultExecutionLogging() {
-        myExecuteLoggingSettings = new Settings().withExecuteLogging(false);
-    }
-
-    /**
-     * Turns off JooQ Default execute SQL logging
-     */
-    public final void turnOnJooQDefaultExecutionLogging() {
-        myExecuteLoggingSettings = null;
-    }
-
 
 }

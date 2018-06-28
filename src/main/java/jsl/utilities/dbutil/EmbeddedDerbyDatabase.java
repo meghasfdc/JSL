@@ -50,6 +50,8 @@ import org.jooq.util.jaxb.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
+
 /**
  * An abstraction for using Derby embedded databases.  The static method createDb() provides a builder
  * for constructing instances.
@@ -59,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * or a script having SQL insert statements. The alter script then places the key and
  * other contraints on the database.  We assume that valid data and scripts are in place.
  * <p>
- * The Excel workbook must a worksheet for each table of the database for which
+ * The Excel workbook must be a worksheet for each table of the database for which
  * you want data inserted. The worksheets should be named exactly the same as the table
  * names in the database. The first row of each sheet should contain the exact field
  * names for the table that the sheet represents. Valid data must be entered into each
@@ -83,15 +85,13 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     private final String myDbName;
     private String myDbSchemaName;
 
-    private Connection myConnection;
-
+    private final DSLContext myDSLContext;
     /**
      * The connection URL
      */
     private String myConnURL;
 
     private final SQLDialect mySQLDialect = SQLDialect.DERBY;
-    private Settings myExecuteLoggingSettings;
 
     private Path myCreationScriptPath;
     private Path myTableScriptPath;
@@ -107,7 +107,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     private final List<String> myAlterCommands;
 
     private EmbeddedDerbyDatabase(DbBuilder builder) throws IOException, SQLException, InvalidFormatException {
-        turnOffJooQDefaultExecutionLogging();
         // set up the arrays to hold possble commands from scripts
         myCreationScriptCommands = new ArrayList<>();
         myTableCommands = new ArrayList<>();
@@ -160,15 +159,17 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         } else {
             openConnection();
         }
+        myDSLContext = DSL.using(getDataSource(), getSQLDialect());
+        setJooQDefaultExecutionLoggingOption(false);
     }
 
     private void openConnection() throws SQLException {
-        myConnection = myEmbeddedDS.getConnection();
-        DatabaseMetaData metaData = myConnection.getMetaData();
+        Connection connection = myEmbeddedDS.getConnection();
+        DatabaseMetaData metaData = connection.getMetaData();
         myConnURL = metaData.getURL();
         myDbSchemaName = metaData.getUserName();
         DbLogger.trace("Connection made to {}", myEmbeddedDS.getDatabaseName());
-        DatabaseIfc.logWarnings(myConnection);
+        DatabaseIfc.logWarnings(connection);
     }
 
     /**
@@ -407,24 +408,35 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         EmbeddedDerbyDatabase connect() throws IOException, SQLException, InvalidFormatException;
     }
 
-    /**
-     *
-     * @return a connection to the database
-     */
-    public final Connection getConnection(){
-        return myConnection;
+    @Override
+    public final DataSource getDataSource() {
+        return myEmbeddedDS;
     }
 
-    /**
-     * The name of the database
-     *
-     * @return the name
-     */
+    @Override
+    public final DSLContext getDSLContext() {
+        return myDSLContext;
+    }
+
     @Override
     public final String getName() {
         return myDbName;
     }
 
+    @Override
+    public final SQLDialect getSQLDialect() {
+        return mySQLDialect;
+    }
+
+    @Override
+    public final Schema getUserSchema() {
+        return getSchema(getDBSchemaName());
+    }
+
+    /**
+     *
+     * @return a Path representation of the directory to the database
+     */
     public final Path getDirectory() {
         return Paths.get(myDbDirPath.toUri());
     }
@@ -457,14 +469,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      */
     public final String getDBSchemaName() {
         return myDbSchemaName;
-    }
-
-    /**
-     * @return the sql dialect for the database.  Here should be derby
-     */
-    @Override
-    public final SQLDialect getSQLDialect() {
-        return mySQLDialect;
     }
 
     /**
@@ -677,46 +681,10 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     }
 
     /**
-     * @return the use defined schema (as opposed to the system defined schema)
-     */
-    @Override
-    public Schema getUserSchema() {
-        return getSchema(getDBSchemaName());
-    }
-
-    /**
      * @return a jooq Parser for parsing queries on the database
      */
     public Parser getParser() {
         return getDSLContext().parser();
-    }
-
-    /**
-     * @return the jooq DSLContext for the database
-     */
-    @Override
-    public DSLContext getDSLContext() {
-        if (myExecuteLoggingSettings == null){
-            return DSL.using(getConnection(), getSQLDialect());
-        } else {
-            return DSL.using(getConnection(), getSQLDialect(), myExecuteLoggingSettings);
-        }
-    }
-
-    /**
-     *  Turns on JooQ Default execute SQL logging
-     */
-    @Override
-    public final void turnOffJooQDefaultExecutionLogging(){
-        myExecuteLoggingSettings = new Settings().withExecuteLogging(false);
-    }
-
-    /**
-     *  Turns off JooQ Default execute SQL logging
-     */
-    @Override
-    public final void turnOnJooQDefaultExecutionLogging(){
-        myExecuteLoggingSettings = null;
     }
 
     /**

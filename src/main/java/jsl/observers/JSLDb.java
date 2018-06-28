@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1109,9 +1110,12 @@ public class JSLDb {
      * Writes all tables of the database in the directory, naming each output
      * file the name of each table
      *
-     * @param pathToOutPutDirectory
+     * @param pathToOutPutDirectory a path to the output directory, if null uses the working directory
      */
     public final void writeAllTablesAsCSV(Path pathToOutPutDirectory) throws IOException {
+        if (pathToOutPutDirectory == null) {
+            pathToOutPutDirectory = Paths.get(".");
+        }
         myDb.writeAllTablesAsCSV(pathToOutPutDirectory);
     }
 
@@ -1161,13 +1165,13 @@ public class JSLDb {
      *  Turns on JooQ Default execute SQL logging
      */
     public final void turnOnJooQDefaultExecutionLogging() {
-        myDb.turnOnJooQDefaultExecutionLogging();
+        myDb.setJooQDefaultExecutionLoggingOption(true);
     }
 
     /**
      *  Turns off JooQ Default execute SQL logging
      */
     public final void turnOffJooQDefaultExecutionLogging() {
-        myDb.turnOffJooQDefaultExecutionLogging();
+        myDb.setJooQDefaultExecutionLoggingOption(false);
     }
 }

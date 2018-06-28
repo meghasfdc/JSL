@@ -20,7 +20,7 @@
  */
 package jsl.utilities.random.sp;
 
-import jsl.utilities.DataSource;
+import jsl.utilities.DataObservable;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -184,7 +184,7 @@ public class IntermittentDemandStatistic implements StatisticAccessorIfc, Identi
      */
     @Override
     public void update(Observable o, Object arg) {
-        DataSource ds = (DataSource) o;
+        DataObservable ds = (DataObservable) o;
         double forecastValue = ds.getValue();
         if (!Double.isNaN(forecastValue)) {
             collect(forecastValue);

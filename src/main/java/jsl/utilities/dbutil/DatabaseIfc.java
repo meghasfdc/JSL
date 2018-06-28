@@ -17,7 +17,6 @@
 package jsl.utilities.dbutil;
 
 import jsl.utilities.excel.ExcelUtil;
-import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.jooq.*;
 import org.jooq.util.GenerationTool;
 import org.jooq.util.jaxb.Generate;
@@ -26,6 +25,7 @@ import org.jooq.util.jaxb.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
@@ -59,9 +59,10 @@ public interface DatabaseIfc {
     Pattern COMMENT_PATTERN = Pattern.compile("^(?:--|\\/\\/|\\#).+");
 
     /**
-     * @return a connection to the database
+     *
+     * @return the DataSource backing the database
      */
-    Connection getConnection();
+    DataSource getDataSource();
 
     /**
      * @return an identifying string representing the database. This has no relation to
@@ -80,20 +81,32 @@ public interface DatabaseIfc {
     DSLContext getDSLContext();
 
     /**
-     * Turns off jooq execution logging
-     */
-    void turnOffJooQDefaultExecutionLogging();
-
-    /**
-     * Turns on jooq execution logging
-     */
-    void turnOnJooQDefaultExecutionLogging();
-
-    /**
      * @return a jooq Schema representing the schema that holds the user defined
      * tables that are in the database
      */
     Schema getUserSchema();
+
+    /**
+     *
+     * @param option true means the default jooq execution logging is on, false means that it is not
+     */
+    default void setJooQDefaultExecutionLoggingOption(boolean option){
+        getDSLContext().settings().withExecuteLogging(option);
+    }
+    /**
+     *
+     * @return true if jooq default execution logging is on
+     */
+    default boolean isJooQDefaultExecutionLoggingOn(){
+        return getDSLContext().settings().isExecuteLogging();
+    }
+
+    /**
+     * @return a connection to the database
+     */
+    default Connection getConnection() throws SQLException {
+        return getDataSource().getConnection();
+    }
 
     /**
      * @return the meta data about the database if available, or null
@@ -742,12 +755,12 @@ public interface DatabaseIfc {
      * that the database exists and has well defined structure.  Places generated
      * source files in package gensrc with the main java source
      *
-     * @param pathToDb path to database, must not be null
+     * @param connection a connection to the database, must not be null
      * @param packageName name of package to be created to hold generated code, must not be null
      */
-    public static void jooqCodeGeneration(Path pathToDb, String pkgDirName, String packageName) throws Exception {
-        if (pathToDb == null) {
-            throw new IllegalArgumentException("The path was null!");
+    public static void jooqCodeGeneration(Connection connection, String pkgDirName, String packageName) throws Exception {
+        if (connection == null) {
+            throw new IllegalArgumentException("The connection was null!");
         }
 
         if (pkgDirName == null) {
@@ -758,10 +771,10 @@ public interface DatabaseIfc {
             throw new IllegalArgumentException("The package name was null!");
         }
 
-        EmbeddedDataSource ds = new EmbeddedDataSource();
-        ds.setDatabaseName(pathToDb.toString());
-
-        Connection connection = ds.getConnection();
+//        EmbeddedDataSource ds = new EmbeddedDataSource();
+//        ds.setDatabaseName(pathToDb.toString());
+//
+//        Connection connection = ds.getConnection();
         org.jooq.util.jaxb.Configuration configuration = new org.jooq.util.jaxb.Configuration()
                 .withGenerator(new Generator()
                         .withDatabase(new org.jooq.util.jaxb.Database()
@@ -787,15 +800,15 @@ public interface DatabaseIfc {
     /**
      * Runs jooq code generation on the database at the supplied path, squelching all exceptions
      *
-     * @param pathToDb path to database, must not be null
+     * @param connection a connection to the database, must not be null
      * @param packageName name of package to be created to hold generated code, must not be null
      */
-    public static void runJooQCodeGeneration(Path pathToDb, String pkgDirName, String packageName) {
+    public static void runJooQCodeGeneration(Connection connection, String pkgDirName, String packageName) {
         try {
-            jooqCodeGeneration(pathToDb, pkgDirName, packageName);
+            jooqCodeGeneration(connection, pkgDirName, packageName);
         } catch (Exception e) {
             e.printStackTrace();
-            DbLogger.trace("Error in jooq code generation for database: {}", pathToDb);
+            DbLogger.trace("Error in jooq code generation for database: pkgDirName {}, packageName {}", pkgDirName, packageName );
         }
     }
 

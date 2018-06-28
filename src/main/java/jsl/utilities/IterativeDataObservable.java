@@ -19,7 +19,6 @@
  */
 package jsl.utilities;
 
-import jsl.utilities.DataSource;
 import jsl.utilities.reporting.JSL;
 
 /** An abstract base class for modeling data sources that users can iterate through
@@ -27,7 +26,7 @@ import jsl.utilities.reporting.JSL;
  * 
  *
  */
-public abstract class IterativeDataSource extends DataSource {
+public abstract class IterativeDataObservable extends DataObservable {
 
     /** An "enum" to indicate that this iterative data source has just been reset to observers
      *  Subclasses are responsible for using notifyObservers(RESET) to let observers
@@ -50,14 +49,14 @@ public abstract class IterativeDataSource extends DataSource {
     /**
      *
      */
-    public IterativeDataSource() {
+    public IterativeDataObservable() {
         this(null);
     }
 
     /**
      * @param name
      */
-    public IterativeDataSource(String name) {
+    public IterativeDataObservable(String name) {
         super(name);
 
     }
