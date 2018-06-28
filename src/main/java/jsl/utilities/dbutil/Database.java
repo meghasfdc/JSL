@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
  *
  * Many databases define the terms database, user, schema in a variety of ways. This abstraction
  * defines this concept as the userSchema.  It is the name of the organizational construct for
- * which the user defined database object are contained. These are not the system abstractions.
+ * which the user defined database objects are contained. These are not the system abstractions.
  * The database name provided to the construct is for labeling and may or may not have any relationship
  * to the actual file name or database name of the database. The supplied connection has all
  * the information that it needs to access the database.
@@ -61,7 +61,8 @@ public class Database implements DatabaseIfc {
      * @param userSchemaName a string representing the name of the user or schema that holds
      *                       the user defined tables with the database. Must not be null
      * @param connection     an active connection to the database, must not be null
-     * @param dialect        the SLQ dialect for this type of database, must not null
+     * @param dialect        the SLQ dialect for this type of database, must not null, it obviously must
+     *                       be consistent with the database referenced by the connection
      */
     public Database(String dbName, String userSchemaName, Connection connection, SQLDialect dialect) {
         Objects.requireNonNull(dbName, "The database name was null");
