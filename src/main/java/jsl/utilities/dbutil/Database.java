@@ -31,7 +31,7 @@ import java.util.Objects;
  * defines this concept as the userSchema.  It is the name of the organizational construct for
  * which the user defined database objects are contained. These are not the system abstractions.
  * The database name provided to the construct is for labeling and may or may not have any relationship
- * to the actual file name or database name of the database. The supplied connection has all
+ * to the actual file name or database name of the database. The supplied DataSource has all
  * the information that it needs to access the database.
  */
 public class Database implements DatabaseIfc {
@@ -64,12 +64,12 @@ public class Database implements DatabaseIfc {
         myName = dbName;
         myDataSource = dataSource;
         mySQLDialect = dialect;
+        myDSLContext = DSL.using(dataSource, dialect);
         myUserSchema = getSchema(userSchemaName);
         if (myUserSchema == null) {
             DbLogger.error("The supplied userSchema name {} was not in the database.", userSchemaName);
             throw new DataAccessException("The supplied userSchema name was not in the database: " + userSchemaName);
         }
-        myDSLContext = DSL.using(getDataSource(), getSQLDialect());
         setJooQDefaultExecutionLoggingOption(false);
     }
 
