@@ -21,6 +21,7 @@ import org.jooq.*;
 import org.jooq.util.GenerationTool;
 import org.jooq.util.jaxb.Generate;
 import org.jooq.util.jaxb.Generator;
+import org.jooq.util.jaxb.Property;
 import org.jooq.util.jaxb.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -810,6 +811,43 @@ public interface DatabaseIfc {
             e.printStackTrace();
             DbLogger.trace("Error in jooq code generation for database: pkgDirName {}, packageName {}", pkgDirName, packageName );
         }
+    }
+
+    /** Runs jooq code generation based solely on a database creation script. Creates an in memory database, runs
+     * the generation process, and places the generated code in the specified target package name and directory
+     *
+     * @param pathToCreationScript the path to the creation script
+     * @param pkgDirName the package directory name
+     * @param packageName the package name
+     * @throws Exception an exception
+     */
+    public static void runJooqCodeGeneration(Path pathToCreationScript, String pkgDirName, String packageName) throws Exception {
+        if (pathToCreationScript == null) {
+            throw new IllegalArgumentException("The path to the creation script was null!");
+        }
+
+        if (pkgDirName == null) {
+            throw new IllegalArgumentException("The package directory name was null!");
+        }
+
+        if (packageName == null) {
+            throw new IllegalArgumentException("The package name was null!");
+        }
+
+        org.jooq.util.jaxb.Configuration configuration = new org.jooq.util.jaxb.Configuration();
+
+        configuration.withGenerator(new Generator()
+                .withDatabase(
+                        new org.jooq.util.jaxb.Database()
+                                .withName("org.jooq.util.ddl.DDLDatabase")
+                                .withProperties(new Property()
+                                        .withKey("scripts")
+                                        .withValue(pathToCreationScript.toString())))
+                .withTarget(new Target().withPackageName(packageName).withDirectory(pkgDirName)));
+
+        GenerationTool tool = new GenerationTool();
+        tool.run(configuration);
+
     }
 
 }
