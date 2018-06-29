@@ -26,15 +26,9 @@ import jsl.utilities.random.RandomIfc;
 import jsl.utilities.statistic.MultipleComparisonAnalyzer;
 import org.jooq.Record5;
 import org.jooq.Result;
-import tech.tablesaw.api.Table;
 
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
-
-import static jsl.utilities.jsldbsrc.Tables.SIMULATION_RUN;
-import static jsl.utilities.jsldbsrc.Tables.WITHIN_REP_STAT;
 
 public class DriveThroughPharmacy extends SchedulingElement {
 
@@ -212,16 +206,16 @@ public class DriveThroughPharmacy extends SchedulingElement {
         sim.run();
         r.printAcrossReplicationSummaryStatistics();
 
-        //sim.getJSLDb().getAcrossRepStatRecords().format(printWriter);
+        //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         dtp.setNumberOfPharmacists(2);
         sim.setExperimentName("2nd Run");
         sim.run();
         System.out.println("Simulation completed.");
         r.printAcrossReplicationSummaryStatistics();
 
-        //sim.getJSLDb().getAcrossRepStatRecords().format(printWriter);
+        //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         String responseName = dtp.getSystemTimeResponse().getName();
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = sim.getJSLDb().getWithinRepAveragesAsResultSet(responseName);
+        Result<Record5<Integer, String, String, Integer, Double>> resultSet = sim.getJSLDatabase().getWithinRepAveragesAsResultSet(responseName);
 
         resultSet.format(printWriter);
 
@@ -229,7 +223,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
 //
 //        map.get("1st Run").forEach(System.out::println);
 
-        Map<String, double[]> withRepAveragesAsMap = sim.getJSLDb().getWithRepAveragesAsMap(responseName);
+        Map<String, double[]> withRepAveragesAsMap = sim.getJSLDatabase().getWithRepAveragesAsMap(responseName);
 
         MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
         System.out.println(multipleComparisonAnalyzer);
@@ -237,7 +231,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
 //        try {
 //            System.out.println();
 //            System.out.println("Tablesaw work");
-//            Table tablesawTable = sim.getJSLDb().getAcrossRepStatRecordsAsTablesawTable("AcrossRepStats");
+//            Table tablesawTable = sim.getJSLDatabase().getAcrossRepStatRecordsAsTablesawTable("AcrossRepStats");
 //            //System.out.println(tablesawTable.columnNames());
 //            //System.out.println(tablesawTable.structure().print());
 //            System.out.println(tablesawTable.print());
