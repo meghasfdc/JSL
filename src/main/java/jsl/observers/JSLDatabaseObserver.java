@@ -16,8 +16,6 @@
 
 package jsl.observers;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
 import jsl.modeling.Simulation;
@@ -25,12 +23,8 @@ import jsl.modeling.StatisticalBatchingElement;
 import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.jsldbsrc.tables.records.ModelElementRecord;
-import jsl.utilities.math.Sets;
-import jsl.utilities.reporting.JSL;
 import jsl.utilities.statistic.BatchStatistic;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.jooq.Result;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,17 +33,17 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- *  Used by Simulation to attach an embedded database to collect statistics. Whether or not
+ *  Used by Simulation to attach a database to collect statistics. Whether or not
  *  the current data in the database will be cleared prior to the run is controlled by the
  *  clearDbFlag option.  Clearing the data is the default option.  Clearing the database
  *  causes the previous database to be deleted and a brand new database with the same name to
  *  be constructed to hold statistical output generated during the simulation.
  */
-public class JSLDbObserver extends ModelElementObserver {
+public class JSLDatabaseObserver extends ModelElementObserver {
 
     protected final Simulation mySimulation;
     protected final Model myModel;
-    protected final JSLDb myJSLDb;
+    protected final JSLDatabase myJSLDatabase;
     protected final boolean myClearDbFlag;
 
     /** Uses the simulation name for the database name (without whitespace). The database will be cleared
@@ -59,7 +53,7 @@ public class JSLDbObserver extends ModelElementObserver {
      * @throws SQLException  an exception
      * @throws IOException an exception
      */
-    public JSLDbObserver(Simulation simulation)
+    public JSLDatabaseObserver(Simulation simulation)
             throws InvalidFormatException, SQLException, IOException {
         this(simulation, true, null);
     }
@@ -68,8 +62,8 @@ public class JSLDbObserver extends ModelElementObserver {
      *
      * @return the underlying JSLDb
      */
-    public final JSLDb getJSLDb(){
-        return myJSLDb;
+    public final JSLDatabase getJSLDatabase(){
+        return myJSLDatabase;
     }
 
     /** Uses the simulation name for the database name (without whitespace)
@@ -80,7 +74,7 @@ public class JSLDbObserver extends ModelElementObserver {
      * @throws SQLException  an exception
      * @throws IOException an exception
      */
-    public JSLDbObserver(Simulation simulation, boolean clearDbFlag)
+    public JSLDatabaseObserver(Simulation simulation, boolean clearDbFlag)
             throws InvalidFormatException, SQLException, IOException {
         this(simulation, clearDbFlag, null);
     }
@@ -94,7 +88,7 @@ public class JSLDbObserver extends ModelElementObserver {
      * @throws SQLException  an exception
      * @throws IOException an exception
      */
-    public JSLDbObserver(Simulation simulation, boolean clearDbFlag, String dbName)
+    public JSLDatabaseObserver(Simulation simulation, boolean clearDbFlag, String dbName)
             throws InvalidFormatException, SQLException, IOException {
         if (simulation == null) {
             throw new IllegalArgumentException("The simulation was null");
@@ -107,17 +101,17 @@ public class JSLDbObserver extends ModelElementObserver {
         }
         dbName = dbName.replaceAll("\\s+","");
         // make the db
-        Path path = JSLDb.dbDir.resolve(dbName);
+        Path path = JSLDatabase.dbDir.resolve(dbName);
         if (Files.exists(path)) {
             // the database exists, check to clear it
             if (clearDbFlag){
-                myJSLDb = JSLDb.makeEmptyJSLDb(dbName);
+                myJSLDatabase = JSLDatabase.makeEmptyJSLDb(dbName);
             } else {
-                myJSLDb = JSLDb.connect(dbName);
+                myJSLDatabase = JSLDatabase.connect(dbName);
             }
         } else {
             // does not exist at all, just make it
-            myJSLDb = JSLDb.makeEmptyJSLDb(dbName);
+            myJSLDatabase = JSLDatabase.makeEmptyJSLDb(dbName);
         }
         myModel.addObserver(this);
     }
@@ -126,10 +120,10 @@ public class JSLDbObserver extends ModelElementObserver {
     protected void beforeExperiment(ModelElement m, Object arg) {
         super.beforeExperiment(m, arg);
         // insert the new simulation run into the database
-        myJSLDb.insertSimulationRunRecord(mySimulation);
+        myJSLDatabase.insertSimulationRunRecord(mySimulation);
         // add the model elements associated with this run to the database
         List<ModelElement> currMEList = myModel.getModelElements();
-        myJSLDb.insertModelElements(currMEList);
+        myJSLDatabase.insertModelElements(currMEList);
     }
 
     @Override
@@ -142,8 +136,8 @@ public class JSLDbObserver extends ModelElementObserver {
         super.afterReplication(m, arg);
         List<ResponseVariable> rvs = myModel.getResponseVariables();
         List<Counter> counters = myModel.getCounters();
-        myJSLDb.insertWithinRepResponses(rvs);
-        myJSLDb.insertWithinRepCounters(counters);
+        myJSLDatabase.insertWithinRepResponses(rvs);
+        myJSLDatabase.insertWithinRepCounters(counters);
 
         Optional<StatisticalBatchingElement> sbe = mySimulation.getStatisticalBatchingElement();
 
@@ -151,18 +145,18 @@ public class JSLDbObserver extends ModelElementObserver {
             // insert the statistics from the batching
             Map<ResponseVariable, BatchStatistic> rmap = sbe.get().getAllResponseVariableBatchStatisticsAsMap();
             Map<TimeWeighted, BatchStatistic> twmap = sbe.get().getAllTimeWeightedBatchStatisticsAsMap();
-            myJSLDb.insertResponseVariableBatchStatistics(rmap);
-            myJSLDb.insertTimeWeightedBatchStatistics(twmap);
+            myJSLDatabase.insertResponseVariableBatchStatistics(rmap);
+            myJSLDatabase.insertTimeWeightedBatchStatistics(twmap);
         }
     }
 
     @Override
     protected void afterExperiment(ModelElement m, Object arg) {
         super.afterExperiment(m, arg);
-        myJSLDb.finalizeCurrentSimulationRunRecord(mySimulation);
+        myJSLDatabase.finalizeCurrentSimulationRunRecord(mySimulation);
         List<ResponseVariable> rvs = myModel.getResponseVariables();
         List<Counter> counters = myModel.getCounters();
-        myJSLDb.insertAcrossRepResponses(rvs);
-        myJSLDb.insertAcrossRepResponsesForCounters(counters);
+        myJSLDatabase.insertAcrossRepResponses(rvs);
+        myJSLDatabase.insertAcrossRepResponsesForCounters(counters);
     }
 }

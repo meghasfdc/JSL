@@ -18,7 +18,6 @@ package jsl.observers;
 
 import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
-import jsl.utilities.reporting.JSL;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
@@ -44,9 +43,9 @@ public class JSLDbJooqCodeGenerator {
             SQLException, InvalidFormatException {
         System.out.println("Making database: " + dbName);
 
-        FileUtils.deleteDirectory(JSLDb.dbDir.resolve(dbName).toFile());
-        Path createScript = JSLDb.dbScriptsDir.resolve(scriptName);
-        EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(dbName, JSLDb.dbDir)
+        FileUtils.deleteDirectory(JSLDatabase.dbDir.resolve(dbName).toFile());
+        Path createScript = JSLDatabase.dbScriptsDir.resolve(scriptName);
+        EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(dbName, JSLDatabase.dbDir)
                 .withCreationScript(createScript)
                 .connect();
         System.out.println("Created database: " + dbName);

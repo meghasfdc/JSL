@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimerTask;
 
-import jsl.observers.JSLDb;
-import jsl.observers.JSLDbObserver;
+import jsl.observers.JSLDatabase;
+import jsl.observers.JSLDatabaseObserver;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
 import jsl.observers.scheduler.ExecutiveTraceReport;
@@ -106,7 +106,7 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     /**
      *  the default observer for the database
      */
-    private JSLDbObserver myJSLDbObserver;
+    private JSLDatabaseObserver myJSLDatabaseObserver;
 
     /**
      *   whether or not the database observer will automatically be added, default is true
@@ -989,8 +989,8 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
      *
      * @return the JSLDbObserver or null if not attached
      */
-    public final JSLDbObserver getJSLDbObserver() {
-        return myJSLDbObserver;
+    public final JSLDatabaseObserver getJSLDatabaseObserver() {
+        return myJSLDatabaseObserver;
     }
 
     /**
@@ -998,9 +998,9 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
      *
      * @return the JSLDb or null if not created/attached
      */
-    public final JSLDb getJSLDb() {
-        if (getJSLDbObserver() != null) {
-            return getJSLDbObserver().getJSLDb();
+    public final JSLDatabase getJSLDatabase() {
+        if (getJSLDatabaseObserver() != null) {
+            return getJSLDatabaseObserver().getJSLDatabase();
         }
         return null;
     }
@@ -1008,10 +1008,10 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     /**
      * Removes the automatically attached JSLDbObserver if it was attached
      */
-    public final void deleteJSLDbObserver() {
-        if (myJSLDbObserver != null) {
-            myModel.deleteObserver(myJSLDbObserver);
-            myJSLDbObserver = null;
+    public final void deleteJSLDatabaseObserver() {
+        if (myJSLDatabaseObserver != null) {
+            myModel.deleteObserver(myJSLDatabaseObserver);
+            myJSLDatabaseObserver = null;
         }
     }
 
@@ -1116,9 +1116,9 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
             super.initializeIterations();
             myExecutive.setTerminationWarningMessageOption(false);
             if (isDbOptionOn()) {
-                if (myJSLDbObserver == null) {
+                if (myJSLDatabaseObserver == null) {
                     try {
-                        myJSLDbObserver = new JSLDbObserver(Simulation.this, isClearDbOptionOn());
+                        myJSLDatabaseObserver = new JSLDatabaseObserver(Simulation.this, isClearDbOptionOn());
                     } catch (InvalidFormatException e) {
                         e.printStackTrace();
                     } catch (SQLException e) {

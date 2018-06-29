@@ -57,7 +57,7 @@ import static jsl.utilities.jsldbsrc.Tables.*;
  * An embedded database that represents the statistical output from simulation runs. See the
  * file JSLDb.sql in the dbScripts directory for the structure of the database.
  */
-public class JSLDb {
+public class JSLDatabase {
 
 //    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -70,7 +70,7 @@ public class JSLDb {
         dbDir = db.toPath();
         dbScriptsDir = dbScript.toPath();
         File jsldb = dbScriptsDir.resolve("JSLDb.sql").toFile();
-        ClassLoader classLoader = JSLDb.class.getClassLoader();
+        ClassLoader classLoader = JSLDatabase.class.getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream("JSLDb.sql");
 
         try {
@@ -87,7 +87,7 @@ public class JSLDb {
     protected SimulationRunRecord myCurrentSimRunRecord;
     private String tblName;
 
-    protected JSLDb(EmbeddedDerbyDatabase database) {
+    protected JSLDatabase(EmbeddedDerbyDatabase database) {
         if (database == null) {
             throw new IllegalArgumentException("The database cannot be null");
         }
@@ -101,7 +101,7 @@ public class JSLDb {
      * @param dbName the name of the JSLDb instance, must not be null
      * @return the JSLDb
      */
-    public static JSLDb makeEmptyJSLDbSquelchExceptions(String dbName) {
+    public static JSLDatabase makeEmptyJSLDbSquelchExceptions(String dbName) {
         try {
             return makeEmptyJSLDb(dbName);
         } catch (IOException e) {
@@ -123,14 +123,14 @@ public class JSLDb {
      * @throws SQLException           an exception
      * @throws IOException            an exception
      */
-    public static JSLDb makeEmptyJSLDb(String dbName) throws IOException,
+    public static JSLDatabase makeEmptyJSLDb(String dbName) throws IOException,
             SQLException, InvalidFormatException {
         FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
         Path createScript = dbScriptsDir.resolve("JSLDb.sql");
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(dbName, dbDir)
                 .withCreationScript(createScript)
                 .connect();
-        return new JSLDb(db);
+        return new JSLDatabase(db);
     }
 
     /**
@@ -142,9 +142,9 @@ public class JSLDb {
      * @throws SQLException           an exception
      * @throws IOException            an exception
      */
-    public static JSLDb connect(String dbName) throws InvalidFormatException, SQLException, IOException {
+    public static JSLDatabase connect(String dbName) throws InvalidFormatException, SQLException, IOException {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb(dbName, dbDir).connect();
-        return new JSLDb(db);
+        return new JSLDatabase(db);
     }
 
     /**
@@ -153,7 +153,7 @@ public class JSLDb {
      * @param dbName the name of the JSLDb instance
      * @return the JSLDb
      */
-    public static JSLDb connectSquelchExceptions(String dbName) {
+    public static JSLDatabase connectSquelchExceptions(String dbName) {
         try {
             return connect(dbName);
         } catch (IOException e) {
