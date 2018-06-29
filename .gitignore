@@ -196,3 +196,5 @@ gradle/wrapper/gradle-wrapper\.jar
 JSL\.iml
 
 \.idea/modules\.xml
+
+\.idea/kotlinc\.xml

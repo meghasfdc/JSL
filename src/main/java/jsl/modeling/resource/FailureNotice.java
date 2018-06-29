@@ -17,11 +17,25 @@ package jsl.modeling.resource;
 
 import jsl.modeling.queue.QObject;
 
+import java.util.Objects;
+
 /**
  * A FailureNotice represents a notification that the ResourceUnit should go
  * down due to a failure. The failure notice may be required to be immediate or
  * not. If not immediate, then the failure may be delayed until the resource
  * unit finishes its current activity.
+ *
+ * A FailureNotice has a well-defined state pattern.  When created, the notice
+ * is placed in the Created state. From the created state, the notice can
+ * become active, delayed, or ignored. If the notice is active, the failure is in
+ * progress. After being active, the notice can only become completed.
+ * If the notice is delayed, the notice is waiting to become active.
+ * After being delayed, the notice can become active or be ignored.
+ * If the resource unit ignored the notice, then the notice is placed in the
+ * ignored state. The ignored state is terminal.  Once the notice finishes
+ * being active, it is placed in the completed state. The completed state
+ * is terminal.  The associated FailureProcess is notified when the
+ * notice enters these states. This allows FailureProcesses to react accordingly.
  *
  *
  * @author rossetti
@@ -34,30 +48,49 @@ public class FailureNotice extends QObject {
     private final IgnoredState myIgnoredState = new IgnoredState();
     private final CompletedState myCompletedState = new CompletedState();
 
-    private final FailureElement myFailureElement;
-    private final double myDownTime;
+    private final FailureProcess myFailureProcess;
+    private final double myDuration;
     private final boolean myDelayableFlag;
     private FailureNoticeState myState;
+    private ResourceUnit myResourceUnit;
 
     /**
      *
      * @param fe the associated FailureElement
-     * @param downTime the time that the failure should last
+     * @param duration the time that the failure should last, must be greater than or equal to 0.0
      * @param delayOption true means it does not need to be immediate
      */
-    FailureNotice(FailureElement fe, double downTime, boolean delayOption) {
+    FailureNotice(FailureProcess fe, double duration, boolean delayOption) {
         super(fe.getTime(), "FailureNotice");
-        myFailureElement = fe;
-        myDownTime = downTime;
+        if (duration < 0){
+            throw new IllegalArgumentException("The failure duration must be >= 0");
+        }
+        myFailureProcess = fe;
+        myDuration = duration;
         myDelayableFlag = delayOption;
         myState = myCreatedState;
+    }
+
+    void setResourceUnit(ResourceUnit resourceUnit){
+        Objects.requireNonNull(resourceUnit, "The resource unit was null");
+        myResourceUnit = resourceUnit;
+    }
+
+    /**
+     *
+     * @return the ResourceUnit that the FailureNotice was sent to, or null if not sent
+     */
+    public final ResourceUnit getResourceUnit(){
+        return myResourceUnit;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append(", time = ").append(getDownTime());
+        sb.append(", FailureProcess = ").append(myFailureProcess.getName());
+        sb.append(", ResourceUnit = ").append(myResourceUnit.getName());
+        sb.append(", duration = ").append(getDuration());
         sb.append(", delayable = ").append(isDelayable());
         sb.append(", state = ").append(myState.myName);
         return sb.toString();
@@ -67,16 +100,16 @@ public class FailureNotice extends QObject {
      *
      * @return the time that the failure should last
      */
-    public final double getDownTime() {
-        return myDownTime;
+    public final double getDuration() {
+        return myDuration;
     }
 
     /**
      *
-     * @return the associated FailureElement
+     * @return the associated FailureProcess
      */
-    public final FailureElement getFailureElement() {
-        return myFailureElement;
+    public final FailureProcess getFailureProcess() {
+        return myFailureProcess;
     }
 
     /**
@@ -92,7 +125,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in created state
      */
-    public final boolean isInCreatedState() {
+    public final boolean isCreated() {
         return myState == myCreatedState;
     }
 
@@ -100,7 +133,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in delayed state
      */
-    public final boolean isInDelayedState() {
+    public final boolean isDelayed() {
         return myState == myDelayedState;
     }
 
@@ -108,7 +141,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in ignored state
      */
-    public final boolean isInIgnoredState() {
+    public final boolean isIgnored() {
         return myState == myIgnoredState;
     }
 
@@ -116,7 +149,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in completed state
      */
-    public final boolean isInCompletedState() {
+    public final boolean isCompleted() {
         return myState == myCompletedState;
     }
 
@@ -124,7 +157,7 @@ public class FailureNotice extends QObject {
      *
      * @return true if in active state
      */
-    public final boolean isInActiveState() {
+    public final boolean isActive() {
         return myState == myActiveState;
     }
 
@@ -145,6 +178,11 @@ public class FailureNotice extends QObject {
 
     final void complete() {
         myState.complete();
+    }
+
+    protected final void setState(FailureNoticeState nextState){
+        myState = nextState;
+        myFailureProcess.failureNoticeStateChange(this);
     }
 
     protected class FailureNoticeState {
@@ -180,20 +218,17 @@ public class FailureNotice extends QObject {
 
         @Override
         protected void activate() {
-            myState = myActiveState;
-            myFailureElement.failureNoticeActivated(FailureNotice.this);
+            setState(myActiveState);
         }
 
         @Override
         protected void delay() {
-            myState = myDelayedState;
-            myFailureElement.failureNoticeDelayed(FailureNotice.this);
+            setState(myDelayedState);
         }
 
         @Override
         protected void ignore() {
-            myState = myIgnoredState;
-            myFailureElement.failureNoticeIgnored(FailureNotice.this);
+            setState(myIgnoredState);
         }
     }
 
@@ -205,10 +240,8 @@ public class FailureNotice extends QObject {
 
         @Override
         protected void complete() {
-            myState = myCompletedState;
-            myFailureElement.failureNoticeCompleted(FailureNotice.this);
+            setState(myCompletedState);
         }
-
     }
 
     protected class DelayedState extends FailureNoticeState {
@@ -219,14 +252,12 @@ public class FailureNotice extends QObject {
 
         @Override
         protected void activate() {
-            myState = myActiveState;
-            myFailureElement.failureNoticeActivated(FailureNotice.this);
+            setState(myActiveState);
         }
 
         @Override
         protected void ignore() {
-            myState = myIgnoredState;
-            myFailureElement.failureNoticeIgnored(FailureNotice.this);
+            setState(myIgnoredState);
         }
     }
 
@@ -241,7 +272,7 @@ public class FailureNotice extends QObject {
     protected class IgnoredState extends FailureNoticeState {
 
         public IgnoredState() {
-            super("Completed");
+            super("Ignored");
         }
 
     }

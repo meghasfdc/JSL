@@ -22,8 +22,9 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamIfc;
 
-/** A distribution on a single value.  The value may
- *  be changed via the setParameters() method
+/** A degenerate distribution on a single value.  The value may
+ *  be changed via the setParameters() method or the setValue() method.
+ *  This is primarily to avoid having to make many Constants.
  *
  * @author rossetti
  */
@@ -50,6 +51,12 @@ public class VConstant extends Constant {
     public void setParameters(double[] parameters) {
         myValue = parameters[0];
     }
+
+    /**
+     *
+     * @param value the value to use for the degenerate distribution
+     */
+    public void setValue(double value) { myValue = value;}
 
     /** Returns a new instance of the random source with the same parameters
      *  with the supplied RngIfc

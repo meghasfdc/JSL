@@ -46,11 +46,11 @@ public class FailureElementTesting {
         Simulation sim = new Simulation("Test FailureElement");
         Model model = sim.getModel();
         ResourceUnit resource = new ResourceUnit.Builder(model).
-                allowFailuresToDelay().autoStartFailures().build();
+                allowFailuresToDelay().build();
         Constant c1 = new Constant(0.5);
         Constant c2 = new Constant(0.2);
-        resource.addTimeBasedFailure(Constant.TWO, c1, true);
-        resource.addTimeBasedFailure(Constant.ONE, c2, true);
+        resource.addTimeBasedFailure(Constant.TWO, c1);
+        resource.addTimeBasedFailure(Constant.ONE, c2);
         
         sim.setLengthOfReplication(20.0);
         sim.setNumberOfReplications(2);
@@ -61,12 +61,11 @@ public class FailureElementTesting {
         // TODO code application logic here
         Simulation sim = new Simulation("Test FailureElement");
         Model model = sim.getModel();
-        ResourceUnit resource = new ResourceUnit.Builder(model).
-               autoStartFailures().build();
+        ResourceUnit resource = new ResourceUnit.Builder(model).build();
         Constant c1 = new Constant(0.5);
         Constant c2 = new Constant(0.2);
-        resource.addTimeBasedFailure(Constant.TWO, c1, false);
-        resource.addTimeBasedFailure(Constant.ONE, c2, false);
+        resource.addTimeBasedFailure(Constant.TWO, c1);
+        resource.addTimeBasedFailure(Constant.ONE, c2);
         sim.setLengthOfReplication(20.0);
         sim.setNumberOfReplications(2);
         sim.run();
