@@ -28,14 +28,16 @@ import java.sql.SQLException;
 
 public class JSLDbJooqCodeGenerator {
 
-    public static void main(String[] args) throws InvalidFormatException, SQLException, IOException {
+    public static void main(String[] args) throws Exception {
 
 //        Path path = Paths.get("src").resolve("main").resolve("resources");
 
  //       System.out.println(path);
         //makeEmptyDb("JSLDbCodeGen", "JSLDb.sql");
 
-        runCodeGeneration();
+        runCodeGenerationUsingEmptyDb();
+
+ //       runCodeGenerationUsingScriptOnly();
 
     }
 
@@ -52,7 +54,7 @@ public class JSLDbJooqCodeGenerator {
         return db;
     }
 
-    public static void runCodeGeneration() throws IOException,
+    public static void runCodeGenerationUsingEmptyDb() throws IOException,
             SQLException, InvalidFormatException {
 
         // make the database
@@ -67,9 +69,18 @@ public class JSLDbJooqCodeGenerator {
         System.out.println("Created database: " + dbName);
         Path dbPath = dbDir.resolve(dbName);
         System.out.println("Running code generation.");
-        DatabaseIfc.runJooQCodeGeneration(dbPath,"src/main/java", "jsl.utilities.jsldbsrc");
+        DatabaseIfc.runJooQCodeGeneration(db.getDataSource(), "JSL_DB",
+                "src/main/java", "jsl.utilities.jsldbsrc");
         System.out.println("Completed code generation.");
         System.out.println("Deleting the database");
         FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
     }
+
+//    public static void runCodeGenerationUsingScriptOnly() throws Exception {
+//        Path createScript = Paths.get("src").resolve("main").resolve("resources").resolve("JSLDb.sql");
+//        System.out.println("Running code generation.");
+//        DatabaseIfc.runJooQCodeGeneration(createScript, "JSL_DB",
+//                "src/main/java", "jsl.utilities.jsldbsrc");
+//        System.out.println("Completed code generation.");
+//    }
 }

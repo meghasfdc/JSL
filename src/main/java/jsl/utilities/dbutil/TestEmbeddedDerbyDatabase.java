@@ -47,7 +47,9 @@ public class TestEmbeddedDerbyDatabase {
 //        createExcelWorkbookFromDB("CreateWithStructureAndDataViaInsertsWithConstraintsDB");
         //duplicateDatabaseTest("FullSPDB");
         Path directory = dbDir.resolve("Clones");
-        EmbeddedDerbyDatabase.connectDb("FullSPDBDUPLICATE",directory).connect().printAllTablesAsText();
+        EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb("FullSPDBDUPLICATE", directory)
+                .connect();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
     }
 
 //    public static void testDuplication() throws IOException,
@@ -65,7 +67,7 @@ public class TestEmbeddedDerbyDatabase {
         FileUtils.deleteDirectory(dbDir.resolve(name).toFile());
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(name, dbDir).connect();
         System.out.println("Printing empty database:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
         return db;
     }
 
@@ -76,7 +78,7 @@ public class TestEmbeddedDerbyDatabase {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(name, dbDir)
                 .withCreationScript(createScript).connect();
         System.out.println("Printing full database:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
         return db;
     }
 
@@ -86,7 +88,7 @@ public class TestEmbeddedDerbyDatabase {
         Path tablesScript = dbScriptsDir.resolve("SPDatabase_Tables.sql");
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(name, dbDir).withTables(tablesScript).connect();
         System.out.println("Printing empty database:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
         return db;
     }
 
@@ -100,7 +102,7 @@ public class TestEmbeddedDerbyDatabase {
                 .withInsertData(insertScript)
                 .connect();
         System.out.println("Printing inserted database:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
         return db;
     }
 
@@ -116,7 +118,7 @@ public class TestEmbeddedDerbyDatabase {
                 .withConstraints(alterScript)
                 .connect();
         System.out.println("Printing inserted database:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
 
         System.out.println();
         System.out.println("Printing alter command");
@@ -133,7 +135,7 @@ public class TestEmbeddedDerbyDatabase {
             SQLException, InvalidFormatException {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb(name, dbDir).connect();
         System.out.println("Printing the connected database:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
         return db;
     }
 
@@ -151,20 +153,21 @@ public class TestEmbeddedDerbyDatabase {
                 .withConstraints(alterScript)
                 .connect();
         System.out.println("Printing inserted database from Excel:");
-        db.printAllTablesAsText();
+        db.printAllTablesAsText(db.getDefaultSchemaName());
         return db;
     }
 
     public static void createExcelWorkbookFromDB(String name) throws IOException,
             SQLException, InvalidFormatException {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb(name, dbDir).connect();
-        ExcelUtil.runWriteDBAsExcelWorkbook(db);
+        List<String> allTableNames = db.getAllTableNames();
+        ExcelUtil.runWriteDBAsExcelWorkbook(db, allTableNames);
     }
 
     public static void duplicateDatabaseTest(String name) throws InvalidFormatException, SQLException, IOException {
         // get the database
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb(name, dbDir).connect();
-        String dupName = db.getName() + "DUPLICATE";
+        String dupName = db.getLabel() + "DUPLICATE";
 
         Path directory = Files.createDirectory(dbDir.resolve("Clones"));
         db.copyDb(dupName, directory);

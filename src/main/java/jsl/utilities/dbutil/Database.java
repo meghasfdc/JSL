@@ -17,7 +17,6 @@
 package jsl.utilities.dbutil;
 
 import org.jooq.*;
-import org.jooq.conf.Settings;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
@@ -25,12 +24,12 @@ import javax.sql.DataSource;
 import java.util.Objects;
 
 /**
- *  A concrete implementation of the DatabaseIfc interface.
- *
+ * A concrete implementation of the DatabaseIfc interface.
+ * <p>
  * Many databases define the terms database, user, schema in a variety of ways. This abstraction
  * defines this concept as the userSchema.  It is the name of the organizational construct for
  * which the user defined database objects are contained. These are not the system abstractions.
- * The database name provided to the construct is for labeling and may or may not have any relationship
+ * The database label provided to the construct is for labeling and may or may not have any relationship
  * to the actual file name or database name of the database. The supplied DataSource has all
  * the information that it needs to access the database.
  */
@@ -40,49 +39,40 @@ public class Database implements DatabaseIfc {
         System.setProperty("org.jooq.no-logo", "true");
     }
 
-    private final String myName;
-    private final Schema myUserSchema;
+    private final String myLabel;
     private final DataSource myDataSource;
     private final SQLDialect mySQLDialect;
+    private String myDefaultSchemaName;
     private DSLContext myDSLContext;
 
     /**
-     * @param dbName         a string representing the name of the database must not be null. This name
-     *                       may or may not have any relation to the actual name of the database. This is
-     *                       used for labeling purposes.
-     * @param userSchemaName a string representing the name of the user or schema that holds
-     *                       the user defined tables with the database. Must not be null
-     * @param dataSource     the DataSource backing the database, must not be null
-     * @param dialect        the SLQ dialect for this type of database, must not null, it obviously must
-     *                       be consistent with the database referenced by the connection
+     * @param dbLabel           a string representing a label for the database must not be null. This label
+     *                          may or may not have any relation to the actual name of the database. This is
+     *                          used for labeling purposes.
+     * @param dataSource        the DataSource backing the database, must not be null
+     * @param dialect           the SLQ dialect for this type of database, must not null, it obviously must
+     *                          be consistent with the database referenced by the connection
      */
-    public Database(String dbName, String userSchemaName, DataSource dataSource, SQLDialect dialect) {
-        Objects.requireNonNull(dbName, "The database name was null");
-        Objects.requireNonNull(userSchemaName, "The database user/schema was null");
+    public Database(String dbLabel, DataSource dataSource, SQLDialect dialect) {
+        Objects.requireNonNull(dbLabel, "The database name was null");
         Objects.requireNonNull(dataSource, "The database source was null");
         Objects.requireNonNull(dialect, "The database dialect was null");
-        myName = dbName;
+        myLabel = dbLabel;
         myDataSource = dataSource;
         mySQLDialect = dialect;
         myDSLContext = DSL.using(dataSource, dialect);
-        myUserSchema = getSchema(userSchemaName);
-        if (myUserSchema == null) {
-            DbLogger.error("The supplied userSchema name {} was not in the database.", userSchemaName);
-            throw new DataAccessException("The supplied userSchema name was not in the database: " + userSchemaName);
-        }
         setJooQDefaultExecutionLoggingOption(false);
     }
 
     @Override
-    public final DataSource getDataSource(){
+    public final DataSource getDataSource() {
         return myDataSource;
     }
 
     @Override
-    public final String getName() {
-        return myName;
+    public final String getLabel() {
+        return myLabel;
     }
-
 
     @Override
     public final SQLDialect getSQLDialect() {
@@ -90,13 +80,25 @@ public class Database implements DatabaseIfc {
     }
 
     @Override
-    public Schema getUserSchema() {
-        return myUserSchema;
-    }
-
-    @Override
     public DSLContext getDSLContext() {
         return myDSLContext;
     }
 
+    @Override
+    public String getDefaultSchemaName() {
+        return myDefaultSchemaName;
+    }
+
+    @Override
+    public void setDefaultSchemaName(String defaultSchemaName) {
+        myDefaultSchemaName = defaultSchemaName;
+        if (defaultSchemaName != null) {
+            if (!containsSchema(defaultSchemaName)) {
+                DbLogger.warn("The supplied default schema name {} was not in the database {}.",
+                        defaultSchemaName, myLabel);
+            }
+        } else {
+            DbLogger.warn("The default schema name was set to null for database {}.", myLabel);
+        }
+    }
 }

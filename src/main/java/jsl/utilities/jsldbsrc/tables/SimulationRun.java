@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import jsl.utilities.jsldbsrc.App;
+import jsl.utilities.jsldbsrc.JslDb;
 import jsl.utilities.jsldbsrc.Keys;
 import jsl.utilities.jsldbsrc.tables.records.SimulationRunRecord;
 
@@ -38,10 +38,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SimulationRun extends TableImpl<SimulationRunRecord> {
 
-    private static final long serialVersionUID = 1919860248;
+    private static final long serialVersionUID = 1503815618;
 
     /**
-     * The reference instance of <code>APP.SIMULATION_RUN</code>
+     * The reference instance of <code>JSL_DB.SIMULATION_RUN</code>
      */
     public static final SimulationRun SIMULATION_RUN = new SimulationRun();
 
@@ -54,106 +54,106 @@ public class SimulationRun extends TableImpl<SimulationRunRecord> {
     }
 
     /**
-     * The column <code>APP.SIMULATION_RUN.ID</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.ID</code>.
      */
     public final TableField<SimulationRunRecord, Integer> ID = createField("ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.SIM_NAME</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.SIM_NAME</code>.
      */
     public final TableField<SimulationRunRecord, String> SIM_NAME = createField("SIM_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.MODEL_NAME</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.MODEL_NAME</code>.
      */
     public final TableField<SimulationRunRecord, String> MODEL_NAME = createField("MODEL_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.EXP_NAME</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.EXP_NAME</code>.
      */
     public final TableField<SimulationRunRecord, String> EXP_NAME = createField("EXP_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.EXP_START_TIME_STAMP</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.EXP_START_TIME_STAMP</code>.
      */
     public final TableField<SimulationRunRecord, Timestamp> EXP_START_TIME_STAMP = createField("EXP_START_TIME_STAMP", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.EXP_END_TIME_STAMP</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.EXP_END_TIME_STAMP</code>.
      */
     public final TableField<SimulationRunRecord, Timestamp> EXP_END_TIME_STAMP = createField("EXP_END_TIME_STAMP", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.NUM_REPS</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.NUM_REPS</code>.
      */
     public final TableField<SimulationRunRecord, Integer> NUM_REPS = createField("NUM_REPS", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.LAST_REP</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.LAST_REP</code>.
      */
     public final TableField<SimulationRunRecord, Integer> LAST_REP = createField("LAST_REP", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.LENGTH_OF_REP</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.LENGTH_OF_REP</code>.
      */
     public final TableField<SimulationRunRecord, Double> LENGTH_OF_REP = createField("LENGTH_OF_REP", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.LENGTH_OF_WARM_UP</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.LENGTH_OF_WARM_UP</code>.
      */
     public final TableField<SimulationRunRecord, Double> LENGTH_OF_WARM_UP = createField("LENGTH_OF_WARM_UP", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.HAS_MORE_REPS</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.HAS_MORE_REPS</code>.
      */
     public final TableField<SimulationRunRecord, Boolean> HAS_MORE_REPS = createField("HAS_MORE_REPS", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.REP_ALLOWED_EXEC_TIME</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.REP_ALLOWED_EXEC_TIME</code>.
      */
     public final TableField<SimulationRunRecord, Long> REP_ALLOWED_EXEC_TIME = createField("REP_ALLOWED_EXEC_TIME", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.REP_INIT_OPTION</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.REP_INIT_OPTION</code>.
      */
     public final TableField<SimulationRunRecord, Boolean> REP_INIT_OPTION = createField("REP_INIT_OPTION", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.RESET_START_STREAM_OPTION</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.RESET_START_STREAM_OPTION</code>.
      */
     public final TableField<SimulationRunRecord, Boolean> RESET_START_STREAM_OPTION = createField("RESET_START_STREAM_OPTION", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.ANTITHETIC_OPTION</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.ANTITHETIC_OPTION</code>.
      */
     public final TableField<SimulationRunRecord, Boolean> ANTITHETIC_OPTION = createField("ANTITHETIC_OPTION", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.ADV_NEXT_SUB_STREAM_OPTION</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.ADV_NEXT_SUB_STREAM_OPTION</code>.
      */
     public final TableField<SimulationRunRecord, Boolean> ADV_NEXT_SUB_STREAM_OPTION = createField("ADV_NEXT_SUB_STREAM_OPTION", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>APP.SIMULATION_RUN.NUM_STREAM_ADVANCES</code>.
+     * The column <code>JSL_DB.SIMULATION_RUN.NUM_STREAM_ADVANCES</code>.
      */
     public final TableField<SimulationRunRecord, Integer> NUM_STREAM_ADVANCES = createField("NUM_STREAM_ADVANCES", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * Create a <code>APP.SIMULATION_RUN</code> table reference
+     * Create a <code>JSL_DB.SIMULATION_RUN</code> table reference
      */
     public SimulationRun() {
         this(DSL.name("SIMULATION_RUN"), null);
     }
 
     /**
-     * Create an aliased <code>APP.SIMULATION_RUN</code> table reference
+     * Create an aliased <code>JSL_DB.SIMULATION_RUN</code> table reference
      */
     public SimulationRun(String alias) {
         this(DSL.name(alias), SIMULATION_RUN);
     }
 
     /**
-     * Create an aliased <code>APP.SIMULATION_RUN</code> table reference
+     * Create an aliased <code>JSL_DB.SIMULATION_RUN</code> table reference
      */
     public SimulationRun(Name alias) {
         this(alias, SIMULATION_RUN);
@@ -172,7 +172,7 @@ public class SimulationRun extends TableImpl<SimulationRunRecord> {
      */
     @Override
     public Schema getSchema() {
-        return App.APP;
+        return JslDb.JSL_DB;
     }
 
     /**
@@ -188,7 +188,7 @@ public class SimulationRun extends TableImpl<SimulationRunRecord> {
      */
     @Override
     public UniqueKey<SimulationRunRecord> getPrimaryKey() {
-        return Keys.SQL180614115403790;
+        return Keys.SQL180629175107020;
     }
 
     /**
@@ -196,7 +196,7 @@ public class SimulationRun extends TableImpl<SimulationRunRecord> {
      */
     @Override
     public List<UniqueKey<SimulationRunRecord>> getKeys() {
-        return Arrays.<UniqueKey<SimulationRunRecord>>asList(Keys.SQL180614115403790);
+        return Arrays.<UniqueKey<SimulationRunRecord>>asList(Keys.SQL180629175107020);
     }
 
     /**

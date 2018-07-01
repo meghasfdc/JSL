@@ -50,10 +50,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author rossetti
@@ -68,9 +65,10 @@ public class ExcelUtil {
      * name as the database
      *
      * @param db the database to read data from
+     * @param tableNames the list of names of tables in the database to write to Excel, must not be null
      */
-    public static void runWriteDBAsExcelWorkbook(DatabaseIfc db) {
-        runWriteDBAsExcelWorkbook(db, null);
+    public static void runWriteDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames) {
+        runWriteDBAsExcelWorkbook(db, tableNames);
     }
 
     /**
@@ -78,11 +76,12 @@ public class ExcelUtil {
      * every table, squelching all exceptions
      *
      * @param db             the database to read data from
+     * @param tableNames the list of names of tables in the database to write to Excel, must not be null
      * @param pathToWorkbook the name of the workbook that is to be made
      */
-    public static void runWriteDBAsExcelWorkbook(DatabaseIfc db, Path pathToWorkbook) {
+    public static void runWriteDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames, Path pathToWorkbook) {
         try {
-            writeDBAsExcelWorkbook(db, pathToWorkbook);
+            writeDBAsExcelWorkbook(db, tableNames, pathToWorkbook);
         } catch (FileNotFoundException ex) {
             logger.error("FileNotFoundException {} ", pathToWorkbook, ex);
             ex.printStackTrace();
@@ -132,11 +131,12 @@ public class ExcelUtil {
      * database in the current working directory.
      *
      * @param db the database to read data from
+     * @param tableNames the list of names of tables in the database to write to Excel, must not be null
      * @throws IOException           io exception
      */
-    public static void writeDBAsExcelWorkbook(DatabaseIfc db)
+    public static void writeDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames)
             throws IOException {
-        writeDBAsExcelWorkbook(db, null);
+        writeDBAsExcelWorkbook(db, tableNames);
     }
 
     /**
@@ -145,19 +145,37 @@ public class ExcelUtil {
      * the current working directory. Each sheet of the workbook will have
      * the field names as the first row in the sheet.
      *
-     * @param db             the database to read data from
+     * @param db             the database to read data from, must not be null
+     * @param tableNames the list of names of tables in the database to write to Excel, must not be null
      * @param pathToWorkbook the name of the workbook that was made
      * @throws IOException           io exception
      */
-    public static void writeDBAsExcelWorkbook(DatabaseIfc db, Path pathToWorkbook)
+    public static void writeDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames, Path pathToWorkbook)
             throws IOException {
+        Objects.requireNonNull(db, "The supplied DatabaseIfc reference was null");
+        Objects.requireNonNull(tableNames, "The supplied list of table names was null");
+        if (tableNames.isEmpty()){
+            logger.warn("The supplied list of table names was empty");
+            return;
+        }
+        List<String> tables = new ArrayList<>();
+        for(String tableName: tableNames){
+            if (db.containsTable(tableName)){
+                tables.add(tableName);
+            } else {
+                logger.warn("The supplied table name {} to write to Excel is not in database {}", tableName, db.getLabel());
+            }
+        }
+        if (tables.isEmpty()){
+            logger.warn("The supplied list of table names had no corresponding tables in database {}", db.getLabel());
+            return;
+        }
         //  if null make the name of the workbook the same as the database name
         if (pathToWorkbook == null) {
             Path currentDir = Paths.get(".");
-            pathToWorkbook = currentDir.resolve(db.getName() + ".xlsx");
+            pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
         }
-        logger.debug("Writing database {} to Excel workbook {}.", db.getName(), pathToWorkbook);
-        List<String> tables = db.getTableNames();
+        logger.debug("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
         XSSFWorkbook workbook = new XSSFWorkbook();
         for (String tableName : tables) {
             Sheet sheet = workbook.createSheet(tableName);
@@ -209,11 +227,11 @@ public class ExcelUtil {
         File file = pathToWorkbook.toFile();
         OPCPackage pkg = OPCPackage.open(file);
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
-        logger.debug("Writing workbook {} to database {}",  pathToWorkbook, db.getName());
+        logger.debug("Writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
         writeWorkbookToDatabase(wb, skipFirstRow, db, tableNames);
         //wb.close();
         pkg.close();
-        logger.debug("Completed writing workbook {} to database {}",  pathToWorkbook, db.getName());
+        logger.debug("Completed writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
     }
 
     /**
@@ -290,11 +308,15 @@ public class ExcelUtil {
         writeSheetToTable(sheet, true, tableName, db);
     }
 
-    /**
-     * @param sheet        the sheet to get the data from
+    /** This method assumes that the tableName exists in the database or that a table with the same
+     * name as the sheet exists within the database and that the sheet has the appropriate structure
+     * to be placed within the table in the database. If the table does not exist in the database
+     * the method returns and logs a warning.
+     *
+     * @param sheet        the sheet to get the data from, must null be null
      * @param skipFirstRow true means skip the first row of the Excel sheet
-     * @param tableName    the name of the table to write to
-     * @param db           the database containing the table
+     * @param tableName    the name of the table to write to, can be null, if so the sheet name is used
+     * @param db           the database containing the table, must not be null
      * @throws IOException an io exception
      */
     public static void writeSheetToTable(Sheet sheet, boolean skipFirstRow, String tableName, DatabaseIfc db) throws IOException {
@@ -307,16 +329,18 @@ public class ExcelUtil {
         if (tableName == null) {
             tableName = sheet.getSheetName();
         }
-        if (!db.tableExists(tableName)) {
-            throw new IllegalArgumentException("The database does not contain a table named: " + tableName);
+        if (!db.containsTable(tableName)) {
+            logger.warn("Attempting to write sheet {} to database {}, the table {} does not exist",
+                    sheet.getSheetName(), db.getLabel(), tableName);
+            return;
         }
 
         final Table<? extends Record> table = db.getTable(tableName);
         final Field<?>[] fields = table.fields();
-        logger.debug("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getName());
+        logger.debug("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getLabel());
         final List<Object[]> lists = readSheetAsListOfObjects(sheet, fields, skipFirstRow);
         db.getDSLContext().loadInto(table).batchAll().loadArrays(lists.iterator()).fields(fields).execute();
-        logger.debug("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getName());
+        logger.debug("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getLabel());
     }
 
     /**
@@ -456,7 +480,8 @@ public class ExcelUtil {
         if (sheet == null) {
             throw new IllegalArgumentException("The sheet was null");
         }
-        if (!db.tableExists(tableName)) {
+        if (!db.containsTable(tableName)) {
+            logger.warn("The supplied table name {} is not in database {}", tableName, db.getLabel());
             return;
         }
         Result<Record> records = db.selectAll(tableName);

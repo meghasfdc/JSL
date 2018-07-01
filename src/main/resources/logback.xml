@@ -29,7 +29,7 @@
             <!-- daily rollover -->
             <fileNamePattern>logs/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
 
-            <!-- keep 30 days' worth of history capped at 30MB total size -->
+            <!-- keep 2 days' worth of history capped at 30MB total size -->
             <maxHistory>2</maxHistory>
             <totalSizeCap>30MB</totalSizeCap>
 
@@ -39,6 +39,48 @@
             <pattern>%d %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <appender name="JOOQFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/jooqLog.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/jooqLog.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 2 days' worth of history capped at 30MB total size -->
+            <maxHistory>2</maxHistory>
+            <totalSizeCap>30MB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JSLDB" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/jslDbLog.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/jslDbLog.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 2 days' worth of history capped at 30MB total size -->
+            <maxHistory>2</maxHistory>
+            <totalSizeCap>30MB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="jsl.utilities.dbutil.DatabaseIfc" additivity="false">
+        <appender-ref ref="JSLDB" />
+    </logger>
+
+    <logger name="org.jooq.tools.LoggerListener" additivity="false">
+        <appender-ref ref="JOOQFILE" />
+    </logger>
 
     <root level="DEBUG">
         <!--<appender-ref ref="consoleAppender" />-->

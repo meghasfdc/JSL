@@ -15,7 +15,7 @@ import jsl.utilities.jsldbsrc.tables.WithinRepStat;
 
 
 /**
- * Convenience access to all tables in APP
+ * Convenience access to all tables in JSL_DB
  */
 @Generated(
     value = {
@@ -28,32 +28,32 @@ import jsl.utilities.jsldbsrc.tables.WithinRepStat;
 public class Tables {
 
     /**
-     * The table <code>APP.ACROSS_REP_STAT</code>.
+     * The table <code>JSL_DB.ACROSS_REP_STAT</code>.
      */
     public static final AcrossRepStat ACROSS_REP_STAT = jsl.utilities.jsldbsrc.tables.AcrossRepStat.ACROSS_REP_STAT;
 
     /**
-     * The table <code>APP.BATCH_STAT</code>.
+     * The table <code>JSL_DB.BATCH_STAT</code>.
      */
     public static final BatchStat BATCH_STAT = jsl.utilities.jsldbsrc.tables.BatchStat.BATCH_STAT;
 
     /**
-     * The table <code>APP.MODEL_ELEMENT</code>.
+     * The table <code>JSL_DB.MODEL_ELEMENT</code>.
      */
     public static final ModelElement MODEL_ELEMENT = jsl.utilities.jsldbsrc.tables.ModelElement.MODEL_ELEMENT;
 
     /**
-     * The table <code>APP.SIMULATION_RUN</code>.
+     * The table <code>JSL_DB.SIMULATION_RUN</code>.
      */
     public static final SimulationRun SIMULATION_RUN = jsl.utilities.jsldbsrc.tables.SimulationRun.SIMULATION_RUN;
 
     /**
-     * The table <code>APP.WITHIN_REP_COUNTER_STAT</code>.
+     * The table <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code>.
      */
     public static final WithinRepCounterStat WITHIN_REP_COUNTER_STAT = jsl.utilities.jsldbsrc.tables.WithinRepCounterStat.WITHIN_REP_COUNTER_STAT;
 
     /**
-     * The table <code>APP.WITHIN_REP_STAT</code>.
+     * The table <code>JSL_DB.WITHIN_REP_STAT</code>.
      */
     public static final WithinRepStat WITHIN_REP_STAT = jsl.utilities.jsldbsrc.tables.WithinRepStat.WITHIN_REP_STAT;
 }

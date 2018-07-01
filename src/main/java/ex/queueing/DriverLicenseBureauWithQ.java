@@ -28,6 +28,7 @@ import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.observers.JSLDatabase;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.reporting.JSL;
@@ -275,5 +276,14 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         System.out.println("Simulation completed.");
 
         r.printAcrossReplicationSummaryStatistics();
+
+        JSLDatabase jslDatabase = sim.getJSLDatabase();
+        System.out.println("Printing across replication records");
+        jslDatabase.getAcrossRepStatRecords().format(System.out);
+        System.out.println();
+        System.out.println(jslDatabase.getDatabase().getDefaultSchemaName());
+//        jslDatabase.clearAllData();
+//        System.out.println("Printing across replication records");
+//        jslDatabase.getAcrossRepStatRecords().format(System.out);
     }
 }

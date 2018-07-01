@@ -30,241 +30,241 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SimulationRunRecord extends UpdatableRecordImpl<SimulationRunRecord> implements Record17<Integer, String, String, String, Timestamp, Timestamp, Integer, Integer, Double, Double, Boolean, Long, Boolean, Boolean, Boolean, Boolean, Integer> {
 
-    private static final long serialVersionUID = -618391077;
+    private static final long serialVersionUID = 2050666897;
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.ID</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.ID</code>.
      */
     public void setId(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.ID</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.ID</code>.
      */
     public Integer getId() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.SIM_NAME</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.SIM_NAME</code>.
      */
     public void setSimName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.SIM_NAME</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.SIM_NAME</code>.
      */
     public String getSimName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.MODEL_NAME</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.MODEL_NAME</code>.
      */
     public void setModelName(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.MODEL_NAME</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.MODEL_NAME</code>.
      */
     public String getModelName() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.EXP_NAME</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.EXP_NAME</code>.
      */
     public void setExpName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.EXP_NAME</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.EXP_NAME</code>.
      */
     public String getExpName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.EXP_START_TIME_STAMP</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.EXP_START_TIME_STAMP</code>.
      */
     public void setExpStartTimeStamp(Timestamp value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.EXP_START_TIME_STAMP</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.EXP_START_TIME_STAMP</code>.
      */
     public Timestamp getExpStartTimeStamp() {
         return (Timestamp) get(4);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.EXP_END_TIME_STAMP</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.EXP_END_TIME_STAMP</code>.
      */
     public void setExpEndTimeStamp(Timestamp value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.EXP_END_TIME_STAMP</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.EXP_END_TIME_STAMP</code>.
      */
     public Timestamp getExpEndTimeStamp() {
         return (Timestamp) get(5);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.NUM_REPS</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.NUM_REPS</code>.
      */
     public void setNumReps(Integer value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.NUM_REPS</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.NUM_REPS</code>.
      */
     public Integer getNumReps() {
         return (Integer) get(6);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.LAST_REP</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.LAST_REP</code>.
      */
     public void setLastRep(Integer value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.LAST_REP</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.LAST_REP</code>.
      */
     public Integer getLastRep() {
         return (Integer) get(7);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.LENGTH_OF_REP</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.LENGTH_OF_REP</code>.
      */
     public void setLengthOfRep(Double value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.LENGTH_OF_REP</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.LENGTH_OF_REP</code>.
      */
     public Double getLengthOfRep() {
         return (Double) get(8);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.LENGTH_OF_WARM_UP</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.LENGTH_OF_WARM_UP</code>.
      */
     public void setLengthOfWarmUp(Double value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.LENGTH_OF_WARM_UP</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.LENGTH_OF_WARM_UP</code>.
      */
     public Double getLengthOfWarmUp() {
         return (Double) get(9);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.HAS_MORE_REPS</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.HAS_MORE_REPS</code>.
      */
     public void setHasMoreReps(Boolean value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.HAS_MORE_REPS</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.HAS_MORE_REPS</code>.
      */
     public Boolean getHasMoreReps() {
         return (Boolean) get(10);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.REP_ALLOWED_EXEC_TIME</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.REP_ALLOWED_EXEC_TIME</code>.
      */
     public void setRepAllowedExecTime(Long value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.REP_ALLOWED_EXEC_TIME</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.REP_ALLOWED_EXEC_TIME</code>.
      */
     public Long getRepAllowedExecTime() {
         return (Long) get(11);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.REP_INIT_OPTION</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.REP_INIT_OPTION</code>.
      */
     public void setRepInitOption(Boolean value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.REP_INIT_OPTION</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.REP_INIT_OPTION</code>.
      */
     public Boolean getRepInitOption() {
         return (Boolean) get(12);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.RESET_START_STREAM_OPTION</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.RESET_START_STREAM_OPTION</code>.
      */
     public void setResetStartStreamOption(Boolean value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.RESET_START_STREAM_OPTION</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.RESET_START_STREAM_OPTION</code>.
      */
     public Boolean getResetStartStreamOption() {
         return (Boolean) get(13);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.ANTITHETIC_OPTION</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.ANTITHETIC_OPTION</code>.
      */
     public void setAntitheticOption(Boolean value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.ANTITHETIC_OPTION</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.ANTITHETIC_OPTION</code>.
      */
     public Boolean getAntitheticOption() {
         return (Boolean) get(14);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.ADV_NEXT_SUB_STREAM_OPTION</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.ADV_NEXT_SUB_STREAM_OPTION</code>.
      */
     public void setAdvNextSubStreamOption(Boolean value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.ADV_NEXT_SUB_STREAM_OPTION</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.ADV_NEXT_SUB_STREAM_OPTION</code>.
      */
     public Boolean getAdvNextSubStreamOption() {
         return (Boolean) get(15);
     }
 
     /**
-     * Setter for <code>APP.SIMULATION_RUN.NUM_STREAM_ADVANCES</code>.
+     * Setter for <code>JSL_DB.SIMULATION_RUN.NUM_STREAM_ADVANCES</code>.
      */
     public void setNumStreamAdvances(Integer value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>APP.SIMULATION_RUN.NUM_STREAM_ADVANCES</code>.
+     * Getter for <code>JSL_DB.SIMULATION_RUN.NUM_STREAM_ADVANCES</code>.
      */
     public Integer getNumStreamAdvances() {
         return (Integer) get(16);

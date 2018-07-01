@@ -25,6 +25,8 @@ import jsl.modeling.Simulation;
 import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.dbutil.DataSourceFactory;
+import jsl.utilities.dbutil.Database;
 import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
 import jsl.utilities.jsldbsrc.tables.records.*;
@@ -36,8 +38,10 @@ import jsl.utilities.statistic.WeightedStatisticIfc;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.jooq.*;
+import org.jooq.impl.SQLDataType;
 import tech.tablesaw.api.Table;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,37 +85,17 @@ public class JSLDatabase {
         }
     }
 
-    //protected final EmbeddedDerbyDatabase myDb;
-    protected final DatabaseIfc myDb;
-
+    protected DatabaseIfc myDb;
     protected SimulationRunRecord myCurrentSimRunRecord;
     private String tblName;
 
-    protected JSLDatabase(EmbeddedDerbyDatabase database) {
+    protected JSLDatabase(DatabaseIfc database) {
         if (database == null) {
             throw new IllegalArgumentException("The database cannot be null");
         }
         myDb = database;
-        myCurrentSimRunRecord = null;
-    }
 
-    /**
-     * Makes an empty JSLDb, if the database already exists it is written over
-     *
-     * @param dbName the name of the JSLDb instance, must not be null
-     * @return the JSLDb
-     */
-    public static JSLDatabase makeEmptyJSLDbSquelchExceptions(String dbName) {
-        try {
-            return makeEmptyJSLDb(dbName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        }
-        return null;
+        myCurrentSimRunRecord = null;
     }
 
     /**
@@ -125,11 +109,16 @@ public class JSLDatabase {
      */
     public static JSLDatabase makeEmptyJSLDb(String dbName) throws IOException,
             SQLException, InvalidFormatException {
-        FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
+        Objects.requireNonNull(dbName, "The database name must not be null");
+        Path pathToDb = dbDir.resolve(dbName);
+        FileUtils.deleteDirectory(pathToDb.toFile());
         Path createScript = dbScriptsDir.resolve("JSLDb.sql");
+//        DataSource ds = DataSourceFactory.getEmbeddedDerbyDataSource(pathToDb, true);
+//        Database db = new Database("JSL_DB", ds, SQLDialect.DERBY);
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(dbName, dbDir)
                 .withCreationScript(createScript)
                 .connect();
+        db.setDefaultSchemaName("JSL_DB");
         return new JSLDatabase(db);
     }
 
@@ -144,26 +133,8 @@ public class JSLDatabase {
      */
     public static JSLDatabase connect(String dbName) throws InvalidFormatException, SQLException, IOException {
         EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.connectDb(dbName, dbDir).connect();
+        db.setDefaultSchemaName("JSL_DB");
         return new JSLDatabase(db);
-    }
-
-    /**
-     * Connects to an already existing JSLDb with the given name
-     *
-     * @param dbName the name of the JSLDb instance
-     * @return the JSLDb
-     */
-    public static JSLDatabase connectSquelchExceptions(String dbName) {
-        try {
-            return connect(dbName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**
@@ -183,7 +154,7 @@ public class JSLDatabase {
         long milliseconds = ZonedDateTime.now().toInstant().toEpochMilli();
         record.setExpStartTimeStamp(new Timestamp(milliseconds));
         record.setNumReps(sim.getNumberOfReplications());
-        if (!Double.isNaN(sim.getLengthOfReplication()) && !Double.isInfinite(sim.getLengthOfReplication())){
+        if (!Double.isNaN(sim.getLengthOfReplication()) && !Double.isInfinite(sim.getLengthOfReplication())) {
             record.setLengthOfRep(sim.getLengthOfReplication());
         }
         record.setLengthOfWarmUp(sim.getLengthOfWarmUp());
@@ -198,13 +169,6 @@ public class JSLDatabase {
     }
 
     /**
-     * @return the current simulation run record or null
-     */
-    public Optional<SimulationRunRecord> getCurrentSimRunRecord() {
-        return Optional.ofNullable(myCurrentSimRunRecord);
-    }
-
-    /**
      * Finalizes the current simulation record after the run is completed
      *
      * @param sim the current simulation
@@ -215,14 +179,6 @@ public class JSLDatabase {
         long milliseconds = ZonedDateTime.now().toInstant().toEpochMilli();
         myCurrentSimRunRecord.setExpEndTimeStamp(new Timestamp(milliseconds));
         myCurrentSimRunRecord.store();
-    }
-
-    /**
-     * @return the current simulation run record id, the last inserted simulation run
-     */
-    public Optional<Integer> getCurrentSimRunRecordId() {
-        Integer id = myCurrentSimRunRecord.getId();
-        return Optional.ofNullable(id);
     }
 
     /**
@@ -297,31 +253,31 @@ public class JSLDatabase {
         r.setRepNum(rv.getExperiment().getCurrentReplicationNumber());
         WeightedStatisticIfc s = rv.getWithinReplicationStatistic();
         r.setStatName(s.getName());
-        if (!Double.isNaN(s.getCount()) && !Double.isInfinite(s.getCount())){
+        if (!Double.isNaN(s.getCount()) && !Double.isInfinite(s.getCount())) {
             r.setStatCount(s.getCount());
         }
-        if (!Double.isNaN(s.getAverage()) && !Double.isInfinite(s.getAverage())){
+        if (!Double.isNaN(s.getAverage()) && !Double.isInfinite(s.getAverage())) {
             r.setAverage(s.getAverage());
         }
-        if (!Double.isNaN(s.getMin()) && !Double.isInfinite(s.getMin())){
+        if (!Double.isNaN(s.getMin()) && !Double.isInfinite(s.getMin())) {
             r.setMinimum(s.getMin());
         }
-        if (!Double.isNaN(s.getMax()) && !Double.isInfinite(s.getMax())){
+        if (!Double.isNaN(s.getMax()) && !Double.isInfinite(s.getMax())) {
             r.setMaximum(s.getMax());
         }
-        if (!Double.isNaN(s.getWeightedSum()) && !Double.isInfinite(s.getWeightedSum())){
+        if (!Double.isNaN(s.getWeightedSum()) && !Double.isInfinite(s.getWeightedSum())) {
             r.setWeightedSum(s.getWeightedSum());
         }
-        if (!Double.isNaN(s.getSumOfWeights()) && !Double.isInfinite(s.getSumOfWeights())){
+        if (!Double.isNaN(s.getSumOfWeights()) && !Double.isInfinite(s.getSumOfWeights())) {
             r.setSumOfWeights(s.getSumOfWeights());
         }
-        if (!Double.isNaN(s.getWeightedSumOfSquares()) && !Double.isInfinite(s.getWeightedSumOfSquares())){
+        if (!Double.isNaN(s.getWeightedSumOfSquares()) && !Double.isInfinite(s.getWeightedSumOfSquares())) {
             r.setWeightedSsq(s.getWeightedSumOfSquares());
         }
-        if (!Double.isNaN(s.getLastValue()) && !Double.isInfinite(s.getLastValue())){
+        if (!Double.isNaN(s.getLastValue()) && !Double.isInfinite(s.getLastValue())) {
             r.setLastValue(s.getLastValue());
         }
-        if (!Double.isNaN(s.getLastWeight()) && !Double.isInfinite(s.getLastWeight())){
+        if (!Double.isNaN(s.getLastWeight()) && !Double.isInfinite(s.getLastWeight())) {
             r.setLastWeight(s.getLastWeight());
         }
         return r;
@@ -362,7 +318,7 @@ public class JSLDatabase {
         r.setSimRunIdFk(simId);
         r.setRepNum(counter.getExperiment().getCurrentReplicationNumber());
         r.setStatName(counter.getName());
-        if (!Double.isNaN(counter.getValue()) && !Double.isInfinite(counter.getValue())){
+        if (!Double.isNaN(counter.getValue()) && !Double.isInfinite(counter.getValue())) {
             r.setLastValue(counter.getValue());
         }
         return r;
@@ -412,8 +368,8 @@ public class JSLDatabase {
      * Creates an AcrossRepStatRecord into the database
      *
      * @param modelElementName the model element name
-     * @param simId           the id of the simulation run
-     * @param s               that statistics to insert
+     * @param simId            the id of the simulation run
+     * @param s                that statistics to insert
      * @return the created record
      */
     protected AcrossRepStatRecord newAcrossRepStatRecord(String modelElementName, Integer simId,
@@ -432,64 +388,64 @@ public class JSLDatabase {
         r.setSimRunIdFk(simId);
         r.setStatName(s.getName());
 
-        if (!Double.isNaN(s.getCount()) && !Double.isInfinite(s.getCount())){
+        if (!Double.isNaN(s.getCount()) && !Double.isInfinite(s.getCount())) {
             r.setStatCount(s.getCount());
         }
-        if (!Double.isNaN(s.getAverage()) && !Double.isInfinite(s.getAverage())){
+        if (!Double.isNaN(s.getAverage()) && !Double.isInfinite(s.getAverage())) {
             r.setAverage(s.getAverage());
         }
-        if (!Double.isNaN(s.getStandardDeviation()) && !Double.isInfinite(s.getStandardDeviation())){
+        if (!Double.isNaN(s.getStandardDeviation()) && !Double.isInfinite(s.getStandardDeviation())) {
             r.setStdDev(s.getStandardDeviation());
         }
-        if (!Double.isNaN(s.getStandardError()) && !Double.isInfinite(s.getStandardError())){
+        if (!Double.isNaN(s.getStandardError()) && !Double.isInfinite(s.getStandardError())) {
             r.setStdErr(s.getStandardError());
         }
-        if (!Double.isNaN(s.getHalfWidth()) && !Double.isInfinite(s.getHalfWidth())){
+        if (!Double.isNaN(s.getHalfWidth()) && !Double.isInfinite(s.getHalfWidth())) {
             r.setHalfWidth(s.getHalfWidth());
         }
-        if (!Double.isNaN(s.getConfidenceLevel()) && !Double.isInfinite(s.getConfidenceLevel())){
+        if (!Double.isNaN(s.getConfidenceLevel()) && !Double.isInfinite(s.getConfidenceLevel())) {
             r.setConfLevel(s.getConfidenceLevel());
         }
-        if (!Double.isNaN(s.getMin()) && !Double.isInfinite(s.getMin())){
+        if (!Double.isNaN(s.getMin()) && !Double.isInfinite(s.getMin())) {
             r.setMinimum(s.getMin());
         }
-        if (!Double.isNaN(s.getMax()) && !Double.isInfinite(s.getMax())){
+        if (!Double.isNaN(s.getMax()) && !Double.isInfinite(s.getMax())) {
             r.setMaximum(s.getMax());
         }
-        if (!Double.isNaN(s.getWeightedSum()) && !Double.isInfinite(s.getWeightedSum())){
+        if (!Double.isNaN(s.getWeightedSum()) && !Double.isInfinite(s.getWeightedSum())) {
             r.setWeightedSum(s.getWeightedSum());
         }
-        if (!Double.isNaN(s.getSumOfWeights()) && !Double.isInfinite(s.getSumOfWeights())){
+        if (!Double.isNaN(s.getSumOfWeights()) && !Double.isInfinite(s.getSumOfWeights())) {
             r.setSumOfWeights(s.getSumOfWeights());
         }
-        if (!Double.isNaN(s.getWeightedSumOfSquares()) && !Double.isInfinite(s.getWeightedSumOfSquares())){
+        if (!Double.isNaN(s.getWeightedSumOfSquares()) && !Double.isInfinite(s.getWeightedSumOfSquares())) {
             r.setWeightedSsq(s.getWeightedSumOfSquares());
         }
-        if (!Double.isNaN(s.getDeviationSumOfSquares()) && !Double.isInfinite(s.getDeviationSumOfSquares())){
+        if (!Double.isNaN(s.getDeviationSumOfSquares()) && !Double.isInfinite(s.getDeviationSumOfSquares())) {
             r.setDevSsq(s.getDeviationSumOfSquares());
         }
-        if (!Double.isNaN(s.getLastValue()) && !Double.isInfinite(s.getLastValue())){
+        if (!Double.isNaN(s.getLastValue()) && !Double.isInfinite(s.getLastValue())) {
             r.setLastValue(s.getLastValue());
         }
-        if (!Double.isNaN(s.getLastWeight()) && !Double.isInfinite(s.getLastWeight())){
+        if (!Double.isNaN(s.getLastWeight()) && !Double.isInfinite(s.getLastWeight())) {
             r.setLastWeight(s.getLastWeight());
         }
-        if (!Double.isNaN(s.getKurtosis()) && !Double.isInfinite(s.getKurtosis())){
+        if (!Double.isNaN(s.getKurtosis()) && !Double.isInfinite(s.getKurtosis())) {
             r.setKurtosis(s.getKurtosis());
         }
-        if (!Double.isNaN(s.getSkewness()) && !Double.isInfinite(s.getSkewness())){
+        if (!Double.isNaN(s.getSkewness()) && !Double.isInfinite(s.getSkewness())) {
             r.setSkewness(s.getSkewness());
         }
-        if (!Double.isNaN(s.getLag1Covariance()) && !Double.isInfinite(s.getLag1Covariance())){
+        if (!Double.isNaN(s.getLag1Covariance()) && !Double.isInfinite(s.getLag1Covariance())) {
             r.setLag1Cov(s.getLag1Covariance());
         }
-        if (!Double.isNaN(s.getLag1Correlation()) && !Double.isInfinite(s.getLag1Correlation())){
+        if (!Double.isNaN(s.getLag1Correlation()) && !Double.isInfinite(s.getLag1Correlation())) {
             r.setLag1Corr(s.getLag1Correlation());
         }
-        if (!Double.isNaN(s.getVonNeumannLag1TestStatistic()) && !Double.isInfinite(s.getVonNeumannLag1TestStatistic())){
+        if (!Double.isNaN(s.getVonNeumannLag1TestStatistic()) && !Double.isInfinite(s.getVonNeumannLag1TestStatistic())) {
             r.setVonNeumanLag1Stat(s.getVonNeumannLag1TestStatistic());
         }
-        if (!Double.isNaN(s.getNumberMissing()) && !Double.isInfinite(s.getNumberMissing())){
+        if (!Double.isNaN(s.getNumberMissing()) && !Double.isInfinite(s.getNumberMissing())) {
             r.setNumMissingObs(s.getNumberMissing());
         }
         return r;
@@ -500,16 +456,16 @@ public class JSLDatabase {
      *
      * @param bmap the map of ResponseVariables to insert for, must not be null
      */
-    protected void insertResponseVariableBatchStatistics(Map<ResponseVariable, BatchStatistic> bmap){
-        if (bmap == null){
+    protected void insertResponseVariableBatchStatistics(Map<ResponseVariable, BatchStatistic> bmap) {
+        if (bmap == null) {
             throw new IllegalArgumentException("The batch statistic map was null");
         }
         List<BatchStatRecord> records = new ArrayList<>();
-        for(Map.Entry<ResponseVariable, BatchStatistic> entry: bmap.entrySet()){
+        for (Map.Entry<ResponseVariable, BatchStatistic> entry : bmap.entrySet()) {
             ResponseVariable rv = entry.getKey();
             BatchStatistic bs = entry.getValue();
             BatchStatRecord batchStatRecord = newBatchStatRecord(rv, myCurrentSimRunRecord.getId(), bs);
-            if (batchStatRecord != null){
+            if (batchStatRecord != null) {
                 records.add(batchStatRecord);
             }
         }
@@ -521,16 +477,16 @@ public class JSLDatabase {
      *
      * @param bmap the map of ResponseVariables to insert for, must not be null
      */
-    protected void insertTimeWeightedBatchStatistics(Map<TimeWeighted, BatchStatistic> bmap){
-        if (bmap == null){
+    protected void insertTimeWeightedBatchStatistics(Map<TimeWeighted, BatchStatistic> bmap) {
+        if (bmap == null) {
             throw new IllegalArgumentException("The batch statistic map was null");
         }
         List<BatchStatRecord> records = new ArrayList<>();
-        for(Map.Entry<TimeWeighted, BatchStatistic> entry: bmap.entrySet()){
+        for (Map.Entry<TimeWeighted, BatchStatistic> entry : bmap.entrySet()) {
             TimeWeighted tw = entry.getKey();
             BatchStatistic bs = entry.getValue();
             BatchStatRecord batchStatRecord = newBatchStatRecord(tw, myCurrentSimRunRecord.getId(), bs);
-            if (batchStatRecord != null){
+            if (batchStatRecord != null) {
                 records.add(batchStatRecord);
             }
         }
@@ -540,12 +496,12 @@ public class JSLDatabase {
     /**
      * Creates an BatchStatRecord into the database
      *
-     * @param rv the response variable, must not be null
-     * @param simId           the id of the simulation run
-     * @param s               that statistics to insert
+     * @param rv    the response variable, must not be null
+     * @param simId the id of the simulation run
+     * @param s     that statistics to insert
      * @return the created record
      */
-    protected BatchStatRecord newBatchStatRecord(ResponseVariable rv, Integer simId, BatchStatistic s){
+    protected BatchStatRecord newBatchStatRecord(ResponseVariable rv, Integer simId, BatchStatistic s) {
         if (simId == null) {
             throw new IllegalArgumentException("Ther simulation id was null");
         }
@@ -561,95 +517,129 @@ public class JSLDatabase {
         r.setStatName(s.getName());
         r.setRepNum(rv.getExperiment().getCurrentReplicationNumber());
 
-        if (!Double.isNaN(s.getCount()) && !Double.isInfinite(s.getCount())){
+        if (!Double.isNaN(s.getCount()) && !Double.isInfinite(s.getCount())) {
             r.setStatCount(s.getCount());
         }
-        if (!Double.isNaN(s.getAverage()) && !Double.isInfinite(s.getAverage())){
+        if (!Double.isNaN(s.getAverage()) && !Double.isInfinite(s.getAverage())) {
             r.setAverage(s.getAverage());
         }
-        if (!Double.isNaN(s.getStandardDeviation()) && !Double.isInfinite(s.getStandardDeviation())){
+        if (!Double.isNaN(s.getStandardDeviation()) && !Double.isInfinite(s.getStandardDeviation())) {
             r.setStdDev(s.getStandardDeviation());
         }
-        if (!Double.isNaN(s.getStandardError()) && !Double.isInfinite(s.getStandardError())){
+        if (!Double.isNaN(s.getStandardError()) && !Double.isInfinite(s.getStandardError())) {
             r.setStdErr(s.getStandardError());
         }
-        if (!Double.isNaN(s.getHalfWidth()) && !Double.isInfinite(s.getHalfWidth())){
+        if (!Double.isNaN(s.getHalfWidth()) && !Double.isInfinite(s.getHalfWidth())) {
             r.setHalfWidth(s.getHalfWidth());
         }
-        if (!Double.isNaN(s.getConfidenceLevel()) && !Double.isInfinite(s.getConfidenceLevel())){
+        if (!Double.isNaN(s.getConfidenceLevel()) && !Double.isInfinite(s.getConfidenceLevel())) {
             r.setConfLevel(s.getConfidenceLevel());
         }
-        if (!Double.isNaN(s.getMin()) && !Double.isInfinite(s.getMin())){
+        if (!Double.isNaN(s.getMin()) && !Double.isInfinite(s.getMin())) {
             r.setMinimum(s.getMin());
         }
-        if (!Double.isNaN(s.getMax()) && !Double.isInfinite(s.getMax())){
+        if (!Double.isNaN(s.getMax()) && !Double.isInfinite(s.getMax())) {
             r.setMaximum(s.getMax());
         }
-        if (!Double.isNaN(s.getWeightedSum()) && !Double.isInfinite(s.getWeightedSum())){
+        if (!Double.isNaN(s.getWeightedSum()) && !Double.isInfinite(s.getWeightedSum())) {
             r.setWeightedSum(s.getWeightedSum());
         }
-        if (!Double.isNaN(s.getSumOfWeights()) && !Double.isInfinite(s.getSumOfWeights())){
+        if (!Double.isNaN(s.getSumOfWeights()) && !Double.isInfinite(s.getSumOfWeights())) {
             r.setSumOfWeights(s.getSumOfWeights());
         }
-        if (!Double.isNaN(s.getWeightedSumOfSquares()) && !Double.isInfinite(s.getWeightedSumOfSquares())){
+        if (!Double.isNaN(s.getWeightedSumOfSquares()) && !Double.isInfinite(s.getWeightedSumOfSquares())) {
             r.setWeightedSsq(s.getWeightedSumOfSquares());
         }
-        if (!Double.isNaN(s.getDeviationSumOfSquares()) && !Double.isInfinite(s.getDeviationSumOfSquares())){
+        if (!Double.isNaN(s.getDeviationSumOfSquares()) && !Double.isInfinite(s.getDeviationSumOfSquares())) {
             r.setDevSsq(s.getDeviationSumOfSquares());
         }
-        if (!Double.isNaN(s.getLastValue()) && !Double.isInfinite(s.getLastValue())){
+        if (!Double.isNaN(s.getLastValue()) && !Double.isInfinite(s.getLastValue())) {
             r.setLastValue(s.getLastValue());
         }
-        if (!Double.isNaN(s.getLastWeight()) && !Double.isInfinite(s.getLastWeight())){
+        if (!Double.isNaN(s.getLastWeight()) && !Double.isInfinite(s.getLastWeight())) {
             r.setLastWeight(s.getLastWeight());
         }
-        if (!Double.isNaN(s.getKurtosis()) && !Double.isInfinite(s.getKurtosis())){
+        if (!Double.isNaN(s.getKurtosis()) && !Double.isInfinite(s.getKurtosis())) {
             r.setKurtosis(s.getKurtosis());
         }
-        if (!Double.isNaN(s.getSkewness()) && !Double.isInfinite(s.getSkewness())){
+        if (!Double.isNaN(s.getSkewness()) && !Double.isInfinite(s.getSkewness())) {
             r.setSkewness(s.getSkewness());
         }
-        if (!Double.isNaN(s.getLag1Covariance()) && !Double.isInfinite(s.getLag1Covariance())){
+        if (!Double.isNaN(s.getLag1Covariance()) && !Double.isInfinite(s.getLag1Covariance())) {
             r.setLag1Cov(s.getLag1Covariance());
         }
-        if (!Double.isNaN(s.getLag1Correlation()) && !Double.isInfinite(s.getLag1Correlation())){
+        if (!Double.isNaN(s.getLag1Correlation()) && !Double.isInfinite(s.getLag1Correlation())) {
             r.setLag1Corr(s.getLag1Correlation());
         }
-        if (!Double.isNaN(s.getVonNeumannLag1TestStatistic()) && !Double.isInfinite(s.getVonNeumannLag1TestStatistic())){
+        if (!Double.isNaN(s.getVonNeumannLag1TestStatistic()) && !Double.isInfinite(s.getVonNeumannLag1TestStatistic())) {
             r.setVonNeumanLag1Stat(s.getVonNeumannLag1TestStatistic());
         }
-        if (!Double.isNaN(s.getNumberMissing()) && !Double.isInfinite(s.getNumberMissing())){
+        if (!Double.isNaN(s.getNumberMissing()) && !Double.isInfinite(s.getNumberMissing())) {
             r.setNumMissingObs(s.getNumberMissing());
         }
-        if (!Double.isNaN(s.getMinBatchSize()) && !Double.isInfinite(s.getMinBatchSize())){
+        if (!Double.isNaN(s.getMinBatchSize()) && !Double.isInfinite(s.getMinBatchSize())) {
             r.setMinBatchSize((double) s.getMinBatchSize());
         }
-        if (!Double.isNaN(s.getMinNumberOfBatches()) && !Double.isInfinite(s.getMinNumberOfBatches())){
+        if (!Double.isNaN(s.getMinNumberOfBatches()) && !Double.isInfinite(s.getMinNumberOfBatches())) {
             r.setMinNumBatches((double) s.getMinNumberOfBatches());
         }
-        if (!Double.isNaN(s.getMaxNumberOfBatchesMultiple()) && !Double.isInfinite(s.getMaxNumberOfBatchesMultiple())){
+        if (!Double.isNaN(s.getMaxNumberOfBatchesMultiple()) && !Double.isInfinite(s.getMaxNumberOfBatchesMultiple())) {
             r.setMaxNumBatchesMultiple((double) s.getMaxNumberOfBatchesMultiple());
         }
-        if (!Double.isNaN(s.getMaxNumBatches()) && !Double.isInfinite(s.getMaxNumBatches())){
+        if (!Double.isNaN(s.getMaxNumBatches()) && !Double.isInfinite(s.getMaxNumBatches())) {
             r.setMaxNumBatches((double) s.getMaxNumBatches());
         }
-        if (!Double.isNaN(s.getNumRebatches()) && !Double.isInfinite(s.getNumRebatches())){
+        if (!Double.isNaN(s.getNumRebatches()) && !Double.isInfinite(s.getNumRebatches())) {
             r.setNumRebatches((double) s.getNumRebatches());
         }
-        if (!Double.isNaN(s.getCurrentBatchSize()) && !Double.isInfinite(s.getCurrentBatchSize())){
+        if (!Double.isNaN(s.getCurrentBatchSize()) && !Double.isInfinite(s.getCurrentBatchSize())) {
             r.setCurrentBatchSize((double) s.getCurrentBatchSize());
         }
-        if (!Double.isNaN(s.getAmountLeftUnbatched()) && !Double.isInfinite(s.getAmountLeftUnbatched())){
+        if (!Double.isNaN(s.getAmountLeftUnbatched()) && !Double.isInfinite(s.getAmountLeftUnbatched())) {
             r.setAmtUnbatched(s.getAmountLeftUnbatched());
         }
-        if (!Double.isNaN(s.getTotalNumberOfObservations()) && !Double.isInfinite(s.getTotalNumberOfObservations())){
+        if (!Double.isNaN(s.getTotalNumberOfObservations()) && !Double.isInfinite(s.getTotalNumberOfObservations())) {
             r.setTotalNumObs(s.getTotalNumberOfObservations());
         }
         return r;
 
     }
+
     /**
-     *
+     * @return the current simulation run record id, the last inserted simulation run
+     */
+    public Optional<Integer> getCurrentSimRunRecordId() {
+        Integer id = myCurrentSimRunRecord.getId();
+        return Optional.ofNullable(id);
+    }
+
+    /**
+     * @return the current simulation run record or null
+     */
+    public Optional<SimulationRunRecord> getCurrentSimRunRecord() {
+        return Optional.ofNullable(myCurrentSimRunRecord);
+    }
+
+//    private void makeSimulationRunTable(){
+//        DSLContext db = myDb.getDSLContext();
+//        db.createTable(SIMULATION_RUN)
+//                .column(SIMULATION_RUN.ID,SQLDataType.INTEGER.nullable(false).identity(true));
+//    }
+
+    /**
+     * Clears all data from the JSL database. Keeps the database structure.
+     */
+    public final void clearAllData() {
+        DSLContext create = myDb.getDSLContext();
+        create.delete(BATCH_STAT).execute();
+        create.delete(WITHIN_REP_COUNTER_STAT).execute();
+        create.delete(ACROSS_REP_STAT).execute();
+        create.delete(WITHIN_REP_STAT).execute();
+        create.delete(MODEL_ELEMENT).execute();
+        create.delete(SIMULATION_RUN).execute();
+    }
+
+    /**
      * @param simId the identifier of the simulation record
      * @return the record or null
      */
@@ -660,7 +650,6 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return the simulation run records as a jooq Result
      */
     public final Result<SimulationRunRecord> getSimulationRunRecords() {
@@ -675,7 +664,6 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return the model element records as a jooq Result
      */
     public final Result<ModelElementRecord> getModelElementRecords() {
@@ -685,19 +673,18 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @param model
      * @return a BiMap linking model element records with corresponding ModelElements
      */
-    public final BiMap<ModelElementRecord, ModelElement> getModelElementRecordBiMap(Model model){
+    public final BiMap<ModelElementRecord, ModelElement> getModelElementRecordBiMap(Model model) {
         if (model == null) {
             throw new IllegalArgumentException("The model was null.");
         }
         BiMap<ModelElementRecord, ModelElement> biMap = HashBiMap.create();
         Result<ModelElementRecord> elementRecords = getModelElementRecords();
-        for(ModelElementRecord r: elementRecords){
+        for (ModelElementRecord r : elementRecords) {
             ModelElement modelElement = model.getModelElement(r.getElementName());
-            if (modelElement != null){
+            if (modelElement != null) {
                 biMap.put(r, modelElement);
             }
         }
@@ -705,7 +692,6 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return the within replication statistics as a jooq Result
      */
     public final Result<WithinRepStatRecord> getWithinRepStatRecords() {
@@ -718,21 +704,19 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return the within replication statistics as a JDBC ResultSet
      */
-    public final ResultSet getWithinRepStatRecordsAsResultSet(){
+    public final ResultSet getWithinRepStatRecordsAsResultSet() {
         ResultSet resultSet = getWithinRepStatRecords().intoResultSet();
         return resultSet;
     }
 
     /**
-     *
-     * @param simId the id of the simulation
+     * @param simId        the id of the simulation
      * @param responseName the response name
      * @return the across replication statistics as a Statistic
      */
-    public Statistic getAcrossRepStatistic(Integer simId, String responseName){
+    public Statistic getAcrossRepStatistic(Integer simId, String responseName) {
         List<Double> averages = myDb.getDSLContext()
                 .select(WITHIN_REP_STAT.AVERAGE)
                 .from(WITHIN_REP_STAT)
@@ -744,12 +728,11 @@ public class JSLDatabase {
     }
 
     /**
-     *
-     * @param simId the id of the simulation
+     * @param simId       the id of the simulation
      * @param counterName the counter name
      * @return the across replication statistics as a Statistic
      */
-    public Statistic getAcrossRepCounterStatistic(Integer simId, String counterName){
+    public Statistic getAcrossRepCounterStatistic(Integer simId, String counterName) {
         List<Double> averages = myDb.getDSLContext()
                 .select(WITHIN_REP_COUNTER_STAT.LAST_VALUE)
                 .from(WITHIN_REP_COUNTER_STAT)
@@ -764,7 +747,7 @@ public class JSLDatabase {
      * @param responseName the name of the response variable
      * @return the within replication averages (simRunId, exp_name, response_name, rep_num, avg)
      */
-    public final Result<Record5<Integer, String, String, Integer, Double>> getWithinRepAveragesAsResultSet(String responseName){
+    public final Result<Record5<Integer, String, String, Integer, Double>> getWithinRepAveragesAsResultSet(String responseName) {
         Result<Record5<Integer, String, String, Integer, Double>> fetch = myDb.getDSLContext()
                 .select(WITHIN_REP_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.MODEL_ELEMENT_NAME,
                         WITHIN_REP_STAT.REP_NUM, WITHIN_REP_STAT.AVERAGE)
@@ -775,19 +758,20 @@ public class JSLDatabase {
         return fetch;
     }
 
-    /** Builds a map to use with MultipleComparisonAnalyzer
+    /**
+     * Builds a map to use with MultipleComparisonAnalyzer
      *
      * @param responseName the name of the response variable
      * @return a Map with key as experiment name and replication averages in the array
      */
-    public final Map<String, double[]> getWithRepAveragesAsMap(String responseName){
+    public final Map<String, double[]> getWithRepAveragesAsMap(String responseName) {
         Result<Record5<Integer, String, String, Integer, Double>> resultSet = getWithinRepAveragesAsResultSet(responseName);
         Map<String, List<Double>> rMap = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.AVERAGE);
         Map<String, double[]> cMap = new LinkedHashMap<>();
-        for(String s: rMap.keySet()){
+        for (String s : rMap.keySet()) {
             List<Double> doubles = rMap.get(s);
             double[] a = Doubles.toArray(doubles);
-            cMap.put(s,a );
+            cMap.put(s, a);
         }
         return cMap;
     }
@@ -796,7 +780,7 @@ public class JSLDatabase {
      * @param counterName the name of the counter variable
      * @return the ending replication count (simRunId, exp_name, counter_name, rep_num, count)
      */
-    public final Result<Record5<Integer, String, String, Integer, Double>> getEndReplicationCountsAsResultSet(String counterName){
+    public final Result<Record5<Integer, String, String, Integer, Double>> getEndReplicationCountsAsResultSet(String counterName) {
         Result<Record5<Integer, String, String, Integer, Double>> fetch = myDb.getDSLContext()
                 .select(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME,
                         WITHIN_REP_COUNTER_STAT.REP_NUM, WITHIN_REP_COUNTER_STAT.LAST_VALUE)
@@ -807,19 +791,20 @@ public class JSLDatabase {
         return fetch;
     }
 
-    /** Builds a map to use with MultipleComparisonAnalyzer
+    /**
+     * Builds a map to use with MultipleComparisonAnalyzer
      *
      * @param counterName the name of the counter variable
      * @return a Map with key as experiment name and replication counts in the array
      */
-    public final Map<String, double[]> getEndReplicationCountsAsMap(String counterName){
+    public final Map<String, double[]> getEndReplicationCountsAsMap(String counterName) {
         Result<Record5<Integer, String, String, Integer, Double>> resultSet = getEndReplicationCountsAsResultSet(counterName);
         Map<String, List<Double>> rMap = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.LAST_VALUE);
         Map<String, double[]> cMap = new LinkedHashMap<>();
-        for(String s: rMap.keySet()){
+        for (String s : rMap.keySet()) {
             List<Double> doubles = rMap.get(s);
             double[] a = Doubles.toArray(doubles);
-            cMap.put(s,a );
+            cMap.put(s, a);
         }
         return cMap;
     }
@@ -832,7 +817,9 @@ public class JSLDatabase {
         return Table.read().db(getWithinRepStatRecordsAsResultSet(), tblName);
     }
 
-    /** Squelches the SQLException
+    /**
+     * Squelches the SQLException
+     *
      * @param tblName the name of the Tablesaw table
      * @return the within replication statistics as a Tablesaw Table or null
      */
@@ -861,10 +848,9 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return the across replication statistics as a JDBC ResultSet
      */
-    public final ResultSet getAcrossRepStatRecordsAsResultSet(){
+    public final ResultSet getAcrossRepStatRecordsAsResultSet() {
         return getAcrossRepStatRecords().intoResultSet();
     }
 
@@ -876,7 +862,9 @@ public class JSLDatabase {
         return Table.read().db(getAcrossRepStatRecordsAsResultSet(), tblName);
     }
 
-    /** Squelches the SQLException
+    /**
+     * Squelches the SQLException
+     *
      * @param tblName the name of the Tablesaw table
      * @return the across replication statistics as a Tablesaw Table or null
      */
@@ -905,10 +893,9 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return the batch statistics as a JDBC ResultSet
      */
-    public final ResultSet getBatchStatRecordsAsResultSet(){
+    public final ResultSet getBatchStatRecordsAsResultSet() {
         return getBatchStatRecords().intoResultSet();
     }
 
@@ -920,7 +907,9 @@ public class JSLDatabase {
         return Table.read().db(getBatchStatRecordsAsResultSet(), tblName);
     }
 
-    /** Squelches the SQLException
+    /**
+     * Squelches the SQLException
+     *
      * @param tblName the name of the Tablesaw table
      * @return the batch statistics as a Tablesaw Table or null
      */
@@ -951,223 +940,19 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return a map keyed by model element name with the across rep stat record as the value
      */
-    public final Map<String, AcrossRepStatRecord> getAcrossRepStatRecordsMapForCurrentSimulation(){
+    public final Map<String, AcrossRepStatRecord> getAcrossRepStatRecordsMapForCurrentSimulation() {
         Map<String, AcrossRepStatRecord> map = getAcrossRepStatRecordsForCurrentSimulation()
                 .intoMap(ACROSS_REP_STAT.MODEL_ELEMENT_NAME);
         return map;
     }
 
     /**
-     * The name of the database
-     *
-     * @return the name
+     * @return a reference to the underlying database via a DatabaseIfc
      */
-    public final String getName() {
-        return myDb.getName();
+    public final DatabaseIfc getDatabase() {
+        return myDb;
     }
 
-//    public final Path getDirectory() {
-//        return myDb.getDirectory();
-//    }
-
-//    /**
-//     * A URL representation of the embedded database
-//     *
-//     * @return the URL
-//     */
-//    public final String getURL() {
-//        return myDb.getURL();
-//    }
-
-//    /**
-//     * @return the path representation for the database
-//     */
-//    public final Path getDBPath() {
-//        return myDb.getDBPath();
-//    }
-
-    /**
-     * @return the sql dialect for the database.  Here should be derby
-     */
-    public final SQLDialect getSQLDialect() {
-        return myDb.getSQLDialect();
-    }
-
-//    /**
-//     * @return the path to the tables only script
-//     */
-//    public final Path getCreationScriptPath() {
-//        return myDb.getCreationScriptPath();
-//    }
-
-    /**
-     * Returns the names of the tables in the current database
-     *
-     * @return a list of the names of the tables as strings
-     */
-    public final List<String> getTableNames() {
-        return myDb.getTableNames();
-    }
-
-    /**
-     * Checks if tables exist in the database
-     *
-     * @return true if it exists
-     */
-    public final boolean hasTables() {
-        return myDb.hasTables();
-    }
-
-    /**
-     * Checks if the supplied table exists in the database
-     *
-     * @param table a string representing the name of the table
-     * @return true if it exists
-     */
-    public final boolean tableExists(String table) {
-        return myDb.tableExists(table);
-    }
-
-    /**
-     * @param tableName the name of the table to write
-     * @param out       the output file for the writing
-     */
-    public final void writeTableAsCSV(String tableName, PrintWriter out) {
-        myDb.writeTableAsCSV(tableName, out);
-    }
-
-    /**
-     * Displays the named table on the console
-     *
-     * @param tableName the name of the table to display
-     */
-    public final void displayTableAsCSV(String tableName) {
-        myDb.printTableAsCSV(tableName);
-    }
-
-    /**
-     * Writes the table in pretty text to the file
-     *
-     * @param tableName the name of the table to write
-     * @param out       the output file to write to
-     */
-    public final void writeTableAsText(String tableName, PrintWriter out) {
-        myDb.writeTableAsText(tableName, out);
-    }
-
-    /**
-     * Displays the name table on the console
-     *
-     * @param tableName the name of the table to write
-     */
-    public final void displayTableAsText(String tableName) {
-        myDb.printTableAsText(tableName);
-    }
-
-    /**
-     * Writes all user defined tables to the output
-     *
-     * @param out the place to write to
-     */
-    public final void writeAllTablesAsText(PrintWriter out) {
-        myDb.writeAllTablesAsText(out);
-    }
-
-    /**
-     * Displays all the user defined tables as text on the console
-     */
-    public final void displayAllTablesAsText() {
-        myDb.printAllTablesAsText();
-    }
-
-    /**
-     * @param table the table to check
-     * @return true if the table has no data in the result
-     */
-    public final boolean isTableEmpty(String table) {
-        return myDb.isTableEmpty(table);
-    }
-
-    /**
-     * @return true if at least one table has data
-     */
-    public final boolean hasData() {
-        return myDb.hasData();
-    }
-
-    /**
-     * @return true if all tables are empty
-     */
-    public final boolean areAllTablesEmpty() {
-        return myDb.areAllTablesEmpty();
-    }
-
-    /**
-     * Writes all tables of the database in the directory, naming each output
-     * file the name of each table
-     *
-     * @param pathToOutPutDirectory
-     */
-    public final void writeAllTablesAsCSV(Path pathToOutPutDirectory) throws IOException {
-        myDb.writeAllTablesAsCSV(pathToOutPutDirectory);
-    }
-
-    /**
-     * @return the jooq DSLContext for the database
-     */
-    public final DSLContext getDSLContext() {
-        return myDb.getDSLContext();
-    }
-
-    /**
-     * Writes all the tables to an Excel workbook, uses name of database, uses the working directory
-     */
-    public final void writeDbToExcelWorkbook() throws IOException {
-        myDb.writeDbToExcelWorkbook();
-    }
-
-    /**
-     * Writes all the tables to an Excel workbook, uses name of database
-     *
-     * @param wbDirectory directory of the workbook, if null uses the working directory
-     */
-    public final void writeDbToExcelWorkbook(Path wbDirectory) throws IOException {
-        myDb.writeDbToExcelWorkbook(wbDirectory);
-    }
-
-    /**
-     * Writes all the tables to an Excel workbook uses the working directory
-     *
-     * @param wbName name of the workbook, if null uses name of database
-     */
-    public final void writeDbToExcelWorkbook(String wbName) throws IOException {
-        myDb.writeDbToExcelWorkbook(wbName);
-    }
-
-    /**
-     * Writes all the tables to an Excel workbook
-     *
-     * @param wbName      name of the workbook, if null uses name of database
-     * @param wbDirectory directory of the workbook, if null uses the working directory
-     */
-    public final void writeDbToExcelWorkbook(String wbName, Path wbDirectory) throws IOException {
-        myDb.writeDbToExcelWorkbook(wbName, wbDirectory);
-    }
-
-    /**
-     *  Turns on JooQ Default execute SQL logging
-     */
-    public final void turnOnJooQDefaultExecutionLogging() {
-        myDb.turnOnJooQDefaultExecutionLogging();
-    }
-
-    /**
-     *  Turns off JooQ Default execute SQL logging
-     */
-    public final void turnOffJooQDefaultExecutionLogging() {
-        myDb.turnOffJooQDefaultExecutionLogging();
-    }
 }

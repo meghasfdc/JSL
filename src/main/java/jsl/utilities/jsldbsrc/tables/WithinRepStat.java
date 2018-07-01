@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import jsl.utilities.jsldbsrc.App;
+import jsl.utilities.jsldbsrc.JslDb;
 import jsl.utilities.jsldbsrc.Keys;
 import jsl.utilities.jsldbsrc.tables.records.WithinRepStatRecord;
 
@@ -38,10 +38,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WithinRepStat extends TableImpl<WithinRepStatRecord> {
 
-    private static final long serialVersionUID = 561998775;
+    private static final long serialVersionUID = -1676289498;
 
     /**
-     * The reference instance of <code>APP.WITHIN_REP_STAT</code>
+     * The reference instance of <code>JSL_DB.WITHIN_REP_STAT</code>
      */
     public static final WithinRepStat WITHIN_REP_STAT = new WithinRepStat();
 
@@ -54,91 +54,91 @@ public class WithinRepStat extends TableImpl<WithinRepStatRecord> {
     }
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.ID</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.ID</code>.
      */
     public final TableField<WithinRepStatRecord, Integer> ID = createField("ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.MODEL_ELEMENT_NAME</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.MODEL_ELEMENT_NAME</code>.
      */
     public final TableField<WithinRepStatRecord, String> MODEL_ELEMENT_NAME = createField("MODEL_ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.SIM_RUN_ID_FK</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.SIM_RUN_ID_FK</code>.
      */
     public final TableField<WithinRepStatRecord, Integer> SIM_RUN_ID_FK = createField("SIM_RUN_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.STAT_NAME</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.STAT_NAME</code>.
      */
     public final TableField<WithinRepStatRecord, String> STAT_NAME = createField("STAT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.REP_NUM</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.REP_NUM</code>.
      */
     public final TableField<WithinRepStatRecord, Integer> REP_NUM = createField("REP_NUM", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.STAT_COUNT</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.STAT_COUNT</code>.
      */
     public final TableField<WithinRepStatRecord, Double> STAT_COUNT = createField("STAT_COUNT", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.AVERAGE</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.AVERAGE</code>.
      */
     public final TableField<WithinRepStatRecord, Double> AVERAGE = createField("AVERAGE", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.MINIMUM</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.MINIMUM</code>.
      */
     public final TableField<WithinRepStatRecord, Double> MINIMUM = createField("MINIMUM", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.MAXIMUM</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.MAXIMUM</code>.
      */
     public final TableField<WithinRepStatRecord, Double> MAXIMUM = createField("MAXIMUM", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.WEIGHTED_SUM</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.WEIGHTED_SUM</code>.
      */
     public final TableField<WithinRepStatRecord, Double> WEIGHTED_SUM = createField("WEIGHTED_SUM", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.SUM_OF_WEIGHTS</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.SUM_OF_WEIGHTS</code>.
      */
     public final TableField<WithinRepStatRecord, Double> SUM_OF_WEIGHTS = createField("SUM_OF_WEIGHTS", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.WEIGHTED_SSQ</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.WEIGHTED_SSQ</code>.
      */
     public final TableField<WithinRepStatRecord, Double> WEIGHTED_SSQ = createField("WEIGHTED_SSQ", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.LAST_VALUE</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.LAST_VALUE</code>.
      */
     public final TableField<WithinRepStatRecord, Double> LAST_VALUE = createField("LAST_VALUE", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_STAT.LAST_WEIGHT</code>.
+     * The column <code>JSL_DB.WITHIN_REP_STAT.LAST_WEIGHT</code>.
      */
     public final TableField<WithinRepStatRecord, Double> LAST_WEIGHT = createField("LAST_WEIGHT", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * Create a <code>APP.WITHIN_REP_STAT</code> table reference
+     * Create a <code>JSL_DB.WITHIN_REP_STAT</code> table reference
      */
     public WithinRepStat() {
         this(DSL.name("WITHIN_REP_STAT"), null);
     }
 
     /**
-     * Create an aliased <code>APP.WITHIN_REP_STAT</code> table reference
+     * Create an aliased <code>JSL_DB.WITHIN_REP_STAT</code> table reference
      */
     public WithinRepStat(String alias) {
         this(DSL.name(alias), WITHIN_REP_STAT);
     }
 
     /**
-     * Create an aliased <code>APP.WITHIN_REP_STAT</code> table reference
+     * Create an aliased <code>JSL_DB.WITHIN_REP_STAT</code> table reference
      */
     public WithinRepStat(Name alias) {
         this(alias, WITHIN_REP_STAT);
@@ -157,7 +157,7 @@ public class WithinRepStat extends TableImpl<WithinRepStatRecord> {
      */
     @Override
     public Schema getSchema() {
-        return App.APP;
+        return JslDb.JSL_DB;
     }
 
     /**
@@ -173,7 +173,7 @@ public class WithinRepStat extends TableImpl<WithinRepStatRecord> {
      */
     @Override
     public UniqueKey<WithinRepStatRecord> getPrimaryKey() {
-        return Keys.SQL180614115403880;
+        return Keys.SQL180629175107410;
     }
 
     /**
@@ -181,7 +181,7 @@ public class WithinRepStat extends TableImpl<WithinRepStatRecord> {
      */
     @Override
     public List<UniqueKey<WithinRepStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<WithinRepStatRecord>>asList(Keys.SQL180614115403880, Keys.WRS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
+        return Arrays.<UniqueKey<WithinRepStatRecord>>asList(Keys.SQL180629175107410, Keys.WRS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
     }
 
     /**
