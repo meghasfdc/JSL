@@ -1148,6 +1148,17 @@ public class JSLDatabase {
     }
 
     /**
+     * Writes all tables as separate comma separated value files into the jslOutput/excel directory.
+     * The files are written to text files using the same name as
+     * the tables in the database
+     *
+     * @throws IOException a checked exception
+     */
+    public void writeAllTablesAsCSV() throws IOException {
+        myDb.writeAllTablesAsCSV("JSL_DB", JSL.ExcelDir);
+    }
+
+    /**
      * Writes all tables as separate comma separated value files into the supplied
      * directory. The files are written to text files using the same name as
      * the tables in the database
@@ -1160,10 +1171,10 @@ public class JSLDatabase {
     }
 
     /**
-     * Writes all the tables to an Excel workbook,  uses the working directory
+     * Writes all the tables to an Excel workbook,  uses JSL.ExcelDir for the directory
      */
     public void writeDbToExcelWorkbook() throws IOException {
-        myDb.writeDbToExcelWorkbook("JSL_DB");
+        myDb.writeDbToExcelWorkbook("JSL_DB", JSL.ExcelDir);
     }
 
     /**
@@ -1175,11 +1186,11 @@ public class JSLDatabase {
     }
 
     /**
-     * Writes all the tables to an Excel workbook uses the working directory
+     * Writes all the tables to an Excel workbook uses JSL.ExcelDir for the directory
      * @param wbName name of the workbook, if null uses name of database
      */
     public void writeDbToExcelWorkbook(String wbName) throws IOException {
-        myDb.writeDbToExcelWorkbook("JSL_DB", wbName);
+        myDb.writeDbToExcelWorkbook("JSL_DB", wbName, JSL.ExcelDir);
     }
 
     /**
