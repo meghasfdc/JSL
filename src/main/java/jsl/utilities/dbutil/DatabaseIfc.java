@@ -545,7 +545,7 @@ public interface DatabaseIfc {
     }
 
     /**
-     * Writes all the tables to an Excel workbook, uses name of database, uses the working directory
+     * Writes all the tables to an Excel workbook, uses name of schema, uses the working directory
      */
     default void writeDbToExcelWorkbook(String schemaName) throws IOException {
         writeDbToExcelWorkbook(schemaName, null, null);

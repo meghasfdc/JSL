@@ -70,7 +70,7 @@ public class TestNHPPPWLinearRepeat extends ModelElement {
     public static void main(String[] args) {
 
         // create the experiment to run the model
-        Simulation s = new Simulation();
+        Simulation s = new Simulation("TestNHPP");
 
         PiecewiseRateFunction f = new PiecewiseLinearRateFunction(0.5, 200.0, 0.5);
 

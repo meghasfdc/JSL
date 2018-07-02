@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package jsl.observers;
+package jsl.utilities.misc;
 
+import jsl.utilities.reporting.JSLDatabase;
 import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
 import org.apache.commons.io.FileUtils;

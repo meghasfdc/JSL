@@ -15,6 +15,7 @@
  */
 package ex.queueing;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 import jsl.modeling.EventActionIfc;
@@ -28,7 +29,7 @@ import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.observers.JSLDatabase;
+import jsl.utilities.reporting.JSLDatabase;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.reporting.JSL;
@@ -255,7 +256,9 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
     public static void runExperiment() {
 
-        Simulation sim = new Simulation("DLB_with_Q");
+        Simulation sim = new Simulation("DLB_with_Q", true);
+
+  //      JSLDatabase.useExistingEmbeddedDerbyJSLDatabase(sim, "AnotherOne");
 
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(sim.getModel());
@@ -277,13 +280,23 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
         r.printAcrossReplicationSummaryStatistics();
 
-        JSLDatabase jslDatabase = sim.getJSLDatabase();
-        System.out.println("Printing across replication records");
-        jslDatabase.getAcrossRepStatRecords().format(System.out);
-        System.out.println();
-        System.out.println(jslDatabase.getDatabase().getDefaultSchemaName());
-//        jslDatabase.clearAllData();
-//        System.out.println("Printing across replication records");
-//        jslDatabase.getAcrossRepStatRecords().format(System.out);
+        Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
+        if (db.isPresent()){
+            System.out.println("Printing across replication records");
+            db.get().getAcrossRepStatRecords().format(System.out);
+            System.out.println();
+            System.out.println(db.get().getDatabase().getDefaultSchemaName());
+//            System.out.println("Clearing all data in the database!");
+//            db.get().clearAllData();
+//            System.out.println("Printing across replication records");
+//            db.get().getAcrossRepStatRecords().format(System.out);
+//            try {
+//                db.get().writeDbToExcelWorkbook();
+//                db.get().getDatabase().writeDbToExcelWorkbook("JSL_DB");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+        }
+
     }
 }

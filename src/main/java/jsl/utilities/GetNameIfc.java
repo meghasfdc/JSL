@@ -13,11 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package jsl.utilities;
 
-/**
- */
-public interface IdentityIfc extends GetNameIfc {
+public interface GetNameIfc {
 
-    long getId();
+    String getName();
 }

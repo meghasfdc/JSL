@@ -15,46 +15,60 @@
  */
 package jsl.modeling;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimerTask;
 
-import jsl.observers.JSLDatabase;
-import jsl.observers.JSLDatabaseObserver;
+import jsl.utilities.reporting.JSLDatabase;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
 import jsl.observers.scheduler.ExecutiveTraceReport;
 import jsl.observers.textfile.IPLogReport;
-import jsl.utilities.IdentityIfc;
 import jsl.utilities.reporting.JSL;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.StatisticAccessorIfc;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 /**
  * Simulation represents a model and experiment that can be run. It encapsulates
  * a model to which model elements can be attached. It allows an experiment and
  * its run parameters to be specified. It allows reporting of results
- * to text files via a SimulationReporter.  It provides access to the simulation
- * statistical database and allows the changing of experiment settings.
- *
- * Whether or not the current data in the database will be cleared prior to the run is controlled by the
- *  setClearDbOption() option.  Clearing the data is the default option.  Clearing the database
- *  causes the previous database to be deleted and a brand new database with the same name to
- *  be constructed to hold statistical output generated during the simulation when calling run().
- *  The generated database has the same name as the simulation and can be found in the jslOutput/db directory.
- *  The generated database is an embedded database. That is, only one client can be using the database at a time.
- *
- *  If the setClearDbOption() is set to false, then any subsequent calls to run() will add their
- *  generated data to the simulation database.  This is useful when comparing data across simulation
- *  runs if the simulation inputs are changed between runs.
+ * to text files via a SimulationReporter.  A simulation can be created to have
+ * an embedded database to automatically hold simulation results.  This option must
+ * be explicitly provided in order to prevent unnecessary creation of databases.
+ * The generated database has the same name as the simulation and can be found in
+ * the jslOutput/db directory. The generated database is an embedded database.
+ * That is, only connections running within the same JVM can access it.
+ * <p>
+ * If a default embedded database is created then whether or not the current data in the
+ * database will be cleared prior to the run is controlled by the
+ * setClearDatabaseOptionForDefaultDatabase() option.  Clearing the data is the default option.
+ * Clearing the database causes the previous embedded database to clear any data prior
+ * to an experiment invoked with the run() method of Simulation.
+ * <p>
+ * If the setClearDatabaseOptionForDefaultDatabase() is set to false, then any subsequent calls
+ * to run() will add their generated data to the simulation database.  This is useful when comparing data across simulation
+ * runs if the simulation inputs are changed between runs within the same program execution.
+ * Use setClearDatabaseOptionForDefaultDatabase() prior to invoking the run() method.
+ * <p>
+ * Note: If you do not want a previously created embedded database to be overwritten then
+ * you can do any of these possibilities:
+ * 1) change the name of the simulation and run with the create embedded database option on to
+ * create a new embedded database.
+ * 2) change how you create the simulation to not create an embedded database. This will prevent
+ * a new embedded database with the same name from being created and over writing a previously
+ * created database.
+ * <p>
+ * If you want to add more results from a new program execution to a previously created
+ * embedded database without deleting it, then create the simulation without an
+ * embedded database and create a new JSLDatabase that references the previously created
+ * embedded database as the backing database. Make sure that you don't set the clear
+ * database option to true; otherwise, you will still lose the previously stored data
+ * when the first experiment is run.
  *
  * @author Manuel Rossetti (rossetti@uark.edu)
  */
-public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessIfc,
+public class Simulation implements ObservableIfc, IterativeProcessIfc,
         ExperimentGetIfc {
 
     /**
@@ -65,32 +79,32 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     /**
      * The name of this object
      */
-    private String myName;
+    private final String myName;
 
     /**
      * The id of this object
      */
-    private int myId;
+    private final int myId;
 
     /**
      * The executive for running events
      */
-    protected Executive myExecutive;
+    protected final Executive myExecutive;
 
     /**
      * The experiment for running the simulation
      */
-    protected Experiment myExperiment;
+    protected final Experiment myExperiment;
 
     /**
      * The model to simulate
      */
-    protected Model myModel;
+    protected final Model myModel;
 
     /**
      * Controls the execution of replications
      */
-    protected ReplicationExecutionProcess myReplicationExecutionProcess;
+    protected final ReplicationExecutionProcess myReplicationExecutionProcess;
 
     /**
      * A flag to control whether or not a warning is issued if the user does not
@@ -104,89 +118,77 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     private StatisticalBatchingElement myBatchingElement;
 
     /**
-     *  the default observer for the database
+     * the default database for holding statistical output
      */
-    private JSLDatabaseObserver myJSLDatabaseObserver;
+    private JSLDatabase myDefaultJSLDatabase;
 
     /**
-     *   whether or not the database observer will automatically be added, default is true
-      */
-    private boolean myDbOption;
-
-    /**
-     *     whether or not the database will be cleared between executions of the simulation, default is true
-     */
-    private boolean myClearDbOption;
-
-    /**
-     * Creates a simulation with name, "Simulation" to run an empty model with
-     * default experimental parameters using the default scheduling executive
+     * Creates a simulation to run a model using the default scheduling executive.
+     * No default database is created and the simulation is give a default name.
      */
     public Simulation() {
-        this(null, null, null, null);
+        this(null, false, null);
     }
 
     /**
-     * Creates a simulation to run the model according to the experimental
-     * parameters using the default scheduling executive
+     * Creates a simulation to run a model using the default scheduling executive.
+     * Does not automatically create an embedded database to hold simulation results
      *
      * @param simName the name of the simulation
      */
     public Simulation(String simName) {
-        this(simName, null, null, null);
+        this(simName, false, null);
     }
 
     /**
-     * Creates a simulation to run the model according to the experimental
-     * parameters using the default scheduling executive
+     * Creates a simulation to run a model.
+     * If the create default database option is true then a new database with the
+     * name "JSL_DB" + simName will be made in the JSLDatabase.dbDir directory. If such
+     * a named database already exists it will be replaced. The default option
+     * for clearing data in the database prior to a simulation experiment will be true.
      *
-     * @param simName the name of the simulation
-     * @param expName the name of the experiment
+     * @param simName               the name of the simulation
+     * @param createDefaultDatabase controls whether or not a default embedded
+     *                              database is created for the simulation.
      */
-    public Simulation(String simName, String expName) {
-        this(simName, null, expName, null);
+    public Simulation(String simName, boolean createDefaultDatabase) {
+        this(simName, createDefaultDatabase, null);
     }
 
     /**
-     * Creates a simulation to run the model according to the experimental
-     * parameters using the default scheduling executive
+     * Creates a simulation to run a model using the supplied scheduling executive.
+     * If the create default database option is true then a new database with the
+     * name "JSL_DB" + simName will be made in the JSLDatabase.dbDir directory. If such
+     * a named database already exists it will be replaced. The default option
+     * for clearing data in the database prior to a simulation experiment will be true.
      *
-     * @param simName   the name of the simulation
-     * @param modelName the name for the model
-     * @param expName   the name of the experiment
+     * @param simName               the name of the simulation
+     * @param createDefaultDatabase controls whether or not a default embedded
+     *                              database is created for the simulation
+     * @param executive             the executive, if null the default executive is used
      */
-    public Simulation(String simName, String modelName, String expName) {
-        this(simName, modelName, expName, null);
-    }
-
-    /**
-     * Creates a simulation to run a model according to the experimental
-     * parameters using the supplied scheduling executive
-     *
-     * @param simName   the name of the simulation
-     * @param modelName the name for the model
-     * @param expName   the name of the experiment
-     * @param executive the executive
-     */
-    public Simulation(String simName, String modelName, String expName,
-                      Executive executive) {
+    public Simulation(String simName, boolean createDefaultDatabase, Executive executive) {
         myIdCounter_ = myIdCounter_ + 1;
         myId = myIdCounter_;
-        setName(simName);
-        myClearDbOption = true;
-        myDbOption = true;
+        if (simName == null) {
+            simName = this.getClass().getSimpleName() + "_" + getId();
+        }
+        myName = simName;
         myReplicationExecutionProcess = new ReplicationExecutionProcess();
-        myExperiment = new Experiment(expName);
         if (executive == null) {
             executive = new Executive();
         }
         myExecutive = executive;
-        if (modelName == null) {
-            modelName = getName() + "_Model";
-        }
+        String modelName = getName() + "_Model";
         myModel = new Model(modelName);
+        String expName = getName() + "_Experiment";
+        myExperiment = new Experiment(expName);
         //setSimulation() is package final, should be no leaking this
         myModel.setSimulation(this);
+        if (createDefaultDatabase) {
+            myDefaultJSLDatabase = JSLDatabase.createEmbeddedDerbyJSLDatabase(this,
+                    true);
+        }
     }
 
     @Override
@@ -194,7 +196,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
         return myName;
     }
 
-    @Override
     public final long getId() {
         return (myId);
     }
@@ -230,7 +231,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
      * A StatisticalBatchingElement is used to control statistical batching for
      * single replication simulations. This method creates and attaches a
      * StatisticalBatchingElement to the model
-     *
      */
     public final void turnOnStatisticalBatching() {
         if (myBatchingElement == null) {
@@ -239,20 +239,10 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
      * @return an optional of the StatisticalBatchingElement because it may or may not be attached
      */
-    public final Optional<StatisticalBatchingElement> getStatisticalBatchingElement(){
+    public final Optional<StatisticalBatchingElement> getStatisticalBatchingElement() {
         return Optional.ofNullable(myBatchingElement);
-    }
-
-    @Override
-    public final void setName(String str) {
-        if (str == null) {
-            myName = this.getClass().getSimpleName() + "_" + getId();
-        } else {
-            myName = str;
-        }
     }
 
     @Override
@@ -533,7 +523,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
 
     /**
      * Turns on a default logging report
-     *
      */
     @Override
     public final void turnOnLogReport() {
@@ -542,7 +531,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
 
     /**
      * Turns of the default logging report
-     *
      */
     @Override
     public final void turnOffLogReport() {
@@ -844,7 +832,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     /**
      * Turns on a default tracing report for the Executive to trace event
      * execution to a file
-     *
      */
     public final void turnOnDefaultEventTraceReport() {
         myExecutive.turnOnDefaultEventTraceReport();
@@ -890,7 +877,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
      * @return a StringBuilder with the Half-Width Summary Report and 95 percent confidence
      */
     public StringBuilder getHalfWidthSummaryReport() {
@@ -898,7 +884,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
      * @param confLevel the confidence level of the report
      * @return a StringBuilder with the Half-Width Summary Report
      */
@@ -926,7 +911,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
      * @param confLevel the confidence level of the report
      */
     public void printHalfWidthSummaryReport(double confLevel) {
@@ -934,8 +918,7 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
-     * @param title the title of the report
+     * @param title     the title of the report
      * @param confLevel the confidence level of the report
      */
     public void printHalfWidthSummaryReport(String title, double confLevel) {
@@ -943,7 +926,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
      * @param out the place to write to
      */
     public void writeHalfWidthSummaryReport(PrintWriter out) {
@@ -951,8 +933,7 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
-     * @param out the place to write to
+     * @param out       the place to write to
      * @param confLevel the confidence level of the report
      */
     public void writeHalfWidthSummaryReport(PrintWriter out, double confLevel) {
@@ -960,9 +941,8 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
     }
 
     /**
-     *
-     * @param out the place to write to
-     * @param title the title of the report
+     * @param out       the place to write to
+     * @param title     the title of the report
      * @param confLevel the confidence level of the report
      */
     public void writeHalfWidthSummaryReport(PrintWriter out, String title, double confLevel) {
@@ -983,69 +963,68 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
         return new SimulationReporter(this);
     }
 
-
     /**
-     * If attached, it will be created after the run starts
-     *
-     * @return the JSLDbObserver or null if not attached
-     */
-    public final JSLDatabaseObserver getJSLDatabaseObserver() {
-        return myJSLDatabaseObserver;
-    }
-
-    /**
-     * Becomes available after the simulation run starts
+     * Is available only if the simulation was created with the option
+     * of automatically creating an embedded database
      *
      * @return the JSLDb or null if not created/attached
      */
-    public final JSLDatabase getJSLDatabase() {
-        if (getJSLDatabaseObserver() != null) {
-            return getJSLDatabaseObserver().getJSLDatabase();
+    public final Optional<JSLDatabase> getDefaultJSLDatabase() {
+        return Optional.ofNullable(myDefaultJSLDatabase);
+    }
+
+    /** Tells the default JSLDatabase to stop observing the model if it exists
+     *
+     * @return the default database if it exists
+     */
+    public final Optional<JSLDatabase> stopDefaultDatabaseModelObservation(){
+        if (myDefaultJSLDatabase != null){
+            myDefaultJSLDatabase.stopObservingModel();
         }
-        return null;
+        return getDefaultJSLDatabase();
     }
 
     /**
-     * Removes the automatically attached JSLDbObserver if it was attached
+     *  If a default database exists and if it is not already observing the model it is
+     *  told to start observing the model. If the default database does not exist then
+     *  this method has no effect and writes a warning to the log file.
      */
-    public final void deleteJSLDatabaseObserver() {
-        if (myJSLDatabaseObserver != null) {
-            myModel.deleteObserver(myJSLDatabaseObserver);
-            myJSLDatabaseObserver = null;
+    public final void startDefaultDatabaseModelObservation(){
+        if (myDefaultJSLDatabase != null){
+            myDefaultJSLDatabase.startObservingModel();
+        } else {
+            JSL.LOGGER.warn("Tried to start default database observation when one does not exist");
         }
     }
 
-    /** True is the default.
+    /**
+     * True is the default setting
      *
-     * @return true means that a JSLDbObserver will be attached automatically
+     * @return true means that if the auto create embedded database option was
+     * specified as true, then its current clear database option is returned. If
+     * no default database was specified to be created then this method always
+     * returns false, because there is no database to clear.
      */
-    public final boolean isDbOptionOn() {
-        return myDbOption;
+    public final boolean isClearDatabaseOptionOnForDefaultDatabase() {
+        if (myDefaultJSLDatabase == null) {
+            return false;
+        }
+        return myDefaultJSLDatabase.getClearDatabaseOption();
     }
 
     /**
-     *  True is the default setting
+     * If no automatically created database exists, then nothing happens and a warning
+     * message is logged.
      *
-     * @param option true means that a JSLDbObserver will be attached automatically
+     * @param option true means that the automatically created database will be
+     *               cleared prior to each experiment
      */
-    public final void setDbOption(boolean option) {
-        this.myDbOption = option;
-    }
-
-    /** True is the default setting
-     * @return true means that the automatically attached JSLDbObserver will
-     * be cleared of all data when attached
-     */
-    public final boolean isClearDbOptionOn() {
-        return myClearDbOption;
-    }
-
-    /** True is the default setting
-     * @param option true means that the automatically attached JSLDbObserver will
-     *               be cleared of all data when attached
-     */
-    public void setClearDbOption(boolean option) {
-        this.myClearDbOption = option;
+    public void setClearDatabaseOptionForDefaultDatabase(boolean option) {
+        if (myDefaultJSLDatabase != null) {
+            myDefaultJSLDatabase.setClearDatabaseOption(option);
+        } else {
+            JSL.LOGGER.warn("Tried to set the clear database option when no database exists to clear");
+        }
     }
 
     /**
@@ -1115,19 +1094,6 @@ public class Simulation implements IdentityIfc, ObservableIfc, IterativeProcessI
         protected final void initializeIterations() {
             super.initializeIterations();
             myExecutive.setTerminationWarningMessageOption(false);
-            if (isDbOptionOn()) {
-                if (myJSLDatabaseObserver == null) {
-                    try {
-                        myJSLDatabaseObserver = new JSLDatabaseObserver(Simulation.this, isClearDbOptionOn());
-                    } catch (InvalidFormatException e) {
-                        e.printStackTrace();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
             myExperiment.resetCurrentReplicationNumber();
             beforeExperiment();
             myModel.setUpExperiment();

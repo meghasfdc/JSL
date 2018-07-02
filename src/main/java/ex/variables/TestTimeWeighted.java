@@ -83,7 +83,7 @@ public class TestTimeWeighted extends SchedulingElement {
     }
 
     public static void testExperiment() {
-        Simulation sim = new Simulation();
+        Simulation sim = new Simulation("TestTimeWeighted");
 
         new TestTimeWeighted(sim.getModel());
 
@@ -100,7 +100,7 @@ public class TestTimeWeighted extends SchedulingElement {
     }
 
     public static void testBatchReplication() {
-        Simulation sim = new Simulation();
+        Simulation sim = new Simulation("TestTimeWeighted");
 
         new TestTimeWeighted(sim.getModel());
 
@@ -127,7 +127,7 @@ public class TestTimeWeighted extends SchedulingElement {
     }
 
     public static void testReplication() {
-        Simulation sim = new Simulation();
+        Simulation sim = new Simulation("TestTimeWeighted");
 
         new TestTimeWeighted(sim.getModel());
 

@@ -1,14 +1,10 @@
 package jsl.utilities.dbutil;
 
-import jsl.observers.JSLDatabase;
 import org.apache.derby.jdbc.ClientDataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
-import org.jooq.SQLDialect;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
 public class DataSourceFactory {
@@ -84,6 +80,7 @@ public class DataSourceFactory {
         if (create){
             ds.setCreateDatabase("create");
         }
+        DatabaseIfc.DbLogger.info("Created an embedded Derby data source for {}", dbName);
         return ds;
     }
 
@@ -109,6 +106,7 @@ public class DataSourceFactory {
         if (create){
             ds.setCreateDatabase("create");
         }
+        DatabaseIfc.DbLogger.info("Created a Derby client data source for {}", dbName);
         return ds;
     }
 }

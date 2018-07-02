@@ -19,20 +19,14 @@ package jsl.modeling;
 import java.util.TimerTask;
 
 import jsl.observers.textfile.IPLogReport;
+import jsl.utilities.GetNameIfc;
 import jsl.utilities.IdentityIfc;
 
 /**
  *
  * @author rossetti
  */
-public interface IterativeProcessIfc extends IdentityIfc {
-
-    /**
-     * Sets the name
-     *
-     * @param str The name as a string.
-     */
-    void setName(String str);
+public interface IterativeProcessIfc extends GetNameIfc {
 
     /**
      * A flag to indicate whether the iterative process is done A iterative

@@ -62,7 +62,7 @@ public class TestNHPPPWConstant extends ModelElement {
     public static void main(String[] args) {
 
         // create the experiment to run the model
-        Simulation s = new Simulation();
+        Simulation s = new Simulation("TestNHPPWConstant");
 
         PiecewiseConstantRateFunction f = new PiecewiseConstantRateFunction(15.0, 1.0);
 

@@ -1,16 +1,13 @@
 package jsl.utilities.dbutil;
 
-import jsl.observers.JSLDatabase;
+import jsl.utilities.reporting.JSLDatabase;
 import org.jooq.Queries;
 import org.jooq.Query;
 import org.jooq.SQLDialect;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;

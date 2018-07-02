@@ -175,11 +175,11 @@ public class ExcelUtil {
             Path currentDir = Paths.get(".");
             pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
         }
-        logger.debug("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
+        logger.info("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
         XSSFWorkbook workbook = new XSSFWorkbook();
         for (String tableName : tables) {
             Sheet sheet = workbook.createSheet(tableName);
-            logger.debug("Writing table {} to Excel sheet.", tableName);
+            logger.info("Writing table {} to Excel sheet.", tableName);
             writeTableAsExcelSheet(db, tableName, sheet);
         }
 
@@ -227,11 +227,11 @@ public class ExcelUtil {
         File file = pathToWorkbook.toFile();
         OPCPackage pkg = OPCPackage.open(file);
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
-        logger.debug("Writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
+        logger.info("Writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
         writeWorkbookToDatabase(wb, skipFirstRow, db, tableNames);
         //wb.close();
         pkg.close();
-        logger.debug("Completed writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
+        logger.info("Completed writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
     }
 
     /**
@@ -277,7 +277,7 @@ public class ExcelUtil {
         for (String tableName : tableNames) {
             XSSFSheet sheet = wb.getSheet(tableName);
             if (sheet == null){
-                logger.debug("Skipping table {} no corresponding sheet in workbook", tableName);
+                logger.info("Skipping table {} no corresponding sheet in workbook", tableName);
                 continue;
             }
             writeSheetToTable(sheet, skipFirstRow, tableName, db);
@@ -337,10 +337,10 @@ public class ExcelUtil {
 
         final Table<? extends Record> table = db.getTable(tableName);
         final Field<?>[] fields = table.fields();
-        logger.debug("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getLabel());
+        logger.info("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getLabel());
         final List<Object[]> lists = readSheetAsListOfObjects(sheet, fields, skipFirstRow);
         db.getDSLContext().loadInto(table).batchAll().loadArrays(lists.iterator()).fields(fields).execute();
-        logger.debug("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getLabel());
+        logger.info("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getLabel());
     }
 
     /**
