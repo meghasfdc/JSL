@@ -17,6 +17,7 @@
 package jsl.utilities.dbutil;
 
 import jsl.utilities.excel.ExcelUtil;
+import jsl.utilities.reporting.JSL;
 import org.jooq.*;
 import org.jooq.util.GenerationTool;
 import org.jooq.util.jaxb.Generator;
@@ -583,15 +584,20 @@ public interface DatabaseIfc {
             return;
         }
         if (wbName == null) {
-            wbName = getLabel();
+            wbName = getLabel() + ".xlsx";
+        } else {
+            // name is not null make sure it has .xlsx
+            if(!wbName.endsWith(".xlsx")){
+                wbName = wbName.concat(".xlsx");
+            }
         }
         if (wbDirectory == null) {
-            wbDirectory = Paths.get(".");
+            wbDirectory = JSL.ExcelDir.toAbsolutePath();
         }
-        if (!wbName.endsWith(".xlsx")){
-            wbName = wbName.concat(".xlsx");
-        }
+//        System.out.println(wbName);
+//        System.out.println(wbDirectory);
         Path path = wbDirectory.resolve(wbName);
+//        System.out.println(path);
         List<String> tableNames = getTableNames(schemaName);
         if (tableNames.isEmpty()){
             DbLogger.warn("The supplied schema name {} had no tables to write to Excel in database {}",

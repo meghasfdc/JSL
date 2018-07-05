@@ -1,5 +1,6 @@
 package jsl.utilities.dbutil;
 
+import jsl.utilities.reporting.JSL;
 import jsl.utilities.reporting.JSLDatabase;
 import org.jooq.Queries;
 import org.jooq.Query;
@@ -20,7 +21,8 @@ public class DataSourceFactoryTest {
        // testDerbyLocalHost();
        // testDataSourceConnection();
        // testParsing();
-        testDatabaseCreation();
+       // testDatabaseCreation();
+        testExcelDbExport();
     }
 
     public static void testDataSourceConnection(){
@@ -144,5 +146,48 @@ public class DataSourceFactoryTest {
         db.executeCreateTask(task);
 
         System.out.println(task);
+    }
+
+    public static void testExcelDbExport() throws IOException {
+        Path path = JSLDatabase.dbDir.resolve("SP");
+        String name = "SP";
+        // just create it
+        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name, true);
+        // make the database
+        Database db = new Database(name, dataSource, SQLDialect.DERBY);
+        // build the creation task
+        //Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
+
+        Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
+        Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
+        Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
+        Database.DbCreateTask task = Database.creationTaskBuilder()
+                .withTables(tables).withInserts(inserts).withConstraints(alters)
+                .build();
+
+        db.executeCreateTask(task);
+        db.writeDbToExcelWorkbook("APP");
+    }
+
+    public static void testExcelDbImport() throws IOException {
+        Path path = JSLDatabase.dbDir.resolve("SPViaExcel");
+        String name = path.toAbsolutePath().toString();
+        // just create it
+        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name, true);
+        // make the database
+        Database db = new Database(name, dataSource, SQLDialect.DERBY);
+        // build the creation task
+        //Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
+
+        Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
+        Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
+        Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
+        Database.DbCreateTask task = Database.creationTaskBuilder()
+                .withTables(tables).withInserts(inserts).withConstraints(alters)
+                .build();
+
+        db.executeCreateTask(task);
+
+        db.writeDbToExcelWorkbook("APP");
     }
 }
