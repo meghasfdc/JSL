@@ -57,7 +57,7 @@ import java.util.*;
  */
 public class ExcelUtil {
 
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Writes the supplied database to an Excel workbook with one sheet for
@@ -83,10 +83,10 @@ public class ExcelUtil {
         try {
             writeDBAsExcelWorkbook(db, tableNames, pathToWorkbook);
         } catch (FileNotFoundException ex) {
-            logger.error("FileNotFoundException {} ", pathToWorkbook, ex);
+            LOG.error("FileNotFoundException {} ", pathToWorkbook, ex);
             ex.printStackTrace();
         } catch (IOException ex) {
-            logger.error("Error in {} runWriteDBAsExcelWorkbook()", pathToWorkbook, ex);
+            LOG.error("Error in {} runWriteDBAsExcelWorkbook()", pathToWorkbook, ex);
             ex.printStackTrace();
         }
 
@@ -117,10 +117,7 @@ public class ExcelUtil {
         try {
             writeWorkbookToDatabase(pathToWorkbook, skipFirstRow, db, tableNames);
         } catch (IOException e) {
-            logger.error("IOException {} ", pathToWorkbook, e);
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            logger.error("InvalidFormatException {} ", pathToWorkbook, e);
+            LOG.error("IOException {} ", pathToWorkbook, e);
             e.printStackTrace();
         }
     }
@@ -155,7 +152,7 @@ public class ExcelUtil {
         Objects.requireNonNull(db, "The supplied DatabaseIfc reference was null");
         Objects.requireNonNull(tableNames, "The supplied list of table names was null");
         if (tableNames.isEmpty()){
-            logger.warn("The supplied list of table names was empty");
+            LOG.warn("The supplied list of table names was empty");
             return;
         }
         List<String> tables = new ArrayList<>();
@@ -163,11 +160,11 @@ public class ExcelUtil {
             if (db.containsTable(tableName)){
                 tables.add(tableName);
             } else {
-                logger.warn("The supplied table name {} to write to Excel is not in database {}", tableName, db.getLabel());
+                LOG.warn("The supplied table name {} to write to Excel is not in database {}", tableName, db.getLabel());
             }
         }
         if (tables.isEmpty()){
-            logger.warn("The supplied list of table names had no corresponding tables in database {}", db.getLabel());
+            LOG.warn("The supplied list of table names had no corresponding tables in database {}", db.getLabel());
             return;
         }
         //  if null make the name of the workbook the same as the database name
@@ -175,11 +172,11 @@ public class ExcelUtil {
             Path currentDir = Paths.get(".");
             pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
         }
-        logger.info("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
+        LOG.info("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
         XSSFWorkbook workbook = new XSSFWorkbook();
         for (String tableName : tables) {
             Sheet sheet = workbook.createSheet(tableName);
-            logger.info("Writing table {} to Excel sheet.", tableName);
+            LOG.info("Writing table {} to Excel sheet.", tableName);
             writeTableAsExcelSheet(db, tableName, sheet);
         }
 
@@ -200,10 +197,9 @@ public class ExcelUtil {
      * @param db             the database to write to
      * @param tableNames     the names of the sheets and tables in the order that needs to be written
      * @throws IOException            an io exception
-     * @throws InvalidFormatException if the workbook has an invalid format
      */
     public static void writeWorkbookToDatabase(Path pathToWorkbook, DatabaseIfc db,
-                                               List<String> tableNames) throws IOException, InvalidFormatException {
+                                               List<String> tableNames) throws IOException {
         writeWorkbookToDatabase(pathToWorkbook, true, db, tableNames);
     }
 
@@ -217,21 +213,26 @@ public class ExcelUtil {
      * @param db             the database to write to
      * @param tableNames     the names of the sheets and tables in the order that needs to be written
      * @throws IOException            an io exception
-     * @throws InvalidFormatException if the workbook has an invalid format
      */
     public static void writeWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, DatabaseIfc db,
-                                               List<String> tableNames) throws IOException, InvalidFormatException {
+                                               List<String> tableNames) throws IOException {
         if (pathToWorkbook == null) {
             throw new IllegalArgumentException("The path to the workbook was null");
         }
         File file = pathToWorkbook.toFile();
-        OPCPackage pkg = OPCPackage.open(file);
+        OPCPackage pkg = null;
+        try {
+            pkg = OPCPackage.open(file);
+        } catch (InvalidFormatException e) {
+            LOG.error("The workbook has an invalid format");
+            throw new IOException("The workbook has an invalid format. See Apache POI InvalidFormatException");
+        }
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
-        logger.info("Writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
+        LOG.info("Writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
         writeWorkbookToDatabase(wb, skipFirstRow, db, tableNames);
         //wb.close();
         pkg.close();
-        logger.info("Completed writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
+        LOG.info("Completed writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
     }
 
     /**
@@ -277,7 +278,7 @@ public class ExcelUtil {
         for (String tableName : tableNames) {
             XSSFSheet sheet = wb.getSheet(tableName);
             if (sheet == null){
-                logger.info("Skipping table {} no corresponding sheet in workbook", tableName);
+                LOG.info("Skipping table {} no corresponding sheet in workbook", tableName);
                 continue;
             }
             writeSheetToTable(sheet, skipFirstRow, tableName, db);
@@ -330,17 +331,16 @@ public class ExcelUtil {
             tableName = sheet.getSheetName();
         }
         if (!db.containsTable(tableName)) {
-            logger.warn("Attempting to write sheet {} to database {}, the table {} does not exist",
+            LOG.warn("Attempting to write sheet {} to database {}, the table {} does not exist",
                     sheet.getSheetName(), db.getLabel(), tableName);
             return;
         }
-
         final Table<? extends Record> table = db.getTable(tableName);
         final Field<?>[] fields = table.fields();
-        logger.info("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getLabel());
+        LOG.info("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getLabel());
         final List<Object[]> lists = readSheetAsListOfObjects(sheet, fields, skipFirstRow);
         db.getDSLContext().loadInto(table).batchAll().loadArrays(lists.iterator()).fields(fields).execute();
-        logger.info("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getLabel());
+        LOG.info("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getLabel());
     }
 
     /**
@@ -415,7 +415,7 @@ public class ExcelUtil {
                     if (s.length() > fieldLength){
                         s = s.substring(0,fieldLength-1);
                         obj = s;
-                        logger.warn("The cell {} was truncated to {} characters for field {}", cell.getStringCellValue(), fieldLength, fields[i].getName());
+                        LOG.warn("The cell {} was truncated to {} characters for field {}", cell.getStringCellValue(), fieldLength, fields[i].getName());
                     }
                 }
             }
@@ -481,7 +481,7 @@ public class ExcelUtil {
             throw new IllegalArgumentException("The sheet was null");
         }
         if (!db.containsTable(tableName)) {
-            logger.warn("The supplied table name {} is not in database {}", tableName, db.getLabel());
+            LOG.warn("The supplied table name {} is not in database {}", tableName, db.getLabel());
             return;
         }
         Result<Record> records = db.selectAll(tableName);
@@ -587,7 +587,7 @@ public class ExcelUtil {
             cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
             cell.setCellStyle(cellStyle);
         } else {
-            logger.error("Could not cast type {} to Excel type.", object.getClass().getName());
+            LOG.error("Could not cast type {} to Excel type.", object.getClass().getName());
             throw new ClassCastException("Could not cast database type to Excel type: " + object.getClass().getName() );
         }
     }
@@ -605,11 +605,10 @@ public class ExcelUtil {
      * @throws IOException  An IO exception from the parser,
      *                      possibly from a byte stream or character stream
      *                      supplied by the application.
-     * @throws SAXException if parsing the XML data fails.
      */
-    public static void processXSSFSheet(StylesTable styles, ReadOnlySharedStringsTable strings,
+    static void processXSSFSheet(StylesTable styles, ReadOnlySharedStringsTable strings,
                                         XSSFSheetXMLHandler.SheetContentsHandler sheetHandler,
-                                        InputStream sheetInputStream) throws IOException, SAXException {
+                                        InputStream sheetInputStream) throws IOException {
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
@@ -619,7 +618,11 @@ public class ExcelUtil {
             sheetParser.setContentHandler(handler);
             sheetParser.parse(sheetSource);
         } catch (ParserConfigurationException e) {
-            throw new RuntimeException("SAX parser appears to be broken - " + e.getMessage());
+            LOG.error("SAX parser appears to be broken - {}", e.getMessage());
+            throw new IOException("SAX parser appears to be broken - " + e.getMessage());
+        } catch (SAXException e) {
+            LOG.error("XML reader appears to be broken - {}", e.getMessage());
+            throw new IOException("XML reader appears to be broken - " + e.getMessage());
         }
     }
 
@@ -629,16 +632,37 @@ public class ExcelUtil {
      * @param xlsxPackage  the xlsx package context for the workbook
      * @param sheetHandler the handler to process each sheet
      * @throws IOException        If reading the data from the package fails.
-     * @throws OpenXML4JException if parsing XML fails
-     * @throws SAXException       if parsing the XML data fails.
      */
-    public static void processAllXSSFSheets(OPCPackage xlsxPackage, XSSFSheetXMLHandler.SheetContentsHandler
-            sheetHandler)
-            throws IOException, OpenXML4JException, SAXException {
-        ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(xlsxPackage);
-        XSSFReader xssfReader = new XSSFReader(xlsxPackage);
-        StylesTable styles = xssfReader.getStylesTable();
-        XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+    static void processAllXSSFSheets(OPCPackage xlsxPackage, XSSFSheetXMLHandler.SheetContentsHandler
+            sheetHandler) throws IOException {
+        ReadOnlySharedStringsTable strings = null;
+        try {
+            strings = new ReadOnlySharedStringsTable(xlsxPackage);
+        } catch (SAXException e) {
+            LOG.error("SAX parser appears to be broken - {}", e.getMessage());
+            throw new IOException("SAX parser appears to be broken - " + e.getMessage());
+        }
+        XSSFReader xssfReader = null;
+        try {
+            xssfReader = new XSSFReader(xlsxPackage);
+        } catch (OpenXML4JException e) {
+            LOG.error("XML reader appears to be broken - {}", e.getMessage());
+            throw new IOException("The XML reader appears to be broken - " + e.getMessage());
+        }
+        StylesTable styles = null;
+        try {
+            styles = xssfReader.getStylesTable();
+        } catch (InvalidFormatException e) {
+            LOG.error("The workbook seems to have a format problem - {}", e.getMessage());
+            throw new IOException("The workbook seems to have a format problem - " + e.getMessage());
+        }
+        XSSFReader.SheetIterator iter = null;
+        try {
+            iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+        } catch (InvalidFormatException e) {
+            LOG.error("The sheet seems to have a format problem - {}", e.getMessage());
+            throw new IOException("The sheet seems to have a format problem - " + e.getMessage());
+        }
         int index = 0;
         while (iter.hasNext()) {
             InputStream stream = iter.next();

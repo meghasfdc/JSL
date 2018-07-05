@@ -124,7 +124,7 @@ public class ExcelTesting {
      * Tests the writing an Excel sheet to a comma separated value file.
      * Depends on having ColonialTemp.xlsx in the current working directory
      */
-    public static void writeSheetAsCSVTest() {
+    public static void writeSheetAsCSVTest() throws IOException {
         Path path = excelDir.resolve("ColonialTemp.xlsx");
         ExcelWorkbookAsCSV excelWorkbookAsCSV = new ExcelWorkbookAsCSV(path);
         excelWorkbookAsCSV.writeXSSFSheetToCSV("PRODUCT");
@@ -135,7 +135,7 @@ public class ExcelTesting {
      * Depends on having ColonialTemp.xlsx in the current working directory
      * Writes to a directory called excelOutput in the current working directory
      */
-    public static void writeWorkbookAsCSVTest() {
+    public static void writeWorkbookAsCSVTest() throws IOException {
         Path path = excelDir.resolve("ColonialTemp.xlsx");
         ExcelWorkbookAsCSV excelWorkbookAsCSV = new ExcelWorkbookAsCSV(path);
         excelWorkbookAsCSV.writeXSSFWorkbookToCSV(Paths.get(".", "excelOutput"));

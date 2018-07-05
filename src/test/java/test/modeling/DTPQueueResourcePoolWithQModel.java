@@ -69,7 +69,7 @@ public class DTPQueueResourcePoolWithQModel extends SchedulingElement {
                 .collectRequestQStats()
                 .build(numServers);
         myResourcePool = new ResourcePoolWithQ(this, units, true, true, "Pharmacists");
-        // myResource = new ResourceUnit.Builder(this).name("Server").build();
+        // myResource = new ResourceUnit.Builder(this).name("Server").builder();
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
         mySysTime = new ResponseVariable(this, "System Time");

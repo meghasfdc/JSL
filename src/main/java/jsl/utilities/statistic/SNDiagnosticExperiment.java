@@ -28,7 +28,7 @@ import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import java.util.*;
 
 /**
- * Use the static create method to get a builder to build the experiment with its addFactor
+ * Use the static create method to get a builder to builder the experiment with its addFactor
  * data.
  * <p>
  * Input uncertainty analyzer based on :
@@ -141,7 +141,7 @@ public class SNDiagnosticExperiment {
     }
 
     /**
-     * The ability to build or add addFactor data
+     * The ability to builder or add addFactor data
      */
     public interface BuildStepIfc extends AddFactorDataStepIfc {
         SNDiagnosticExperiment build();
@@ -190,9 +190,9 @@ public class SNDiagnosticExperiment {
             mySimOutput[i] = mySim.runReplications(numReplications, row);
         }
 
-        // build data set for regression
+        // builder data set for regression
         buildDataForRegression(numBootstrapSamples);
-        // fit the regression model, build output data
+        // fit the regression model, builder output data
         fitRegressionModel();
     }
 

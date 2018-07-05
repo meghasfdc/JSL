@@ -105,7 +105,7 @@ uploadShadow {
         }
     }
 }
-// exclude all tests from the build
+// exclude all tests from the builder
 // comment this out if you want to run the tests
 test {
     exclude '**/**'

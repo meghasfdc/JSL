@@ -44,7 +44,7 @@ public class TestMakingResourceUnitsAndQueues {
         ResourceUnit r1 = new ResourceUnit.Builder(model).build();
         RequestReactor rr = new RequestReactor();
         // directly hold Customer
-        //Queue<Customer> q = new Queue.Builder<Customer>(model).build();
+        //Queue<Customer> q = new Queue.Builder<Customer>(model).builder();
         Queue<Customer> q = new Queue<>(model);
         QObject qo = new QObject(0.0);
         Queue<QObject> q1 = new Queue<>(model);

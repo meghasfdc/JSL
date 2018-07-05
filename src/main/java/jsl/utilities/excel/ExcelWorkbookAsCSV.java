@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
  */
 public class ExcelWorkbookAsCSV {
 
-    final static org.slf4j.Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    final static org.slf4j.Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private OPCPackage myPackage;
     private ReadOnlySharedStringsTable myReadOnlySharedStrings;
@@ -56,7 +56,7 @@ public class ExcelWorkbookAsCSV {
     private StylesTable myStyles;
     private XSSFWorkbook myWorkBook;
 
-    public ExcelWorkbookAsCSV(Path pathToWorkbook) {
+    public ExcelWorkbookAsCSV(Path pathToWorkbook) throws IOException {
 
         try {
             myPackage = OPCPackage.open(pathToWorkbook.toString(), PackageAccess.READ);
@@ -64,14 +64,16 @@ public class ExcelWorkbookAsCSV {
             myReadOnlySharedStrings = new ReadOnlySharedStringsTable(myPackage);
             myXSSFReader = new XSSFReader(myPackage);
             myStyles = myXSSFReader.getStylesTable();
-        } catch (InvalidFormatException | InvalidOperationException ex) {
-            logger.error("Error making ExcelWorkbookAsCSV {} ", pathToWorkbook, ex);
+        } catch (InvalidFormatException | InvalidOperationException  ex) {
+            LOG.error("Error making ExcelWorkbookAsCSV {} ", pathToWorkbook, ex);
+            throw new IOException("Error constructing ExcelWorkbookAsCSV " + ex);
         } catch (IOException | SAXException | OpenXML4JException ex) {
-            logger.error("Error making ExcelWorkbookAsCSV {} ", pathToWorkbook, ex);
+            LOG.error("Error making ExcelWorkbookAsCSV {} ", pathToWorkbook, ex);
+            throw new IOException("Error constructing ExcelWorkbookAsCSV " + ex);
         }
     }
 
-    public void writeXSSFSheetToCSV(String sheetName) {
+    public void writeXSSFSheetToCSV(String sheetName) throws IOException {
         writeXSSFSheetToCSV(sheetName, null);
     }
 
@@ -79,7 +81,7 @@ public class ExcelWorkbookAsCSV {
      * @param sheetName the name of the sheet to write to the file
      * @param path      the path to the file to write to
      */
-    public void writeXSSFSheetToCSV(String sheetName, Path path) {
+    public void writeXSSFSheetToCSV(String sheetName, Path path) throws IOException {
         if (sheetName == null) {
             throw new IllegalArgumentException("The sheet name cannot be null!");
         }
@@ -106,8 +108,9 @@ public class ExcelWorkbookAsCSV {
             sheetInputStream.close();
             printWriter.flush();
             printWriter.close();
-        } catch (IOException | InvalidFormatException | SAXException ex) {
-            logger.error("Error writeXSSFSheetToCSV {} ", sheetName, ex);
+        } catch (InvalidFormatException ex) {
+            LOG.error("Error writeXSSFSheetToCSV {} ", sheetName, ex);
+            throw new IOException("Error writeXSSFSheetToCSV " + ex);
         }
     }
 
@@ -117,11 +120,11 @@ public class ExcelWorkbookAsCSV {
      *
      * @param pathToOutPutDirectory
      */
-    public void writeXSSFWorkbookToCSV(Path pathToOutPutDirectory) {
+    public void writeXSSFWorkbookToCSV(Path pathToOutPutDirectory) throws IOException {
         try {
             Files.createDirectories(pathToOutPutDirectory);
         } catch (IOException ex) {
-            logger.error("Error writeXSSFWorkbookToCSV {} ", pathToOutPutDirectory, ex);
+            LOG.error("Error writeXSSFWorkbookToCSV {} ", pathToOutPutDirectory, ex);
         }
         int numSheets = myWorkBook.getNumberOfSheets();
         for (int i = 0; i < numSheets; i++) {

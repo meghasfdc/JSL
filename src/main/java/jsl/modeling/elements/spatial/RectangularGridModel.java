@@ -27,7 +27,7 @@ import jsl.utilities.random.distributions.Uniform;
  * This class can be used to hold ModelElements that can be in a
  * RectangularGridSpatialModel2D. This defines a model element with the ability
  * to schedule that has a RectangularGridSpatialModel2D spatial model.
- * Sub-classes can build on this.
+ * Sub-classes can builder on this.
  *
  * @author rossetti
  */

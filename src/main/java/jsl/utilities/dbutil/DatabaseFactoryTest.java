@@ -10,10 +10,11 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class DataSourceFactoryTest {
+public class DatabaseFactoryTest {
 
     public static void main(String[] args) throws IOException {
 
@@ -21,16 +22,17 @@ public class DataSourceFactoryTest {
        // testDerbyLocalHost();
        // testDataSourceConnection();
        // testParsing();
-       // testDatabaseCreation();
-        testExcelDbExport();
+  //      testDatabaseCreation();
+  //      testExcelDbExport();
+        testExcelDbImport();
     }
 
     public static void testDataSourceConnection(){
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
         String name = path.toAbsolutePath().toString();
-//        DataSource dataSource = DataSourceFactory.getClientDerbyDataSourceWithLocalHost(name,
+//        DataSource dataSource = DataSourceFactory.createClientDerbyDataSourceWithLocalHost(name,
 //                null, null, false);
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name,
+        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(name,
                 null, null, false);
         try {
             dataSource.getConnection();
@@ -44,7 +46,7 @@ public class DataSourceFactoryTest {
         //note the server must be started for this to work
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
         String name = path.toAbsolutePath().toString();
-        DataSource dataSource = DataSourceFactory.getClientDerbyDataSourceWithLocalHost(name,
+        DataSource dataSource = DatabaseFactory.createClientDerbyDataSourceWithLocalHost(name,
                 null, null, false);
         Database db = new Database("JSL", dataSource, SQLDialect.DERBY);
         db.setJooQDefaultExecutionLoggingOption(true);
@@ -60,7 +62,7 @@ public class DataSourceFactoryTest {
     public static void testDerbyEmbeddedWithCreateScript() throws IOException {
         Path path = JSLDatabase.dbDir.resolve("TmpDb");
         Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(path, true);
+        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path, true);
         Database db = new Database("TmpDb", dataSource, SQLDialect.DERBY);
         db.executeScript(pathToCreationScript);
         List<String> jsl_db = db.getTableNames("JSL_DB");
@@ -72,7 +74,7 @@ public class DataSourceFactoryTest {
 
     public static void testDerbyEmbeddedExisting(){
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(path);
+        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path);
         Database db = new Database("JSL", dataSource, SQLDialect.DERBY);
         db.setJooQDefaultExecutionLoggingOption(true);
 
@@ -87,7 +89,7 @@ public class DataSourceFactoryTest {
     public static void testParsing() throws IOException {
         Path path = JSLDatabase.dbDir.resolve("TmpDb2");
         Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(path, true);
+        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path, true);
         Database db = new Database("TmpDb2", dataSource, SQLDialect.DERBY);
         List<String> lines = DatabaseIfc.parseQueriesInSQLScript(pathToCreationScript);
         //List<String> lines = Files.readAllLines(pathToCreationScript, StandardCharsets.UTF_8);
@@ -126,16 +128,16 @@ public class DataSourceFactoryTest {
         Path path = JSLDatabase.dbDir.resolve("TestCreationTaskDb");
         String name = path.toAbsolutePath().toString();
         // just create it
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name, true);
+        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(name, true);
         // make the database
         Database db = new Database(name, dataSource, SQLDialect.DERBY);
-        // build the creation task
+        // builder the creation task
         //Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
 
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
         Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
         Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
-        Database.DbCreateTask task = Database.creationTaskBuilder()
+        DbCreateTask task = DbCreateTask.builder()
                 .withTables(tables).withInserts(inserts).withConstraints(alters)
                 .build();
         System.out.println(task);
@@ -149,45 +151,40 @@ public class DataSourceFactoryTest {
     }
 
     public static void testExcelDbExport() throws IOException {
-        Path path = JSLDatabase.dbDir.resolve("SP");
-        String name = "SP";
-        // just create it
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name, true);
+        String dbName = "SP";
         // make the database
-        Database db = new Database(name, dataSource, SQLDialect.DERBY);
-        // build the creation task
-        //Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
-
+        Database db = DatabaseFactory.createEmbeddedDerbyDatabase(dbName);
+        // builder the creation task
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
         Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
         Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
-        Database.DbCreateTask task = Database.creationTaskBuilder()
+        DbCreateTask task = DbCreateTask.builder()
                 .withTables(tables).withInserts(inserts).withConstraints(alters)
                 .build();
-
+        // execute the creation task
         db.executeCreateTask(task);
         db.writeDbToExcelWorkbook("APP");
     }
 
     public static void testExcelDbImport() throws IOException {
-        Path path = JSLDatabase.dbDir.resolve("SPViaExcel");
-        String name = path.toAbsolutePath().toString();
-        // just create it
-        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name, true);
+        String dbName = "SPViaExcel";
         // make the database
-        Database db = new Database(name, dataSource, SQLDialect.DERBY);
-        // build the creation task
-        //Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
+        Database db = DatabaseFactory.createEmbeddedDerbyDatabase(dbName);
 
+        // builder the creation task
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
         Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
         Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
-        Database.DbCreateTask task = Database.creationTaskBuilder()
-                .withTables(tables).withInserts(inserts).withConstraints(alters)
+
+        Path wbPath = JSL.ExcelDir.resolve("SP.xlsx");
+        DbCreateTask task = DbCreateTask.builder()
+                .withTables(tables)
+                .withExcelData(wbPath, Arrays.asList("S", "P", "SP"))
+                .withConstraints(alters)
                 .build();
 
         db.executeCreateTask(task);
 
-        db.writeDbToExcelWorkbook("APP");
+        db.printAllTablesAsText("APP");
     }
 }

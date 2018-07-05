@@ -27,7 +27,7 @@ import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.observers.ModelElementObserver;
-import jsl.utilities.dbutil.DataSourceFactory;
+import jsl.utilities.dbutil.DatabaseFactory;
 import jsl.utilities.dbutil.Database;
 import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.jsldbsrc.tables.records.*;
@@ -35,7 +35,6 @@ import jsl.utilities.statistic.BatchStatistic;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.WeightedStatisticIfc;
-import org.apache.commons.io.FileUtils;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import tech.tablesaw.api.Table;
@@ -180,14 +179,8 @@ public class JSLDatabase {
             dbName = dbName.replaceAll("\\s+","");
         }
         Path pathToDb = dbDir.resolve(dbName);
-        try {
-            FileUtils.deleteDirectory(pathToDb.toFile());
-            DatabaseIfc.DbLogger.info("Deleting directory to derby database {}", pathToDb);
-        } catch (IOException e) {
-            DatabaseIfc.DbLogger.error("Unable to delete directory to derby database {}", pathToDb);
-            throw new DataAccessException("Unable to delete directory to derby database {}");
-        }
-        DataSource ds = DataSourceFactory.getEmbeddedDerbyDataSource(pathToDb, true);
+        DatabaseFactory.deleteEmbeddedDerbyDatabase(pathToDb);
+        DataSource ds = DatabaseFactory.createEmbeddedDerbyDataSource(pathToDb, true);
         Database db = new Database(dbName, ds, SQLDialect.DERBY);
         return new JSLDatabase(db, simulation, clearDataOption);
     }
@@ -221,10 +214,10 @@ public class JSLDatabase {
         if (Files.isDirectory(pathToDb)){
             // the directory holding the database exists already
             // just make a data source for it
-            ds = DataSourceFactory.getEmbeddedDerbyDataSource(pathToDb);
+            ds = DatabaseFactory.createEmbeddedDerbyDataSource(pathToDb);
         } else {
             // the named database does not exist, make a new one
-            ds = DataSourceFactory.getEmbeddedDerbyDataSource(pathToDb, true);
+            ds = DatabaseFactory.createEmbeddedDerbyDataSource(pathToDb, true);
             JSL.LOGGER.warn("The requested database {} does not exist, made a new one instead", pathToDb.toString());
         }
         Database db = new Database(dbName, ds, SQLDialect.DERBY);

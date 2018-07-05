@@ -14,59 +14,54 @@
  *    limitations under the License.
  */
 
-package jsl.utilities.misc;
+package jsl.utilities.reporting;
 
-import jsl.utilities.reporting.JSLDatabase;
+import jsl.utilities.dbutil.DatabaseFactory;
+import jsl.utilities.dbutil.Database;
 import jsl.utilities.dbutil.DatabaseIfc;
-import jsl.utilities.dbutil.EmbeddedDerbyDatabase;
+import jsl.utilities.dbutil.DbCreateTask;
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.jooq.SQLDialect;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 
 public class JSLDbJooqCodeGenerator {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
 
-//        Path path = Paths.get("src").resolve("main").resolve("resources");
-
- //       System.out.println(path);
         //makeEmptyDb("JSLDbCodeGen", "JSLDb.sql");
 
         runCodeGenerationUsingEmptyDb();
 
- //       runCodeGenerationUsingScriptOnly();
-
     }
 
-    public static EmbeddedDerbyDatabase makeEmptyDb(String dbName, String scriptName) throws IOException,
-            SQLException, InvalidFormatException {
+    public static DatabaseIfc makeEmptyDb(String dbName, String scriptName) throws IOException {
         System.out.println("Making database: " + dbName);
 
         FileUtils.deleteDirectory(JSLDatabase.dbDir.resolve(dbName).toFile());
         Path createScript = JSLDatabase.dbScriptsDir.resolve(scriptName);
-        EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(dbName, JSLDatabase.dbDir)
-                .withCreationScript(createScript)
-                .connect();
+        DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbName, true);
+        Database db = new Database(dbName, derbyDataSource, SQLDialect.DERBY);
+        DbCreateTask task = DbCreateTask.builder().withCreationScript(createScript).build();
+        db.executeCreateTask(task);
         System.out.println("Created database: " + dbName);
         return db;
     }
 
-    public static void runCodeGenerationUsingEmptyDb() throws IOException,
-            SQLException, InvalidFormatException {
-
+    public static void runCodeGenerationUsingEmptyDb() throws IOException {
         // make the database
         String dbName = "tmpJSLDb";
         System.out.println("Making database: " + dbName);
         Path dbDir = Paths.get(".", "db");
         FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
         Path createScript = Paths.get("src").resolve("main").resolve("resources").resolve("JSLDb.sql");
-        EmbeddedDerbyDatabase db = EmbeddedDerbyDatabase.createDb(dbName, dbDir)
-                .withCreationScript(createScript)
-                .connect();
+        DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbName, true);
+        Database db = new Database(dbName, derbyDataSource, SQLDialect.DERBY);
+        DbCreateTask task = DbCreateTask.builder().withCreationScript(createScript).build();
+        db.executeCreateTask(task);
         System.out.println("Created database: " + dbName);
         Path dbPath = dbDir.resolve(dbName);
         System.out.println("Running code generation.");

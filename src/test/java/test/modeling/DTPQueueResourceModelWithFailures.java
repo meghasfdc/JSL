@@ -71,7 +71,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         Constant c1 = new Constant(3.0);
         TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1, c1);
         //SingleFailureEvent fe = new SingleFailureEvent(myResource, new Constant(5), new Constant(6));
-        // myResource = new ResourceUnit.Builder(this).name("Server").build();
+        // myResource = new ResourceUnit.Builder(this).name("Server").builder();
 //        RandomIfc duration = new Constant(5);
 //        RandomIfc timeToFailure = new Constant(6);
         RandomIfc duration = new Uniform(4, 5);
