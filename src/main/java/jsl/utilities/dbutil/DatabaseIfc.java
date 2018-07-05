@@ -654,6 +654,7 @@ public interface DatabaseIfc {
             }
             getConnection().setAutoCommit(true);
         } catch (SQLException ex) {
+            flag = false;
             DbLogger.error("SQLException: ", ex);
             try {
                 getConnection().rollback();

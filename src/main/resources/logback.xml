@@ -91,15 +91,15 @@
         </encoder>
     </appender>
 
-    <logger name="jsl.utilities.dbutil.DatabaseIfc" additivity="false">
+    <logger name="jsl.utilities.dbutil.DatabaseIfc" level="DEBUG" additivity="false">
         <appender-ref ref="JSLDB" />
     </logger>
 
-    <logger name="jsl.utilities.excel.ExcelUtil" additivity="false">
+    <logger name="jsl.utilities.excel.ExcelUtil" level="DEBUG" additivity="false">
         <appender-ref ref="JSLEXCEL" />
     </logger>
 
-    <logger name="org.jooq.tools.LoggerListener" additivity="false">
+    <logger name="org.jooq.tools.LoggerListener" level="DEBUG" additivity="false">
         <appender-ref ref="JOOQFILE" />
     </logger>
 

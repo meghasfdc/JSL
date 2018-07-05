@@ -19,7 +19,8 @@ public class DataSourceFactoryTest {
        // makeDbTest();
        // testDerbyLocalHost();
        // testDataSourceConnection();
-        testParsing();
+       // testParsing();
+        testDatabaseCreation();
     }
 
     public static void testDataSourceConnection(){
@@ -117,5 +118,31 @@ public class DataSourceFactoryTest {
 
         //System.out.println("Executing batch of queries");
         // queries.executeBatch();
+    }
+
+    public static void testDatabaseCreation(){
+        Path path = JSLDatabase.dbDir.resolve("TestCreationTaskDb");
+        String name = path.toAbsolutePath().toString();
+        // just create it
+        DataSource dataSource = DataSourceFactory.getEmbeddedDerbyDataSource(name, true);
+        // make the database
+        Database db = new Database(name, dataSource, SQLDialect.DERBY);
+        // build the creation task
+        //Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("JSLDb.sql");
+
+        Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
+        Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
+        Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
+        Database.DbCreateTask task = Database.creationTaskBuilder()
+                .withTables(tables).withInserts(inserts).withConstraints(alters)
+                .build();
+        System.out.println(task);
+
+        task.getCreationScriptCommands().forEach(System.out::println);
+        task.getInsertCommands().forEach(System.out::println);
+        task.getAlterCommands().forEach(System.out::println);
+        db.executeCreateTask(task);
+
+        System.out.println(task);
     }
 }
