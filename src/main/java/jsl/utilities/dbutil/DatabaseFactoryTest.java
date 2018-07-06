@@ -17,12 +17,12 @@ public class DatabaseFactoryTest {
 
     public static void main(String[] args) throws IOException {
 
-       // makeDbTest();
        // testDerbyLocalHost();
        // testDataSourceConnection();
        // testParsing();
    //     testDatabaseCreation();
-        testExcelDbExport();
+        testDerbyEmbeddedExisting();
+ //       testExcelDbExport();
   //      testExcelDbImport();
 
  //       metaDataTest();
@@ -57,6 +57,7 @@ public class DatabaseFactoryTest {
         for(String s: jsl_db){
             System.out.println(s);
         }
+        System.out.println();
         db.printTableAsText("ACROSS_REP_STAT");
     }
 
@@ -75,8 +76,9 @@ public class DatabaseFactoryTest {
 
     public static void testDerbyEmbeddedExisting(){
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
-        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path);
-        Database db = new Database("JSL", dataSource, SQLDialect.DERBY);
+        Database db = DatabaseFactory.getEmbeddedDerbyDatabase("JSLDb_DLB_with_Q");
+//        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path);
+//        Database db = new Database("JSL", dataSource, SQLDialect.DERBY);
         db.setJooQDefaultExecutionLoggingOption(true);
 
         List<String> jsl_db = db.getTableNames("JSL_DB");
