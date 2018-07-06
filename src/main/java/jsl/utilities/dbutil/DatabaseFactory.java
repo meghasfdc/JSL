@@ -12,29 +12,33 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
 
 public class DatabaseFactory {
 
-    /** If the database already exists it is deleted. Creates the database in JSLDatabase.dbDir
+    /**
+     * If the database already exists it is deleted. Creates the database in JSLDatabase.dbDir
      *
      * @param dbName the name of the database
      * @return the created database
      */
-    public static Database createEmbeddedDerbyDatabase(String dbName){
+    public static Database createEmbeddedDerbyDatabase(String dbName) {
         return createEmbeddedDerbyDatabase(dbName, JSLDatabase.dbDir);
     }
 
-    /** If the database already exists it is deleted
+    /**
+     * If the database already exists it is deleted
      *
-     * @param dbName the name of the embedded database
-     * @param dbDir a path to the directory to hold the database
+     * @param dbName the name of the embedded database. Must not be null
+     * @param dbDir  a path to the directory to hold the database. Must not be null
      * @return the created database
      */
-    public static Database createEmbeddedDerbyDatabase(String dbName, Path dbDir){
+    public static Database createEmbeddedDerbyDatabase(String dbName, Path dbDir) {
         Objects.requireNonNull(dbName, "The database name was null");
+        Objects.requireNonNull(dbDir, "The path to the database must not be null");
         Path pathToDb = dbDir.resolve(dbName);
         deleteEmbeddedDerbyDatabase(pathToDb);
         DataSource ds = createEmbeddedDerbyDataSource(pathToDb, true);
@@ -43,7 +47,71 @@ public class DatabaseFactory {
     }
 
     /**
+     * The database must already exist. It is not created. An exception is thrown if it does not exist.
+     * Assumes that the named database is  in JSLDatabase.dbDir
      *
+     * @param dbName the name of the embedded database, must not be null
+     * @return the created database
+     */
+    public static Database getEmbeddedDerbyDatabase(String dbName) {
+        return getEmbeddedDerbyDatabase(dbName, JSLDatabase.dbDir);
+    }
+
+    /**
+     * The database must already exist. It is not created. An exception is thrown if it does not exist.
+     *
+     * @param dbName the name of the embedded database, must not be null
+     * @param dbDir  a path to the directory to hold the database, must not be null
+     * @return the created database
+     */
+    public static Database getEmbeddedDerbyDatabase(String dbName, Path dbDir) {
+        Objects.requireNonNull(dbName, "The database name was null");
+        Objects.requireNonNull(dbDir, "The path to the database must not be null");
+        Path pathToDb = dbDir.resolve(dbName);
+        if (!isEmbeddedDerbyDatabaseExists(dbName, dbDir)) {
+            throw new IllegalStateException("The database does not exist at location " + pathToDb);
+        }
+        DataSource ds = createEmbeddedDerbyDataSource(pathToDb, false);
+        Database db = new Database(dbName, ds, SQLDialect.DERBY);
+        return db;
+    }
+
+    /**
+     * Checks if the database exists in in JSLDatabase.dbDir
+     *
+     * @param dbName the name of the database
+     * @return true if it exists false if not
+     */
+    public static boolean isEmbeddedDerbyDatabaseExists(String dbName) {
+        return isEmbeddedDerbyDatabaseExists(dbName, JSLDatabase.dbDir);
+    }
+
+    /**
+     * @param dbName the name of the database
+     * @param dbDir  the directory to the database
+     * @return true if it exists false if not
+     */
+    public static boolean isEmbeddedDerbyDatabaseExists(String dbName, Path dbDir) {
+        if ((dbDir == null) || (dbName == null)) {
+            return false;
+        }
+        Path pathToDb = dbDir.resolve(dbName);
+        return Files.exists(pathToDb);
+    }
+
+    /**
+     * @param fullPath the full path to the database including its name (because derby
+     *                 stores the database in a directory
+     * @return true if it exists
+     */
+    public static boolean isEmbeddedDerbyDatabaseExists(Path fullPath) {
+        if (fullPath == null) {
+            return false;
+        }
+        return Files.exists(fullPath);
+    }
+
+    /**
      * @param pathToDb the path to the embedded database on disk
      */
     public static void deleteEmbeddedDerbyDatabase(Path pathToDb) {
@@ -55,67 +123,66 @@ public class DatabaseFactory {
             throw new DataAccessException("Unable to delete directory to derby database {}");
         }
     }
+
     /**
+     * The database must already exist. It will not be created
      *
      * @param pathToDb a path to the database, must not be null
      * @return the created DataSource
      */
-    public static DataSource createEmbeddedDerbyDataSource(Path pathToDb){
+    public static DataSource createEmbeddedDerbyDataSource(Path pathToDb) {
         return createEmbeddedDerbyDataSource(pathToDb, null, null, false);
     }
 
     /**
-     *
      * @param pathToDb a path to the database, must not be null
-     * @param create a flag to indicate if the database should be created upon first connection
+     * @param create   a flag to indicate if the database should be created upon first connection
      * @return the created DataSource
      */
-    public static DataSource createEmbeddedDerbyDataSource(Path pathToDb, boolean create){
+    public static DataSource createEmbeddedDerbyDataSource(Path pathToDb, boolean create) {
         return createEmbeddedDerbyDataSource(pathToDb, null, null, create);
     }
 
     /**
-     *
      * @param pathToDb a path to the database, must not be null
-     * @param user a user name, can be null
-     * @param pWord a password, can be null
-     * @param create a flag to indicate if the database should be created upon first connection
+     * @param user     a user name, can be null
+     * @param pWord    a password, can be null
+     * @param create   a flag to indicate if the database should be created upon first connection
      * @return the created DataSource
      */
     public static DataSource createEmbeddedDerbyDataSource(Path pathToDb, String user,
-                                                           String pWord, boolean create){
+                                                           String pWord, boolean create) {
         return createEmbeddedDerbyDataSource(pathToDb.toString(), user, pWord, create);
     }
 
-    /** Assumes that the database exists
+    /**
+     * Assumes that the database exists
      *
      * @param dbName the path to the database, must not be null
      * @return the created DataSource
      */
-    public static DataSource createEmbeddedDerbyDataSource(String dbName){
+    public static DataSource createEmbeddedDerbyDataSource(String dbName) {
         return createEmbeddedDerbyDataSource(dbName, null, null, false);
     }
 
     /**
-     *
      * @param dbName the path to the database, must not be null
      * @param create a flag to indicate if the database should be created upon first connection
      * @return the created DataSource
      */
-    public static DataSource createEmbeddedDerbyDataSource(String dbName, boolean create){
+    public static DataSource createEmbeddedDerbyDataSource(String dbName, boolean create) {
         return createEmbeddedDerbyDataSource(dbName, null, null, create);
     }
 
     /**
-     *
      * @param dbName the path to the database, must not be null
-     * @param user a user name, can be null
-     * @param pWord a password, can be null
+     * @param user   a user name, can be null
+     * @param pWord  a password, can be null
      * @param create a flag to indicate if the database should be created upon first connection
      * @return the created DataSource
      */
     public static DataSource createEmbeddedDerbyDataSource(String dbName, String user, String pWord,
-                                                           boolean create){
+                                                           boolean create) {
         Objects.requireNonNull(dbName, "The path name to the database must not be null");
         EmbeddedDataSource ds = new EmbeddedDataSource();
         ds.setDatabaseName(dbName);
@@ -123,7 +190,13 @@ public class DatabaseFactory {
             ds.setUser(user);
         if (pWord != null)
             ds.setPassword(pWord);
-        if (create){
+        if (create) {
+            Path path = Paths.get(dbName);
+            DatabaseIfc.DbLogger.info("Create option is on for {}", dbName);
+            if (isEmbeddedDerbyDatabaseExists(path)){
+                DatabaseIfc.DbLogger.info("Database already exists at location {}", dbName);
+                deleteEmbeddedDerbyDatabase(path);
+            }
             ds.setCreateDatabase("create");
         }
         DatabaseIfc.DbLogger.info("Created an embedded Derby data source for {}", dbName);
@@ -131,15 +204,14 @@ public class DatabaseFactory {
     }
 
     /**
-     *
      * @param dbName the path to the database, must not be null
-     * @param user a user name, can be null
-     * @param pWord a password, can be null
+     * @param user   a user name, can be null
+     * @param pWord  a password, can be null
      * @param create a flag to indicate if the database should be created upon first connection
      * @return the created DataSource
      */
     public static DataSource createClientDerbyDataSourceWithLocalHost(String dbName, String user, String pWord,
-                                                                      boolean create){
+                                                                      boolean create) {
         Objects.requireNonNull(dbName, "The path name to the database must not be null");
         ClientDataSource ds = new ClientDataSource();
         ds.setDatabaseName(dbName);
@@ -149,18 +221,19 @@ public class DatabaseFactory {
             ds.setUser(user);
         if (pWord != null)
             ds.setPassword(pWord);
-        if (create){
+        if (create) {
             ds.setCreateDatabase("create");
         }
         DatabaseIfc.DbLogger.info("Created a Derby client data source for {}", dbName);
         return ds;
     }
 
-    /** Duplicates the database into a new database with the supplied name and directory.
-     *  Assumes that the source database has no active connections and performs a file system copy
+    /**
+     * Duplicates the database into a new database with the supplied name and directory.
+     * Assumes that the source database has no active connections and performs a file system copy
      *
-     * @param sourceDB the path to the database that needs duplicating
-     * @param dupName the name of the duplicate database
+     * @param sourceDB  the path to the database that needs duplicating
+     * @param dupName   the name of the duplicate database
      * @param directory the directory to place the database in
      * @throws IOException thrown if the system file copy commands fail
      */
@@ -188,15 +261,17 @@ public class DatabaseFactory {
         FileUtils.copyDirectory(source, target);
     }
 
-    /** Uses an active database connection and derby system commands to freeze the database,
+    /**
+     * Uses an active database connection and derby system commands to freeze the database,
      * uses system OS commands to copy the database, and then unfreezes the database.  The duplicate name
      * and directory path must not already exist
-     * @param ds a DataSource to the embedded derby database, obviously it must point to the derby database
-     * @param dupName the name of the duplicate database, obviouisly it must reference the same database that is
-     *                referenced by the DataSource
+     *
+     * @param ds        a DataSource to the embedded derby database, obviously it must point to the derby database
+     * @param dupName   the name of the duplicate database, obviouisly it must reference the same database that is
+     *                  referenced by the DataSource
      * @param directory the directory to place the database in
      * @throws SQLException thrown if the derby commands fail
-     * @throws IOException thrown if the system file copy commands fail
+     * @throws IOException  thrown if the system file copy commands fail
      */
     public static final void copyEmbeddedDerbyDatabase(DataSource ds, Path sourceDB, String dupName, Path directory)
             throws SQLException, IOException {

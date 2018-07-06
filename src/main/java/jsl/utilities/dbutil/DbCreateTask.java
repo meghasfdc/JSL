@@ -16,12 +16,17 @@
 
 package jsl.utilities.dbutil;
 
+import jsl.utilities.excel.ExcelUtil;
+import org.jooq.exception.DataAccessException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static jsl.utilities.dbutil.DatabaseIfc.DbLogger;
 
 /**
  * A DbCreateTask represents a set of instructions that can be used to create, possibly fill,
@@ -47,15 +52,7 @@ public class DbCreateTask {
     private List<String> myAlterCommands = new ArrayList<>();
     private Type type;
     private State state = State.UN_EXECUTED;
-
-    /**
-     * Use to builder a DbCreateTask that can then be executed on the database.
-     *
-     * @return a builder that can be used to builder a properly configured DbCreateTask
-     */
-    public static DbCreateTaskFirstStepIfc builder() {
-        return new DbCreateTaskBuilder();
-    }
+    private Database myDatabase;
 
     /**
      *
@@ -138,6 +135,7 @@ public class DbCreateTask {
     }
 
     private DbCreateTask(DbCreateTaskBuilder builder) {
+        myDatabase = builder.database;
         type = Type.NONE;
         if (builder.pathToCreationScript != null) {
             // full creation script provided
@@ -182,6 +180,111 @@ public class DbCreateTask {
                 }
             }
         }
+        executeCreateTask();
+    }
+
+    /**
+     * Attempts to execute a configured set of tasks that will create, possibly fill, and
+     * alter the database.
+     *
+     * @return true if the task was executed correctly, false otherwise
+     */
+    private final boolean executeCreateTask() {
+        switch (getState()) {
+            case UN_EXECUTED:
+                // execute the task
+                return dbCreateTaskExecution();
+            case EXECUTED:
+                DbLogger.error("Tried to execute an already executed create task.\n {}", this);
+                return false;
+            case EXECUTION_ERROR:
+                DbLogger.error("Tried to execute a previously executed task that had errors.\n {}", this);
+                return false;
+            case NO_TABLES_ERROR:
+                DbLogger.error("Tried to execute a create task with no tables created.\n {}", this);
+                return false;
+        }
+        return false;
+    }
+
+    private boolean dbCreateTaskExecution() {
+        boolean execFlag = false; // assume it does not execute
+        switch (getType()) {
+            case NONE:
+                DbLogger.warn("Attempted to execute a create task with no commands.\n {}", this);
+                execFlag = true;
+                setState(DbCreateTask.State.EXECUTED);
+                break;
+            case FULL_SCRIPT:
+                DbLogger.info("Attempting to execute full script create task...\n {}", this);
+                execFlag = myDatabase.executeCommands(getCreationScriptCommands());
+                break;
+            case TABLES:
+                DbLogger.info("Attempting to execute tables only create task. \n{}", this);
+                execFlag = myDatabase.executeCommands(getTableCommands());
+                break;
+            case TABLES_INSERT:
+                DbLogger.info("Attempting to execute tables plus insert create task.\n{}", this);
+                execFlag = myDatabase.executeCommands(getTableCommands());
+                if (execFlag){
+                    execFlag = myDatabase.executeCommands(getInsertCommands());
+                }
+                break;
+            case TABLES_ALTER:
+                DbLogger.info("Attempting to execute tables plus alter create task.\n{}", this);
+                execFlag = myDatabase.executeCommands(getTableCommands());
+                if (execFlag){
+                    execFlag = myDatabase.executeCommands(getAlterCommands());
+                }
+                break;
+            case TABLES_INSERT_ALTER:
+                DbLogger.info("Attempting to execute create/insert/alter tables create task.\n {}", this);
+                execFlag = myDatabase.executeCommands(getTableCommands());
+                if (execFlag){
+                    execFlag = myDatabase.executeCommands(getInsertCommands());
+                }
+                if (execFlag){
+                    execFlag = myDatabase.executeCommands(getAlterCommands());
+                }
+                break;
+            case TABLES_EXCEL:
+                DbLogger.info("Attempting to execute tables create plus Excel import task.\n {}", this);
+                execFlag = myDatabase.executeCommands(getTableCommands());
+                if (execFlag){
+                    try {
+                        ExcelUtil.writeWorkbookToDatabase(getExcelWorkbookPathForDataInsert(),
+                                true, myDatabase,
+                                getInsertTableOrder());
+                    } catch (IOException e) {
+                        execFlag = false;
+                    }
+                }
+                break;
+            case TABLES_EXCEL_ALTER:
+                DbLogger.info("Attempting to execute tables create plus Excel plus alter import task.\n {}", this);
+                execFlag = myDatabase.executeCommands(getTableCommands());
+                if (execFlag){
+                    try {
+                        ExcelUtil.writeWorkbookToDatabase(getExcelWorkbookPathForDataInsert(),
+                                true, myDatabase, getInsertTableOrder());
+                        execFlag = myDatabase.executeCommands(getAlterCommands());
+                    } catch (IOException e) {
+                        execFlag = false;
+                    }
+                }
+                break;
+        }
+        if (execFlag) {
+            setState(DbCreateTask.State.EXECUTED);
+            DbLogger.info("The task was successfully executed.");
+        } else {
+            setState(DbCreateTask.State.EXECUTION_ERROR);
+            DbLogger.info("The task had execution errors.");
+            //TODO decide whether to throw this error or not
+            throw new DataAccessException("There was an execution error for task \n" + this +
+                    "\n see jslDbLog.log for details ");
+        }
+        return execFlag; // note can only get here if execFlag is true because of the execution exception
     }
 
     /**
@@ -195,7 +298,7 @@ public class DbCreateTask {
         return state;
     }
 
-    void setState(State state){
+    private void setState(State state){
         this.state = state;
     }
 
@@ -214,10 +317,10 @@ public class DbCreateTask {
         try {
             commands.addAll(DatabaseIfc.parseQueriesInSQLScript(pathToScript));
         } catch (IOException e) {
-            DatabaseIfc.DbLogger.warn("The script {} t failed to parse.", pathToScript);
+            DbLogger.warn("The script {} t failed to parse.", pathToScript);
         }
         if (commands.isEmpty()) {
-            DatabaseIfc.DbLogger.warn("The script {} produced no commands to execute.", pathToScript);
+            DbLogger.warn("The script {} produced no commands to execute.", pathToScript);
         }
         return commands;
     }
@@ -226,7 +329,7 @@ public class DbCreateTask {
      * A builder that can be used to configure a database creation task through as set of configuration
      * steps.
      */
-    public static final class DbCreateTaskBuilder implements DbCreateTaskBuildStepIfc, WithCreateScriptStepIfc,
+    public static final class DbCreateTaskBuilder implements DbCreateTaskExecuteStepIfc, WithCreateScriptStepIfc,
             WithTablesScriptStepIfc, DbCreateTaskFirstStepIfc, AfterTablesOnlyStepIfc,
             DbInsertStepIfc, DBAfterInsertStepIfc, DBAddConstraintsStepIfc {
 
@@ -236,9 +339,14 @@ public class DbCreateTask {
         private Path pathToExcelWorkbook;
         private Path pathToAlterScript;
         private List<String> tableNamesInInsertOrder;
+        private Database database;
+
+        DbCreateTaskBuilder(Database database){
+            this.database = database;
+        }
 
         @Override
-        public DbCreateTaskBuildStepIfc withCreationScript(Path pathToScript) {
+        public DbCreateTaskExecuteStepIfc withCreationScript(Path pathToScript) {
             if (pathToScript == null) {
                 throw new IllegalArgumentException("The provided creation script path was null");
             }
@@ -290,7 +398,7 @@ public class DbCreateTask {
         }
 
         @Override
-        public DbCreateTaskBuildStepIfc withConstraints(Path toAlterScript) {
+        public DbCreateTaskExecuteStepIfc withConstraints(Path toAlterScript) {
             if (toAlterScript == null) {
                 throw new IllegalArgumentException("The provided alter script path was null");
             }
@@ -302,7 +410,7 @@ public class DbCreateTask {
         }
 
         @Override
-        public DbCreateTask build() {
+        public DbCreateTask execute() {
             return new DbCreateTask(this);
         }
     }
@@ -325,7 +433,7 @@ public class DbCreateTask {
          * @param pathToCreationScript a path to a full creation script that specifies the database, must not be null
          * @return A builder step to permit connecting
          */
-        DbCreateTaskBuildStepIfc withCreationScript(Path pathToCreationScript);
+        DbCreateTaskExecuteStepIfc withCreationScript(Path pathToCreationScript);
     }
 
     /**
@@ -339,11 +447,11 @@ public class DbCreateTask {
         AfterTablesOnlyStepIfc withTables(Path pathToScript);
     }
 
-    public interface AfterTablesOnlyStepIfc extends DbCreateTaskBuildStepIfc, DbInsertStepIfc {
+    public interface AfterTablesOnlyStepIfc extends DbCreateTaskExecuteStepIfc, DbInsertStepIfc {
 
     }
 
-    public interface DbCreateStepIfc extends DbCreateTaskBuildStepIfc {
+    public interface DbCreateStepIfc extends DbCreateTaskExecuteStepIfc {
         /**
          * @param toCreateScript the path to a script that will create the database, must not be null
          * @return a reference to the insert step in the builder process
@@ -352,7 +460,7 @@ public class DbCreateTask {
 
     }
 
-    public interface DbInsertStepIfc extends DbCreateTaskBuildStepIfc {
+    public interface DbInsertStepIfc extends DbCreateTaskExecuteStepIfc {
 
         /**
          * @param toExcelWorkbook a path to an Excel workbook that can be read to insert
@@ -372,26 +480,26 @@ public class DbCreateTask {
 
     }
 
-    public interface DBAddConstraintsStepIfc extends DbCreateTaskBuildStepIfc {
+    public interface DBAddConstraintsStepIfc extends DbCreateTaskExecuteStepIfc {
         /**
          * @param toConstraintScript a path to an SQL script that can be read to alter the
          *                           table structure of the database and add constraints, must not be null
          * @return a reference to the alter step in the builder process
          */
-        DbCreateTaskBuildStepIfc withConstraints(Path toConstraintScript);
+        DbCreateTaskExecuteStepIfc withConstraints(Path toConstraintScript);
     }
 
-    public interface DBAfterInsertStepIfc extends DBAddConstraintsStepIfc, DbCreateTaskBuildStepIfc {
+    public interface DBAfterInsertStepIfc extends DBAddConstraintsStepIfc, DbCreateTaskExecuteStepIfc {
 
     }
 
-    public interface DbCreateTaskBuildStepIfc {
+    public interface DbCreateTaskExecuteStepIfc {
         /**
          * Finishes the builder process of building the creation commands
          *
          * @return an instance of DbCreateCommandList
          */
-        DbCreateTask build();
+        DbCreateTask execute();
     }
 
 }

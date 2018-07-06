@@ -45,8 +45,7 @@ public class JSLDbJooqCodeGenerator {
         Path createScript = JSLDatabase.dbScriptsDir.resolve(scriptName);
         DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbName, true);
         Database db = new Database(dbName, derbyDataSource, SQLDialect.DERBY);
-        DbCreateTask task = DbCreateTask.builder().withCreationScript(createScript).build();
-        db.executeCreateTask(task);
+        db.create().withCreationScript(createScript).execute();
         System.out.println("Created database: " + dbName);
         return db;
     }
@@ -60,8 +59,7 @@ public class JSLDbJooqCodeGenerator {
         Path createScript = Paths.get("src").resolve("main").resolve("resources").resolve("JSLDb.sql");
         DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbName, true);
         Database db = new Database(dbName, derbyDataSource, SQLDialect.DERBY);
-        DbCreateTask task = DbCreateTask.builder().withCreationScript(createScript).build();
-        db.executeCreateTask(task);
+        db.create().withCreationScript(createScript).execute();
         System.out.println("Created database: " + dbName);
         Path dbPath = dbDir.resolve(dbName);
         System.out.println("Running code generation.");

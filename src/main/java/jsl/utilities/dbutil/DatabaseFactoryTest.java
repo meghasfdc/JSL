@@ -2,13 +2,12 @@ package jsl.utilities.dbutil;
 
 import jsl.utilities.reporting.JSL;
 import jsl.utilities.reporting.JSLDatabase;
-import org.jooq.Queries;
-import org.jooq.Query;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -22,9 +21,11 @@ public class DatabaseFactoryTest {
        // testDerbyLocalHost();
        // testDataSourceConnection();
        // testParsing();
-  //      testDatabaseCreation();
-  //      testExcelDbExport();
-        testExcelDbImport();
+   //     testDatabaseCreation();
+        testExcelDbExport();
+  //      testExcelDbImport();
+
+ //       metaDataTest();
     }
 
     public static void testDataSourceConnection(){
@@ -137,15 +138,15 @@ public class DatabaseFactoryTest {
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
         Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
         Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
-        DbCreateTask task = DbCreateTask.builder()
+
+        DbCreateTask task = db.create()
                 .withTables(tables).withInserts(inserts).withConstraints(alters)
-                .build();
+                .execute();
         System.out.println(task);
 
         task.getCreationScriptCommands().forEach(System.out::println);
         task.getInsertCommands().forEach(System.out::println);
         task.getAlterCommands().forEach(System.out::println);
-        db.executeCreateTask(task);
 
         System.out.println(task);
     }
@@ -158,11 +159,10 @@ public class DatabaseFactoryTest {
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
         Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
         Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
-        DbCreateTask task = DbCreateTask.builder()
-                .withTables(tables).withInserts(inserts).withConstraints(alters)
-                .build();
-        // execute the creation task
-        db.executeCreateTask(task);
+        DbCreateTask task = db.create().withTables(tables).withInserts(inserts).withConstraints(alters)
+                .execute();
+
+        System.out.println(task);
         db.writeDbToExcelWorkbook("APP");
     }
 
@@ -177,14 +177,27 @@ public class DatabaseFactoryTest {
         Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
 
         Path wbPath = JSL.ExcelDir.resolve("SP.xlsx");
-        DbCreateTask task = DbCreateTask.builder()
-                .withTables(tables)
+
+        db.create().withTables(tables)
                 .withExcelData(wbPath, Arrays.asList("S", "P", "SP"))
                 .withConstraints(alters)
-                .build();
-
-        db.executeCreateTask(task);
+                .execute();
 
         db.printAllTablesAsText("APP");
+    }
+
+    public static void metaDataTest(){
+
+        Database sp = DatabaseFactory.getEmbeddedDerbyDatabase("SP");
+        Meta meta = sp.getDSLContext().meta();
+
+        System.out.println("The catalogs are:");
+        List<Catalog> catalogs = meta.getCatalogs();
+        for(Catalog c: catalogs){
+            System.out.println(c);
+        }
+        List<Schema> schemas = meta.getSchemas();
+        System.out.println(schemas);
+
     }
 }
