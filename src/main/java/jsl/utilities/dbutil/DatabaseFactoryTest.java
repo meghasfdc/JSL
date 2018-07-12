@@ -21,11 +21,13 @@ public class DatabaseFactoryTest {
        // testDataSourceConnection();
        // testParsing();
    //     testDatabaseCreation();
-        testDerbyEmbeddedExisting();
+        //testDerbyEmbeddedExisting();
  //       testExcelDbExport();
   //      testExcelDbImport();
 
  //       metaDataTest();
+
+        testPostgresLocalHost();
     }
 
     public static void testDataSourceConnection(){
@@ -59,6 +61,37 @@ public class DatabaseFactoryTest {
         }
         System.out.println();
         db.printTableAsText("ACROSS_REP_STAT");
+    }
+
+    public static void testPostgresLocalHost(){
+        String dbName = "temp";
+        String user = "test";
+        String pw = "test";
+        DataSource dataSource = DatabaseFactory.getPostGressDataSourceWithLocalHost(dbName, user, pw);
+        // make the database
+        Database db = new Database(dbName, dataSource, SQLDialect.POSTGRES);
+        // builder the creation task
+        Path pathToCreationScript = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Postgres.sql");
+
+//        Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
+//        Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
+//        Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
+
+//        DbCreateTask task = db.create()
+//                .withTables(tables).withInserts(inserts).withConstraints(alters)
+//                .execute();
+
+        DbCreateTask task = db.create().withCreationScript(pathToCreationScript).execute();
+        System.out.println(task);
+
+        task.getCreationScriptCommands().forEach(System.out::println);
+//        task.getInsertCommands().forEach(System.out::println);
+//        task.getAlterCommands().forEach(System.out::println);
+
+        System.out.println(task);
+
+        db.printTableAsText("s");
+
     }
 
     public static void testDerbyEmbeddedWithCreateScript() throws IOException {

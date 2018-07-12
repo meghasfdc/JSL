@@ -49,6 +49,12 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.derby/derbyclient
     implementation group: 'org.apache.derby', name: 'derbyclient', version: '10.14.1.0'
 
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
+
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.2.0'
+
     // https://mvnrepository.com/artifact/org.jooq/jooq
     api group: 'org.jooq', name: 'jooq', version: '3.10.4'
     // https://mvnrepository.com/artifact/org.jooq/jooq-meta

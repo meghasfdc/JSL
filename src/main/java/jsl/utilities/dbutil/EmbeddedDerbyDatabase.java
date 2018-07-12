@@ -796,8 +796,8 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         if (Files.exists(directory.resolve(dupName))) {
             throw new IllegalArgumentException("A database with the supplied name already exists in the directory! db name = " + dupName);
         }
-
-        Statement s = getConnection().createStatement();
+        Connection connection = getConnection();
+        Statement s = connection.createStatement();
         // freeze the database
         s.executeUpdate("CALL SYSCS_UTIL.SYSCS_FREEZE_DATABASE()");
         //copy the database directory during this interval
@@ -807,6 +807,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         FileUtils.copyDirectory(source, target);
         s.executeUpdate("CALL SYSCS_UTIL.SYSCS_UNFREEZE_DATABASE()");
         s.close();
+        connection.close();
     }
 
 }

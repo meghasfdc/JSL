@@ -91,7 +91,11 @@
         </encoder>
     </appender>
 
-    <logger name="jsl.utilities.dbutil.DatabaseIfc" level="DEBUG" additivity="false">
+    <logger name="jsl.utilities.dbutil.DatabaseIfc" level="TRACE" additivity="false">
+        <appender-ref ref="JSLDB" />
+    </logger>
+
+    <logger name="com.zaxxer.hikari" level="TRACE" additivity="false">
         <appender-ref ref="JSLDB" />
     </logger>
 

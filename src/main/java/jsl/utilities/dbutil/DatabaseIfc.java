@@ -39,7 +39,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * Many databases define the terms database, user, schema in a variety of ways. This abstraction
  * defines this concept as the userSchema.  It is the name of the organizational construct for
  * which the user defined database object are contained. These are not the system abstractions.
@@ -60,7 +59,6 @@ public interface DatabaseIfc {
     Pattern COMMENT_PATTERN = Pattern.compile("^(?:--|\\/\\/|\\#).+");
 
     /**
-     *
      * @return the DataSource backing the database
      */
     DataSource getDataSource();
@@ -82,14 +80,14 @@ public interface DatabaseIfc {
     DSLContext getDSLContext();
 
     /**
-     *
      * @return a String that represents the name of the default schema for the database.
      * This is the schema that contains the database objects such as the tables. This may
      * be null if no default schema is specified.
      */
     String getDefaultSchemaName();
 
-    /** Sets the name of the default schema
+    /**
+     * Sets the name of the default schema
      *
      * @param name the name for the default schema, may be null
      */
@@ -99,26 +97,27 @@ public interface DatabaseIfc {
      * @return a jooq Schema representing the default schema that holds the user defined
      * tables that are in the database, or null if no default schema is specified
      */
-    default Schema getDefaultSchema(){
+    default Schema getDefaultSchema() {
         return getSchema(getDefaultSchemaName());
     }
 
     /**
-     *
      * @param option true means the default jooq execution logging is on, false means that it is not
      */
-    default void setJooQDefaultExecutionLoggingOption(boolean option){
+    default void setJooQDefaultExecutionLoggingOption(boolean option) {
         getDSLContext().settings().withExecuteLogging(option);
-    }
-    /**
-     *
-     * @return true if jooq default execution logging is on
-     */
-    default boolean isJooQDefaultExecutionLoggingOn(){
-        return getDSLContext().settings().isExecuteLogging();
     }
 
     /**
+     * @return true if jooq default execution logging is on
+     */
+    default boolean isJooQDefaultExecutionLoggingOn() {
+        return getDSLContext().settings().isExecuteLogging();
+    }
+
+    /** It is best to use this method within a try-with-resource construct
+     *  This method calls the DataSource for a connection. You are responsible for closing the connection.
+     *
      * @return a connection to the database
      */
     default Connection getConnection() throws SQLException {
@@ -130,8 +129,8 @@ public interface DatabaseIfc {
      */
     default DatabaseMetaData getDatabaseMetaData() {
         DatabaseMetaData metaData = null;
-        try {
-            metaData = getConnection().getMetaData();
+        try (Connection connection = getConnection()) {
+            metaData = connection.getMetaData();
         } catch (SQLException e) {
             DbLogger.warn("The meta data was not available {}", e);
         }
@@ -152,10 +151,9 @@ public interface DatabaseIfc {
     }
 
     /**
-     *
      * @return a list of all table names within the database
      */
-    default List<String> getAllTableNames(){
+    default List<String> getAllTableNames() {
         Meta meta = getDSLContext().meta();
         List<Table<?>> tables = meta.getTables();
         List<String> list = new ArrayList<>();
@@ -166,20 +164,18 @@ public interface DatabaseIfc {
     }
 
     /**
-     *
      * @param schemaName the schema name to check
      * @return true if the database contains a schema with the provided name
      */
-    default boolean containsSchema(String schemaName){
+    default boolean containsSchema(String schemaName) {
         return getSchema(schemaName) != null;
     }
 
     /**
-     *
      * @param schema the schema to check
      * @return true if the schema is in this database
      */
-    default boolean containsSchema(Schema schema){
+    default boolean containsSchema(Schema schema) {
         Meta meta = getDSLContext().meta();
         List<Schema> schemas = meta.getSchemas();
         return schemas.contains(schema);
@@ -213,24 +209,22 @@ public interface DatabaseIfc {
     }
 
     /**
-     *
      * @param tableName the unqualified table name to find as a string
      * @return true if the database contains the table
      */
-    default boolean containsTable(String tableName){
+    default boolean containsTable(String tableName) {
         return getTable(tableName) != null;
     }
 
     /**
-     *
      * @param tableName the unqualified table name to find as a string
      * @return the jooq Table representation or null if not found
      */
-    default Table<?> getTable(String tableName){
+    default Table<?> getTable(String tableName) {
         Meta meta = getDSLContext().meta();
         List<Table<?>> tables = meta.getTables();
         Table<?> found = null;
-        for (Table<?>  t : tables) {
+        for (Table<?> t : tables) {
             if (t.getName().equals(tableName)) {
                 found = t;
                 break;
@@ -245,7 +239,7 @@ public interface DatabaseIfc {
      */
     default List<Table<?>> getTables(String schemaName) {
         Schema schema = getSchema(schemaName);
-        if (schema == null){
+        if (schema == null) {
             return new ArrayList<>();
         }
         return schema.getTables();
@@ -253,6 +247,7 @@ public interface DatabaseIfc {
 
     /**
      * Checks if tables exist in the specified schema
+     *
      * @param schemaName the name of the schema that should contain the tables
      * @return true if at least one table exists in the schema
      */
@@ -264,7 +259,7 @@ public interface DatabaseIfc {
      * Checks if the supplied table exists in the schema
      *
      * @param schemaName the name of the schema that should contain the table
-     * @param table a string representing the unqualified name of the table
+     * @param table      a string representing the unqualified name of the table
      * @return true if it exists
      */
     default boolean containsTable(String schemaName, String table) {
@@ -273,12 +268,12 @@ public interface DatabaseIfc {
 
     /**
      * @param schemaName the name of the schema that should contain the table
-     * @param tableName a string representation of the unqualified table name as recognized by valid SQL table name
+     * @param tableName  a string representation of the unqualified table name as recognized by valid SQL table name
      * @return a jooq Table, or null if no table with that name exists
      */
     default Table<?> getTable(String schemaName, String tableName) {
         Schema schema = getSchema(schemaName);
-        if (schema == null){
+        if (schema == null) {
             return null;
         }
         return schema.getTable(tableName);
@@ -335,8 +330,9 @@ public interface DatabaseIfc {
 
     /**
      * Writes all tables as text
+     *
      * @param schemaName the name of the schema that should contain the tables
-     * @param out the PrintWriter to write to
+     * @param out        the PrintWriter to write to
      */
     default void writeAllTablesAsText(String schemaName, PrintWriter out) {
         List<Table<?>> tables = getTables(schemaName);
@@ -364,6 +360,7 @@ public interface DatabaseIfc {
 
     /**
      * Prints all tables as text to the console
+     *
      * @param schemaName the name of the schema that should contain the tables
      */
     default void printAllTablesAsText(String schemaName) {
@@ -375,7 +372,7 @@ public interface DatabaseIfc {
      * directory. The files are written to text files using the same name as
      * the tables in the database
      *
-     * @param schemaName the name of the schema that should contain the tables
+     * @param schemaName            the name of the schema that should contain the tables
      * @param pathToOutPutDirectory the path to the output directory to hold the csv files
      * @throws IOException a checked exception
      */
@@ -496,7 +493,7 @@ public interface DatabaseIfc {
      * Writes the insert queries associated with the supplied table to the PrintWriter
      *
      * @param tableName the unqualified name of the table
-     * @param out the PrintWriter to write to
+     * @param out       the PrintWriter to write to
      */
     default void writeInsertQueries(String tableName, PrintWriter out) {
         if (!containsTable(tableName)) {
@@ -527,6 +524,7 @@ public interface DatabaseIfc {
 
     /**
      * Prints all table data as insert queries to the console
+     *
      * @param schemaName the name of the schema that should contain the tables
      */
     default void printAllTablesAsInsertQueries(String schemaName) {
@@ -535,8 +533,9 @@ public interface DatabaseIfc {
 
     /**
      * Writes all table data as insert queries to the PrintWriter
+     *
      * @param schemaName the name of the schema that should contain the tables
-     * @param out the PrintWriter to write to
+     * @param out        the PrintWriter to write to
      */
     default void writeAllTablesAsInsertQueries(String schemaName, PrintWriter out) {
         List<Table<?>> tables = getTables(schemaName);
@@ -554,7 +553,8 @@ public interface DatabaseIfc {
 
     /**
      * Writes all the tables to an Excel workbook, uses name of database
-     * @param schemaName the name of the schema that should contain the tables
+     *
+     * @param schemaName  the name of the schema that should contain the tables
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
     default void writeDbToExcelWorkbook(String schemaName, Path wbDirectory) throws IOException {
@@ -563,8 +563,9 @@ public interface DatabaseIfc {
 
     /**
      * Writes all the tables to an Excel workbook uses the working directory
+     *
      * @param schemaName the name of the schema that should contain the tables
-     * @param wbName name of the workbook, if null uses name of database
+     * @param wbName     name of the workbook, if null uses name of database
      */
     default void writeDbToExcelWorkbook(String schemaName, String wbName) throws IOException {
         writeDbToExcelWorkbook(schemaName, wbName, null);
@@ -572,13 +573,14 @@ public interface DatabaseIfc {
 
     /**
      * Writes all the tables in the supplied schema to an Excel workbook
-     * @param schemaName the name of the schema that should contain the tables, must not be null
+     *
+     * @param schemaName  the name of the schema that should contain the tables, must not be null
      * @param wbName      name of the workbook, if null uses name of database
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
     default void writeDbToExcelWorkbook(String schemaName, String wbName, Path wbDirectory) throws IOException {
         Objects.requireNonNull(schemaName, "The schema name was null");
-        if (!containsSchema(schemaName)){
+        if (!containsSchema(schemaName)) {
             DbLogger.warn("Attempting to write to Excel: The supplied schema name {} is not in database {}",
                     schemaName, getLabel());
             return;
@@ -587,7 +589,7 @@ public interface DatabaseIfc {
             wbName = getLabel() + ".xlsx";
         } else {
             // name is not null make sure it has .xlsx
-            if(!wbName.endsWith(".xlsx")){
+            if (!wbName.endsWith(".xlsx")) {
                 wbName = wbName.concat(".xlsx");
             }
         }
@@ -599,7 +601,7 @@ public interface DatabaseIfc {
         Path path = wbDirectory.resolve(wbName);
 //        System.out.println(path);
         List<String> tableNames = getTableNames(schemaName);
-        if (tableNames.isEmpty()){
+        if (tableNames.isEmpty()) {
             DbLogger.warn("The supplied schema name {} had no tables to write to Excel in database {}",
                     schemaName, getLabel());
         } else {
@@ -609,31 +611,22 @@ public interface DatabaseIfc {
 
     /**
      * Executes the SQL provided in the string. Squelches exceptions The string
-     * must not have ";" semi-colon at the end.
+     * must not have ";" semi-colon at the end. The caller is responsible for closing the connection
      *
+     * @param con a connection for preparing the statement
      * @param cmd the command
-     * @return true if the command executed
+     * @return true if the command executed without an exception
      */
-    default boolean executeCommand(String cmd) throws SQLException {
-        Statement statement = null;
+    default boolean executeCommand(Connection con, String cmd) {
         boolean flag = false;
-        try {
-            statement = getConnection().createStatement();
+        try (Statement statement = con.createStatement()) {
             statement.execute(cmd);
             DbLogger.trace("Executed SQL: {}", cmd);
             statement.close();
             flag = true;
         } catch (SQLException ex) {
             DbLogger.error("SQLException when executing {}", cmd, ex);
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException ex1) {
-                DbLogger.error("SQLException when closing statement {}", cmd, ex);
-            }
         }
-
         return flag;
     }
 
@@ -646,29 +639,23 @@ public interface DatabaseIfc {
      */
     default boolean executeCommands(List<String> cmds) {
         boolean flag = true;
-        try {
-            getConnection().setAutoCommit(false);
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false);
             for (String cmd : cmds) {
-                flag = executeCommand(cmd);
+                flag = executeCommand(con, cmd);
                 if (flag == false) {
-                    getConnection().rollback();
+                    con.rollback();
                     break;
                 }
             }
             if (flag == true) {
-                getConnection().commit();
+                con.commit();
             }
-            getConnection().setAutoCommit(true);
+            con.setAutoCommit(true);
         } catch (SQLException ex) {
             flag = false;
             DbLogger.error("SQLException: ", ex);
-            try {
-                getConnection().rollback();
-            } catch (SQLException ex1) {
-                DbLogger.error("SQLException: ", ex);
-            }
         }
-
         return flag;
     }
 
@@ -867,9 +854,9 @@ public interface DatabaseIfc {
      * that the database exists and has well defined structure.  Places generated
      * source files in package gensrc with the main java source
      *
-     * @param dataSource a DataSource that can provide a connection to the database, must not be null
-     * @param schemaName the name of the schema for which tables need to be generated, must not be null
-     * @param pkgDirName the directory that holds the target package, must not be null
+     * @param dataSource  a DataSource that can provide a connection to the database, must not be null
+     * @param schemaName  the name of the schema for which tables need to be generated, must not be null
+     * @param pkgDirName  the directory that holds the target package, must not be null
      * @param packageName name of package to be created to hold generated code, must not be null
      */
     public static void jooqCodeGeneration(DataSource dataSource, String schemaName,
@@ -898,9 +885,9 @@ public interface DatabaseIfc {
      * that the database exists and has well defined structure.  Places generated
      * source files in package gensrc with the main java source. Squelches all exceptions.
      *
-     * @param dataSource a DataSource that can provide a connection to the database, must not be null
-     * @param schemaName the name of the schema for which tables need to be generated, must not be null
-     * @param pkgDirName the directory that holds the target package, must not be null
+     * @param dataSource  a DataSource that can provide a connection to the database, must not be null
+     * @param schemaName  the name of the schema for which tables need to be generated, must not be null
+     * @param pkgDirName  the directory that holds the target package, must not be null
      * @param packageName name of package to be created to hold generated code, must not be null
      */
     public static void runJooQCodeGeneration(DataSource dataSource, String schemaName,
@@ -909,7 +896,7 @@ public interface DatabaseIfc {
             jooqCodeGeneration(dataSource, schemaName, pkgDirName, packageName);
         } catch (Exception e) {
             e.printStackTrace();
-            DbLogger.trace("Error in jooq code generation for database: schemaName {} ,pkgDirName {}, packageName {}", schemaName, pkgDirName, packageName );
+            DbLogger.trace("Error in jooq code generation for database: schemaName {} ,pkgDirName {}, packageName {}", schemaName, pkgDirName, packageName);
         }
     }
 

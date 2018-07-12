@@ -1,5 +1,7 @@
 package jsl.utilities.dbutil;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import jsl.utilities.reporting.JSLDatabase;
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.ClientDataSource;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
+import java.util.Properties;
 
 public class DatabaseFactory {
 
@@ -225,6 +228,27 @@ public class DatabaseFactory {
             ds.setCreateDatabase("create");
         }
         DatabaseIfc.DbLogger.info("Created a Derby client data source for {}", dbName);
+        return ds;
+    }
+
+    /**
+     *
+     * @param dbName the name of the database, must not be null
+     * @param user the user
+     * @param pWord the password
+     * @return the DataSource for getting connections
+     */
+    public static DataSource getPostGressDataSourceWithLocalHost(String dbName, String user, String pWord){
+        Objects.requireNonNull(dbName, "The path name to the database must not be null");
+        Properties props = new Properties();
+        props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
+        props.setProperty("dataSource.user", user);
+        props.setProperty("dataSource.password", pWord);
+        props.setProperty("dataSource.databaseName", dbName);
+        //props.setProperty("autoCommit", "false");
+        HikariConfig config = new HikariConfig(props);
+        config.setLeakDetectionThreshold(60*1000);
+        HikariDataSource ds = new HikariDataSource(config);
         return ds;
     }
 
