@@ -159,10 +159,10 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
             Connection connection = myEmbeddedDS.getConnection();
             DatabaseMetaData metaData = connection.getMetaData();
             myConnURL = metaData.getURL();
-            DbLogger.trace("Connection made to {}", myEmbeddedDS.getDatabaseName());
+            LOG.trace("Connection made to {}", myEmbeddedDS.getDatabaseName());
             DatabaseIfc.logWarnings(connection);
         } catch (SQLException e) {
-            DbLogger.error("Unable to make connection to {}", myEmbeddedDS.getDatabaseName());
+            LOG.error("Unable to make connection to {}", myEmbeddedDS.getDatabaseName());
             throw new DataAccessException("Unable to make connection to database");
         }
     }
@@ -433,11 +433,11 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         myDefaultSchemaName = defaultSchemaName;
         if (defaultSchemaName != null) {
             if (!containsSchema(defaultSchemaName)) {
-                DbLogger.warn("The supplied default schema name {} was not in the database {}.",
+                LOG.warn("The supplied default schema name {} was not in the database {}.",
                         defaultSchemaName, getLabel());
             }
         } else {
-            DbLogger.warn("The default schema name was set to null for database {}.", getLabel());
+            LOG.warn("The default schema name was set to null for database {}.", getLabel());
         }
     }
 

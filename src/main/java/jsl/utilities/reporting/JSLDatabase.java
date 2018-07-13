@@ -36,6 +36,7 @@ import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 import org.jooq.*;
+import org.jooq.conf.RenderNameStyle;
 import org.jooq.exception.DataAccessException;
 import tech.tablesaw.api.Table;
 
@@ -58,13 +59,13 @@ import static jsl.utilities.jsldbsrc.Tables.*;
 /**
  * An embedded database that represents the statistical output from simulation runs. See the
  * file JSLDb.sql in the dbScripts directory for the structure of the database.
- * Assumes that a schema called JSL_DB exists in the database.
- *
- * If the supplied database does not have a schema called JSL_DB, then
+ * Assumes that a schema called getJSLSchemaName() exists in the database.
+ * <p>
+ * If the supplied database does not have a schema called getJSLSchemaName(), then
  * the schema is created and the appropriate JSL related database artifacts are installed
- * in the schema. If a schema called JSL_DB already exists in the database, then the
+ * in the schema. If a schema called getJSLSchemaName() already exists in the database, then the
  * assumption is that the schema is appropriately configured to hold JSL related
- * database artifacts.  The default schema of the database is set to JSL_DB.
+ * database artifacts.  The default schema of the database is set to getJSLSchemaName().
  */
 public class JSLDatabase {
 
@@ -73,6 +74,8 @@ public class JSLDatabase {
     public final static Path dbDir;
     public final static Path dbScriptsDir;
 
+    private static String jslSchemaName = "JSL_DB";
+
     static {
         File db = JSL.makeOutputSubDirectory("db");
         File dbScript = JSL.makeOutputSubDirectory("dbScript");
@@ -80,10 +83,12 @@ public class JSLDatabase {
         dbScriptsDir = dbScript.toPath();
         File jsldb = dbScriptsDir.resolve("JSLDb.sql").toFile();
         ClassLoader classLoader = JSLDatabase.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("JSLDb.sql");
-
+        InputStream jslcreate = classLoader.getResourceAsStream("JSLDb.sql");
+        InputStream jsldrop = classLoader.getResourceAsStream("JSLDbDropScript.sql");
         try {
-            Files.copy(inputStream, dbScriptsDir.resolve("JSLDb.sql"),
+            Files.copy(jslcreate, dbScriptsDir.resolve("JSLDb.sql"),
+                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(jsldrop, dbScriptsDir.resolve("JSLDbDropScript.sql"),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
@@ -98,16 +103,16 @@ public class JSLDatabase {
     private SimulationDatabaseObserver mySimulationObserver;
 
     /**
-     * Creates an instance of a JSLDatabase. Assumes that a schema called JSL_DB exists
-     * in the database. If the supplied database does not have a schema called JSL_DB, then
+     * Creates an instance of a JSLDatabase. Assumes that a schema called getJSLSchemaName() exists
+     * in the database. If the supplied database does not have a schema called getJSLSchemaName(), then
      * the schema is created and the appropriate JSL related database artifacts are installed
-     * in the schema. If a schema called JSL_DB already exists in the database, then the
+     * in the schema. If a schema called getJSLSchemaName() already exists in the database, then the
      * assumption is that the schema is appropriately configured to hold JSL related
-     * database artifacts.  The default schema of the database is set to JSL_DB.
-     *
+     * database artifacts.  The default schema of the database is set to getJSLSchemaName()
+     * <p>
      * The clear database option is set to false.
      *
-     * @param database the database to use for setting up the JSLDatabase, must not be null
+     * @param database   the database to use for setting up the JSLDatabase, must not be null
      * @param simulation the simulation to be associated with the JSLDatabase, must not be null
      */
     public JSLDatabase(DatabaseIfc database, Simulation simulation) {
@@ -115,15 +120,15 @@ public class JSLDatabase {
     }
 
     /**
-     * Creates an instance of a JSLDatabase. Assumes that a schema called JSL_DB exists
-     * in the database. If the supplied database does not have a schema called JSL_DB, then
+     * Creates an instance of a JSLDatabase. Assumes that a schema called getJSLSchemaName() exists
+     * in the database. If the supplied database does not have a schema called getJSLSchemaName(), then
      * the schema is created and the appropriate JSL related database artifacts are installed
-     * in the schema. If a schema called JSL_DB already exists in the database, then the
+     * in the schema. If a schema called getJSLSchemaName() already exists in the database, then the
      * assumption is that the schema is appropriately configured to hold JSL related
-     * database artifacts.  The default schema of the database is set to JSL_DB.
+     * database artifacts.  The default schema of the database is set to getJSLSchemaName().
      *
-     * @param database the database to use for setting up the JSLDatabase, must not be null
-     * @param simulation the simulation to be associated with the JSLDatabase, must not be null
+     * @param database        the database to use for setting up the JSLDatabase, must not be null
+     * @param simulation      the simulation to be associated with the JSLDatabase, must not be null
      * @param clearDataOption whether or not the database will be cleared before each simulation
      *                        experiment
      */
@@ -131,52 +136,59 @@ public class JSLDatabase {
         Objects.requireNonNull(database, "The database was null");
         Objects.requireNonNull(simulation, "The simulation was null");
         myDb = database;
-        if (!myDb.containsSchema("JSL_DB")) {
+        if (!myDb.containsSchema(getJSLSchemaName())) {
+            DatabaseIfc.LOG.warn("The database {} does not contain schema {}", myDb.getLabel(), getJSLSchemaName());
             // assume that the schema has not been made and run the table creation script
             try {
-                myDb.executeScript(dbScriptsDir.resolve("JSLDb.sql"));
+                DatabaseIfc.LOG.warn("Assume the schema has not be made and execute the creation script JSLDb.sql");
+                boolean b = myDb.executeScript(dbScriptsDir.resolve("JSLDb.sql"));
+                if (b == false) {
+                    throw new DataAccessException("The execution script JSLDb.sql did not fully execute");
+                }
             } catch (IOException e) {
-                DatabaseIfc.DbLogger.error("Unable to execute JSLDb.sql creation script");
+                DatabaseIfc.LOG.error("Unable to execute JSLDb.sql creation script");
                 throw new DataAccessException("Unable to execute JSLDb.sql creation script");
             }
         }
-        myDb.setDefaultSchemaName("JSL_DB");
+        myDb.setDefaultSchemaName(getJSLSchemaName());
         mySimulation = simulation;
         myClearDbFlag = clearDataOption;
         myCurrentSimRunRecord = null;
         startObservingModel();
     }
 
-    /** The name of the database is created based on the name of the simulation via
-     *  "JSLDb_" + simulation.getName();
-     * @param simulation the simulation to be associated with the JSLDatabase, must not be null
+    /**
+     * The name of the database is created based on the name of the simulation via
+     * "JSLDb_" + simulation.getName();
+     *
+     * @param simulation      the simulation to be associated with the JSLDatabase, must not be null
      * @param clearDataOption whether or not the database will be cleared before each simulation
      *                        experiment
      * @return the created JSLDatabase which is backed by an embedded derby database
      */
     public static JSLDatabase createEmbeddedDerbyJSLDatabase(Simulation simulation,
-                                                             boolean clearDataOption){
+                                                             boolean clearDataOption) {
         return createEmbeddedDerbyJSLDatabase(simulation, clearDataOption, null);
     }
 
     /**
-     * @param simulation the simulation to be associated with the JSLDatabase, must not be null
+     * @param simulation      the simulation to be associated with the JSLDatabase, must not be null
      * @param clearDataOption whether or not the database will be cleared before each simulation
      *                        experiment
-     * @param dbName the name of the database within the JSLDatabase.dbDir
-     *               directory. If the JSLDatabase.dbDir already
-     *               contains an embedded derby database with that name then that database is
-     *               deleted and a new one is created in its place. If the supplied
-     *               name is null then the database name is "JSLDb_" + simulation.getName();
+     * @param dbName          the name of the database within the JSLDatabase.dbDir
+     *                        directory. If the JSLDatabase.dbDir already
+     *                        contains an embedded derby database with that name then that database is
+     *                        deleted and a new one is created in its place. If the supplied
+     *                        name is null then the database name is "JSLDb_" + simulation.getName();
      * @return the created JSLDatabase which is backed by an embedded derby database
      */
     public static JSLDatabase createEmbeddedDerbyJSLDatabase(Simulation simulation,
-                                                           boolean clearDataOption, String dbName){
+                                                             boolean clearDataOption, String dbName) {
         Objects.requireNonNull(simulation, "The Simulation was null");
-        if (dbName == null){
+        if (dbName == null) {
             // use the simulation name
             dbName = "JSLDb_" + simulation.getName();
-            dbName = dbName.replaceAll("\\s+","");
+            dbName = dbName.replaceAll("\\s+", "");
         }
         Path pathToDb = dbDir.resolve(dbName);
         DatabaseFactory.deleteEmbeddedDerbyDatabase(pathToDb);
@@ -185,50 +197,174 @@ public class JSLDatabase {
         return new JSLDatabase(db, simulation, clearDataOption);
     }
 
-    /** The database will not be cleared between simulation runs
+    /**
+     * The database will not be cleared between simulation runs
      *
      * @param simulation the simulation to be associated with the JSLDatabase, must not be null
-     * @param dbName the name of the existing database within the JSLDatabase.dbDir directory
+     * @param dbName     the name of the existing database within the JSLDatabase.dbDir directory
      * @return the JSLDatabase which is backed by an embedded derby database
      */
     public static JSLDatabase useExistingEmbeddedDerbyJSLDatabase(Simulation simulation,
-                                                                  String dbName){
+                                                                  String dbName) {
         return useExistingEmbeddedDerbyJSLDatabase(simulation, false, dbName);
     }
 
     /**
      * If the database does not exist, then a new one is created.
      *
-     * @param simulation the simulation to be associated with the JSLDatabase, must not be null
+     * @param simulation      the simulation to be associated with the JSLDatabase, must not be null
      * @param clearDataOption whether or not the database will be cleared before each simulation
-     * @param dbName the name of the existing database within the JSLDatabase.dbDir directory
+     * @param dbName          the name of the existing database within the JSLDatabase.dbDir directory
      * @return the JSLDatabase which is backed by an embedded derby database
      */
     public static JSLDatabase useExistingEmbeddedDerbyJSLDatabase(Simulation simulation,
                                                                   boolean clearDataOption,
-                                                                  String dbName){
+                                                                  String dbName) {
         Objects.requireNonNull(simulation, "The Simulation was null");
         Objects.requireNonNull(dbName, "The database name was was null");
         Path pathToDb = dbDir.resolve(dbName);
         DataSource ds = null;
-        if (Files.isDirectory(pathToDb)){
+        if (Files.isDirectory(pathToDb)) {
             // the directory holding the database exists already
             // just make a data source for it
             ds = DatabaseFactory.createEmbeddedDerbyDataSource(pathToDb);
         } else {
             // the named database does not exist, make a new one
             ds = DatabaseFactory.createEmbeddedDerbyDataSource(pathToDb, true);
-            JSL.LOGGER.warn("The requested database {} does not exist, made a new one instead", pathToDb.toString());
+            DatabaseIfc.LOG.warn("The requested database {} does not exist, made a new one instead", pathToDb.toString());
         }
         Database db = new Database(dbName, ds, SQLDialect.DERBY);
         return new JSLDatabase(db, simulation, clearDataOption);
     }
 
     /**
-     *  Called by the model before the simulation experiment is run
+     * Creates a getJSLSchemaName() schema within the database specified within the database.
+     * If such a schema already exists in thee database, it is dropped.
+     *
+     * @param simulation      the simulation that will use the database
+     * @param clearDataOption whether or not the data will be cleared prior to experiments
+     * @param dbName          the name of the database, must not be null
+     * @param user            the user
+     * @param pWord           the password
+     * @return a fresh new JSLDatabase
      */
-    protected void beforeExperiment(){
-        if (getClearDatabaseOption()){
+    public static JSLDatabase createPostgresLocalHostJSLDatabase(Simulation simulation, boolean clearDataOption,
+                                                                 String dbName, String user, String pWord) {
+        return createPostgresJSLDatabase(simulation, clearDataOption, "localhost", dbName, user, pWord);
+    }
+
+    /**
+     * Creates a getJSLSchemaName() schema within the database specified within the database.
+     * If such a schema already exists in thee database, it is dropped.
+     *
+     * @param simulation      the simulation that will use the database
+     * @param clearDataOption whether or not the data will be cleared prior to experiments
+     * @param dbServerName    the name of the database server, must not be null
+     * @param dbName          the name of the database, must not be null
+     * @param user            the user
+     * @param pWord           the password
+     * @return a fresh new JSLDatabase
+     */
+    public static JSLDatabase createPostgresJSLDatabase(Simulation simulation, boolean clearDataOption,
+                                                        String dbServerName, String dbName, String user, String pWord) {
+        Objects.requireNonNull(simulation, "The Simulation was null");
+        Objects.requireNonNull(dbServerName, "The name to the database server must not be null");
+        Objects.requireNonNull(dbName, "The path name to the database must not be null");
+        Properties props = new Properties();
+        props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
+        props.setProperty("dataSource.user", user);
+        props.setProperty("dataSource.password", pWord);
+        props.setProperty("dataSource.databaseName", dbName);
+        props.setProperty("dataSource.serverName", dbServerName);
+        JSLDatabase jslDatabase = createJSLDatabase(simulation, clearDataOption, props, SQLDialect.POSTGRES);
+        jslDatabase.getDatabase().getDSLContext().settings().withRenderNameStyle(RenderNameStyle.LOWER);
+        DatabaseIfc.LOG.info("Created a postgres JSL database {} ", jslDatabase.getDatabase().getLabel());
+        return jslDatabase;
+    }
+
+    /**
+     * Creates a getJSLSchemaName() schema within the database specified within the supplied database properties.
+     * If such a schema already exists in thee database, it is dropped.
+     *
+     * @param simulation      the simulation that will use the database
+     * @param clearDataOption whether or not the data will be cleared prior to experiments
+     * @param dBProperties    appropriately configured HikariCP datasource properties
+     * @param sqlDialect      the jooq dialect for the database. It must match the database type in the properties
+     * @return a fresh new JSLDatabase
+     */
+    public static JSLDatabase createJSLDatabase(Simulation simulation, boolean clearDataOption,
+                                                Properties dBProperties, SQLDialect sqlDialect) {
+        Objects.requireNonNull(simulation, "The Simulation was null");
+        Objects.requireNonNull(dBProperties, "The database properties was was null");
+        Objects.requireNonNull(sqlDialect, "The database dialect was was null");
+        DataSource ds = DatabaseFactory.getDataSource(dBProperties);
+        String user = dBProperties.getProperty("dataSource.user");
+        String name = dBProperties.getProperty("dataSource.databaseName");
+        String dbLabel = user + ":" + name;
+        Database db = new Database(dbLabel, ds, sqlDialect);
+        dropJSLDbSchema(db);
+        return new JSLDatabase(db, simulation, clearDataOption);
+    }
+
+    /**
+     * @return the name of the schema that holds JSL database artifacts
+     */
+    public static String getJSLSchemaName() {
+        return jslSchemaName;
+    }
+
+    /**
+     * Drops the getJSLSchemaName() schema and any related tables in the supplied database if they exist.
+     * If the database does not contain a schema called getJSLSchemaName(), then nothing happens
+     *
+     * @param db the database to do the dropping action
+     */
+    public static void dropJSLDbSchema(Database db) {
+        if (db.containsSchema(getJSLSchemaName())) {
+            DatabaseIfc.LOG.debug("The database {} contains the JSL schema {}", db.getLabel(), getJSLSchemaName());
+            DatabaseIfc.LOG.debug("Attempting to drop the JSL schema ....");
+            // need to delete the schema and any tables/data
+            org.jooq.Table<?> table = db.getTable(getJSLSchemaName(), "batch_stat");
+            if (table != null) {
+                db.getDSLContext().dropTable(table).execute();
+            }
+            table = db.getTable(getJSLSchemaName(), "within_rep_counter_stat");
+            if (table != null) {
+                db.getDSLContext().dropTable(table).execute();
+            }
+            table = db.getTable(getJSLSchemaName(), "across_rep_stat");
+            if (table != null) {
+                db.getDSLContext().dropTable(table).execute();
+            }
+            table = db.getTable(getJSLSchemaName(), "within_rep_stat");
+            if (table != null) {
+                db.getDSLContext().dropTable(table).execute();
+            }
+            table = db.getTable(getJSLSchemaName(), "model_element");
+            if (table != null) {
+                db.getDSLContext().dropTable(table).execute();
+            }
+            table = db.getTable(getJSLSchemaName(), "simulation_run");
+            if (table != null) {
+                db.getDSLContext().dropTable(table).execute();
+            }
+            db.getDSLContext().dropSchema(getJSLSchemaName()).execute();
+            DatabaseIfc.LOG.debug("Completed the dropping of the JSL schema");
+        } else {
+            DatabaseIfc.LOG.debug("The database {} does not contain the JSL schema {}", db.getLabel(), getJSLSchemaName());
+            List<Schema> schemas = db.getDSLContext().meta().getSchemas();
+            DatabaseIfc.LOG.debug("The database {} has the following schemas", db.getLabel());
+            for (Schema s : schemas) {
+                DatabaseIfc.LOG.debug("schema: {}", s.getName());
+            }
+        }
+    }
+
+    /**
+     * Called by the model before the simulation experiment is run
+     */
+    protected void beforeExperiment() {
+        if (getClearDatabaseOption()) {
             clearAllData();
         }
         // insert the new simulation run into the database
@@ -241,13 +377,13 @@ public class JSLDatabase {
     /**
      * Called by the model after the simulation experiment replication is run
      */
-    protected void afterReplication(){
+    protected void afterReplication() {
         List<ResponseVariable> rvs = getModel().getResponseVariables();
         List<Counter> counters = getModel().getCounters();
         insertWithinRepResponses(rvs);
         insertWithinRepCounters(counters);
         Optional<StatisticalBatchingElement> sbe = mySimulation.getStatisticalBatchingElement();
-        if(sbe.isPresent()){
+        if (sbe.isPresent()) {
             // insert the statistics from the batching
             Map<ResponseVariable, BatchStatistic> rmap = sbe.get().getAllResponseVariableBatchStatisticsAsMap();
             Map<TimeWeighted, BatchStatistic> twmap = sbe.get().getAllTimeWeightedBatchStatisticsAsMap();
@@ -257,9 +393,9 @@ public class JSLDatabase {
     }
 
     /**
-     *  Called by the model after the simulation experiment is run
+     * Called by the model after the simulation experiment is run
      */
-    protected void afterExperiment(){
+    protected void afterExperiment() {
         finalizeCurrentSimulationRunRecord(mySimulation);
         List<ResponseVariable> rvs = getModel().getResponseVariables();
         List<Counter> counters = getModel().getCounters();
@@ -1080,7 +1216,6 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @return true means that the underlying database will be cleared before each
      * simulation run
      */
@@ -1089,44 +1224,41 @@ public class JSLDatabase {
     }
 
     /**
-     *
      * @param option true means that the database will be cleared before each simulation run
      */
-    public final void setClearDatabaseOption(boolean option){
+    public final void setClearDatabaseOption(boolean option) {
         myClearDbFlag = option;
     }
 
     /**
-     *
      * @return the attached model
      */
-    public final Model getModel(){
+    public final Model getModel() {
         return mySimulation.getModel();
     }
 
     /**
-     *
      * @return the simulation that is being tabulated
      */
-    public final Simulation getSimulation(){
+    public final Simulation getSimulation() {
         return mySimulation;
     }
 
     /**
      * Tells the database to stop observing the model if it is observing it
      */
-    public final void stopObservingModel(){
-        if (mySimulationObserver != null){
+    public final void stopObservingModel() {
+        if (mySimulationObserver != null) {
             getModel().deleteObserver(mySimulationObserver);
             mySimulationObserver = null;
         }
     }
 
     /**
-     *  Tells the database to observe the model if it is not already
+     * Tells the database to observe the model if it is not already
      */
-    public final void startObservingModel(){
-        if (mySimulationObserver == null){
+    public final void startObservingModel() {
+        if (mySimulationObserver == null) {
             mySimulationObserver = new SimulationDatabaseObserver();
             getModel().addObserver(mySimulationObserver);
         }
@@ -1134,10 +1266,11 @@ public class JSLDatabase {
 
     /**
      * Writes all tables as text
+     *
      * @param out the PrintWriter to write to
      */
     public void writeAllTablesAsText(PrintWriter out) {
-        myDb.writeAllTablesAsText("JSL_DB", out);
+        myDb.writeAllTablesAsText(getJSLSchemaName(), out);
     }
 
     /**
@@ -1148,7 +1281,7 @@ public class JSLDatabase {
      * @throws IOException a checked exception
      */
     public void writeAllTablesAsCSV() throws IOException {
-        myDb.writeAllTablesAsCSV("JSL_DB", JSL.ExcelDir);
+        myDb.writeAllTablesAsCSV(getJSLSchemaName(), JSL.ExcelDir);
     }
 
     /**
@@ -1160,39 +1293,42 @@ public class JSLDatabase {
      * @throws IOException a checked exception
      */
     public void writeAllTablesAsCSV(Path pathToOutPutDirectory) throws IOException {
-        myDb.writeAllTablesAsCSV("JSL_DB", pathToOutPutDirectory);
+        myDb.writeAllTablesAsCSV(getJSLSchemaName(), pathToOutPutDirectory);
     }
 
     /**
      * Writes all the tables to an Excel workbook,  uses JSL.ExcelDir for the directory
      */
     public void writeDbToExcelWorkbook() throws IOException {
-        myDb.writeDbToExcelWorkbook("JSL_DB", JSL.ExcelDir);
+        myDb.writeDbToExcelWorkbook(getJSLSchemaName(), JSL.ExcelDir);
     }
 
     /**
      * Writes all the tables to an Excel workbook, uses name of database
+     *
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
     public void writeDbToExcelWorkbook(Path wbDirectory) throws IOException {
-        myDb.writeDbToExcelWorkbook("JSL_DB", wbDirectory);
+        myDb.writeDbToExcelWorkbook(getJSLSchemaName(), wbDirectory);
     }
 
     /**
      * Writes all the tables to an Excel workbook uses JSL.ExcelDir for the directory
+     *
      * @param wbName name of the workbook, if null uses name of database
      */
     public void writeDbToExcelWorkbook(String wbName) throws IOException {
-        myDb.writeDbToExcelWorkbook("JSL_DB", wbName, JSL.ExcelDir);
+        myDb.writeDbToExcelWorkbook(getJSLSchemaName(), wbName, JSL.ExcelDir);
     }
 
     /**
      * Writes all the tables to an Excel workbook
+     *
      * @param wbName      name of the workbook, if null uses name of database
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
     public void writeDbToExcelWorkbook(String wbName, Path wbDirectory) throws IOException {
-        myDb.writeDbToExcelWorkbook("JSL_DB", wbName, wbDirectory);
+        myDb.writeDbToExcelWorkbook(getJSLSchemaName(), wbName, wbDirectory);
     }
 
     private class SimulationDatabaseObserver extends ModelElementObserver {

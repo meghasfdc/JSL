@@ -120,9 +120,9 @@ public class DatabaseFactory {
     public static void deleteEmbeddedDerbyDatabase(Path pathToDb) {
         try {
             FileUtils.deleteDirectory(pathToDb.toFile());
-            DatabaseIfc.DbLogger.info("Deleting directory to derby database {}", pathToDb);
+            DatabaseIfc.LOG.info("Deleting directory to derby database {}", pathToDb);
         } catch (IOException e) {
-            DatabaseIfc.DbLogger.error("Unable to delete directory to derby database {}", pathToDb);
+            DatabaseIfc.LOG.error("Unable to delete directory to derby database {}", pathToDb);
             throw new DataAccessException("Unable to delete directory to derby database {}");
         }
     }
@@ -195,14 +195,14 @@ public class DatabaseFactory {
             ds.setPassword(pWord);
         if (create) {
             Path path = Paths.get(dbName);
-            DatabaseIfc.DbLogger.info("Create option is on for {}", dbName);
+            DatabaseIfc.LOG.info("Create option is on for {}", dbName);
             if (isEmbeddedDerbyDatabaseExists(path)){
-                DatabaseIfc.DbLogger.info("Database already exists at location {}", dbName);
+                DatabaseIfc.LOG.info("Database already exists at location {}", dbName);
                 deleteEmbeddedDerbyDatabase(path);
             }
             ds.setCreateDatabase("create");
         }
-        DatabaseIfc.DbLogger.info("Created an embedded Derby data source for {}", dbName);
+        DatabaseIfc.LOG.info("Created an embedded Derby data source for {}", dbName);
         return ds;
     }
 
@@ -227,7 +227,7 @@ public class DatabaseFactory {
         if (create) {
             ds.setCreateDatabase("create");
         }
-        DatabaseIfc.DbLogger.info("Created a Derby client data source for {}", dbName);
+        DatabaseIfc.LOG.info("Created a Derby client data source for {}", dbName);
         return ds;
     }
 
@@ -238,16 +238,40 @@ public class DatabaseFactory {
      * @param pWord the password
      * @return the DataSource for getting connections
      */
-    public static DataSource getPostGressDataSourceWithLocalHost(String dbName, String user, String pWord){
+    public static DataSource getPostGresDataSourceWithLocalHost(String dbName, String user, String pWord) {
+        return getPostGresDataSource("localhost", dbName, user, pWord);
+    }
+
+    /** Assumes standard PostGres port
+     *
+     * @param dbServerName the name of the database server, must not be null
+     * @param dbName the name of the database, must not be null
+     * @param user the user
+     * @param pWord the password
+     * @return the DataSource for getting connections
+     */
+    public static DataSource getPostGresDataSource(String dbServerName, String dbName, String user,
+                                                                 String pWord){
+        Objects.requireNonNull(dbServerName, "The name to the database server must not be null");
         Objects.requireNonNull(dbName, "The path name to the database must not be null");
         Properties props = new Properties();
         props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
         props.setProperty("dataSource.user", user);
         props.setProperty("dataSource.password", pWord);
         props.setProperty("dataSource.databaseName", dbName);
-        //props.setProperty("autoCommit", "false");
-        HikariConfig config = new HikariConfig(props);
-        config.setLeakDetectionThreshold(60*1000);
+        props.setProperty("dataSource.serverName", dbServerName);
+        return getDataSource(props);
+    }
+
+    /** Assumes that the properties are appropriately configured to create a DataSource
+     *  via  HikariCP
+     *
+     * @param properties the properties
+     * @return a pooled connection DataSource
+     */
+    public static DataSource getDataSource(Properties properties){
+        Objects.requireNonNull(properties, "The properties must not be null");
+        HikariConfig config = new HikariConfig(properties);
         HikariDataSource ds = new HikariDataSource(config);
         return ds;
     }

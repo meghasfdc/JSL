@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static jsl.utilities.dbutil.DatabaseIfc.DbLogger;
+import static jsl.utilities.dbutil.DatabaseIfc.LOG;
 
 /**
  * A DbCreateTask represents a set of instructions that can be used to create, possibly fill,
@@ -195,13 +195,13 @@ public class DbCreateTask {
                 // execute the task
                 return dbCreateTaskExecution();
             case EXECUTED:
-                DbLogger.error("Tried to execute an already executed create task.\n {}", this);
+                LOG.error("Tried to execute an already executed create task.\n {}", this);
                 return false;
             case EXECUTION_ERROR:
-                DbLogger.error("Tried to execute a previously executed task that had errors.\n {}", this);
+                LOG.error("Tried to execute a previously executed task that had errors.\n {}", this);
                 return false;
             case NO_TABLES_ERROR:
-                DbLogger.error("Tried to execute a create task with no tables created.\n {}", this);
+                LOG.error("Tried to execute a create task with no tables created.\n {}", this);
                 return false;
         }
         return false;
@@ -211,34 +211,34 @@ public class DbCreateTask {
         boolean execFlag = false; // assume it does not execute
         switch (getType()) {
             case NONE:
-                DbLogger.warn("Attempted to execute a create task with no commands.\n {}", this);
+                LOG.warn("Attempted to execute a create task with no commands.\n {}", this);
                 execFlag = true;
                 setState(DbCreateTask.State.EXECUTED);
                 break;
             case FULL_SCRIPT:
-                DbLogger.info("Attempting to execute full script create task...\n {}", this);
+                LOG.info("Attempting to execute full script create task...\n {}", this);
                 execFlag = myDatabase.executeCommands(getCreationScriptCommands());
                 break;
             case TABLES:
-                DbLogger.info("Attempting to execute tables only create task. \n{}", this);
+                LOG.info("Attempting to execute tables only create task. \n{}", this);
                 execFlag = myDatabase.executeCommands(getTableCommands());
                 break;
             case TABLES_INSERT:
-                DbLogger.info("Attempting to execute tables plus insert create task.\n{}", this);
+                LOG.info("Attempting to execute tables plus insert create task.\n{}", this);
                 execFlag = myDatabase.executeCommands(getTableCommands());
                 if (execFlag){
                     execFlag = myDatabase.executeCommands(getInsertCommands());
                 }
                 break;
             case TABLES_ALTER:
-                DbLogger.info("Attempting to execute tables plus alter create task.\n{}", this);
+                LOG.info("Attempting to execute tables plus alter create task.\n{}", this);
                 execFlag = myDatabase.executeCommands(getTableCommands());
                 if (execFlag){
                     execFlag = myDatabase.executeCommands(getAlterCommands());
                 }
                 break;
             case TABLES_INSERT_ALTER:
-                DbLogger.info("Attempting to execute create/insert/alter tables create task.\n {}", this);
+                LOG.info("Attempting to execute create/insert/alter tables create task.\n {}", this);
                 execFlag = myDatabase.executeCommands(getTableCommands());
                 if (execFlag){
                     execFlag = myDatabase.executeCommands(getInsertCommands());
@@ -248,7 +248,7 @@ public class DbCreateTask {
                 }
                 break;
             case TABLES_EXCEL:
-                DbLogger.info("Attempting to execute tables create plus Excel import task.\n {}", this);
+                LOG.info("Attempting to execute tables create plus Excel import task.\n {}", this);
                 execFlag = myDatabase.executeCommands(getTableCommands());
                 if (execFlag){
                     try {
@@ -261,7 +261,7 @@ public class DbCreateTask {
                 }
                 break;
             case TABLES_EXCEL_ALTER:
-                DbLogger.info("Attempting to execute tables create plus Excel plus alter import task.\n {}", this);
+                LOG.info("Attempting to execute tables create plus Excel plus alter import task.\n {}", this);
                 execFlag = myDatabase.executeCommands(getTableCommands());
                 if (execFlag){
                     try {
@@ -276,10 +276,10 @@ public class DbCreateTask {
         }
         if (execFlag) {
             setState(DbCreateTask.State.EXECUTED);
-            DbLogger.info("The task was successfully executed.");
+            LOG.info("The task was successfully executed.");
         } else {
             setState(DbCreateTask.State.EXECUTION_ERROR);
-            DbLogger.info("The task had execution errors.");
+            LOG.info("The task had execution errors.");
             //TODO decide whether to throw this error or not
             throw new DataAccessException("There was an execution error for task \n" + this +
                     "\n see jslDbLog.log for details ");
@@ -317,10 +317,10 @@ public class DbCreateTask {
         try {
             commands.addAll(DatabaseIfc.parseQueriesInSQLScript(pathToScript));
         } catch (IOException e) {
-            DbLogger.warn("The script {} t failed to parse.", pathToScript);
+            LOG.warn("The script {} t failed to parse.", pathToScript);
         }
         if (commands.isEmpty()) {
-            DbLogger.warn("The script {} produced no commands to execute.", pathToScript);
+            LOG.warn("The script {} produced no commands to execute.", pathToScript);
         }
         return commands;
     }

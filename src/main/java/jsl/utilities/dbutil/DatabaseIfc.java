@@ -30,7 +30,6 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,7 @@ public interface DatabaseIfc {
         COMMENT, CONTINUED, END
     }
 
-    Logger DbLogger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     String DEFAULT_DELIMITER = ";";
     Pattern NEW_DELIMITER_PATTERN = Pattern.compile("(?:--|\\/\\/|\\#)?!DELIMITER=(.+)");
@@ -132,7 +131,7 @@ public interface DatabaseIfc {
         try (Connection connection = getConnection()) {
             metaData = connection.getMetaData();
         } catch (SQLException e) {
-            DbLogger.warn("The meta data was not available {}", e);
+            LOG.warn("The meta data was not available {}", e);
         }
         return metaData;
     }
@@ -188,6 +187,7 @@ public interface DatabaseIfc {
     default Schema getSchema(String schemaName) {
         Meta meta = getDSLContext().meta();
         List<Schema> schemas = meta.getSchemas();
+        //LOG.debug("Looking for schema {}",schemaName);
         Schema found = null;
         for (Schema s : schemas) {
             if (s.getName().equals(schemaName)) {
@@ -221,6 +221,7 @@ public interface DatabaseIfc {
      * @return the jooq Table representation or null if not found
      */
     default Table<?> getTable(String tableName) {
+        //LOG.debug("Looking for table {}",tableName);
         Meta meta = getDSLContext().meta();
         List<Table<?>> tables = meta.getTables();
         Table<?> found = null;
@@ -287,7 +288,7 @@ public interface DatabaseIfc {
      */
     default void writeTableAsCSV(String tableName, PrintWriter out) {
         if (!containsTable(tableName)) {
-            DbLogger.trace("Table: {} does not exist in database {}", tableName, getLabel());
+            LOG.trace("Table: {} does not exist in database {}", tableName, getLabel());
             return;
         }
         out.println(selectAll(tableName).formatCSV());
@@ -311,7 +312,7 @@ public interface DatabaseIfc {
      */
     default void writeTableAsText(String tableName, PrintWriter out) {
         if (!containsTable(tableName)) {
-            DbLogger.trace("Table: {} does not exist in database {}", tableName, getLabel());
+            LOG.trace("Table: {} does not exist in database {}", tableName, getLabel());
             return;
         }
         out.println(tableName);
@@ -469,11 +470,11 @@ public interface DatabaseIfc {
      */
     default String getInsertQueries(Table<? extends Record> table) {
         if (table == null) {
-            DbLogger.trace("The supplied table reference was null");
+            LOG.trace("The supplied table reference was null");
             throw new IllegalArgumentException("The supplied table was null");
         }
         if (!containsTable(table)) {
-            DbLogger.trace("Table: {} does not exist in database {}", table.getName(), getLabel());
+            LOG.trace("Table: {} does not exist in database {}", table.getName(), getLabel());
             return null;
         }
         Result<Record> results = selectAll(table);
@@ -497,7 +498,7 @@ public interface DatabaseIfc {
      */
     default void writeInsertQueries(String tableName, PrintWriter out) {
         if (!containsTable(tableName)) {
-            DbLogger.trace("Table: {} does not exist in database {}", tableName, getLabel());
+            LOG.trace("Table: {} does not exist in database {}", tableName, getLabel());
             return;
         }
         writeInsertQueries(getTable(tableName), out);
@@ -514,7 +515,7 @@ public interface DatabaseIfc {
             throw new IllegalArgumentException("The supplied table was null");
         }
         if (!containsTable(table)) {
-            DbLogger.trace("Table: {} does not exist in database {}", table.getName(), getLabel());
+            LOG.trace("Table: {} does not exist in database {}", table.getName(), getLabel());
             return;
         }
         Result<Record> results = selectAll(table);
@@ -581,7 +582,7 @@ public interface DatabaseIfc {
     default void writeDbToExcelWorkbook(String schemaName, String wbName, Path wbDirectory) throws IOException {
         Objects.requireNonNull(schemaName, "The schema name was null");
         if (!containsSchema(schemaName)) {
-            DbLogger.warn("Attempting to write to Excel: The supplied schema name {} is not in database {}",
+            LOG.warn("Attempting to write to Excel: The supplied schema name {} is not in database {}",
                     schemaName, getLabel());
             return;
         }
@@ -602,11 +603,26 @@ public interface DatabaseIfc {
 //        System.out.println(path);
         List<String> tableNames = getTableNames(schemaName);
         if (tableNames.isEmpty()) {
-            DbLogger.warn("The supplied schema name {} had no tables to write to Excel in database {}",
+            LOG.warn("The supplied schema name {} had no tables to write to Excel in database {}",
                     schemaName, getLabel());
         } else {
             ExcelUtil.writeDBAsExcelWorkbook(this, tableNames, path);
         }
+    }
+
+    /** Executes a single command on an database connection
+     *
+     * @param cmd a valid SQL command
+     * @return true if the command executed without an SQLException
+     */
+    default boolean executeCommand(String cmd){
+        boolean flag = false;
+        try (Connection con = getConnection()){
+            flag = executeCommand(con, cmd);
+        } catch (SQLException ex){
+            LOG.error("SQLException when executing {}", cmd, ex);
+        }
+        return flag;
     }
 
     /**
@@ -621,11 +637,11 @@ public interface DatabaseIfc {
         boolean flag = false;
         try (Statement statement = con.createStatement()) {
             statement.execute(cmd);
-            DbLogger.trace("Executed SQL: {}", cmd);
+            LOG.trace("Executed SQL: {}", cmd);
             statement.close();
             flag = true;
         } catch (SQLException ex) {
-            DbLogger.error("SQLException when executing {}", cmd, ex);
+            LOG.error("SQLException when executing {}", cmd, ex);
         }
         return flag;
     }
@@ -654,7 +670,7 @@ public interface DatabaseIfc {
             con.setAutoCommit(true);
         } catch (SQLException ex) {
             flag = false;
-            DbLogger.error("SQLException: ", ex);
+            LOG.error("SQLException: ", ex);
         }
         return flag;
     }
@@ -672,7 +688,7 @@ public interface DatabaseIfc {
         if (Files.notExists(path)) {
             throw new IllegalArgumentException("The script file does not exist");
         }
-        DbLogger.trace("Executing SQL in file: {}", path);
+        LOG.trace("Executing SQL in file: {}", path);
         return executeCommands(parseQueriesInSQLScript(path));
     }
 
@@ -775,7 +791,7 @@ public interface DatabaseIfc {
         SQLWarning warning = conn.getWarnings();
         if (warning != null) {
             while (warning != null) {
-                DbLogger.warn("Message: {}", warning.getMessage());
+                LOG.warn("Message: {}", warning.getMessage());
                 warning = warning.getNextWarning();
             }
         }
@@ -842,7 +858,7 @@ public interface DatabaseIfc {
             // End of statement
             if (trimmedLine.endsWith(delimiter)) {
                 command.delete(command.length() - delimiter.length() - 1, command.length());
-                DbLogger.trace("Parsed SQL: {}", command);
+                LOG.trace("Parsed SQL: {}", command);
                 return true;
             }
         }
@@ -896,7 +912,7 @@ public interface DatabaseIfc {
             jooqCodeGeneration(dataSource, schemaName, pkgDirName, packageName);
         } catch (Exception e) {
             e.printStackTrace();
-            DbLogger.trace("Error in jooq code generation for database: schemaName {} ,pkgDirName {}, packageName {}", schemaName, pkgDirName, packageName);
+            LOG.trace("Error in jooq code generation for database: schemaName {} ,pkgDirName {}, packageName {}", schemaName, pkgDirName, packageName);
         }
     }
 

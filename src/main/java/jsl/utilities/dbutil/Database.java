@@ -16,17 +16,10 @@
 
 package jsl.utilities.dbutil;
 
-import jsl.utilities.excel.ExcelUtil;
 import org.jooq.*;
-import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -97,14 +90,15 @@ public class Database implements DatabaseIfc {
 
     @Override
     public void setDefaultSchemaName(String defaultSchemaName) {
+        LOG.debug("Setting the default schema name to {}", defaultSchemaName);
         myDefaultSchemaName = defaultSchemaName;
         if (defaultSchemaName != null) {
             if (!containsSchema(defaultSchemaName)) {
-                DbLogger.warn("The supplied default schema name {} was not in the database {}.",
+                LOG.warn("The supplied default schema name {} was not in the database {}.",
                         defaultSchemaName, myLabel);
             }
         } else {
-            DbLogger.warn("The default schema name was set to null for database {}.", myLabel);
+            LOG.warn("The default schema name was set to null for database {}.", myLabel);
         }
     }
 

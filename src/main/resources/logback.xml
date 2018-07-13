@@ -91,12 +91,29 @@
         </encoder>
     </appender>
 
-    <logger name="jsl.utilities.dbutil.DatabaseIfc" level="TRACE" additivity="false">
+    <appender name="hikari" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/hikari.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/hikari.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 2 days' worth of history capped at 30MB total size -->
+            <maxHistory>2</maxHistory>
+            <totalSizeCap>30MB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="jsl.utilities.dbutil.DatabaseIfc" level="DEBUG" additivity="false">
         <appender-ref ref="JSLDB" />
     </logger>
 
-    <logger name="com.zaxxer.hikari" level="TRACE" additivity="false">
-        <appender-ref ref="JSLDB" />
+    <logger name="com.zaxxer.hikari" level="OFF" additivity="false">
+        <appender-ref ref="hikari" />
     </logger>
 
     <logger name="jsl.utilities.excel.ExcelUtil" level="DEBUG" additivity="false">

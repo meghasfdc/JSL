@@ -255,10 +255,13 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
     }
 
     public static void runExperiment() {
+        PrintWriter out = new PrintWriter(System.out);
 
         Simulation sim = new Simulation("DLB_with_Q", true);
-
+        Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
+  //      db.get().getDatabase().setJooQDefaultExecutionLoggingOption(true);
   //      JSLDatabase.useExistingEmbeddedDerbyJSLDatabase(sim, "AnotherOne");
+        JSLDatabase jslDatabase = JSLDatabase.createPostgresLocalHostJSLDatabase(sim, true, "test", "test", "test");
 
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(sim.getModel());
@@ -280,7 +283,7 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
         r.printAcrossReplicationSummaryStatistics();
 
-        Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
+
         if (db.isPresent()){
             System.out.println("Printing across replication records");
             db.get().getAcrossRepStatRecords().format(System.out);
@@ -297,6 +300,9 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 //                e.printStackTrace();
 //            }
         }
+
+        System.out.println("Using the postgres db");
+        jslDatabase.writeAllTablesAsText(out);
 
     }
 }
