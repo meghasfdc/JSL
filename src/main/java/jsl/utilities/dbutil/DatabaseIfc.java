@@ -180,7 +180,11 @@ public interface DatabaseIfc {
         return schemas.contains(schema);
     }
 
-    /**
+    /** The name of the schema is first checked for an exact lexicographical match.
+     *  If a match occurs, the schema is returned.  If a lexicographical match fails,
+     *  then a check for a match ignoring the case of the string is performed.
+     *  This is done because SQL identifier names should be case insensitive.
+     *  If neither matches then null is returned.
      * @param schemaName the schema name to find
      * @return the jooq schema for the name or null
      */
@@ -188,14 +192,16 @@ public interface DatabaseIfc {
         Meta meta = getDSLContext().meta();
         List<Schema> schemas = meta.getSchemas();
         //LOG.debug("Looking for schema {}",schemaName);
-        Schema found = null;
+        //Schema found = null;
         for (Schema s : schemas) {
             if (s.getName().equals(schemaName)) {
-                found = s;
-                break;
+                return s;
+            } else if (s.getName().equalsIgnoreCase(schemaName)){
+                return s;
             }
         }
-        return found;
+        // if it gets here it was not found
+        return null;
     }
 
     /**
@@ -216,7 +222,12 @@ public interface DatabaseIfc {
         return getTable(tableName) != null;
     }
 
-    /**
+    /** The name of the table is first checked for an exact lexicographical match.
+     *  If a match occurs, the table is returned.  If a lexicographical match fails,
+     *  then a check for a match ignoring the case of the string is performed.
+     *  This is done because SQL identifier names should be case insensitive.
+     *  If neither matches then null is returned.
+     *
      * @param tableName the unqualified table name to find as a string
      * @return the jooq Table representation or null if not found
      */
@@ -224,14 +235,39 @@ public interface DatabaseIfc {
         //LOG.debug("Looking for table {}",tableName);
         Meta meta = getDSLContext().meta();
         List<Table<?>> tables = meta.getTables();
-        Table<?> found = null;
         for (Table<?> t : tables) {
             if (t.getName().equals(tableName)) {
-                found = t;
-                break;
+                return t;
+            } else if (t.getName().equalsIgnoreCase(tableName)){
+                return t;
             }
         }
-        return found;
+        return null;
+    }
+
+    /** The name of the table is first checked for an exact lexicographical match.
+     *  If a match occurs, the table is returned.  If a lexicographical match fails,
+     *  then a check for a match ignoring the case of the string is performed.
+     *  This is done because SQL identifier names should be case insensitive.
+     *  If neither matches then null is returned.
+     *
+     * @param schema the schema to check, must not be null
+     * @param tableName the unqualified table name to find as a string
+     * @return the jooq Table representation or null if not found
+     */
+    default Table<?> getTable(Schema schema, String tableName) {
+        Objects.requireNonNull(schema, "The schema was null");
+        //LOG.debug("Looking for table {}",tableName);
+        Table<?> table = schema.getTable(tableName);
+        if (table == null){
+            // try all upper case
+             table = schema.getTable(tableName.toUpperCase());
+             if (table == null){
+                 // try all lower case
+                 table = schema.getTable(tableName.toLowerCase());
+             }
+        }
+        return table;
     }
 
     /**

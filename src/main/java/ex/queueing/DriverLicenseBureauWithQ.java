@@ -18,6 +18,7 @@ package ex.queueing;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
+
 import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
@@ -198,18 +199,6 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         }
     }
 
-    public static void main(String[] args) {
-
-        System.out.println("Driver License Bureau Test");
-
-        //runReplication();
-        //runBatchReplication();
-        runExperiment();
-
-        System.out.println("Done!");
-
-    }
-
     public static void runReplication() {
         Simulation sim = new Simulation("DLB_with_Q_1_REP");
 
@@ -255,13 +244,42 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
     }
 
     public static void runExperiment() {
+        Simulation sim = new Simulation("DLB_with_Q", true);
+        // create the model element and attach it to the main model
+        new DriverLicenseBureauWithQ(sim.getModel());
+
+        // set the parameters of the experiment
+        sim.setNumberOfReplications(30);
+        sim.setLengthOfReplication(20000.0);
+        sim.setLengthOfWarmUp(5000.0);
+
+        SimulationReporter r = sim.makeSimulationReporter();
+        //r.turnOnReplicationCSVStatisticReporting();
+        System.out.println(sim);
+
+        // tell the simulation to run
+        System.out.println("Simulation started.");
+        sim.run();
+        System.out.println("Simulation completed.");
+
+        r.printAcrossReplicationSummaryStatistics();
+
+    }
+
+    public static void testDatabases() {
+        // this example has 3 JSL databases collecting data
         PrintWriter out = new PrintWriter(System.out);
 
         Simulation sim = new Simulation("DLB_with_Q", true);
+        // get the default JSL database
         Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
-  //      db.get().getDatabase().setJooQDefaultExecutionLoggingOption(true);
-  //      JSLDatabase.useExistingEmbeddedDerbyJSLDatabase(sim, "AnotherOne");
-        JSLDatabase jslDatabase = JSLDatabase.createPostgresLocalHostJSLDatabase(sim, true, "test", "test", "test");
+
+        // make and use an additional embedded derby database
+        JSLDatabase.useExistingEmbeddedDerbyJSLDatabase(sim, "AnotherOne");
+
+        // make an use an addition postgres database, assumes that postgres local host server is running
+        JSLDatabase jslDatabase = JSLDatabase.getPostgresLocalHostJSLDatabase(sim,
+                true, "test", "test", "test");
 
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(sim.getModel());
@@ -273,7 +291,6 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
         SimulationReporter r = sim.makeSimulationReporter();
 
-        //r.turnOnReplicationCSVStatisticReporting();
         System.out.println(sim);
 
         // tell the simulation to run
@@ -283,26 +300,42 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
         r.printAcrossReplicationSummaryStatistics();
 
-
-        if (db.isPresent()){
+        if (db.isPresent()) {
             System.out.println("Printing across replication records");
             db.get().getAcrossRepStatRecords().format(System.out);
             System.out.println();
-            System.out.println(db.get().getDatabase().getDefaultSchemaName());
+
 //            System.out.println("Clearing all data in the database!");
 //            db.get().clearAllData();
-//            System.out.println("Printing across replication records");
-//            db.get().getAcrossRepStatRecords().format(System.out);
-//            try {
-//                db.get().writeDbToExcelWorkbook();
-////                db.get().getDatabase().writeDbToExcelWorkbook("JSL_DB");
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+                // uncomment to write data from database to Excel workbook
+            try {
+                db.get().writeDbToExcelWorkbook();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         System.out.println("Using the postgres db");
         jslDatabase.writeAllTablesAsText(out);
+        try {
+            jslDatabase.writeDbToExcelWorkbook();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println("Driver License Bureau Test");
+
+        //runReplication();
+        //runBatchReplication();
+        //runExperiment();
+
+        testDatabases();
+
+        System.out.println("Done!");
 
     }
 }

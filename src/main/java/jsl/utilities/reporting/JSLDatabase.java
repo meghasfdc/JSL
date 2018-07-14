@@ -74,6 +74,9 @@ public class JSLDatabase {
     public final static Path dbDir;
     public final static Path dbScriptsDir;
 
+    private static final List<String> JSLTableNames = Arrays.asList("batch_stat", "within_rep_counter_stat",
+            "across_rep_stat", "within_rep_stat", "model_element", "simulation_run");
+
     private static String jslSchemaName = "JSL_DB";
 
     static {
@@ -300,9 +303,83 @@ public class JSLDatabase {
         DataSource ds = DatabaseFactory.getDataSource(dBProperties);
         String user = dBProperties.getProperty("dataSource.user");
         String name = dBProperties.getProperty("dataSource.databaseName");
-        String dbLabel = user + ":" + name;
+        String dbLabel = user + "_" + name;
         Database db = new Database(dbLabel, ds, sqlDialect);
         dropJSLDbSchema(db);
+        return new JSLDatabase(db, simulation, clearDataOption);
+    }
+
+    /**
+     * Creates a reference to a JSLDatabase. This method assumes that the data source
+     * has a properly configured JSL schema. If it does not, one is created. If it has
+     * one the data from previous simulations remains. If the clear data option is
+     * set to true then the data WILL be deleted prior to the first experiment.
+     *
+     * @param simulation      the simulation that will use the database
+     * @param clearDataOption whether or not the data will be cleared prior to experiments
+     * @param dbName          the name of the database, must not be null
+     * @param user            the user
+     * @param pWord           the password
+     * @return a fresh new JSLDatabase
+     */
+    public static JSLDatabase getPostgresLocalHostJSLDatabase(Simulation simulation, boolean clearDataOption,
+                                                              String dbName, String user, String pWord) {
+        return getPostgresJSLDatabase(simulation, clearDataOption, "localhost", dbName, user, pWord);
+    }
+
+    /**
+     * Creates a reference to a JSLDatabase. This method assumes that the data source
+     * has a properly configured JSL schema. If it does not, one is created. If it has
+     * one the data from previous simulations remains. If the clear data option is
+     * set to true then the data WILL be deleted prior to the first experiment.
+     *
+     * @param simulation      the simulation that will use the database
+     * @param clearDataOption whether or not the data will be cleared prior to experiments
+     * @param dbServerName    the name of the database server, must not be null
+     * @param dbName          the name of the database, must not be null
+     * @param user            the user
+     * @param pWord           the password
+     * @return a fresh new JSLDatabase
+     */
+    public static JSLDatabase getPostgresJSLDatabase(Simulation simulation, boolean clearDataOption,
+                                                     String dbServerName, String dbName, String user, String pWord) {
+        Objects.requireNonNull(simulation, "The Simulation was null");
+        Objects.requireNonNull(dbServerName, "The name to the database server must not be null");
+        Objects.requireNonNull(dbName, "The path name to the database must not be null");
+        Properties props = new Properties();
+        props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
+        props.setProperty("dataSource.user", user);
+        props.setProperty("dataSource.password", pWord);
+        props.setProperty("dataSource.databaseName", dbName);
+        props.setProperty("dataSource.serverName", dbServerName);
+        JSLDatabase jslDatabase = getJSLDatabase(simulation, clearDataOption, props, SQLDialect.POSTGRES);
+        jslDatabase.getDatabase().getDSLContext().settings().withRenderNameStyle(RenderNameStyle.LOWER);
+        DatabaseIfc.LOG.info("Connected to a postgres JSL database {} ", jslDatabase.getDatabase().getLabel());
+        return jslDatabase;
+    }
+
+    /**
+     * Creates a reference to a JSLDatabase. This method assumes that the data source
+     * has a properly configured JSL schema. If it does not, one is created. If it has
+     * one the data from previous simulations remains. If the clear data option is
+     * set to true then the data WILL be deleted prior to the first experiment.
+     *
+     * @param simulation      the simulation that will use the database
+     * @param clearDataOption whether or not the data will be cleared prior to experiments
+     * @param dBProperties    appropriately configured HikariCP datasource properties
+     * @param sqlDialect      the jooq dialect for the database. It must match the database type in the properties
+     * @return a reference to JSLDatabase
+     */
+    public static JSLDatabase getJSLDatabase(Simulation simulation, boolean clearDataOption,
+                                             Properties dBProperties, SQLDialect sqlDialect) {
+        Objects.requireNonNull(simulation, "The Simulation was null");
+        Objects.requireNonNull(dBProperties, "The database properties was was null");
+        Objects.requireNonNull(sqlDialect, "The database dialect was was null");
+        DataSource ds = DatabaseFactory.getDataSource(dBProperties);
+        String user = dBProperties.getProperty("dataSource.user");
+        String name = dBProperties.getProperty("dataSource.databaseName");
+        String dbLabel = user + "_" + name;
+        Database db = new Database(dbLabel, ds, sqlDialect);
         return new JSLDatabase(db, simulation, clearDataOption);
     }
 
@@ -314,6 +391,13 @@ public class JSLDatabase {
     }
 
     /**
+     * @return the names of the tables in the JSL database as strings
+     */
+    public static List<String> getJSLTableNames() {
+        return new ArrayList<>(JSLTableNames);
+    }
+
+    /**
      * Drops the getJSLSchemaName() schema and any related tables in the supplied database if they exist.
      * If the database does not contain a schema called getJSLSchemaName(), then nothing happens
      *
@@ -321,35 +405,29 @@ public class JSLDatabase {
      */
     public static void dropJSLDbSchema(Database db) {
         if (db.containsSchema(getJSLSchemaName())) {
-            DatabaseIfc.LOG.debug("The database {} contains the JSL schema {}", db.getLabel(), getJSLSchemaName());
-            DatabaseIfc.LOG.debug("Attempting to drop the JSL schema ....");
             // need to delete the schema and any tables/data
-            org.jooq.Table<?> table = db.getTable(getJSLSchemaName(), "batch_stat");
-            if (table != null) {
-                db.getDSLContext().dropTable(table).execute();
+            Schema schema = db.getSchema(getJSLSchemaName());
+            DatabaseIfc.LOG.debug("The database {} contains the JSL schema {}", db.getLabel(), schema.getName());
+            DatabaseIfc.LOG.debug("Attempting to drop the schema {}....", schema.getName());
+            org.jooq.Table<?> table = null;
+            List<org.jooq.Table<?>> tables = schema.getTables();
+            DatabaseIfc.LOG.debug("Schema {} has tables ... ", schema.getName());
+            for (org.jooq.Table<?> t : tables) {
+                DatabaseIfc.LOG.debug("table: {}", t.getName());
             }
-            table = db.getTable(getJSLSchemaName(), "within_rep_counter_stat");
-            if (table != null) {
-                db.getDSLContext().dropTable(table).execute();
+            for (String name : JSLTableNames) {
+                DatabaseIfc.LOG.debug("Checking for table {} ", name);
+                table = db.getTable(schema, name);
+                if (table != null) {
+                    db.getDSLContext().dropTable(table).execute();
+                    DatabaseIfc.LOG.debug("Dropped table {} ", table.getName());
+                }
             }
-            table = db.getTable(getJSLSchemaName(), "across_rep_stat");
-            if (table != null) {
-                db.getDSLContext().dropTable(table).execute();
-            }
-            table = db.getTable(getJSLSchemaName(), "within_rep_stat");
-            if (table != null) {
-                db.getDSLContext().dropTable(table).execute();
-            }
-            table = db.getTable(getJSLSchemaName(), "model_element");
-            if (table != null) {
-                db.getDSLContext().dropTable(table).execute();
-            }
-            table = db.getTable(getJSLSchemaName(), "simulation_run");
-            if (table != null) {
-                db.getDSLContext().dropTable(table).execute();
-            }
-            db.getDSLContext().dropSchema(getJSLSchemaName()).execute();
-            DatabaseIfc.LOG.debug("Completed the dropping of the JSL schema");
+            db.getDSLContext().dropSchema(schema.getName()).execute(); // works
+            //db.getDSLContext().dropSchema(schema).execute(); // doesn't work
+            // db.getDSLContext().execute("drop schema jsl_db restrict"); //works
+            //boolean exec = db.executeCommand("drop schema jsl_db restrict");
+            DatabaseIfc.LOG.debug("Completed the dropping of the JSL schema {}", schema.getName());
         } else {
             DatabaseIfc.LOG.debug("The database {} does not contain the JSL schema {}", db.getLabel(), getJSLSchemaName());
             List<Schema> schemas = db.getDSLContext().meta().getSchemas();
