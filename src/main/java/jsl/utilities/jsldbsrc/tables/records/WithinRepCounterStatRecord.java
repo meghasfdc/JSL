@@ -28,87 +28,87 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WithinRepCounterStatRecord extends UpdatableRecordImpl<WithinRepCounterStatRecord> implements Record6<Integer, String, Integer, String, Integer, Double> {
 
-    private static final long serialVersionUID = -1025569495;
+    private static final long serialVersionUID = 407472407;
 
     /**
-     * Setter for <code>APP.WITHIN_REP_COUNTER_STAT.ID</code>.
+     * Setter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.ID</code>.
      */
     public void setId(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>APP.WITHIN_REP_COUNTER_STAT.ID</code>.
+     * Getter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.ID</code>.
      */
     public Integer getId() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>APP.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
+     * Setter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
      */
     public void setModelElementName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>APP.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
+     * Getter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
      */
     public String getModelElementName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>APP.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
+     * Setter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
      */
     public void setSimRunIdFk(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>APP.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
+     * Getter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
      */
     public Integer getSimRunIdFk() {
         return (Integer) get(2);
     }
 
     /**
-     * Setter for <code>APP.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
+     * Setter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
      */
     public void setStatName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>APP.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
+     * Getter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
      */
     public String getStatName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>APP.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
+     * Setter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
      */
     public void setRepNum(Integer value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>APP.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
+     * Getter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
      */
     public Integer getRepNum() {
         return (Integer) get(4);
     }
 
     /**
-     * Setter for <code>APP.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
+     * Setter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
      */
     public void setLastValue(Double value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>APP.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
+     * Getter for <code>JSL_DB.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
      */
     public Double getLastValue() {
         return (Double) get(5);

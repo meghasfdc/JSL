@@ -302,12 +302,12 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
          * Builds a list with the specified number of resource timeUnits all
          * with the same specifications, named getName():Unit:&#35;
          *
-         * @param numToBuild the number to build
+         * @param numToBuild the number to builder
          * @return the filled up list
          */
         public List<ResourceUnit> build(int numToBuild) {
             if (numToBuild <= 0) {
-                throw new IllegalArgumentException("The number to build must be > 0");
+                throw new IllegalArgumentException("The number to builder must be > 0");
             }
             List<ResourceUnit> list = new ArrayList<>();
 

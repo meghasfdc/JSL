@@ -70,7 +70,7 @@ public class TestNHPP extends ModelElement {
 
     public static void runModel1() {
         // create the experiment to run the model
-        Simulation s = new Simulation();
+        Simulation s = new Simulation("TestNHPP");
 
         PiecewiseConstantRateFunction f = new PiecewiseConstantRateFunction(15.0, 1.0);
 
@@ -98,7 +98,7 @@ public class TestNHPP extends ModelElement {
     }
 
     public static void runModel2() {
-        Simulation s = new Simulation();
+        Simulation s = new Simulation("TestNHPP");
 
         PiecewiseRateFunction f = new PiecewiseLinearRateFunction(0.5, 200.0, 0.5);
 

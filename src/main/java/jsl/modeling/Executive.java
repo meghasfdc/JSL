@@ -237,7 +237,6 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
      *
      * @param str The name as a string.
      */
-    @Override
     public final void setName(String str) {
         if (str == null) {
             myName = this.getClass().getSimpleName();

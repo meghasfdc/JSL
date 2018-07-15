@@ -391,13 +391,14 @@ public class MultiBootstrap implements RandomStreamIfc {
         Table table = Table.create(getName());
         Map<String, double[]> averages = getBootstrapSampleAverages();
         for(String name: averages.keySet()){
-            DoubleColumn dc = new DoubleColumn(name + ":avg", averages.get(name));
-            table.addColumn(dc);
+            DoubleColumn dc = DoubleColumn.create(name + ":avg", averages.get(name));
+           // DoubleColumn dc = new DoubleColumn(name + ":avg", averages.get(name));
+            table.addColumns(dc);
         }
         Map<String, double[]> variances = getBootstrapSampleVariances();
         for(String name: variances.keySet()){
-            DoubleColumn dc = new DoubleColumn(name + ":var", variances.get(name));
-            table.addColumn(dc);
+            DoubleColumn dc = DoubleColumn.create(name + ":var", variances.get(name));
+            table.addColumns(dc);
         }
         return table;
     }

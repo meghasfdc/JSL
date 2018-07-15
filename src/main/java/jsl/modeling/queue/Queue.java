@@ -223,7 +223,7 @@ public class Queue<T extends QObject> extends ModelElement implements
 //         *
 //         * @return the newly created Queue
 //         */
-//        public Queue<T> build() {
+//        public Queue<T> builder() {
 //            return new Queue(parent, name, discipline, statOption);
 //        }
 //    }

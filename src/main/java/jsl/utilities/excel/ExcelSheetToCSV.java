@@ -31,7 +31,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 /**
  * @author rossetti
  */
-public class ExcelSheetToCSV implements SheetContentsHandler {
+class ExcelSheetToCSV implements SheetContentsHandler {
 
     /**
      * Number of columns to read starting with leftmost

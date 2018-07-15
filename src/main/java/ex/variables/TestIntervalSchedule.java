@@ -41,7 +41,7 @@ public class TestIntervalSchedule {
      */
     public static void main(String[] args) {
         Simulation sim = new Simulation("DLB_with_Q");
-        sim.setDbOption(false);
+        sim.setClearDatabaseOptionForDefaultDatabase(false);
         Model m = sim.getModel();
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(m);

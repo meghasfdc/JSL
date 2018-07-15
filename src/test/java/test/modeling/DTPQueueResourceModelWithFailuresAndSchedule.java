@@ -81,7 +81,7 @@ public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElem
         Constant c1 = new Constant(100.0);
         myResource.addTimeBasedFailure(Constant.TWO, c1);
         //       myResource.addTimeBasedFailure(Constant.TWO, c1, false);
-        // myResource = new ResourceUnit.Builder(this).name("Server").build();
+        // myResource = new ResourceUnit.Builder(this).name("Server").builder();
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
         mySysTime = new ResponseVariable(this, "System Time");

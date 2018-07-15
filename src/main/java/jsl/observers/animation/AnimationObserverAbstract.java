@@ -40,7 +40,7 @@ public abstract class AnimationObserverAbstract extends Mover2DObserver {
         // tell the message handler that a new message is beginning
         myAnimationMessageHandler.beginMessage();
 
-        // build standard model element message
+        // builder standard model element message
 //		buildStandardModelElementMessage(m);
 
         // handle the model element updates

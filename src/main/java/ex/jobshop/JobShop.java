@@ -16,6 +16,7 @@
 package ex.jobshop;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,6 +140,7 @@ public class JobShop extends ModelElement {
         r.printAcrossReplicationSummaryStatistics();
 
         //r.showAcrossReplicationSummaryStatisticsAsPDF();
+        //sim.getJSLDatabase().getAcrossRepStatRecords().format(new PrintWriter(System.out));
 
     }
 }

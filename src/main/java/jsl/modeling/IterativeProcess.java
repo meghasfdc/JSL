@@ -335,7 +335,6 @@ abstract public class IterativeProcess<T> implements ObservableIfc, IterativePro
      *
      * @param str The name as a string.
      */
-    @Override
     public final void setName(String str) {
         if (str == null) {
             String s = this.getClass().getName();
@@ -354,7 +353,6 @@ abstract public class IterativeProcess<T> implements ObservableIfc, IterativePro
      *
      * @return the id
      */
-    @Override
     public final long getId() {
         return (myId);
     }

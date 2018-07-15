@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import jsl.utilities.jsldbsrc.App;
+import jsl.utilities.jsldbsrc.JslDb;
 import jsl.utilities.jsldbsrc.Keys;
 import jsl.utilities.jsldbsrc.tables.records.ModelElementRecord;
 
@@ -37,10 +37,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ModelElement extends TableImpl<ModelElementRecord> {
 
-    private static final long serialVersionUID = -447794331;
+    private static final long serialVersionUID = -1968773197;
 
     /**
-     * The reference instance of <code>APP.MODEL_ELEMENT</code>
+     * The reference instance of <code>JSL_DB.MODEL_ELEMENT</code>
      */
     public static final ModelElement MODEL_ELEMENT = new ModelElement();
 
@@ -53,46 +53,46 @@ public class ModelElement extends TableImpl<ModelElementRecord> {
     }
 
     /**
-     * The column <code>APP.MODEL_ELEMENT.SIM_RUN_ID_FK</code>.
+     * The column <code>JSL_DB.MODEL_ELEMENT.SIM_RUN_ID_FK</code>.
      */
     public final TableField<ModelElementRecord, Integer> SIM_RUN_ID_FK = createField("SIM_RUN_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>APP.MODEL_ELEMENT.ELEMENT_NAME</code>.
+     * The column <code>JSL_DB.MODEL_ELEMENT.ELEMENT_NAME</code>.
      */
     public final TableField<ModelElementRecord, String> ELEMENT_NAME = createField("ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.MODEL_ELEMENT.ELEMENT_ID</code>.
+     * The column <code>JSL_DB.MODEL_ELEMENT.ELEMENT_ID</code>.
      */
     public final TableField<ModelElementRecord, Long> ELEMENT_ID = createField("ELEMENT_ID", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>APP.MODEL_ELEMENT.CLASS_NAME</code>.
+     * The column <code>JSL_DB.MODEL_ELEMENT.CLASS_NAME</code>.
      */
     public final TableField<ModelElementRecord, String> CLASS_NAME = createField("CLASS_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.MODEL_ELEMENT.PARENT_NAME_FK</code>.
+     * The column <code>JSL_DB.MODEL_ELEMENT.PARENT_NAME_FK</code>.
      */
     public final TableField<ModelElementRecord, String> PARENT_NAME_FK = createField("PARENT_NAME_FK", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
 
     /**
-     * Create a <code>APP.MODEL_ELEMENT</code> table reference
+     * Create a <code>JSL_DB.MODEL_ELEMENT</code> table reference
      */
     public ModelElement() {
         this(DSL.name("MODEL_ELEMENT"), null);
     }
 
     /**
-     * Create an aliased <code>APP.MODEL_ELEMENT</code> table reference
+     * Create an aliased <code>JSL_DB.MODEL_ELEMENT</code> table reference
      */
     public ModelElement(String alias) {
         this(DSL.name(alias), MODEL_ELEMENT);
     }
 
     /**
-     * Create an aliased <code>APP.MODEL_ELEMENT</code> table reference
+     * Create an aliased <code>JSL_DB.MODEL_ELEMENT</code> table reference
      */
     public ModelElement(Name alias) {
         this(alias, MODEL_ELEMENT);
@@ -111,7 +111,7 @@ public class ModelElement extends TableImpl<ModelElementRecord> {
      */
     @Override
     public Schema getSchema() {
-        return App.APP;
+        return JslDb.JSL_DB;
     }
 
     /**

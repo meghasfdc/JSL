@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
  * @author rossetti
  *
  */
-public class DataSourceArray extends IterativeDataSource {
+public class DataObservableArray extends IterativeDataObservable {
 
     protected double[] myValues;
 
@@ -34,7 +34,7 @@ public class DataSourceArray extends IterativeDataSource {
     /**
      * @param values
      */
-    public DataSourceArray(double[] values) {
+    public DataObservableArray(double[] values) {
         this(values, values.length, null);
     }
 
@@ -42,7 +42,7 @@ public class DataSourceArray extends IterativeDataSource {
      * @param values
      * @param name
      */
-    public DataSourceArray(double[] values, String name) {
+    public DataObservableArray(double[] values, String name) {
         this(values, values.length, name);
     }
 
@@ -51,7 +51,7 @@ public class DataSourceArray extends IterativeDataSource {
      * @param n
      * @param name
      */
-    public DataSourceArray(double[] values, int n, String name) {
+    public DataObservableArray(double[] values, int n, String name) {
         super(name);
         setValues(values, n);
     }

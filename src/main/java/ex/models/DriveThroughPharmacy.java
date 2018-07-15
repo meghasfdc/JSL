@@ -21,6 +21,7 @@ import jsl.modeling.queue.Queue;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.reporting.JSLDatabase;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.statistic.MultipleComparisonAnalyzer;
@@ -29,6 +30,7 @@ import org.jooq.Result;
 
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Optional;
 
 public class DriveThroughPharmacy extends SchedulingElement {
 
@@ -176,7 +178,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
     public static void runModel(int numServers) {
 
         PrintWriter printWriter = new PrintWriter(System.out);
-        Simulation sim = new Simulation("Drive Through Pharmacy");
+        Simulation sim = new Simulation("Drive Through Pharmacy", true);
 
         sim.turnOnStatisticalBatching();
         //sim.setClearDbOption(false);
@@ -215,7 +217,8 @@ public class DriveThroughPharmacy extends SchedulingElement {
 
         //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         String responseName = dtp.getSystemTimeResponse().getName();
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = sim.getJSLDatabase().getWithinRepAveragesAsResultSet(responseName);
+        Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
+        Result<Record5<Integer, String, String, Integer, Double>> resultSet = db.get().getWithinRepAveragesAsResultSet(responseName);
 
         resultSet.format(printWriter);
 
@@ -223,7 +226,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
 //
 //        map.get("1st Run").forEach(System.out::println);
 
-        Map<String, double[]> withRepAveragesAsMap = sim.getJSLDatabase().getWithRepAveragesAsMap(responseName);
+        Map<String, double[]> withRepAveragesAsMap = db.get().getWithRepAveragesAsMap(responseName);
 
         MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
         System.out.println(multipleComparisonAnalyzer);

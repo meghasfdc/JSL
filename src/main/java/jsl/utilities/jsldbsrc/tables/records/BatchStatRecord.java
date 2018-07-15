@@ -25,465 +25,465 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BatchStatRecord extends UpdatableRecordImpl<BatchStatRecord> {
 
-    private static final long serialVersionUID = -475722684;
+    private static final long serialVersionUID = -1604184424;
 
     /**
-     * Setter for <code>APP.BATCH_STAT.ID</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.ID</code>.
      */
     public void setId(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.ID</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.ID</code>.
      */
     public Integer getId() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
      */
     public void setModelElementName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
      */
     public String getModelElementName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.SIM_RUN_ID_FK</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.SIM_RUN_ID_FK</code>.
      */
     public void setSimRunIdFk(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.SIM_RUN_ID_FK</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.SIM_RUN_ID_FK</code>.
      */
     public Integer getSimRunIdFk() {
         return (Integer) get(2);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.STAT_NAME</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
      */
     public void setStatName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.STAT_NAME</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
      */
     public String getStatName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.REP_NUM</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.REP_NUM</code>.
      */
     public void setRepNum(Integer value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.REP_NUM</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.REP_NUM</code>.
      */
     public Integer getRepNum() {
         return (Integer) get(4);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.STAT_COUNT</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.STAT_COUNT</code>.
      */
     public void setStatCount(Double value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.STAT_COUNT</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.STAT_COUNT</code>.
      */
     public Double getStatCount() {
         return (Double) get(5);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.AVERAGE</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.AVERAGE</code>.
      */
     public void setAverage(Double value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.AVERAGE</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.AVERAGE</code>.
      */
     public Double getAverage() {
         return (Double) get(6);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.STD_DEV</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.STD_DEV</code>.
      */
     public void setStdDev(Double value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.STD_DEV</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.STD_DEV</code>.
      */
     public Double getStdDev() {
         return (Double) get(7);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.STD_ERR</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.STD_ERR</code>.
      */
     public void setStdErr(Double value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.STD_ERR</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.STD_ERR</code>.
      */
     public Double getStdErr() {
         return (Double) get(8);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.HALF_WIDTH</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.HALF_WIDTH</code>.
      */
     public void setHalfWidth(Double value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.HALF_WIDTH</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.HALF_WIDTH</code>.
      */
     public Double getHalfWidth() {
         return (Double) get(9);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.CONF_LEVEL</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.CONF_LEVEL</code>.
      */
     public void setConfLevel(Double value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.CONF_LEVEL</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.CONF_LEVEL</code>.
      */
     public Double getConfLevel() {
         return (Double) get(10);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MINIMUM</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MINIMUM</code>.
      */
     public void setMinimum(Double value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MINIMUM</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MINIMUM</code>.
      */
     public Double getMinimum() {
         return (Double) get(11);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MAXIMUM</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MAXIMUM</code>.
      */
     public void setMaximum(Double value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MAXIMUM</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MAXIMUM</code>.
      */
     public Double getMaximum() {
         return (Double) get(12);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.WEIGHTED_SUM</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.WEIGHTED_SUM</code>.
      */
     public void setWeightedSum(Double value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.WEIGHTED_SUM</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.WEIGHTED_SUM</code>.
      */
     public Double getWeightedSum() {
         return (Double) get(13);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.SUM_OF_WEIGHTS</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.SUM_OF_WEIGHTS</code>.
      */
     public void setSumOfWeights(Double value) {
         set(14, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.SUM_OF_WEIGHTS</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.SUM_OF_WEIGHTS</code>.
      */
     public Double getSumOfWeights() {
         return (Double) get(14);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.WEIGHTED_SSQ</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.WEIGHTED_SSQ</code>.
      */
     public void setWeightedSsq(Double value) {
         set(15, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.WEIGHTED_SSQ</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.WEIGHTED_SSQ</code>.
      */
     public Double getWeightedSsq() {
         return (Double) get(15);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.DEV_SSQ</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.DEV_SSQ</code>.
      */
     public void setDevSsq(Double value) {
         set(16, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.DEV_SSQ</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.DEV_SSQ</code>.
      */
     public Double getDevSsq() {
         return (Double) get(16);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.LAST_VALUE</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.LAST_VALUE</code>.
      */
     public void setLastValue(Double value) {
         set(17, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.LAST_VALUE</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.LAST_VALUE</code>.
      */
     public Double getLastValue() {
         return (Double) get(17);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.LAST_WEIGHT</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.LAST_WEIGHT</code>.
      */
     public void setLastWeight(Double value) {
         set(18, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.LAST_WEIGHT</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.LAST_WEIGHT</code>.
      */
     public Double getLastWeight() {
         return (Double) get(18);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.KURTOSIS</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.KURTOSIS</code>.
      */
     public void setKurtosis(Double value) {
         set(19, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.KURTOSIS</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.KURTOSIS</code>.
      */
     public Double getKurtosis() {
         return (Double) get(19);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.SKEWNESS</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.SKEWNESS</code>.
      */
     public void setSkewness(Double value) {
         set(20, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.SKEWNESS</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.SKEWNESS</code>.
      */
     public Double getSkewness() {
         return (Double) get(20);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.LAG1_COV</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.LAG1_COV</code>.
      */
     public void setLag1Cov(Double value) {
         set(21, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.LAG1_COV</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.LAG1_COV</code>.
      */
     public Double getLag1Cov() {
         return (Double) get(21);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.LAG1_CORR</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.LAG1_CORR</code>.
      */
     public void setLag1Corr(Double value) {
         set(22, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.LAG1_CORR</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.LAG1_CORR</code>.
      */
     public Double getLag1Corr() {
         return (Double) get(22);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.VON_NEUMAN_LAG1_STAT</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.VON_NEUMAN_LAG1_STAT</code>.
      */
     public void setVonNeumanLag1Stat(Double value) {
         set(23, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.VON_NEUMAN_LAG1_STAT</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.VON_NEUMAN_LAG1_STAT</code>.
      */
     public Double getVonNeumanLag1Stat() {
         return (Double) get(23);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.NUM_MISSING_OBS</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.NUM_MISSING_OBS</code>.
      */
     public void setNumMissingObs(Double value) {
         set(24, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.NUM_MISSING_OBS</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.NUM_MISSING_OBS</code>.
      */
     public Double getNumMissingObs() {
         return (Double) get(24);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MIN_BATCH_SIZE</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MIN_BATCH_SIZE</code>.
      */
     public void setMinBatchSize(Double value) {
         set(25, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MIN_BATCH_SIZE</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MIN_BATCH_SIZE</code>.
      */
     public Double getMinBatchSize() {
         return (Double) get(25);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MIN_NUM_BATCHES</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MIN_NUM_BATCHES</code>.
      */
     public void setMinNumBatches(Double value) {
         set(26, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MIN_NUM_BATCHES</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MIN_NUM_BATCHES</code>.
      */
     public Double getMinNumBatches() {
         return (Double) get(26);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MAX_NUM_BATCHES_MULTIPLE</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MAX_NUM_BATCHES_MULTIPLE</code>.
      */
     public void setMaxNumBatchesMultiple(Double value) {
         set(27, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MAX_NUM_BATCHES_MULTIPLE</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MAX_NUM_BATCHES_MULTIPLE</code>.
      */
     public Double getMaxNumBatchesMultiple() {
         return (Double) get(27);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.MAX_NUM_BATCHES</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.MAX_NUM_BATCHES</code>.
      */
     public void setMaxNumBatches(Double value) {
         set(28, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.MAX_NUM_BATCHES</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.MAX_NUM_BATCHES</code>.
      */
     public Double getMaxNumBatches() {
         return (Double) get(28);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.NUM_REBATCHES</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.NUM_REBATCHES</code>.
      */
     public void setNumRebatches(Double value) {
         set(29, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.NUM_REBATCHES</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.NUM_REBATCHES</code>.
      */
     public Double getNumRebatches() {
         return (Double) get(29);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.CURRENT_BATCH_SIZE</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.CURRENT_BATCH_SIZE</code>.
      */
     public void setCurrentBatchSize(Double value) {
         set(30, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.CURRENT_BATCH_SIZE</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.CURRENT_BATCH_SIZE</code>.
      */
     public Double getCurrentBatchSize() {
         return (Double) get(30);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.AMT_UNBATCHED</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.AMT_UNBATCHED</code>.
      */
     public void setAmtUnbatched(Double value) {
         set(31, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.AMT_UNBATCHED</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.AMT_UNBATCHED</code>.
      */
     public Double getAmtUnbatched() {
         return (Double) get(31);
     }
 
     /**
-     * Setter for <code>APP.BATCH_STAT.TOTAL_NUM_OBS</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.TOTAL_NUM_OBS</code>.
      */
     public void setTotalNumObs(Double value) {
         set(32, value);
     }
 
     /**
-     * Getter for <code>APP.BATCH_STAT.TOTAL_NUM_OBS</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.TOTAL_NUM_OBS</code>.
      */
     public Double getTotalNumObs() {
         return (Double) get(32);

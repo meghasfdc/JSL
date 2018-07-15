@@ -22,33 +22,23 @@
 package jsl.utilities.dbutil;
 
 import java.io.*;
-import java.lang.invoke.MethodHandles;
 import java.nio.file.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jsl.utilities.excel.ExcelUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDataSource;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.jooq.*;
-import org.jooq.conf.Settings;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.jooq.util.GenerationTool;
-import org.jooq.util.jaxb.Database;
-import org.jooq.util.jaxb.Generate;
-import org.jooq.util.jaxb.Generator;
-import org.jooq.util.jaxb.Target;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
 
 /**
  * An abstraction for using Derby embedded databases.  The static method createDb() provides a builder
@@ -57,16 +47,19 @@ import org.slf4j.LoggerFactory;
  * The assumption is that the creation script only creates the tables with no
  * constraints on keys. The insertion process can be either through Excel
  * or a script having SQL insert statements. The alter script then places the key and
- * other contraints on the database.  We assume that valid data and scripts are in place.
+ * other constraints on the database.  We assume that valid data and scripts are in place.
  * <p>
- * The Excel workbook must a worksheet for each table of the database for which
+ * The Excel workbook must be a worksheet for each table of the database for which
  * you want data inserted. The worksheets should be named exactly the same as the table
  * names in the database. The first row of each sheet should contain the exact field
  * names for the table that the sheet represents. Valid data must be entered into each
  * sheet. No validation is provided.
  *
+ * This class is being deprecated.  Use Database and DatabaseFactory instead.
+ *
  * @author rossetti
  */
+@Deprecated
 public class EmbeddedDerbyDatabase implements DatabaseIfc {
 
     /**
@@ -81,17 +74,15 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     private final Path myDbDirPath;
 
     private final String myDbName;
-    private String myDbSchemaName;
+    private String myDefaultSchemaName;
 
-    private Connection myConnection;
-
+    private final DSLContext myDSLContext;
     /**
      * The connection URL
      */
     private String myConnURL;
 
     private final SQLDialect mySQLDialect = SQLDialect.DERBY;
-    private Settings myExecuteLoggingSettings;
 
     private Path myCreationScriptPath;
     private Path myTableScriptPath;
@@ -106,8 +97,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     private final List<String> myInsertCommands;
     private final List<String> myAlterCommands;
 
-    private EmbeddedDerbyDatabase(DbBuilder builder) throws IOException, SQLException, InvalidFormatException {
-        turnOffJooQDefaultExecutionLogging();
+    private EmbeddedDerbyDatabase(DbBuilder builder) throws IOException {
         // set up the arrays to hold possble commands from scripts
         myCreationScriptCommands = new ArrayList<>();
         myTableCommands = new ArrayList<>();
@@ -128,7 +118,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         myInsertionScriptPath = builder.pathToInsertScript;
         myAlterScriptPath = builder.pathToAlterScript;
         myExcelInsertPath = builder.pathToExcelWorkbook;
-        // start the build process
+        // start the builder process
         if (builder.createFlag == true) {
             myEmbeddedDS.setCreateDatabase("create");
             openConnection();
@@ -160,15 +150,21 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         } else {
             openConnection();
         }
+        myDSLContext = DSL.using(getDataSource(), getSQLDialect());
+        setJooQDefaultExecutionLoggingOption(false);
     }
 
-    private void openConnection() throws SQLException {
-        myConnection = myEmbeddedDS.getConnection();
-        DatabaseMetaData metaData = myConnection.getMetaData();
-        myConnURL = metaData.getURL();
-        myDbSchemaName = metaData.getUserName();
-        DbLogger.trace("Connection made to {}", myEmbeddedDS.getDatabaseName());
-        DatabaseIfc.logWarnings(myConnection);
+    private void openConnection() {
+        try {
+            Connection connection = myEmbeddedDS.getConnection();
+            DatabaseMetaData metaData = connection.getMetaData();
+            myConnURL = metaData.getURL();
+            LOG.trace("Connection made to {}", myEmbeddedDS.getDatabaseName());
+            DatabaseIfc.logWarnings(connection);
+        } catch (SQLException e) {
+            LOG.error("Unable to make connection to {}", myEmbeddedDS.getDatabaseName());
+            throw new DataAccessException("Unable to make connection to database");
+        }
     }
 
     /**
@@ -177,7 +173,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param name the name of the database
      * @return the new database after creation
      */
-    public static final FirstDbBuilderStepIfc createDb(String name) {
+    public static FirstDbBuilderStepIfc createDb(String name) {
         return new DbBuilder(name, Paths.get("."), true);
     }
 
@@ -188,7 +184,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param dbDirectory a path to the directory that holds the database
      * @return the new database after creation
      */
-    public static final FirstDbBuilderStepIfc createDb(String name, Path dbDirectory) {
+    public static FirstDbBuilderStepIfc createDb(String name, Path dbDirectory) {
         return new DbBuilder(name, dbDirectory, true);
     }
 
@@ -198,7 +194,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param name the name of the database
      * @return the new database after creation
      */
-    public static final DbConnector connectDb(String name) {
+    public static DbConnector connectDb(String name) {
         return new DbConnector(name, Paths.get("."));
     }
 
@@ -209,7 +205,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
      * @param dbDirectory a path to the directory that holds the database
      * @return the new database after creation
      */
-    public static final DbConnector connectDb(String name, Path dbDirectory) {
+    public static DbConnector connectDb(String name, Path dbDirectory) {
         return new DbConnector(name, dbDirectory);
     }
 
@@ -229,15 +225,14 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         }
 
         @Override
-        public EmbeddedDerbyDatabase connect() throws IOException, SQLException, InvalidFormatException {
+        public EmbeddedDerbyDatabase connect() throws IOException {
             DbBuilder dbBuilder = new DbBuilder(dbName, pathToDirectory, false);
-            EmbeddedDerbyDatabase db = null;
             return dbBuilder.connect();
         }
     }
 
     /**
-     * Provides the build process for creating instances of EmbeddedDerbyDatabase.
+     * Provides the builder process for creating instances of EmbeddedDerbyDatabase.
      * The assumption is that the creation script only creates the tables with no
      * constraints on keys. The insertion process can be either through Excel
      * or a script having SQL insert statements. The alter script then places the key and
@@ -319,13 +314,14 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         }
 
         @Override
-        public EmbeddedDerbyDatabase connect() throws IOException, SQLException, InvalidFormatException {
+        public EmbeddedDerbyDatabase connect() throws IOException {
             return new EmbeddedDerbyDatabase(this);
         }
 
     }
 
-    public interface FirstDbBuilderStepIfc extends DbConnectStepIfc, WithCreateScriptStepIfc, WithTablesOnlyScriptStepIfc {
+    public interface FirstDbBuilderStepIfc extends DbConnectStepIfc, WithCreateScriptStepIfc,
+            WithTablesOnlyScriptStepIfc {
 
     }
 
@@ -336,7 +332,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     public interface WithCreateScriptStepIfc {
         /**
          * @param pathToCreationScript a path to a full creation script that specifies the database, must not be null
-         * @return A build step to permit connecting
+         * @return A builder step to permit connecting
          */
         DbConnectStepIfc withCreationScript(Path pathToCreationScript);
     }
@@ -347,7 +343,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     public interface WithTablesOnlyScriptStepIfc {
         /**
          * @param pathToScript a path to a script that specifies the database tables, must not be null
-         * @return A build step to permit connecting
+         * @return A builder step to permit connecting
          */
         AfterTablesOnlyStepIfc withTables(Path pathToScript);
     }
@@ -359,7 +355,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     public interface DbCreateStepIfc extends DbConnectStepIfc {
         /**
          * @param toCreateScript the path to a script that will create the database, must not be null
-         * @return a reference to the insert step in the build process
+         * @return a reference to the insert step in the builder process
          */
         DbInsertStepIfc using(Path toCreateScript);
 
@@ -372,14 +368,14 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
          *                        data into the database, must not be null
          * @param tableNames      a list of table names that need to be filled. Sheets in
          *                        the workbook must correspond exactly to these names
-         * @return a reference to the alter step in the build process
+         * @return a reference to the alter step in the builder process
          */
         DBAfterInsertStepIfc withExcelData(Path toExcelWorkbook, List<String> tableNames);
 
         /**
          * @param toInsertScript a path to an SQL script that can be read to insert
          *                       data into the database, must not be null
-         * @return a reference to the alter step in the build process
+         * @return a reference to the alter step in the builder process
          */
         DBAfterInsertStepIfc withInsertData(Path toInsertScript);
 
@@ -389,7 +385,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         /**
          * @param toConstraintScript a path to an SQL script that can be read to alter the
          *                           table structure of the database and add constraints, must not be null
-         * @return a reference to the alter step in the build process
+         * @return a reference to the alter step in the builder process
          */
         DbConnectStepIfc withConstraints(Path toConstraintScript);
     }
@@ -400,31 +396,55 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
 
     public interface DbConnectStepIfc {
         /**
-         * Finalizes the build process and connects to the database
+         * Finalizes the builder process and connects to the database
          *
          * @return an instance of EmbeddedDerbyDatabase
          */
-        EmbeddedDerbyDatabase connect() throws IOException, SQLException, InvalidFormatException;
+        EmbeddedDerbyDatabase connect() throws IOException;
     }
 
-    /**
-     *
-     * @return a connection to the database
-     */
-    public final Connection getConnection(){
-        return myConnection;
-    }
-
-    /**
-     * The name of the database
-     *
-     * @return the name
-     */
     @Override
-    public final String getName() {
+    public final DataSource getDataSource() {
+        return myEmbeddedDS;
+    }
+
+    @Override
+    public final DSLContext getDSLContext() {
+        return myDSLContext;
+    }
+
+    @Override
+    public final String getLabel() {
         return myDbName;
     }
 
+    @Override
+    public final SQLDialect getSQLDialect() {
+        return mySQLDialect;
+    }
+
+    @Override
+    public String getDefaultSchemaName() {
+        return myDefaultSchemaName;
+    }
+
+    @Override
+    public void setDefaultSchemaName(String defaultSchemaName) {
+        myDefaultSchemaName = defaultSchemaName;
+        if (defaultSchemaName != null) {
+            if (!containsSchema(defaultSchemaName)) {
+                LOG.warn("The supplied default schema name {} was not in the database {}.",
+                        defaultSchemaName, getLabel());
+            }
+        } else {
+            LOG.warn("The default schema name was set to null for database {}.", getLabel());
+        }
+    }
+
+    /**
+     *
+     * @return a Path representation of the directory to the database
+     */
     public final Path getDirectory() {
         return Paths.get(myDbDirPath.toUri());
     }
@@ -453,21 +473,6 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     }
 
     /**
-     * @return the schema name for the database (if defined)
-     */
-    public final String getDBSchemaName() {
-        return myDbSchemaName;
-    }
-
-    /**
-     * @return the sql dialect for the database.  Here should be derby
-     */
-    @Override
-    public final SQLDialect getSQLDialect() {
-        return mySQLDialect;
-    }
-
-    /**
      * @return the path to the tables only script
      */
     public final Path getCreationScriptPath() {
@@ -477,7 +482,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * Sets the path, but does not execute the script
      *
-     * @param path
+     * @param path the path to the script
      */
     public void setCreationScriptPath(Path path) {
         myCreationScriptPath = path;
@@ -493,7 +498,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * Sets the path, but does not execute the script
      *
-     * @param path
+     * @param path the path to the script
      */
     public void setTablesOnlyScriptPath(Path path) {
         myTableScriptPath = path;
@@ -509,7 +514,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * Sets the path, but does not execute the script
      *
-     * @param path
+     * @param path the path to the script
      */
     public void setInsertionScriptPath(Path path) {
         myInsertionScriptPath = path;
@@ -527,7 +532,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     /**
      * Sets the path, but does not cause any inserts
      *
-     * @param path
+     * @param path the path to the script
      */
     public void setExcelInsertPath(Path path) {
         myExcelInsertPath = path;
@@ -677,46 +682,10 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     }
 
     /**
-     * @return the use defined schema (as opposed to the system defined schema)
-     */
-    @Override
-    public Schema getUserSchema() {
-        return getSchema(getDBSchemaName());
-    }
-
-    /**
      * @return a jooq Parser for parsing queries on the database
      */
     public Parser getParser() {
         return getDSLContext().parser();
-    }
-
-    /**
-     * @return the jooq DSLContext for the database
-     */
-    @Override
-    public DSLContext getDSLContext() {
-        if (myExecuteLoggingSettings == null){
-            return DSL.using(getConnection(), getSQLDialect());
-        } else {
-            return DSL.using(getConnection(), getSQLDialect(), myExecuteLoggingSettings);
-        }
-    }
-
-    /**
-     *  Turns on JooQ Default execute SQL logging
-     */
-    @Override
-    public final void turnOffJooQDefaultExecutionLogging(){
-        myExecuteLoggingSettings = new Settings().withExecuteLogging(false);
-    }
-
-    /**
-     *  Turns off JooQ Default execute SQL logging
-     */
-    @Override
-    public final void turnOnJooQDefaultExecutionLogging(){
-        myExecuteLoggingSettings = null;
     }
 
     /**
@@ -725,14 +694,24 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     private Queries getJOOQDDLQueries() {
         //TODO waiting on jooq fix
         //return create.ddl(getUserSchema(), DDLFlag.TABLE, DDLFlag.PRIMARY_KEY, DDLFlag.UNIQUE, DDLFlag.FOREIGN_KEY);
-        return getDSLContext().ddl(getUserSchema());
+        Schema schema = getDefaultSchema();
+        if (schema != null){
+            return getDSLContext().ddl(schema);
+        } else {
+            return null;
+        }
     }
 
     /**
      * @return the DDL queries needed to define and create the database as a string
      */
     private String getJOOQDDLQueriesAsString() {
-        return getDSLContext().ddl(getUserSchema()).toString();
+        Schema schema = getDefaultSchema();
+        if (schema != null){
+            return getDSLContext().ddl(schema).toString();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -743,6 +722,9 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
     private void writeJOOQDDLQueries(PrintWriter out) {
         //TODO waiting on jooq fix
         Queries ddlQueries = getJOOQDDLQueries();
+        if (ddlQueries == null){
+            return;
+        }
         Query[] queries = ddlQueries.queries();
         if (queries.length == 1) {
             return;
@@ -775,6 +757,9 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         //TODO waiting on jooq fix
         List<String> list = new ArrayList<>();
         Queries ddlQueries = getJOOQDDLQueries();
+        if (ddlQueries == null){
+            return list;
+        }
         Query[] queries = ddlQueries.queries();
         if (queries.length == 1) {
             return list;
@@ -811,8 +796,8 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         if (Files.exists(directory.resolve(dupName))) {
             throw new IllegalArgumentException("A database with the supplied name already exists in the directory! db name = " + dupName);
         }
-
-        Statement s = getConnection().createStatement();
+        Connection connection = getConnection();
+        Statement s = connection.createStatement();
         // freeze the database
         s.executeUpdate("CALL SYSCS_UTIL.SYSCS_FREEZE_DATABASE()");
         //copy the database directory during this interval
@@ -822,38 +807,7 @@ public class EmbeddedDerbyDatabase implements DatabaseIfc {
         FileUtils.copyDirectory(source, target);
         s.executeUpdate("CALL SYSCS_UTIL.SYSCS_UNFREEZE_DATABASE()");
         s.close();
-    }
-
-    /** Duplicates the database into a new database with the supplied name and directory.
-     *  Assumes that the source database has no active connections and performs a file system copy
-     *
-     * @param sourceDB the path to the database that needs duplicating
-     * @param dupName the name of the duplicate database
-     * @param directory the directory to place the database in
-     * @throws IOException thrown if the system file copy commands fail
-     */
-    public static void copyDatabase(Path sourceDB, String dupName, Path directory) throws IOException {
-        if (sourceDB == null) {
-            throw new IllegalArgumentException("The path to the source must not be null!");
-        }
-
-        if (dupName == null) {
-            throw new IllegalArgumentException("The duplicate's name must not be null!");
-        }
-        if (directory == null) {
-            throw new IllegalArgumentException("The directory must not be null!");
-        }
-        if (!Files.isDirectory(directory)) {
-            throw new IllegalArgumentException("The directory path was not a directory!");
-        }
-
-        if (Files.exists(directory.resolve(dupName))) {
-            throw new IllegalArgumentException("A database with the supplied name already exists in the directory! db name = " + dupName);
-        }
-
-        File target = directory.resolve(dupName).toFile();
-        File source = sourceDB.toFile();
-        FileUtils.copyDirectory(source, target);
+        connection.close();
     }
 
 }

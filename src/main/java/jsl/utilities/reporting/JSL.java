@@ -67,6 +67,8 @@ public class JSL {
 
     private static String workingDirectory;
 
+    public final static Path ExcelDir;
+
     private static StringBuilder ZEROES = new StringBuilder("000000000000");
 
     private static StringBuilder BLANKS = new StringBuilder("            ");
@@ -107,6 +109,8 @@ public class JSL {
             LOGGER.error(str, ex);
         }
 
+        File excelDir = JSL.makeOutputSubDirectory("excel");
+        ExcelDir = excelDir.toPath();
     }
 
     /**

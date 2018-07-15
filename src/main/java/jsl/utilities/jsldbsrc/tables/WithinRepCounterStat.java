@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import jsl.utilities.jsldbsrc.App;
+import jsl.utilities.jsldbsrc.JslDb;
 import jsl.utilities.jsldbsrc.Keys;
 import jsl.utilities.jsldbsrc.tables.records.WithinRepCounterStatRecord;
 
@@ -38,10 +38,10 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> {
 
-    private static final long serialVersionUID = 2135552048;
+    private static final long serialVersionUID = 1871745645;
 
     /**
-     * The reference instance of <code>APP.WITHIN_REP_COUNTER_STAT</code>
+     * The reference instance of <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code>
      */
     public static final WithinRepCounterStat WITHIN_REP_COUNTER_STAT = new WithinRepCounterStat();
 
@@ -54,51 +54,51 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
     }
 
     /**
-     * The column <code>APP.WITHIN_REP_COUNTER_STAT.ID</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.ID</code>.
      */
     public final TableField<WithinRepCounterStatRecord, Integer> ID = createField("ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
      */
     public final TableField<WithinRepCounterStatRecord, String> MODEL_ELEMENT_NAME = createField("MODEL_ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
      */
     public final TableField<WithinRepCounterStatRecord, Integer> SIM_RUN_ID_FK = createField("SIM_RUN_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
      */
     public final TableField<WithinRepCounterStatRecord, String> STAT_NAME = createField("STAT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
      */
     public final TableField<WithinRepCounterStatRecord, Integer> REP_NUM = createField("REP_NUM", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>APP.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
      */
     public final TableField<WithinRepCounterStatRecord, Double> LAST_VALUE = createField("LAST_VALUE", org.jooq.impl.SQLDataType.DOUBLE, this, "");
 
     /**
-     * Create a <code>APP.WITHIN_REP_COUNTER_STAT</code> table reference
+     * Create a <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code> table reference
      */
     public WithinRepCounterStat() {
         this(DSL.name("WITHIN_REP_COUNTER_STAT"), null);
     }
 
     /**
-     * Create an aliased <code>APP.WITHIN_REP_COUNTER_STAT</code> table reference
+     * Create an aliased <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code> table reference
      */
     public WithinRepCounterStat(String alias) {
         this(DSL.name(alias), WITHIN_REP_COUNTER_STAT);
     }
 
     /**
-     * Create an aliased <code>APP.WITHIN_REP_COUNTER_STAT</code> table reference
+     * Create an aliased <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code> table reference
      */
     public WithinRepCounterStat(Name alias) {
         this(alias, WITHIN_REP_COUNTER_STAT);
@@ -117,7 +117,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public Schema getSchema() {
-        return App.APP;
+        return JslDb.JSL_DB;
     }
 
     /**
@@ -133,7 +133,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public UniqueKey<WithinRepCounterStatRecord> getPrimaryKey() {
-        return Keys.SQL180614115403960;
+        return Keys.SQL180629175107690;
     }
 
     /**
@@ -141,7 +141,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public List<UniqueKey<WithinRepCounterStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<WithinRepCounterStatRecord>>asList(Keys.SQL180614115403960, Keys.WRCS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
+        return Arrays.<UniqueKey<WithinRepCounterStatRecord>>asList(Keys.SQL180629175107690, Keys.WRCS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
     }
 
     /**

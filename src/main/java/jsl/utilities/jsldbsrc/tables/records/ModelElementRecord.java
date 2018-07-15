@@ -28,73 +28,73 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ModelElementRecord extends UpdatableRecordImpl<ModelElementRecord> implements Record5<Integer, String, Long, String, String> {
 
-    private static final long serialVersionUID = 1281144150;
+    private static final long serialVersionUID = -1765890072;
 
     /**
-     * Setter for <code>APP.MODEL_ELEMENT.SIM_RUN_ID_FK</code>.
+     * Setter for <code>JSL_DB.MODEL_ELEMENT.SIM_RUN_ID_FK</code>.
      */
     public void setSimRunIdFk(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>APP.MODEL_ELEMENT.SIM_RUN_ID_FK</code>.
+     * Getter for <code>JSL_DB.MODEL_ELEMENT.SIM_RUN_ID_FK</code>.
      */
     public Integer getSimRunIdFk() {
         return (Integer) get(0);
     }
 
     /**
-     * Setter for <code>APP.MODEL_ELEMENT.ELEMENT_NAME</code>.
+     * Setter for <code>JSL_DB.MODEL_ELEMENT.ELEMENT_NAME</code>.
      */
     public void setElementName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>APP.MODEL_ELEMENT.ELEMENT_NAME</code>.
+     * Getter for <code>JSL_DB.MODEL_ELEMENT.ELEMENT_NAME</code>.
      */
     public String getElementName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>APP.MODEL_ELEMENT.ELEMENT_ID</code>.
+     * Setter for <code>JSL_DB.MODEL_ELEMENT.ELEMENT_ID</code>.
      */
     public void setElementId(Long value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>APP.MODEL_ELEMENT.ELEMENT_ID</code>.
+     * Getter for <code>JSL_DB.MODEL_ELEMENT.ELEMENT_ID</code>.
      */
     public Long getElementId() {
         return (Long) get(2);
     }
 
     /**
-     * Setter for <code>APP.MODEL_ELEMENT.CLASS_NAME</code>.
+     * Setter for <code>JSL_DB.MODEL_ELEMENT.CLASS_NAME</code>.
      */
     public void setClassName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>APP.MODEL_ELEMENT.CLASS_NAME</code>.
+     * Getter for <code>JSL_DB.MODEL_ELEMENT.CLASS_NAME</code>.
      */
     public String getClassName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>APP.MODEL_ELEMENT.PARENT_NAME_FK</code>.
+     * Setter for <code>JSL_DB.MODEL_ELEMENT.PARENT_NAME_FK</code>.
      */
     public void setParentNameFk(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>APP.MODEL_ELEMENT.PARENT_NAME_FK</code>.
+     * Getter for <code>JSL_DB.MODEL_ELEMENT.PARENT_NAME_FK</code>.
      */
     public String getParentNameFk() {
         return (String) get(4);
