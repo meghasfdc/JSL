@@ -21,6 +21,7 @@ import jsl.utilities.reporting.JSL;
 import org.jooq.*;
 import org.jooq.util.GenerationTool;
 import org.jooq.util.jaxb.Generator;
+import org.jooq.util.jaxb.Property;
 import org.jooq.util.jaxb.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -904,7 +905,7 @@ public interface DatabaseIfc {
     /**
      * Runs jooq code generation on the database at the supplied path.  Assumes
      * that the database exists and has well defined structure.  Places generated
-     * source files in package gensrc with the main java source
+     * source files in named package with the main java source
      *
      * @param dataSource  a DataSource that can provide a connection to the database, must not be null
      * @param schemaName  the name of the schema for which tables need to be generated, must not be null
@@ -929,6 +930,36 @@ public interface DatabaseIfc {
                                 .withDirectory(pkgDirName)));
         GenerationTool tool = new GenerationTool();
         tool.setConnection(connection);
+        tool.run(configuration);
+    }
+
+    /**
+     * Runs jooq code generation on the database at the supplied creation script.
+     * Places generated source files in named package with the main java source
+     *
+     * @param pathToCreationScript  a path to a valid database creation script, must not be null
+     * @param schemaName  the name of the schema for which tables need to be generated, must not be null
+     * @param pkgDirName  the directory that holds the target package, must not be null
+     * @param packageName name of package to be created to hold generated code, must not be null
+     */
+    public static void jooqCodeGeneration(Path pathToCreationScript, String schemaName,
+                                          String pkgDirName, String packageName) throws Exception {
+        Objects.requireNonNull(pathToCreationScript,"The path to the creation script was null");
+        Objects.requireNonNull(schemaName, "The schema name was null");
+        Objects.requireNonNull(pkgDirName, "The package directory was null");
+        Objects.requireNonNull(packageName, "The package name was null");
+        org.jooq.util.jaxb.Configuration configuration = new org.jooq.util.jaxb.Configuration();
+        configuration.withGenerator(new Generator()
+                .withDatabase(
+                        new org.jooq.util.jaxb.Database()
+                                .withName("org.jooq.util.ddl.DDLDatabase")
+                                .withInputSchema(schemaName)
+                                .withProperties(new Property()
+                                        .withKey("scripts")
+                                        .withValue(pathToCreationScript.toString())))
+                .withTarget(new Target().withPackageName(packageName).withDirectory(pkgDirName)));
+
+        GenerationTool tool = new GenerationTool();
         tool.run(configuration);
     }
 

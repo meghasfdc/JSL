@@ -33,13 +33,13 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
     // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core
-    api group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.12.0'
+    api group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.21.0'
 
     // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-plot
-    api group: 'tech.tablesaw', name: 'tablesaw-plot', version: '0.12.0'
+    api group: 'tech.tablesaw', name: 'tablesaw-plot', version: '0.21.0'
 
     // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-smile
-    api group: 'tech.tablesaw', name: 'tablesaw-smile', version: '0.12.0'
+    api group: 'tech.tablesaw', name: 'tablesaw-smile', version: '0.21.0'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     api group: 'com.google.guava', name: 'guava', version: '23.5-jre'
@@ -61,6 +61,8 @@ dependencies {
     api group: 'org.jooq', name: 'jooq-meta', version: '3.10.4'
     // https://mvnrepository.com/artifact/org.jooq/jooq-codegen
     api group: 'org.jooq', name: 'jooq-codegen', version: '3.10.4'
+    // this is to use jooq code generation from script
+    runtime group: 'org.jooq', name: 'jooq-meta-extensions', version: '3.10.4'
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
@@ -83,9 +85,6 @@ dependencies {
 //    implementation group: 'org.hsqldb', name: 'hsqldb', version: '2.4.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-
-    // this is to use jooq code generation from script
-//    runtime group: 'org.jooq', name: 'jooq-meta-extensions', version: '3.10.4'
 
 }
 
