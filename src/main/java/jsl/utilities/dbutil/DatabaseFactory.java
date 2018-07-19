@@ -28,7 +28,7 @@ public class DatabaseFactory {
      * @param dbName the name of the database
      * @return the created database
      */
-    public static Database createEmbeddedDerbyDatabase(String dbName) {
+    public static DatabaseIfc createEmbeddedDerbyDatabase(String dbName) {
         return createEmbeddedDerbyDatabase(dbName, JSLDatabase.dbDir);
     }
 
@@ -39,7 +39,7 @@ public class DatabaseFactory {
      * @param dbDir  a path to the directory to hold the database. Must not be null
      * @return the created database
      */
-    public static Database createEmbeddedDerbyDatabase(String dbName, Path dbDir) {
+    public static DatabaseIfc createEmbeddedDerbyDatabase(String dbName, Path dbDir) {
         Objects.requireNonNull(dbName, "The database name was null");
         Objects.requireNonNull(dbDir, "The path to the database must not be null");
         Path pathToDb = dbDir.resolve(dbName);
@@ -56,7 +56,7 @@ public class DatabaseFactory {
      * @param dbName the name of the embedded database, must not be null
      * @return the created database
      */
-    public static Database getEmbeddedDerbyDatabase(String dbName) {
+    public static DatabaseIfc getEmbeddedDerbyDatabase(String dbName) {
         return getEmbeddedDerbyDatabase(dbName, JSLDatabase.dbDir);
     }
 
@@ -67,7 +67,7 @@ public class DatabaseFactory {
      * @param dbDir  a path to the directory to hold the database, must not be null
      * @return the created database
      */
-    public static Database getEmbeddedDerbyDatabase(String dbName, Path dbDir) {
+    public static DatabaseIfc getEmbeddedDerbyDatabase(String dbName, Path dbDir) {
         Objects.requireNonNull(dbName, "The database name was null");
         Objects.requireNonNull(dbDir, "The path to the database must not be null");
         Path pathToDb = dbDir.resolve(dbName);

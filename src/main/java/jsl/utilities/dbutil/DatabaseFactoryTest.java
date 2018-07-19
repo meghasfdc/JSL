@@ -110,7 +110,7 @@ public class DatabaseFactoryTest {
 
     public static void testDerbyEmbeddedExisting(){
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
-        Database db = DatabaseFactory.getEmbeddedDerbyDatabase("JSLDb_DLB_with_Q");
+        DatabaseIfc db = DatabaseFactory.getEmbeddedDerbyDatabase("JSLDb_DLB_with_Q");
 //        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path);
 //        Database db = new Database("JSL", dataSource, SQLDialect.DERBY);
         db.setJooQDefaultExecutionLoggingOption(true);
@@ -190,7 +190,7 @@ public class DatabaseFactoryTest {
     public static void testExcelDbExport() throws IOException {
         String dbName = "SP";
         // make the database
-        Database db = DatabaseFactory.createEmbeddedDerbyDatabase(dbName);
+        DatabaseIfc db = DatabaseFactory.createEmbeddedDerbyDatabase(dbName);
         // builder the creation task
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
         Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
@@ -205,7 +205,7 @@ public class DatabaseFactoryTest {
     public static void testExcelDbImport() throws IOException {
         String dbName = "SPViaExcel";
         // make the database
-        Database db = DatabaseFactory.createEmbeddedDerbyDatabase(dbName);
+        DatabaseIfc db = DatabaseFactory.createEmbeddedDerbyDatabase(dbName);
 
         // builder the creation task
         Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
@@ -224,7 +224,7 @@ public class DatabaseFactoryTest {
 
     public static void metaDataTest(){
 
-        Database sp = DatabaseFactory.getEmbeddedDerbyDatabase("SP");
+        DatabaseIfc sp = DatabaseFactory.getEmbeddedDerbyDatabase("SP");
         Meta meta = sp.getDSLContext().meta();
 
         System.out.println("The catalogs are:");

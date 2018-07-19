@@ -623,6 +623,24 @@ public interface DatabaseIfc {
                     schemaName, getLabel());
             return;
         }
+        List<String> tableNames = getTableNames(schemaName);
+        if (tableNames.isEmpty()) {
+            LOG.warn("The supplied schema name {} had no tables to write to Excel in database {}",
+                    schemaName, getLabel());
+        } else {
+            writeDbToExcelWorkbook(tableNames, wbName, wbDirectory);
+        }
+    }
+
+    /**
+     * Writes the tables in the supplied list to an Excel workbook, if they exist in the database.
+     *
+     * @param tableNames  a list of table names that should be written toe Excel, must not be null
+     * @param wbName      name of the workbook, if null uses name of database
+     * @param wbDirectory directory of the workbook, if null uses the working directory
+     */
+    default void writeDbToExcelWorkbook(List<String> tableNames, String wbName, Path wbDirectory) throws IOException {
+        Objects.requireNonNull(tableNames, "The list of table names was null");
         if (wbName == null) {
             wbName = getLabel() + ".xlsx";
         } else {
@@ -634,17 +652,20 @@ public interface DatabaseIfc {
         if (wbDirectory == null) {
             wbDirectory = JSL.ExcelDir.toAbsolutePath();
         }
-//        System.out.println(wbName);
-//        System.out.println(wbDirectory);
         Path path = wbDirectory.resolve(wbName);
-//        System.out.println(path);
-        List<String> tableNames = getTableNames(schemaName);
         if (tableNames.isEmpty()) {
-            LOG.warn("The supplied schema name {} had no tables to write to Excel in database {}",
-                    schemaName, getLabel());
+            LOG.warn("The supplied list of table names was empty when writing to Excel in database {}", getLabel());
         } else {
             ExcelUtil.writeDBAsExcelWorkbook(this, tableNames, path);
         }
+    }
+
+    /**
+     *
+     * @return returns a DbCreateTask that can be configured to execute on the database
+     */
+    default DbCreateTask.DbCreateTaskFirstStepIfc create(){
+        return new DbCreateTask.DbCreateTaskBuilder(this);
     }
 
     /** Executes a single command on an database connection
@@ -912,8 +933,8 @@ public interface DatabaseIfc {
      * @param pkgDirName  the directory that holds the target package, must not be null
      * @param packageName name of package to be created to hold generated code, must not be null
      */
-    public static void jooqCodeGeneration(DataSource dataSource, String schemaName,
-                                          String pkgDirName, String packageName) throws Exception {
+    public static void jooqCodeGenerationDerbyDatabase(DataSource dataSource, String schemaName,
+                                                       String pkgDirName, String packageName) throws Exception {
         Objects.requireNonNull(dataSource, "The data source was null");
         Objects.requireNonNull(schemaName, "The schema name was null");
         Objects.requireNonNull(pkgDirName, "The package directory was null");
@@ -973,10 +994,10 @@ public interface DatabaseIfc {
      * @param pkgDirName  the directory that holds the target package, must not be null
      * @param packageName name of package to be created to hold generated code, must not be null
      */
-    public static void runJooQCodeGeneration(DataSource dataSource, String schemaName,
+    public static void runJooQCodeGenerationDerbyDatabase(DataSource dataSource, String schemaName,
                                              String pkgDirName, String packageName) {
         try {
-            jooqCodeGeneration(dataSource, schemaName, pkgDirName, packageName);
+            jooqCodeGenerationDerbyDatabase(dataSource, schemaName, pkgDirName, packageName);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.trace("Error in jooq code generation for database: schemaName {} ,pkgDirName {}, packageName {}", schemaName, pkgDirName, packageName);

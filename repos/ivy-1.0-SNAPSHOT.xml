@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-  <info organisation="rossetti" module="JSL" revision="1.0-SNAPSHOT" status="integration" publication="20180715184642"/>
+  <info organisation="rossetti" module="JSL" revision="1.0-SNAPSHOT" status="integration" publication="20180719124853"/>
   <configurations>
     <conf name="api" visibility="private" extends="compile"/>
     <conf name="apiElements" visibility="private" extends="api,runtime"/>

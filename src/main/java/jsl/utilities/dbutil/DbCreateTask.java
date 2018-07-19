@@ -52,7 +52,7 @@ public class DbCreateTask {
     private List<String> myAlterCommands = new ArrayList<>();
     private Type type;
     private State state = State.UN_EXECUTED;
-    private Database myDatabase;
+    private DatabaseIfc myDatabase;
 
     /**
      *
@@ -339,9 +339,9 @@ public class DbCreateTask {
         private Path pathToExcelWorkbook;
         private Path pathToAlterScript;
         private List<String> tableNamesInInsertOrder;
-        private Database database;
+        private DatabaseIfc database;
 
-        DbCreateTaskBuilder(Database database){
+        DbCreateTaskBuilder(DatabaseIfc database){
             this.database = database;
         }
 
