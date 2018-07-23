@@ -1573,7 +1573,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
         if (isUsingSchedule()) {
             throw new IllegalArgumentException("The ResourceUnit is already listening to a Schedule");
         }
-        myScheduleListener = new ScheduleListener();
+        myScheduleListener = new ScheduleListener(schedule);
         schedule.addScheduleChangeListener(myScheduleListener);
         return myScheduleListener;
     }
@@ -1583,6 +1583,18 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      */
     public final boolean isUsingSchedule() {
         return myScheduleListener != null;
+    }
+
+    /**
+     *  If the resource is using a schedule, the resource stops listening for
+     *  schedule changes and is no longer using a schedule
+     */
+    public final void stopUsingSchedule(){
+        if (!isUsingSchedule()){
+            return;
+        }
+        myScheduleListener.mySchedule.deleteScheduleChangeListener(myScheduleListener);
+        myScheduleListener = null;
     }
 
     /**
@@ -1864,6 +1876,12 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     }
 
     protected class ScheduleListener implements ScheduleChangeListenerIfc {
+
+        private final Schedule mySchedule;
+
+        public ScheduleListener(Schedule schedule){
+            mySchedule = schedule;
+        }
 
         @Override
         public void scheduleStarted(Schedule schedule) {

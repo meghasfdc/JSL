@@ -443,6 +443,25 @@ public class Schedule extends SchedulingElement {
         return aItem;
     }
 
+    /** Removes the item from the schedule. If the item is null or not on this
+     * schedule nothing happens.
+     *
+     * @param item the item to remove
+     */
+    public void removeItem(ScheduleItem item){
+        if (item == null){
+            return;
+        }
+        myItems.remove(item);
+    }
+
+    /**
+     *  Removes all schedule items from the schedule
+     */
+    public void clearSchedule(){
+        myItems.clear();
+    }
+
     @Override
     public String asString(){
         StringBuilder sb = new StringBuilder();

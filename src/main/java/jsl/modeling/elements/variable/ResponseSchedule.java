@@ -144,7 +144,8 @@ public class ResponseSchedule extends SchedulingElement {
      * @param repeatSchedule Whether or not the schedule will repeat
      * @param name           the name of the model element
      */
-    public ResponseSchedule(ModelElement parent, double startTime, boolean repeatSchedule, String name) {
+    public ResponseSchedule(ModelElement parent, double startTime, boolean repeatSchedule,
+                            String name) {
         super(parent, name);
         if (Double.isInfinite(startTime)) {
             throw new IllegalArgumentException("The start time cannot be infinity");
