@@ -44,6 +44,21 @@ import jsl.modeling.SchedulingElement;
  * reached. The default is for the schedule to automatically repeat.
  * Note that depending on the simulation run length only a portion of the
  * scheduled intervals may be executed.
+ * <p>
+ * The classic use case of this class is to collect statistics for each hour of the day.
+ * In this case, the user would use the addIntervals() method to add 24 intervals of 1 hour duration.
+ * Then responses (response variables, time weighted variables, and counters) can be added
+ * to the schedule. In which case, they will be added to each interval. Thus, interval statistics
+ * for each of the 24 intervals will be collected for everyone of the added responses.  If more
+ * than one day is simulated and the schedule is allowed to repeat, then statistics are collected
+ * across the days.  That is, the statistics of hour 1 on day 1 are averaged with the
+ * statistics of hour 1 on all subsequent days.
+ * <p>
+ *  This functionality is built on the ResponseInterval class, which can be used separately. In
+ *  other words, response intervals do not have to be on a schedule. The schedule facilitates
+ *  the collection of many responses across many intervals.
+ * </p>
+ *
  */
 public class ResponseSchedule extends SchedulingElement {
 
