@@ -32,9 +32,9 @@ public class JSLDbJooqCodeGenerator {
 
     public static void main(String[] args) throws IOException {
 
-        makeEmptyDb("JSLDbCodeGen", "JSLDb.sql");
+//        makeEmptyDb("JSLDbCodeGen", "JSLDb.sql");
 
- //       runCodeGenerationUsingEmptyDb();
+        runCodeGenerationUsingEmptyDb();
 
     }
 
@@ -42,8 +42,10 @@ public class JSLDbJooqCodeGenerator {
         System.out.println("Making database: " + dbName);
 
         FileUtils.deleteDirectory(JSLDatabase.dbDir.resolve(dbName).toFile());
+
         Path createScript = JSLDatabase.dbScriptsDir.resolve(scriptName);
-        DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbName, true);
+        Path dbPath = JSLDatabase.dbDir.resolve(dbName);
+        DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbPath, true);
         Database db = new Database(dbName, derbyDataSource, SQLDialect.DERBY);
         db.create().withCreationScript(createScript).execute();
         System.out.println("Created database: " + dbName);
@@ -54,21 +56,20 @@ public class JSLDbJooqCodeGenerator {
         // make the database
         String dbName = "tmpJSLDb";
         System.out.println("Making database: " + dbName);
-        Path dbDir = Paths.get(".", "db");
-        FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
+        Path dbPath = JSLDatabase.dbDir.resolve(dbName);
+        FileUtils.deleteDirectory(dbPath.toFile());
        // Path createScript = Paths.get("src").resolve("main").resolve("resources").resolve("JSLDb.sql");
         Path createScript = Paths.get("src").resolve("main").resolve("resources").resolve("JSLDb.sql");
-        DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbName, true);
+        DataSource derbyDataSource = DatabaseFactory.createEmbeddedDerbyDataSource(dbPath, true);
         Database db = new Database(dbName, derbyDataSource, SQLDialect.DERBY);
         db.create().withCreationScript(createScript).execute();
-        System.out.println("Created database: " + dbName);
-        Path dbPath = dbDir.resolve(dbName);
+        System.out.println("Created database: " + dbPath);
         System.out.println("Running code generation.");
-        DatabaseIfc.runJooQCodeGenerationDerbyDatabase(db.getDataSource(), "JSLDb",
+        DatabaseIfc.runJooQCodeGenerationDerbyDatabase(db.getDataSource(), "JSL_DB",
                 "src/main/java", "jsl.utilities.jsldbsrc");
         System.out.println("Completed code generation.");
         System.out.println("Deleting the database");
-        FileUtils.deleteDirectory(dbDir.resolve(dbName).toFile());
+        FileUtils.deleteDirectory(dbPath.toFile());
     }
 
 //    public static void runCodeGenerationUsingScriptOnly() throws Exception {

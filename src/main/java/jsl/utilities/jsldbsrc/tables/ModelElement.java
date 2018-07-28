@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ModelElement extends TableImpl<ModelElementRecord> {
 
-    private static final long serialVersionUID = -1968773197;
+    private static final long serialVersionUID = 714227234;
 
     /**
      * The reference instance of <code>JSL_DB.MODEL_ELEMENT</code>
@@ -76,6 +76,16 @@ public class ModelElement extends TableImpl<ModelElementRecord> {
      * The column <code>JSL_DB.MODEL_ELEMENT.PARENT_NAME_FK</code>.
      */
     public final TableField<ModelElementRecord, String> PARENT_NAME_FK = createField("PARENT_NAME_FK", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
+
+    /**
+     * The column <code>JSL_DB.MODEL_ELEMENT.LEFT_COUNT</code>.
+     */
+    public final TableField<ModelElementRecord, Integer> LEFT_COUNT = createField("LEFT_COUNT", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>JSL_DB.MODEL_ELEMENT.RIGHT_COUNT</code>.
+     */
+    public final TableField<ModelElementRecord, Integer> RIGHT_COUNT = createField("RIGHT_COUNT", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * Create a <code>JSL_DB.MODEL_ELEMENT</code> table reference
