@@ -558,6 +558,8 @@ public class JSLDatabase {
         if (modelElement.getParentModelElement() != null) {
             record.setParentNameFk(modelElement.getParentModelElement().getName());
         }
+        record.setLeftCount(modelElement.getLeftPreOrderTraversalCount());
+        record.setRightCount(modelElement.getRightPreOrderTraversalCount());
         return record;
     }
 

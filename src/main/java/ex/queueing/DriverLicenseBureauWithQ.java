@@ -275,11 +275,16 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
 
         // make and use an additional embedded derby database
-        JSLDatabase.useExistingEmbeddedDerbyJSLDatabase(sim, "AnotherOne");
+//        JSLDatabase.useExistingEmbeddedDerbyJSLDatabase(sim, "AnotherOne");
+        JSLDatabase.createEmbeddedDerbyJSLDatabase(sim, true, "AnotherOne");
 
         // make an use an addition postgres database, assumes that postgres local host server is running
-        JSLDatabase jslDatabase = JSLDatabase.getPostgresLocalHostJSLDatabase(sim,
+//        JSLDatabase jslDatabase = JSLDatabase.getPostgresLocalHostJSLDatabase(sim,
+//                true, "test", "test", "test");
+
+        JSLDatabase jslDatabase = JSLDatabase.createPostgresLocalHostJSLDatabase(sim,
                 true, "test", "test", "test");
+
 
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(sim.getModel());
