@@ -167,6 +167,16 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
     private long myId;
 
     /**
+     *  the left traversal count for pre-order traversal of the model element tree
+     */
+    private int myLeftCount;
+
+    /**
+     *  the right traversal count for pre-order traversal of the model element tree
+     */
+    private int myRightCount;
+
+    /**
      * The name of the model element
      */
     private String myName;
@@ -3126,10 +3136,55 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
         return new ModelElementComparator();
     }
 
+    /**
+     * A Comparator for comparing model elements based on getId()
+     */
     public static class ModelElementComparator implements Comparator<ModelElement> {
         @Override
         public int compare(ModelElement o1, ModelElement o2) {
             return Long.compare(o1.getId(), o2.getId());
         }
+    }
+
+    /**
+     * This method is called from Model
+     *
+     * @param count the count label initializer for the root
+     * @return the count to get back to this node
+     */
+    final int markPreOrderTraversalTree(int count){
+        count = count + 1;
+        myLeftCount = count;
+//        System.out.println(getName());
+//        System.out.println("count = " + count);
+//        System.out.println("left count = " + myLeftCount);
+        for(ModelElement m: myModelElements){
+            count = m.markPreOrderTraversalTree(count);
+        }
+        // reached end of children or no children
+        count = count + 1;
+        myRightCount = count;
+//        System.out.println(getName());
+//        System.out.println("count = " + count);
+//        System.out.println("right count = " + myRightCount);
+        return count;
+    }
+
+    /**
+     *
+     * @return the left traversal count label in a pre-order traversal of the model element hierarchy for this
+     * model element based on the Model as the root node (label = 1)
+     */
+    public final int getLeftPreOrderTraversalCount(){
+        return myLeftCount;
+    }
+
+    /**
+     *
+     * @return the right traversal count label in a pre-order traversal of the model element hierarchy for this
+     * model element based on the Model as the root node (label = 1)
+     */
+    public final int getRightPreOrderTraversalCount(){
+        return myRightCount;
     }
 }

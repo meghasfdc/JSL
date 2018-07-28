@@ -1096,6 +1096,7 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
             myExecutive.setTerminationWarningMessageOption(false);
             myExperiment.resetCurrentReplicationNumber();
             beforeExperiment();
+            myModel.markPreOrderTraversalModelElementHierarchy();
             myModel.setUpExperiment();
             if (getRepLengthWarningMessageOption()) {
                 if (Double.isInfinite(myExperiment.getLengthOfReplication())) {

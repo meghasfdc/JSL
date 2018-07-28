@@ -32,9 +32,9 @@ public class JSLDbJooqCodeGenerator {
 
     public static void main(String[] args) throws IOException {
 
- //       makeEmptyDb("JSLDbCodeGen", "JSLDb.sql");
+        makeEmptyDb("JSLDbCodeGen", "JSLDb.sql");
 
-        runCodeGenerationUsingEmptyDb();
+ //       runCodeGenerationUsingEmptyDb();
 
     }
 

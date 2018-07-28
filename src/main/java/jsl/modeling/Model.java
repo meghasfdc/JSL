@@ -1230,4 +1230,14 @@ public class Model extends ModelElement {
             event.setModelElement(Model.this);
         }
     }
+
+    /** Counts the number of pre-order traversals of the model element tree and
+     *  labels each model element with the appropriate left and right traversal
+     *  count.  Called from Simulation in ReplicationExecutionProcess.initializeIterations()
+     *
+     * @return the number of traversals in the model element hierarchy
+     */
+    final void markPreOrderTraversalModelElementHierarchy(){
+        markPreOrderTraversalTree(0);
+    }
 }

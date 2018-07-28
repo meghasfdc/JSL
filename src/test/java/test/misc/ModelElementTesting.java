@@ -74,4 +74,10 @@ public class ModelElementTesting {
         System.out.println(myModel.getModelElementsAsString());
     }
 
+//    @Test
+//    public void test3() {
+//        int traversals = myModel.markPreOrderTraversalModelElementHierarchy();
+//        System.out.println("# traversals = " + traversals);
+//        assertTrue(traversals == 24);
+//    }
 }
