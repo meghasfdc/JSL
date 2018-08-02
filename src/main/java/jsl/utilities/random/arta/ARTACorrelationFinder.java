@@ -212,16 +212,6 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 		sb.append(mySARootFinder);
 		return(sb.toString());
 	}
-	
-	
-	/**
-	 * @param milliseconds
-	 * @param timerTask
-	 * @see jsl.modeling.IterativeProcess#turnOnTimer(long, java.util.TimerTask)
-	 */
-	public final void turnOnTimer(long milliseconds, TimerTask timerTask) {
-		mySARootFinder.turnOnTimer(milliseconds, timerTask);
-	}
 
 	/**
 	 * @param milliseconds
@@ -279,7 +269,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 		if (found == true){
 			System.out.println("Searching for match");
 			ARTAFinderOutputTask t = new ARTAFinderOutputTask(b);
-			b.turnOnTimer(10000, t);
+			b.turnOnTimer(10000);
 		
 			b.setDesiredPrecision(0.005);
 			
@@ -318,8 +308,8 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 		if (found == true){
 			System.out.println("Searching for match");
 			ARTAFinderOutputTask t = new ARTAFinderOutputTask(b);
-			b.turnOnTimer(10000, t);
-		
+			b.turnOnTimer(10000);
+
 			b.setDesiredPrecision(0.005);
 			
 			b.findMatchingCorrelation();

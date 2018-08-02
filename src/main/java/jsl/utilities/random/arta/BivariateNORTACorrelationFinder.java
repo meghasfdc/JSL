@@ -174,16 +174,7 @@ public class BivariateNORTACorrelationFinder extends
 		sb.append(mySARootFinder);
 		return(sb.toString());
 	}
-	
-	
-	/**
-	 * @param milliseconds
-	 * @param timerTask
-	 * @see jsl.modeling.IterativeProcess#turnOnTimer(long, java.util.TimerTask)
-	 */
-	public final void turnOnTimer(long milliseconds, TimerTask timerTask) {
-		mySARootFinder.turnOnTimer(milliseconds, timerTask);
-	}
+
 
 	/**
 	 * @param milliseconds
@@ -244,7 +235,7 @@ public class BivariateNORTACorrelationFinder extends
 		if (found == true){
 			System.out.println("Searching for match");
 			NORTAFinderOutputTask t = new NORTAFinderOutputTask(b);
-			b.turnOnTimer(10000, t);
+			b.turnOnTimer(10000);
 		
 			b.setDesiredPrecision(0.005);
 			

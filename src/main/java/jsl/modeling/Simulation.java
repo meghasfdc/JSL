@@ -491,17 +491,6 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
     }
 
     /**
-     * Turns on a timer and task that can be attached to the execution
-     *
-     * @param milliseconds the time for the task
-     * @param timerTask    the timer task
-     */
-    @Override
-    public final void turnOnTimer(long milliseconds, TimerTask timerTask) {
-        myReplicationExecutionProcess.turnOnTimer(milliseconds, timerTask);
-    }
-
-    /**
      * Turns on a default timer and task to report on simulation progress
      *
      * @param milliseconds time for timer task

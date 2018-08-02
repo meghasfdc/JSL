@@ -901,11 +901,6 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
     }
 
     @Override
-    public void turnOnTimer(long milliseconds, TimerTask timerTask) {
-        myEventExecutionProcess.turnOnTimer(milliseconds, timerTask);
-    }
-
-    @Override
     public boolean allStepsCompleted() {
         return myEventExecutionProcess.allStepsCompleted();
     }

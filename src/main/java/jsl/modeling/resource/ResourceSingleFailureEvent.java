@@ -86,6 +86,14 @@ public class ResourceSingleFailureEvent extends SchedulingElement {
     }
 
     /**
+     *
+     * @param eventDuration the source of randomness for the event duration
+     */
+    public void setEventDurationInitialRandomSource(RandomIfc eventDuration){
+        myEventDurationRV.setInitialRandomSource(eventDuration);
+    }
+
+    /**
      *  Allows each replication to start at a different time and to have
      *  a different failure duration.
      */

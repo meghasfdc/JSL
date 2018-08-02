@@ -607,15 +607,10 @@ abstract public class IterativeProcess<T> implements ObservableIfc, IterativePro
 
     @Override
     public final void turnOnTimer(long milliseconds) {
-        turnOnTimer(milliseconds, new ShowElapsedTimeTask());
-    }
-
-    @Override
-    public final void turnOnTimer(long milliseconds, TimerTask timerTask) {
-        if (timerTask == null) {
-            throw new IllegalArgumentException("The TimerTask must be non-null.");
+        if (milliseconds <= 0){
+            myTBConsoleUpdates = 0;
+            return;
         }
-        myTimerTask = timerTask;
         myTBConsoleUpdates = milliseconds;
     }
 
@@ -845,8 +840,12 @@ abstract public class IterativeProcess<T> implements ObservableIfc, IterativePro
 
         setState(myInitializedState);
         if (myTBConsoleUpdates > 0) {
+            if (myTimer != null){
+                myTimer.cancel();
+                myTimer.purge();
+            }
             myTimer = new Timer();
-            myTimer.schedule(myTimerTask, myTBConsoleUpdates, myTBConsoleUpdates);
+            myTimer.schedule(new ShowElapsedTimeTask(), myTBConsoleUpdates, myTBConsoleUpdates);
         }
         myInitFlag = true;
 

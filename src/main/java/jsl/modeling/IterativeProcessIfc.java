@@ -134,17 +134,6 @@ public interface IterativeProcessIfc extends GetNameIfc {
     void turnOnTimer(long milliseconds);
 
     /**
-     * This method will cause the a timer to start allowing a TimerTask to be
-     * scheduled. An example use of this is to periodically print some
-     * information to the console about the iterative process to be printed to
-     * the console periodically according to the parameter given
-     *
-     * @param milliseconds the time for the task
-     * @param timerTask the TimerTask
-     */
-    void turnOnTimer(long milliseconds, TimerTask timerTask);
-
-    /**
      * Checks if the iterative process is in the created state. If the
      * iterative process is in the created state this method will return true
      *
