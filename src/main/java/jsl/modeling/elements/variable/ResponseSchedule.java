@@ -335,7 +335,10 @@ public class ResponseSchedule extends SchedulingElement {
      */
     public final ResponseScheduleItem addResponseInterval(double startTime,
                                                           double duration, String label) {
-        ResponseScheduleItem item = new ResponseScheduleItem(this, startTime, duration, label);
+        int n = myScheduleItems.size() + 1;
+        label = String.format("Interval:%02d",n) + ":" + label;
+        ResponseScheduleItem item = new ResponseScheduleItem(this, startTime, duration,
+                getName() + ":" + label);
         if (startTime + item.getDuration() > getLength()) {
             myLength = startTime + item.getDuration();
         }

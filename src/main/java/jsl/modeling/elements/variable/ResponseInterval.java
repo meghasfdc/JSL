@@ -258,13 +258,18 @@ public class ResponseInterval extends SchedulingElement {
             throw new IllegalArgumentException("The supplied response was already added.");
         }
         ResponseVariable rv = new ResponseVariable(this,
-                theResponse.getName() + ":" + getStringLabel());
+                theResponse.getName() + ":IntervalAvg:" + getStringLabel());
         IntervalData data = new IntervalData();
+        if (theResponse instanceof TimeWeighted){
+            ResponseVariable rv2 = new ResponseVariable(this,
+                theResponse.getName() + ":ValueAtStart:" + getStringLabel());
+            data.myValueAtStart = rv2;
+        }
         data.myResponse = rv;
         if (intervalEmptyStatOption){
-            ResponseVariable rv2 = new ResponseVariable(this,
+            ResponseVariable rv3 = new ResponseVariable(this,
                     theResponse.getName() + ":" + getStringLabel()+":P(Empty)");
-            data.myEmptyResponse = rv2;
+            data.myEmptyResponse = rv3;
         }
         myResponses.put(theResponse, data);
         theResponse.addObserver(myObserver);
@@ -434,6 +439,7 @@ public class ResponseInterval extends SchedulingElement {
 
         ResponseVariable myResponse;
         ResponseVariable myEmptyResponse;
+        ResponseVariable myValueAtStart;
         double mySumAtStart = 0.0;
         double mySumOfWeightsAtStart = 0.0;
         double myTotalAtStart = 0.0;
@@ -462,6 +468,9 @@ public class ResponseInterval extends SchedulingElement {
                 data.mySumAtStart = w.getWeightedSum();
                 data.mySumOfWeightsAtStart = w.getSumOfWeights();
                 data.myNumObsAtStart = w.getCount();
+                if (key instanceof TimeWeighted){
+                    data.myValueAtStart.setValue(key.getValue());
+                }
             }
 
             for (Map.Entry<Counter, IntervalData> entry : myCounters.entrySet()) {
