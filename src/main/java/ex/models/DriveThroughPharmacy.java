@@ -29,6 +29,8 @@ import org.jooq.Record5;
 import org.jooq.Result;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -218,7 +220,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
         //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         String responseName = dtp.getSystemTimeResponse().getName();
         Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = db.get().getWithinRepAveragesAsResultSet(responseName);
+        Result<Record5<Integer, String, Integer, Integer, Double>> resultSet = db.get().getWithinRepAveragesAsResultSet(responseName);
 
         resultSet.format(printWriter);
 
@@ -228,8 +230,16 @@ public class DriveThroughPharmacy extends SchedulingElement {
 
         Map<String, double[]> withRepAveragesAsMap = db.get().getWithRepAveragesAsMap(responseName);
 
-        MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
-        System.out.println(multipleComparisonAnalyzer);
+        System.out.println();
+        for(String name: withRepAveragesAsMap.keySet()){
+            double[] doubles = withRepAveragesAsMap.get(name);
+            System.out.println(name);
+            System.out.println(Arrays.asList(doubles));
+        }
+
+
+//        MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
+ //       System.out.println(multipleComparisonAnalyzer);
 
 //        try {
 //            System.out.println();

@@ -25,7 +25,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BatchStatRecord extends UpdatableRecordImpl<BatchStatRecord> {
 
-    private static final long serialVersionUID = -1604184424;
+    private static final long serialVersionUID = 1383938826;
 
     /**
      * Setter for <code>JSL_DB.BATCH_STAT.ID</code>.
@@ -42,17 +42,17 @@ public class BatchStatRecord extends UpdatableRecordImpl<BatchStatRecord> {
     }
 
     /**
-     * Setter for <code>JSL_DB.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
+     * Setter for <code>JSL_DB.BATCH_STAT.ELEMENT_ID_FK</code>.
      */
-    public void setModelElementName(String value) {
+    public void setElementIdFk(Integer value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>JSL_DB.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
+     * Getter for <code>JSL_DB.BATCH_STAT.ELEMENT_ID_FK</code>.
      */
-    public String getModelElementName() {
-        return (String) get(1);
+    public Integer getElementIdFk() {
+        return (Integer) get(1);
     }
 
     /**
@@ -70,31 +70,31 @@ public class BatchStatRecord extends UpdatableRecordImpl<BatchStatRecord> {
     }
 
     /**
-     * Setter for <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
-     */
-    public void setStatName(String value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
-     */
-    public String getStatName() {
-        return (String) get(3);
-    }
-
-    /**
      * Setter for <code>JSL_DB.BATCH_STAT.REP_NUM</code>.
      */
     public void setRepNum(Integer value) {
-        set(4, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>JSL_DB.BATCH_STAT.REP_NUM</code>.
      */
     public Integer getRepNum() {
-        return (Integer) get(4);
+        return (Integer) get(3);
+    }
+
+    /**
+     * Setter for <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
+     */
+    public void setStatName(String value) {
+        set(4, value);
+    }
+
+    /**
+     * Getter for <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
+     */
+    public String getStatName() {
+        return (String) get(4);
     }
 
     /**
@@ -515,14 +515,14 @@ public class BatchStatRecord extends UpdatableRecordImpl<BatchStatRecord> {
     /**
      * Create a detached, initialised BatchStatRecord
      */
-    public BatchStatRecord(Integer id, String modelElementName, Integer simRunIdFk, String statName, Integer repNum, Double statCount, Double average, Double stdDev, Double stdErr, Double halfWidth, Double confLevel, Double minimum, Double maximum, Double weightedSum, Double sumOfWeights, Double weightedSsq, Double devSsq, Double lastValue, Double lastWeight, Double kurtosis, Double skewness, Double lag1Cov, Double lag1Corr, Double vonNeumanLag1Stat, Double numMissingObs, Double minBatchSize, Double minNumBatches, Double maxNumBatchesMultiple, Double maxNumBatches, Double numRebatches, Double currentBatchSize, Double amtUnbatched, Double totalNumObs) {
+    public BatchStatRecord(Integer id, Integer elementIdFk, Integer simRunIdFk, Integer repNum, String statName, Double statCount, Double average, Double stdDev, Double stdErr, Double halfWidth, Double confLevel, Double minimum, Double maximum, Double weightedSum, Double sumOfWeights, Double weightedSsq, Double devSsq, Double lastValue, Double lastWeight, Double kurtosis, Double skewness, Double lag1Cov, Double lag1Corr, Double vonNeumanLag1Stat, Double numMissingObs, Double minBatchSize, Double minNumBatches, Double maxNumBatchesMultiple, Double maxNumBatches, Double numRebatches, Double currentBatchSize, Double amtUnbatched, Double totalNumObs) {
         super(BatchStat.BATCH_STAT);
 
         set(0, id);
-        set(1, modelElementName);
+        set(1, elementIdFk);
         set(2, simRunIdFk);
-        set(3, statName);
-        set(4, repNum);
+        set(3, repNum);
+        set(4, statName);
         set(5, statCount);
         set(6, average);
         set(7, stdDev);

@@ -287,7 +287,7 @@ public abstract class SpatialModel extends Observable implements IdentityIfc {
      * @return The identifier for the model.
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

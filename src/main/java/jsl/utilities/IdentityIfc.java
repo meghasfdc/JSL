@@ -19,5 +19,5 @@ package jsl.utilities;
  */
 public interface IdentityIfc extends GetNameIfc {
 
-    long getId();
+    int getId();
 }

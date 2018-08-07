@@ -78,7 +78,7 @@ public class AttributeType implements IdentityIfc {
      * created.  It may vary if the order of creation changes.
      * @return The identifier for the attribute type.
      */
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 }

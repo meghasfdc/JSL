@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> {
 
-    private static final long serialVersionUID = 605526657;
+    private static final long serialVersionUID = 1293037990;
 
     /**
      * The reference instance of <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code>
@@ -59,9 +59,9 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
     public final TableField<WithinRepCounterStatRecord, Integer> ID = createField("ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME</code>.
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.ELEMENT_ID_FK</code>.
      */
-    public final TableField<WithinRepCounterStatRecord, String> MODEL_ELEMENT_NAME = createField("MODEL_ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
+    public final TableField<WithinRepCounterStatRecord, Integer> ELEMENT_ID_FK = createField("ELEMENT_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK</code>.
@@ -69,14 +69,14 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
     public final TableField<WithinRepCounterStatRecord, Integer> SIM_RUN_ID_FK = createField("SIM_RUN_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
-     */
-    public final TableField<WithinRepCounterStatRecord, String> STAT_NAME = createField("STAT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
-
-    /**
      * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.REP_NUM</code>.
      */
     public final TableField<WithinRepCounterStatRecord, Integer> REP_NUM = createField("REP_NUM", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.STAT_NAME</code>.
+     */
+    public final TableField<WithinRepCounterStatRecord, String> STAT_NAME = createField("STAT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
 
     /**
      * The column <code>JSL_DB.WITHIN_REP_COUNTER_STAT.LAST_VALUE</code>.
@@ -133,7 +133,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public UniqueKey<WithinRepCounterStatRecord> getPrimaryKey() {
-        return Keys.SQL180728165152590;
+        return Keys.SQL180807170214660;
     }
 
     /**
@@ -141,7 +141,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public List<UniqueKey<WithinRepCounterStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<WithinRepCounterStatRecord>>asList(Keys.SQL180728165152590, Keys.WRCS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
+        return Arrays.<UniqueKey<WithinRepCounterStatRecord>>asList(Keys.SQL180807170214660, Keys.WRCS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
     }
 
     /**

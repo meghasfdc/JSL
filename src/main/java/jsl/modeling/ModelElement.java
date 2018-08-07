@@ -56,7 +56,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * incremented to give a running total of the number of model elements
      * created
      */
-    private static long myCounter_;
+    private static int myCounter_;
 
     /**
      * A constant for the default batch havingPriority
@@ -164,7 +164,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * The id of the model element, currently if the model element is the ith
      * model element created then the id is equal to i
      */
-    private long myId;
+    private int myId;
 
     /**
      *  the left traversal count for pre-order traversal of the model element tree
@@ -559,7 +559,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * @return The identifier for the model element.
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 
@@ -1433,14 +1433,14 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
         sb.append('\'');
         sb.append(", Parent Name='");
         String pName = null;
-        Long id = null;
+        int pid = 0;
         if (myParentModelElement!= null){
             pName = myParentModelElement.getName();
-            id = myParentModelElement.getId();
+            pid = myParentModelElement.getId();
         }
         sb.append(pName);
         sb.append(", Parent ID=");
-        sb.append(id);
+        sb.append(pid);
         sb.append(", Model=" );
         sb.append(myModel.getName());
         sb.append('}');

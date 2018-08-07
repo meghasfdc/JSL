@@ -31,11 +31,11 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
 
     /** A counter to count the number of created to assign "unique" ids
      */
-    private static long myIdCounter_;
+    private static int myIdCounter_;
 
     /** The id of this object
      */
-    protected long myId;
+    protected int myId;
 
     /** Holds the name of the statistic for reporting purposes.
      */
@@ -102,7 +102,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      * @return
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

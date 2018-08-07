@@ -17,6 +17,7 @@ package jsl.modeling;
 
 import java.text.DecimalFormat;
 import jsl.modeling.elements.resource.Entity;
+import jsl.utilities.GetNameIfc;
 import jsl.utilities.IdentityIfc;
 
 /**
@@ -27,7 +28,7 @@ import jsl.utilities.IdentityIfc;
  * other of work to be done.
  * @param <T> the type associated with the (optional) message sent with the event
  */
-public class JSLEvent<T> implements Comparable<JSLEvent>, IdentityIfc {
+public class JSLEvent<T> implements Comparable<JSLEvent>, GetNameIfc {
 
     /**
      * Represents the default priority for events within the Executive
@@ -270,7 +271,6 @@ public class JSLEvent<T> implements Comparable<JSLEvent>, IdentityIfc {
      *
      * @return A long representing the id
      */
-    @Override
     public final long getId() {
         return (myId);
     }

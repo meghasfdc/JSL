@@ -556,7 +556,8 @@ public class JSLDatabase {
         record.setElementId(modelElement.getId());
         record.setClassName(modelElement.getClass().getSimpleName());
         if (modelElement.getParentModelElement() != null) {
-            record.setParentNameFk(modelElement.getParentModelElement().getName());
+            record.setParentIdFk(modelElement.getParentModelElement().getId());
+            record.setParentName(modelElement.getParentModelElement().getName());
         }
         record.setLeftCount(modelElement.getLeftPreOrderTraversalCount());
         record.setRightCount(modelElement.getRightPreOrderTraversalCount());
@@ -594,7 +595,7 @@ public class JSLDatabase {
             throw new IllegalArgumentException("There is no current simulation run record.");
         }
         WithinRepStatRecord r = myDb.getDSLContext().newRecord(WITHIN_REP_STAT);
-        r.setModelElementName(rv.getName());
+        r.setElementIdFk(rv.getId());
         r.setSimRunIdFk(simId);
         r.setRepNum(rv.getExperiment().getCurrentReplicationNumber());
         WeightedStatisticIfc s = rv.getWithinReplicationStatistic();
@@ -660,7 +661,7 @@ public class JSLDatabase {
             throw new IllegalArgumentException("There is no current simulation run record.");
         }
         WithinRepCounterStatRecord r = myDb.getDSLContext().newRecord(WITHIN_REP_COUNTER_STAT);
-        r.setModelElementName(counter.getName());
+        r.setElementIdFk(counter.getId());
         r.setSimRunIdFk(simId);
         r.setRepNum(counter.getExperiment().getCurrentReplicationNumber());
         r.setStatName(counter.getName());
@@ -682,7 +683,7 @@ public class JSLDatabase {
         List<AcrossRepStatRecord> records = new ArrayList<>();
         for (ResponseVariable rv : responses) {
             StatisticAccessorIfc s = rv.getAcrossReplicationStatistic();
-            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(rv.getName(), myCurrentSimRunRecord.getId(), s);
+            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(rv, myCurrentSimRunRecord.getId(), s);
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -702,7 +703,7 @@ public class JSLDatabase {
         List<AcrossRepStatRecord> records = new ArrayList<>();
         for (Counter counter : counters) {
             StatisticAccessorIfc s = counter.getAcrossReplicationStatistic();
-            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(counter.getName(), myCurrentSimRunRecord.getId(), s);
+            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(counter, myCurrentSimRunRecord.getId(), s);
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -713,24 +714,24 @@ public class JSLDatabase {
     /**
      * Creates an AcrossRepStatRecord into the database
      *
-     * @param modelElementName the model element name
+     * @param modelElement the model element name
      * @param simId            the id of the simulation run
      * @param s                that statistics to insert
      * @return the created record
      */
-    protected AcrossRepStatRecord newAcrossRepStatRecord(String modelElementName, Integer simId,
+    protected AcrossRepStatRecord newAcrossRepStatRecord(ModelElement modelElement, Integer simId,
                                                          StatisticAccessorIfc s) {
         if (simId == null) {
             throw new IllegalArgumentException("Ther simulation id was null");
         }
-        if (modelElementName == null) {
-            throw new IllegalArgumentException("The model element name was null.");
+        if (modelElement == null) {
+            throw new IllegalArgumentException("The model element was null.");
         }
         if (s == null) {
             throw new IllegalArgumentException("There supplied StatisticAccessorIfc was null");
         }
         AcrossRepStatRecord r = myDb.getDSLContext().newRecord(ACROSS_REP_STAT);
-        r.setModelElementName(modelElementName);
+        r.setElementIdFk(modelElement.getId());
         r.setSimRunIdFk(simId);
         r.setStatName(s.getName());
 
@@ -858,7 +859,7 @@ public class JSLDatabase {
             throw new IllegalArgumentException("There supplied StatisticAccessorIfc was null");
         }
         BatchStatRecord r = myDb.getDSLContext().newRecord(BATCH_STAT);
-        r.setModelElementName(rv.getName());
+        r.setElementIdFk(rv.getId());
         r.setSimRunIdFk(simId);
         r.setStatName(s.getName());
         r.setRepNum(rv.getExperiment().getCurrentReplicationNumber());
@@ -1038,7 +1039,7 @@ public class JSLDatabase {
         Result<WithinRepStatRecord> withinRepStatRecords = myDb.getDSLContext()
                 .selectFrom(WITHIN_REP_STAT).orderBy(WITHIN_REP_STAT.SIM_RUN_ID_FK,
                         WITHIN_REP_STAT.ID,
-                        WITHIN_REP_STAT.MODEL_ELEMENT_NAME,
+                        WITHIN_REP_STAT.ELEMENT_ID_FK,
                         WITHIN_REP_STAT.REP_NUM).fetch();
         return withinRepStatRecords;
     }
@@ -1053,15 +1054,20 @@ public class JSLDatabase {
 
     /**
      * @param simId        the id of the simulation
-     * @param responseName the response name
+     * @param responseName the name of the model element that is a response
      * @return the across replication statistics as a Statistic
      */
     public Statistic getAcrossRepStatistic(Integer simId, String responseName) {
+        ModelElement modelElement = mySimulation.getModel().getModelElement(responseName);
+        if (modelElement == null){
+            return new Statistic();
+        }
+        int id = modelElement.getId();
         List<Double> averages = myDb.getDSLContext()
                 .select(WITHIN_REP_STAT.AVERAGE)
                 .from(WITHIN_REP_STAT)
                 .where(WITHIN_REP_STAT.SIM_RUN_ID_FK.eq(simId)
-                        .and(WITHIN_REP_STAT.MODEL_ELEMENT_NAME.eq(responseName))).fetch(WITHIN_REP_STAT.AVERAGE);
+                        .and(WITHIN_REP_STAT.ELEMENT_ID_FK.eq(id))).fetch(WITHIN_REP_STAT.AVERAGE);
         Statistic s = new Statistic(Doubles.toArray(averages));
         s.setName(responseName);
         return s;
@@ -1073,11 +1079,16 @@ public class JSLDatabase {
      * @return the across replication statistics as a Statistic
      */
     public Statistic getAcrossRepCounterStatistic(Integer simId, String counterName) {
+        ModelElement modelElement = mySimulation.getModel().getModelElement(counterName);
+        if (modelElement == null){
+            return new Statistic();
+        }
+        int id = modelElement.getId();
         List<Double> averages = myDb.getDSLContext()
                 .select(WITHIN_REP_COUNTER_STAT.LAST_VALUE)
                 .from(WITHIN_REP_COUNTER_STAT)
                 .where(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK.eq(simId)
-                        .and(WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME.eq(counterName))).fetch(WITHIN_REP_COUNTER_STAT.LAST_VALUE);
+                        .and(WITHIN_REP_COUNTER_STAT.ELEMENT_ID_FK.eq(id))).fetch(WITHIN_REP_COUNTER_STAT.LAST_VALUE);
         Statistic s = new Statistic(Doubles.toArray(averages));
         s.setName(counterName);
         return s;
@@ -1085,15 +1096,20 @@ public class JSLDatabase {
 
     /**
      * @param responseName the name of the response variable
-     * @return the within replication averages (simRunId, exp_name, response_name, rep_num, avg)
+     * @return the within replication averages (simRunId, exp_name, response_id, rep_num, avg)
      */
-    public final Result<Record5<Integer, String, String, Integer, Double>> getWithinRepAveragesAsResultSet(String responseName) {
-        Result<Record5<Integer, String, String, Integer, Double>> fetch = myDb.getDSLContext()
-                .select(WITHIN_REP_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.MODEL_ELEMENT_NAME,
+    public final Result<Record5<Integer, String, Integer, Integer, Double>> getWithinRepAveragesAsResultSet(String responseName) {
+        ModelElement modelElement = mySimulation.getModel().getModelElement(responseName);
+        if (modelElement == null){
+            return null;
+        }
+        int id = modelElement.getId();
+        Result<Record5<Integer, String, Integer, Integer, Double>> fetch = myDb.getDSLContext()
+                .select(WITHIN_REP_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.ELEMENT_ID_FK,
                         WITHIN_REP_STAT.REP_NUM, WITHIN_REP_STAT.AVERAGE)
                 .from(WITHIN_REP_STAT.join(SIMULATION_RUN).on(
                         WITHIN_REP_STAT.SIM_RUN_ID_FK.eq(SIMULATION_RUN.ID)))
-                .where(WITHIN_REP_STAT.MODEL_ELEMENT_NAME.eq(responseName))
+                .where(WITHIN_REP_STAT.ELEMENT_ID_FK.eq(id))
                 .orderBy(WITHIN_REP_STAT.SIM_RUN_ID_FK, WITHIN_REP_STAT.REP_NUM).fetch();
         return fetch;
     }
@@ -1105,7 +1121,7 @@ public class JSLDatabase {
      * @return a Map with key as experiment name and replication averages in the array
      */
     public final Map<String, double[]> getWithRepAveragesAsMap(String responseName) {
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = getWithinRepAveragesAsResultSet(responseName);
+        Result<Record5<Integer, String, Integer, Integer, Double>> resultSet = getWithinRepAveragesAsResultSet(responseName);
         Map<String, List<Double>> rMap = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.AVERAGE);
         Map<String, double[]> cMap = new LinkedHashMap<>();
         for (String s : rMap.keySet()) {
@@ -1118,15 +1134,20 @@ public class JSLDatabase {
 
     /**
      * @param counterName the name of the counter variable
-     * @return the ending replication count (simRunId, exp_name, counter_name, rep_num, count)
+     * @return the ending replication count (simRunId, exp_name, counter_id, rep_num, count)
      */
-    public final Result<Record5<Integer, String, String, Integer, Double>> getEndReplicationCountsAsResultSet(String counterName) {
-        Result<Record5<Integer, String, String, Integer, Double>> fetch = myDb.getDSLContext()
-                .select(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME,
+    public final Result<Record5<Integer, String, Integer, Integer, Double>> getEndReplicationCountsAsResultSet(String counterName) {
+        ModelElement modelElement = mySimulation.getModel().getModelElement(counterName);
+        if (modelElement == null){
+            return null;
+        }
+        int id = modelElement.getId();
+        Result<Record5<Integer, String, Integer, Integer, Double>> fetch = myDb.getDSLContext()
+                .select(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.ELEMENT_ID_FK,
                         WITHIN_REP_COUNTER_STAT.REP_NUM, WITHIN_REP_COUNTER_STAT.LAST_VALUE)
                 .from(WITHIN_REP_COUNTER_STAT.join(SIMULATION_RUN).on(
                         WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK.eq(SIMULATION_RUN.ID)))
-                .where(WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME.eq(counterName))
+                .where(WITHIN_REP_COUNTER_STAT.ELEMENT_ID_FK.eq(id))
                 .orderBy(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK, WITHIN_REP_COUNTER_STAT.REP_NUM).fetch();
         return fetch;
     }
@@ -1138,7 +1159,7 @@ public class JSLDatabase {
      * @return a Map with key as experiment name and replication counts in the array
      */
     public final Map<String, double[]> getEndReplicationCountsAsMap(String counterName) {
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = getEndReplicationCountsAsResultSet(counterName);
+        Result<Record5<Integer, String, Integer, Integer, Double>> resultSet = getEndReplicationCountsAsResultSet(counterName);
         Map<String, List<Double>> rMap = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.LAST_VALUE);
         Map<String, double[]> cMap = new LinkedHashMap<>();
         for (String s : rMap.keySet()) {
@@ -1182,7 +1203,7 @@ public class JSLDatabase {
         Result<AcrossRepStatRecord> acrossRepStatRecords = myDb.getDSLContext()
                 .selectFrom(ACROSS_REP_STAT).orderBy(ACROSS_REP_STAT.SIM_RUN_ID_FK,
                         ACROSS_REP_STAT.ID,
-                        ACROSS_REP_STAT.MODEL_ELEMENT_NAME,
+                        ACROSS_REP_STAT.ELEMENT_ID_FK,
                         ACROSS_REP_STAT.STAT_NAME).fetch();
         return acrossRepStatRecords;
     }
@@ -1227,7 +1248,7 @@ public class JSLDatabase {
         Result<BatchStatRecord> batchStatRecords = myDb.getDSLContext()
                 .selectFrom(BATCH_STAT).orderBy(BATCH_STAT.SIM_RUN_ID_FK,
                         BATCH_STAT.ID,
-                        BATCH_STAT.MODEL_ELEMENT_NAME,
+                        BATCH_STAT.ELEMENT_ID_FK,
                         BATCH_STAT.STAT_NAME, BATCH_STAT.REP_NUM).fetch();
         return batchStatRecords;
     }
@@ -1274,17 +1295,17 @@ public class JSLDatabase {
                 .where(ACROSS_REP_STAT.SIM_RUN_ID_FK.eq(myCurrentSimRunRecord.getId()))
                 .orderBy(ACROSS_REP_STAT.SIM_RUN_ID_FK,
                         ACROSS_REP_STAT.ID,
-                        ACROSS_REP_STAT.MODEL_ELEMENT_NAME,
+                        ACROSS_REP_STAT.ELEMENT_ID_FK,
                         ACROSS_REP_STAT.STAT_NAME).fetch();
         return acrossRepStatRecords;
     }
 
     /**
-     * @return a map keyed by model element name with the across rep stat record as the value
+     * @return a map keyed by model element id with the across rep stat record as the value
      */
-    public final Map<String, AcrossRepStatRecord> getAcrossRepStatRecordsMapForCurrentSimulation() {
-        Map<String, AcrossRepStatRecord> map = getAcrossRepStatRecordsForCurrentSimulation()
-                .intoMap(ACROSS_REP_STAT.MODEL_ELEMENT_NAME);
+    public final Map<Integer, AcrossRepStatRecord> getAcrossRepStatRecordsMapForCurrentSimulation() {
+        Map<Integer, AcrossRepStatRecord> map = getAcrossRepStatRecordsForCurrentSimulation()
+                .intoMap(ACROSS_REP_STAT.ELEMENT_ID_FK);
         return map;
     }
 

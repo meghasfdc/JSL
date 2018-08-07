@@ -28,19 +28,19 @@ import jsl.utilities.GetValueIfc;
  * responsible for managing the type of the attached object.
  *
  */
-public class QObject implements IdentityIfc, Comparable<QObject> {
+public class QObject implements GetNameIfc, Comparable<QObject> {
 
     /**
      * incremented to give a running total of the number of model QObject
      * created
      */
-    private static int myCounter_;
+    private static long myCounter_;
 
     /**
      * The id of the QObject, currently if the QObject is the ith QObject
      * created then the id is equal to i
      */
-    private int myId;
+    private long myId;
 
     /**
      * The name of the QObject
@@ -140,13 +140,12 @@ public class QObject implements IdentityIfc, Comparable<QObject> {
     }
 
     /**
-     * Gets a uniquely assigned integer identifier for this QObject. This
+     * Gets a uniquely assigned identifier for this QObject. This
      * identifier is assigned when the QObject is created. It may vary if the
      * order of creation changes.
      *
      * @return The identifier for the entity.
      */
-    @Override
     public final long getId() {
         return (myId);
     }

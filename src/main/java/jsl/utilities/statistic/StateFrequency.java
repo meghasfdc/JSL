@@ -20,7 +20,6 @@ import jsl.modeling.State;
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
 import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.distributions.DEmpiricalPMF;
 
 import java.util.*;
 
@@ -315,7 +314,7 @@ public class StateFrequency implements IdentityIfc {
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return myIdentity.getId();
     }
 

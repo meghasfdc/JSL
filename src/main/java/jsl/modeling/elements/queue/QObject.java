@@ -34,7 +34,7 @@ import jsl.utilities.GetValueIfc;
  *
  */
 @Deprecated
-public class QObject implements IdentityIfc, Comparable<QObject> {
+public class QObject implements GetNameIfc, Comparable<QObject> {
 
     /** incremented to give a running total of the
      *  number of model QObject created
@@ -134,7 +134,6 @@ public class QObject implements IdentityIfc, Comparable<QObject> {
      * created.  It may vary if the order of creation changes.
      * @return The identifier for the entity.
      */
-    @Override
     public final long getId() {
         return (myId);
     }

@@ -30,11 +30,11 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
 
     /** A counter to count the number of created to assign "unique" ids
      */
-    private static long myIdCounter_;
+    private static int myIdCounter_;
 
     /** The id of this object
      */
-    protected long myId;
+    protected int myId;
 
     /** Holds the name of the statistic for reporting purposes.
      */
@@ -127,7 +127,7 @@ public class AutoRegressiveNormal implements RandomIfc, SampleIfc, ControllableI
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

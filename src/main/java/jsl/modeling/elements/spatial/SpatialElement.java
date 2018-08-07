@@ -93,7 +93,7 @@ public class SpatialElement extends Observable implements SpatialElementIfc {
     /**
      * A unique id given to the element
      */
-    private long myId;
+    private int myId;
 
     /**
      * If the element is related to a JSL ModelElement then this refers to the
@@ -257,7 +257,7 @@ public class SpatialElement extends Observable implements SpatialElementIfc {
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

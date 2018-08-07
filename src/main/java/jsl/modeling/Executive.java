@@ -15,7 +15,6 @@
  */
 package jsl.modeling;
 
-import java.util.TimerTask;
 import jsl.calendar.CalendarIfc;
 import jsl.calendar.PriorityQueueEventCalendar;
 import jsl.observers.ObservableComponent;
@@ -228,7 +227,7 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
      * @return the id
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

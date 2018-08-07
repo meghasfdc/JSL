@@ -78,7 +78,7 @@ public class ModelElementObserver implements ObserverIfc, IdentityIfc {
      * @return The identifier for the model element observer
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

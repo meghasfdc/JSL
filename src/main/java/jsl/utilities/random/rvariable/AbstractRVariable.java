@@ -100,7 +100,7 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return myIdentity.getId();
     }
 
