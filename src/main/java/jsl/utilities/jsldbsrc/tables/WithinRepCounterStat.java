@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> {
 
-    private static final long serialVersionUID = 1293037990;
+    private static final long serialVersionUID = 1899138870;
 
     /**
      * The reference instance of <code>JSL_DB.WITHIN_REP_COUNTER_STAT</code>
@@ -133,7 +133,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public UniqueKey<WithinRepCounterStatRecord> getPrimaryKey() {
-        return Keys.SQL180807170214660;
+        return Keys.SQL180810145638680;
     }
 
     /**
@@ -141,7 +141,7 @@ public class WithinRepCounterStat extends TableImpl<WithinRepCounterStatRecord> 
      */
     @Override
     public List<UniqueKey<WithinRepCounterStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<WithinRepCounterStatRecord>>asList(Keys.SQL180807170214660, Keys.WRCS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
+        return Arrays.<UniqueKey<WithinRepCounterStatRecord>>asList(Keys.SQL180810145638680, Keys.WRCS_UNIQUE_ELEMENT_SIMRUN_REPNUM);
     }
 
     /**

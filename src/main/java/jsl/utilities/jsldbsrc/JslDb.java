@@ -20,6 +20,7 @@ import jsl.utilities.jsldbsrc.tables.WithinRepCounterStat;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
 import jsl.utilities.jsldbsrc.tables.WithinRepResponseView;
 import jsl.utilities.jsldbsrc.tables.WithinRepStat;
+import jsl.utilities.jsldbsrc.tables.WithinRepView;
 
 import org.jooq.Catalog;
 import org.jooq.Table;
@@ -39,7 +40,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class JslDb extends SchemaImpl {
 
-    private static final long serialVersionUID = -902554365;
+    private static final long serialVersionUID = -1751533744;
 
     /**
      * The reference instance of <code>JSL_DB</code>
@@ -97,6 +98,11 @@ public class JslDb extends SchemaImpl {
     public final WithinRepStat WITHIN_REP_STAT = jsl.utilities.jsldbsrc.tables.WithinRepStat.WITHIN_REP_STAT;
 
     /**
+     * The table <code>JSL_DB.WITHIN_REP_VIEW</code>.
+     */
+    public final WithinRepView WITHIN_REP_VIEW = jsl.utilities.jsldbsrc.tables.WithinRepView.WITHIN_REP_VIEW;
+
+    /**
      * No further instances allowed
      */
     private JslDb() {
@@ -130,6 +136,7 @@ public class JslDb extends SchemaImpl {
             WithinRepCounterStat.WITHIN_REP_COUNTER_STAT,
             WithinRepCounterView.WITHIN_REP_COUNTER_VIEW,
             WithinRepResponseView.WITHIN_REP_RESPONSE_VIEW,
-            WithinRepStat.WITHIN_REP_STAT);
+            WithinRepStat.WITHIN_REP_STAT,
+            WithinRepView.WITHIN_REP_VIEW);
     }
 }

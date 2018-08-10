@@ -285,7 +285,6 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         JSLDatabase jslDatabase = JSLDatabase.createPostgresLocalHostJSLDatabase(sim,
                 true, "test", "test", "test");
 
-
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(sim.getModel());
 
@@ -313,20 +312,20 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 //            System.out.println("Clearing all data in the database!");
 //            db.get().clearAllData();
                 // uncomment to write data from database to Excel workbook
-            try {
-                db.get().writeDbToExcelWorkbook();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                db.get().writeDbToExcelWorkbook();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
-        System.out.println("Using the postgres db");
-        jslDatabase.writeAllTablesAsText(out);
-        try {
-            jslDatabase.writeDbToExcelWorkbook();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        System.out.println("Using the postgres db");
+//        jslDatabase.writeAllTablesAsText(out);
+//        try {
+//            jslDatabase.writeDbToExcelWorkbook();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

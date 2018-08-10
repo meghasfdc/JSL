@@ -21,6 +21,7 @@ import jsl.modeling.queue.Queue;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.jsldbsrc.tables.records.WithinRepViewRecord;
 import jsl.utilities.reporting.JSLDatabase;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.random.RandomIfc;
@@ -29,10 +30,7 @@ import org.jooq.Record5;
 import org.jooq.Result;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class DriveThroughPharmacy extends SchedulingElement {
 
@@ -183,7 +181,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
         Simulation sim = new Simulation("Drive Through Pharmacy", true);
 
         sim.turnOnStatisticalBatching();
-        //sim.setClearDbOption(false);
+        sim.setClearDatabaseOptionForDefaultDatabase(false);
         // get the model
         Model m = sim.getModel();
 
@@ -220,26 +218,27 @@ public class DriveThroughPharmacy extends SchedulingElement {
         //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         String responseName = dtp.getSystemTimeResponse().getName();
         Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
-        Result<Record5<Integer, String, Integer, Integer, Double>> resultSet = db.get().getWithinRepAveragesAsResultSet(responseName);
 
-        resultSet.format(printWriter);
+//        Result<WithinRepViewRecord> resultSet = db.get().getWithRepViewRecords();
+//        resultSet.format(printWriter);
 
-//        Map<String, List<Double>> map = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.AVERAGE);
-//
-//        map.get("1st Run").forEach(System.out::println);
+        Set<String> expNames = new LinkedHashSet<>();
+        expNames.add("1st Run");
+        expNames.add("2nd Run");
 
-        Map<String, double[]> withRepAveragesAsMap = db.get().getWithRepAveragesAsMap(responseName);
+        Map<String, double[]> withRepAveragesAsMap = db.get()
+                .getWithinRepViewValuesAsMapForExperiments(expNames, responseName);
 
         System.out.println();
         for(String name: withRepAveragesAsMap.keySet()){
             double[] doubles = withRepAveragesAsMap.get(name);
             System.out.println(name);
-            System.out.println(Arrays.asList(doubles));
+            System.out.println(Arrays.toString(doubles));
         }
-
-
-//        MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
- //       System.out.println(multipleComparisonAnalyzer);
+        System.out.println();
+        MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
+        multipleComparisonAnalyzer.setName("System Time Analysis");
+        System.out.println(multipleComparisonAnalyzer);
 
 //        try {
 //            System.out.println();

@@ -16,6 +16,7 @@ import jsl.utilities.jsldbsrc.tables.WithinRepCounterStat;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
 import jsl.utilities.jsldbsrc.tables.WithinRepResponseView;
 import jsl.utilities.jsldbsrc.tables.WithinRepStat;
+import jsl.utilities.jsldbsrc.tables.WithinRepView;
 
 
 /**
@@ -80,4 +81,9 @@ public class Tables {
      * The table <code>JSL_DB.WITHIN_REP_STAT</code>.
      */
     public static final WithinRepStat WITHIN_REP_STAT = jsl.utilities.jsldbsrc.tables.WithinRepStat.WITHIN_REP_STAT;
+
+    /**
+     * The table <code>JSL_DB.WITHIN_REP_VIEW</code>.
+     */
+    public static final WithinRepView WITHIN_REP_VIEW = jsl.utilities.jsldbsrc.tables.WithinRepView.WITHIN_REP_VIEW;
 }

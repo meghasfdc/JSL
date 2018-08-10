@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jsl.utilities.GetNameIfc;
 import jsl.utilities.Interval;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.reporting.StatisticReporter;
@@ -43,7 +44,7 @@ import jsl.utilities.reporting.StatisticReporter;
  *
  * @author rossetti
  */
-public class MultipleComparisonAnalyzer {
+public class MultipleComparisonAnalyzer implements GetNameIfc {
 
     private LinkedHashMap<String, double[]> myDataMap;
 
@@ -53,8 +54,23 @@ public class MultipleComparisonAnalyzer {
 
     private LinkedHashMap<String, LinkedHashMap<String, Statistic>> myPairDiffStats;
 
+    private String myName;
+
     public MultipleComparisonAnalyzer(Map<String, double[]> dataMap) {
         setDataMap(dataMap);
+    }
+
+    @Override
+    public final String getName() {
+        return myName;
+    }
+
+    /**
+     *
+     * @param name the name of the comparison
+     */
+    public final void setName(String name){
+        myName = name;
     }
 
     /**
@@ -1210,7 +1226,10 @@ public class MultipleComparisonAnalyzer {
 
     @Override
     public String toString() {
-        StringBuilder sb = this.getSummaryStatistics("Raw Data");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Multiple Comparison Report for: ").append(getName());
+        sb.append(System.lineSeparator());
+        sb.append(this.getSummaryStatistics("Raw Data"))  ;
         sb.append(System.lineSeparator());
         sb.append(getConfidenceIntervalsOnData());
         sb.append(System.lineSeparator());
