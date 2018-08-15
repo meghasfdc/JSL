@@ -211,6 +211,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
         //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         dtp.setNumberOfPharmacists(2);
         sim.setExperimentName("2nd Run");
+        //sim.setExperimentName("1st Run");//To test error message
         sim.run();
         System.out.println("Simulation completed.");
         r.printAcrossReplicationSummaryStatistics();
@@ -218,6 +219,10 @@ public class DriveThroughPharmacy extends SchedulingElement {
         //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
         String responseName = dtp.getSystemTimeResponse().getName();
         Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
+
+        if (!db.isPresent()){
+            return;
+        }
 
 //        Result<WithinRepViewRecord> resultSet = db.get().getWithRepViewRecords();
 //        resultSet.format(printWriter);
