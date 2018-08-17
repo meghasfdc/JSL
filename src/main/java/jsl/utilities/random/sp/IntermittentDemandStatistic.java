@@ -36,11 +36,11 @@ import jsl.utilities.statistic.StatisticAccessorIfc;
  */
 public class IntermittentDemandStatistic implements StatisticAccessorIfc, IdentityIfc, Observer {
 
-    protected long myId;
+    protected int myId;
 
     protected String myName;
 
-    private static long myIdCounter_;
+    private static int myIdCounter_;
 
     private double myDemand;
 
@@ -173,7 +173,7 @@ public class IntermittentDemandStatistic implements StatisticAccessorIfc, Identi
     }
 
     @Override
-    public long getId() {
+    public int getId() {
         return myId;
     }
 

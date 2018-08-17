@@ -82,7 +82,7 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return myIdentity.getId();
     }
 

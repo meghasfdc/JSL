@@ -50,12 +50,12 @@ public class Bootstrap implements IdentityIfc, RandomStreamIfc {
     /**
      * A counter to count the number of created to assign "unique" ids
      */
-    private static long myIdCounter_;
+    private static int myIdCounter_;
 
     /**
      * The id of this object
      */
-    protected final long myId;
+    protected final int myId;
     protected final String myName;
     protected final DPopulation myOriginalPop;
     protected final Statistic myAcrossBSStat;
@@ -197,7 +197,7 @@ public class Bootstrap implements IdentityIfc, RandomStreamIfc {
     /**
      * @return the identity is unique to this execution/construction
      */
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

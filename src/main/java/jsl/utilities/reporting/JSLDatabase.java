@@ -30,11 +30,9 @@ import jsl.observers.ModelElementObserver;
 import jsl.utilities.dbutil.DatabaseFactory;
 import jsl.utilities.dbutil.Database;
 import jsl.utilities.dbutil.DatabaseIfc;
+import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
 import jsl.utilities.jsldbsrc.tables.records.*;
-import jsl.utilities.statistic.BatchStatistic;
-import jsl.utilities.statistic.Statistic;
-import jsl.utilities.statistic.StatisticAccessorIfc;
-import jsl.utilities.statistic.WeightedStatisticIfc;
+import jsl.utilities.statistic.*;
 import org.jooq.*;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.exception.DataAccessException;
@@ -76,6 +74,9 @@ public class JSLDatabase {
 
     private static final List<String> JSLTableNames = Arrays.asList("batch_stat", "within_rep_counter_stat",
             "across_rep_stat", "within_rep_stat", "model_element", "simulation_run");
+
+    private static final List<String> JSLViewNames = Arrays.asList("within_rep_response_view",
+            "within_rep_counter_view", "across_rep_view", "batch_stat_view", "within_rep_view");
 
     private static String jslSchemaName = "JSL_DB";
 
@@ -190,8 +191,9 @@ public class JSLDatabase {
         Objects.requireNonNull(simulation, "The Simulation was null");
         if (dbName == null) {
             // use the simulation name
-            dbName = "JSLDb_" + simulation.getName();
-            dbName = dbName.replaceAll("\\s+", "");
+            String name = simulation.getName().replaceAll("\\s+", "");
+            dbName = "JSLDb_" + name;
+            //dbName = dbName.replaceAll("\\s+", "");
         }
         Path pathToDb = dbDir.resolve(dbName);
         DatabaseFactory.deleteEmbeddedDerbyDatabase(pathToDb);
@@ -409,11 +411,21 @@ public class JSLDatabase {
             Schema schema = db.getSchema(getJSLSchemaName());
             DatabaseIfc.LOG.debug("The database {} contains the JSL schema {}", db.getLabel(), schema.getName());
             DatabaseIfc.LOG.debug("Attempting to drop the schema {}....", schema.getName());
+
+            //first drop any views, then the tables
             org.jooq.Table<?> table = null;
             List<org.jooq.Table<?>> tables = schema.getTables();
-            DatabaseIfc.LOG.debug("Schema {} has tables ... ", schema.getName());
+            DatabaseIfc.LOG.debug("Schema {} has jooq tables or views ... ", schema.getName());
             for (org.jooq.Table<?> t : tables) {
-                DatabaseIfc.LOG.debug("table: {}", t.getName());
+                DatabaseIfc.LOG.debug("table or view: {}", t.getName());
+            }
+            for (String name : JSLViewNames) {
+                DatabaseIfc.LOG.debug("Checking for view {} ", name);
+                table = db.getTable(schema, name);
+                if (table != null) {
+                    db.getDSLContext().dropView(table).execute();
+                    DatabaseIfc.LOG.debug("Dropped view {} ", table.getName());
+                }
             }
             for (String name : JSLTableNames) {
                 DatabaseIfc.LOG.debug("Checking for table {} ", name);
@@ -443,7 +455,22 @@ public class JSLDatabase {
      */
     protected void beforeExperiment() {
         if (getClearDatabaseOption()) {
-            clearAllData();
+            clearSimulationData();
+        } else {
+            // no clear option, need to check if simulation record exists
+            String simName = mySimulation.getName();
+            String expName = mySimulation.getExperimentName();
+            if (simulationRunRecordExists(simName, expName)){
+                JSL.LOGGER.error("A simulation run record exists for simulation: {}, and experiment: {}",
+                        simName, expName);
+                JSL.LOGGER.error("You attempted to run a simulation for a run that has ");
+                JSL.LOGGER.error(" the same name and experiment without allowing its data to be cleared.");
+                JSL.LOGGER.error("You should consider using setClearDatabaseOptionForDefaultDatabase() on Simulation.");
+                JSL.LOGGER.error("Or, you might change the name of the experiment before calling simulation.run().");
+                JSL.LOGGER.error("This error is to prevent you from accidentily losing data associated with simulation: {}, and experiment: {}",
+                        simName, expName);
+                throw new DataAccessException("A simulation run record already exists with the name " + simName + " and experiment name " + expName);
+            }
         }
         // insert the new simulation run into the database
         insertSimulationRunRecord(mySimulation);
@@ -556,7 +583,8 @@ public class JSLDatabase {
         record.setElementId(modelElement.getId());
         record.setClassName(modelElement.getClass().getSimpleName());
         if (modelElement.getParentModelElement() != null) {
-            record.setParentNameFk(modelElement.getParentModelElement().getName());
+            record.setParentIdFk(modelElement.getParentModelElement().getId());
+            record.setParentName(modelElement.getParentModelElement().getName());
         }
         record.setLeftCount(modelElement.getLeftPreOrderTraversalCount());
         record.setRightCount(modelElement.getRightPreOrderTraversalCount());
@@ -594,7 +622,7 @@ public class JSLDatabase {
             throw new IllegalArgumentException("There is no current simulation run record.");
         }
         WithinRepStatRecord r = myDb.getDSLContext().newRecord(WITHIN_REP_STAT);
-        r.setModelElementName(rv.getName());
+        r.setElementIdFk(rv.getId());
         r.setSimRunIdFk(simId);
         r.setRepNum(rv.getExperiment().getCurrentReplicationNumber());
         WeightedStatisticIfc s = rv.getWithinReplicationStatistic();
@@ -660,7 +688,7 @@ public class JSLDatabase {
             throw new IllegalArgumentException("There is no current simulation run record.");
         }
         WithinRepCounterStatRecord r = myDb.getDSLContext().newRecord(WITHIN_REP_COUNTER_STAT);
-        r.setModelElementName(counter.getName());
+        r.setElementIdFk(counter.getId());
         r.setSimRunIdFk(simId);
         r.setRepNum(counter.getExperiment().getCurrentReplicationNumber());
         r.setStatName(counter.getName());
@@ -682,7 +710,7 @@ public class JSLDatabase {
         List<AcrossRepStatRecord> records = new ArrayList<>();
         for (ResponseVariable rv : responses) {
             StatisticAccessorIfc s = rv.getAcrossReplicationStatistic();
-            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(rv.getName(), myCurrentSimRunRecord.getId(), s);
+            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(rv, myCurrentSimRunRecord.getId(), s);
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -702,7 +730,7 @@ public class JSLDatabase {
         List<AcrossRepStatRecord> records = new ArrayList<>();
         for (Counter counter : counters) {
             StatisticAccessorIfc s = counter.getAcrossReplicationStatistic();
-            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(counter.getName(), myCurrentSimRunRecord.getId(), s);
+            AcrossRepStatRecord statRecord = newAcrossRepStatRecord(counter, myCurrentSimRunRecord.getId(), s);
             if (statRecord != null) {
                 records.add(statRecord);
             }
@@ -713,24 +741,24 @@ public class JSLDatabase {
     /**
      * Creates an AcrossRepStatRecord into the database
      *
-     * @param modelElementName the model element name
-     * @param simId            the id of the simulation run
-     * @param s                that statistics to insert
+     * @param modelElement the model element name
+     * @param simId        the id of the simulation run
+     * @param s            that statistics to insert
      * @return the created record
      */
-    protected AcrossRepStatRecord newAcrossRepStatRecord(String modelElementName, Integer simId,
+    protected AcrossRepStatRecord newAcrossRepStatRecord(ModelElement modelElement, Integer simId,
                                                          StatisticAccessorIfc s) {
         if (simId == null) {
             throw new IllegalArgumentException("Ther simulation id was null");
         }
-        if (modelElementName == null) {
-            throw new IllegalArgumentException("The model element name was null.");
+        if (modelElement == null) {
+            throw new IllegalArgumentException("The model element was null.");
         }
         if (s == null) {
             throw new IllegalArgumentException("There supplied StatisticAccessorIfc was null");
         }
         AcrossRepStatRecord r = myDb.getDSLContext().newRecord(ACROSS_REP_STAT);
-        r.setModelElementName(modelElementName);
+        r.setElementIdFk(modelElement.getId());
         r.setSimRunIdFk(simId);
         r.setStatName(s.getName());
 
@@ -858,7 +886,7 @@ public class JSLDatabase {
             throw new IllegalArgumentException("There supplied StatisticAccessorIfc was null");
         }
         BatchStatRecord r = myDb.getDSLContext().newRecord(BATCH_STAT);
-        r.setModelElementName(rv.getName());
+        r.setElementIdFk(rv.getId());
         r.setSimRunIdFk(simId);
         r.setStatName(s.getName());
         r.setRepNum(rv.getExperiment().getCurrentReplicationNumber());
@@ -980,6 +1008,76 @@ public class JSLDatabase {
     }
 
     /**
+     * Deletes all simulation data associated with the (current) simulation. In other
+     * words, the simulation run data associated with a simulation with the current
+     * name and the experiment with the current name.
+     */
+    protected final void clearSimulationData() {
+        String simName = mySimulation.getName();
+        String expName = mySimulation.getExperimentName();
+        deleteSimulationRunRecord(simName, expName);
+    }
+
+    /**
+     * The combination of simName and expName should be unique within the database. Many
+     * different experiments can be run with different names for the same simulation. This method
+     * deletes the simulation run record with the provided names AND all related data
+     * associated with that simulation run.  If a SIMULATION_RUN record does not
+     * exist with the simName and expName combination, nothing occurs.
+     *
+     * @param simName the name of the simulation
+     * @param expName the experiment name for the simulation
+     */
+    public final void deleteSimulationRunRecord(String simName, String expName) {
+        DSLContext create = myDb.getDSLContext();
+        SimulationRunRecord simulationRunRecord = create.selectFrom(SIMULATION_RUN)
+                .where(SIMULATION_RUN.SIM_NAME.eq(simName)
+                        .and(SIMULATION_RUN.EXP_NAME.eq(expName)))
+                .fetchOne();
+        if (simulationRunRecord != null) {
+            simulationRunRecord.delete();
+        }
+    }
+
+    /**
+     * The combination of simName and expName should be unique within the database. Many
+     * different experiments can be run with different names for the same simulation. This method
+     * gets the simulation run record with the provided names.  If a SIMULATION_RUN record does not
+     * exist with the simName and expName combination, null is returned.
+     *
+     * @param simName the name of the simulation
+     * @param expName the experiment name for the simulation
+     * @return the record or null
+     */
+    public final SimulationRunRecord getSimulationRunRecord(String simName, String expName) {
+        DSLContext create = myDb.getDSLContext();
+        SimulationRunRecord simulationRunRecord = create.selectFrom(SIMULATION_RUN)
+                .where(SIMULATION_RUN.SIM_NAME.eq(simName)
+                        .and(SIMULATION_RUN.EXP_NAME.eq(expName)))
+                .fetchOne();
+
+        return simulationRunRecord;
+    }
+
+    /**
+     * The combination of simName and expName should be unique within the database. Many
+     * different experiments can be run with different names for the same simulation. This method
+     * checks if the simulation run record with the provided names exists.
+     *
+     * @param simName the name of the simulation
+     * @param expName the experiment name for the simulation
+     * @return true if the record exits
+     */
+    public final boolean simulationRunRecordExists(String simName, String expName) {
+        DSLContext create = myDb.getDSLContext();
+        SimulationRunRecord simulationRunRecord = create.selectFrom(SIMULATION_RUN)
+                .where(SIMULATION_RUN.SIM_NAME.eq(simName)
+                        .and(SIMULATION_RUN.EXP_NAME.eq(expName)))
+                .fetchOne();
+        return simulationRunRecord != null;
+    }
+
+    /**
      * @param simId the identifier of the simulation record
      * @return the record or null
      */
@@ -1036,9 +1134,10 @@ public class JSLDatabase {
      */
     public final Result<WithinRepStatRecord> getWithinRepStatRecords() {
         Result<WithinRepStatRecord> withinRepStatRecords = myDb.getDSLContext()
-                .selectFrom(WITHIN_REP_STAT).orderBy(WITHIN_REP_STAT.SIM_RUN_ID_FK,
+                .selectFrom(WITHIN_REP_STAT)
+                .orderBy(WITHIN_REP_STAT.SIM_RUN_ID_FK,
                         WITHIN_REP_STAT.ID,
-                        WITHIN_REP_STAT.MODEL_ELEMENT_NAME,
+                        WITHIN_REP_STAT.ELEMENT_ID_FK,
                         WITHIN_REP_STAT.REP_NUM).fetch();
         return withinRepStatRecords;
     }
@@ -1052,63 +1151,190 @@ public class JSLDatabase {
     }
 
     /**
+     * @return a jooq Result of across replication statistics for all simulation runs
+     */
+    public final Result<AcrossRepStatRecord> getAcrossRepStatRecords() {
+        Result<AcrossRepStatRecord> acrossRepStatRecords = myDb.getDSLContext()
+                .selectFrom(ACROSS_REP_STAT)
+                .orderBy(ACROSS_REP_STAT.SIM_RUN_ID_FK,
+                        ACROSS_REP_STAT.ID,
+                        ACROSS_REP_STAT.ELEMENT_ID_FK,
+                        ACROSS_REP_STAT.STAT_NAME).fetch();
+        return acrossRepStatRecords;
+    }
+
+    /**
+     * @return the across replication statistics as a JDBC ResultSet
+     */
+    public final ResultSet getAcrossRepStatRecordsAsResultSet() {
+        return getAcrossRepStatRecords().intoResultSet();
+    }
+
+    /**
+     * @return a jooq Result of batch statistics
+     */
+    public final Result<BatchStatRecord> getBatchStatRecords() {
+        Result<BatchStatRecord> batchStatRecords = myDb.getDSLContext()
+                .selectFrom(BATCH_STAT)
+                .orderBy(BATCH_STAT.SIM_RUN_ID_FK,
+                        BATCH_STAT.ID,
+                        BATCH_STAT.ELEMENT_ID_FK,
+                        BATCH_STAT.STAT_NAME, BATCH_STAT.REP_NUM).fetch();
+        return batchStatRecords;
+    }
+
+    /**
+     * @return the batch statistics as a JDBC ResultSet
+     */
+    public final ResultSet getBatchStatRecordsAsResultSet() {
+        return getBatchStatRecords().intoResultSet();
+    }
+
+    /**
+     * Within replication view of that simulation response results
+     *
+     * @return a jooq Result holding (simid, exp_name, element_name, stat_name, rep_num, average)
+     */
+    public final Result<WithinRepResponseViewRecord> getWithinRepResponseViewRecords() {
+        Result<WithinRepResponseViewRecord> fetch = myDb.getDSLContext()
+                .selectFrom(WITHIN_REP_RESPONSE_VIEW)
+                .orderBy(WITHIN_REP_RESPONSE_VIEW.SIM_RUN_ID_FK,
+                        WITHIN_REP_RESPONSE_VIEW.EXP_NAME,
+                        WITHIN_REP_RESPONSE_VIEW.ELEMENT_NAME,
+                        WITHIN_REP_RESPONSE_VIEW.STAT_NAME,
+                        WITHIN_REP_RESPONSE_VIEW.REP_NUM).fetch();
+        return fetch;
+    }
+
+    /**
+     * Within replication view of that simulation counter results
+     *
+     * @return a jooq Result holding (simid, exp_name, element_name, stat_name, rep_num, last_value)
+     */
+    public final Result<WithinRepCounterViewRecord> getWithinRepCounterViewRecords() {
+        Result<WithinRepCounterViewRecord> fetch = myDb.getDSLContext()
+                .selectFrom(WITHIN_REP_COUNTER_VIEW)
+                .orderBy(WITHIN_REP_COUNTER_VIEW.SIM_RUN_ID_FK,
+                        WITHIN_REP_COUNTER_VIEW.EXP_NAME,
+                        WITHIN_REP_COUNTER_VIEW.ELEMENT_NAME,
+                        WITHIN_REP_COUNTER_VIEW.STAT_NAME,
+                        WITHIN_REP_COUNTER_VIEW.REP_NUM).fetch();
+        return fetch;
+    }
+
+    /**
+     * Across replication view of that simulation response results
+     *
+     * @return a jooq Result holding (simid, exp_name, element_name, stat_name, stat_count, average, std_dev)
+     */
+    public final Result<AcrossRepViewRecord> getAcrossRepViewRecords() {
+        Result<AcrossRepViewRecord> fetch = myDb.getDSLContext()
+                .selectFrom(ACROSS_REP_VIEW)
+                .orderBy(ACROSS_REP_VIEW.SIM_RUN_ID_FK,
+                        ACROSS_REP_VIEW.EXP_NAME,
+                        ACROSS_REP_VIEW.ELEMENT_NAME,
+                        ACROSS_REP_VIEW.STAT_NAME).fetch();
+        return fetch;
+    }
+
+    /**
+     * @return A JDBC ResultSet of the across replication view records.
+     */
+    public final ResultSet getAcrossRepViewRecordsAsResultSet() {
+        return getAcrossRepViewRecords().intoResultSet();
+    }
+
+    /**
+     * Batch statistic view of that simulation batch response results
+     *
+     * @return a jooq Result holding (simid, exp_name, element_name, stat_name, stat_count, average, std_dev)
+     */
+    public final Result<BatchStatViewRecord> getBatchStatViewRecords() {
+        Result<BatchStatViewRecord> fetch = myDb.getDSLContext()
+                .selectFrom(BATCH_STAT_VIEW)
+                .orderBy(BATCH_STAT_VIEW.SIM_RUN_ID_FK,
+                        BATCH_STAT_VIEW.EXP_NAME,
+                        BATCH_STAT_VIEW.ELEMENT_NAME,
+                        BATCH_STAT_VIEW.STAT_NAME).fetch();
+        return fetch;
+    }
+
+    /**
+     * Returns observations for each replication for all ResponseVariable, TimeWeighted, and Counter
+     * responses. In the case of ResponseVariable and TimeWeighted response, the value field
+     * is the within replication average. In the case of a Counter, the value field is the
+     * last value of the counter variable (i.e. the total count for the replication).
+     *
+     * @return a jooq Result holding (simid, exp_name, element_name, stat_name, rep_num, value)
+     */
+    public final Result<WithinRepViewRecord> getWithRepViewRecords() {
+        Result<WithinRepViewRecord> fetch = myDb.getDSLContext()
+                .selectFrom(WITHIN_REP_VIEW)
+                .orderBy(WITHIN_REP_VIEW.SIM_RUN_ID_FK,
+                        WITHIN_REP_VIEW.EXP_NAME,
+                        WITHIN_REP_VIEW.ELEMENT_NAME,
+                        WITHIN_REP_VIEW.STAT_NAME,
+                        WITHIN_REP_VIEW.REP_NUM).fetch();
+        return fetch;
+    }
+
+    /**
+     * @return the within replication view records as a JDBC ResultSet
+     */
+    public final ResultSet getWithinRepViewRecordsAsResultSet() {
+        return getWithRepViewRecords().intoResultSet();
+    }
+
+    /**
+     * @return a map with key sim run id holding the within replication view records by simulation run id
+     */
+    public final Map<Integer, WithinRepViewRecord> getWithinRepViewRecordsBySimulationRunId() {
+        Map<Integer, WithinRepViewRecord> map = getWithRepViewRecords()
+                .intoMap(WITHIN_REP_VIEW.SIM_RUN_ID_FK);
+        return map;
+    }
+
+    /**
+     * @return a map with key sim run id holding the across replication view records
+     */
+    public final Map<Integer, AcrossRepViewRecord> getAcrossRepViewRecordsBySimulationRunId() {
+        Map<Integer, AcrossRepViewRecord> map = getAcrossRepViewRecords().intoMap(ACROSS_REP_VIEW.SIM_RUN_ID_FK);
+        return map;
+    }
+
+    /**
      * @param simId        the id of the simulation
-     * @param responseName the response name
+     * @param responseName the name of the model element that has observations within each replication. It can be
+     *                     a Counter, ResponseVariable, or TimeWeighted model element name
      * @return the across replication statistics as a Statistic
      */
-    public Statistic getAcrossRepStatistic(Integer simId, String responseName) {
-        List<Double> averages = myDb.getDSLContext()
-                .select(WITHIN_REP_STAT.AVERAGE)
-                .from(WITHIN_REP_STAT)
-                .where(WITHIN_REP_STAT.SIM_RUN_ID_FK.eq(simId)
-                        .and(WITHIN_REP_STAT.MODEL_ELEMENT_NAME.eq(responseName))).fetch(WITHIN_REP_STAT.AVERAGE);
-        Statistic s = new Statistic(Doubles.toArray(averages));
+    public final Statistic getAcrossRepStatistic(Integer simId, String responseName) {
+        List<Double> list = myDb.getDSLContext()
+                .select(WITHIN_REP_VIEW.VALUE)
+                .from(WITHIN_REP_VIEW)
+                .where(WITHIN_REP_VIEW.SIM_RUN_ID_FK.eq(simId))
+                .and(WITHIN_REP_VIEW.ELEMENT_NAME.eq(responseName))
+                .fetch(WITHIN_REP_VIEW.VALUE);
+        Statistic s = new Statistic(Doubles.toArray(list));
         s.setName(responseName);
         return s;
     }
 
     /**
-     * @param simId       the id of the simulation
-     * @param counterName the counter name
-     * @return the across replication statistics as a Statistic
-     */
-    public Statistic getAcrossRepCounterStatistic(Integer simId, String counterName) {
-        List<Double> averages = myDb.getDSLContext()
-                .select(WITHIN_REP_COUNTER_STAT.LAST_VALUE)
-                .from(WITHIN_REP_COUNTER_STAT)
-                .where(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK.eq(simId)
-                        .and(WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME.eq(counterName))).fetch(WITHIN_REP_COUNTER_STAT.LAST_VALUE);
-        Statistic s = new Statistic(Doubles.toArray(averages));
-        s.setName(counterName);
-        return s;
-    }
-
-    /**
-     * @param responseName the name of the response variable
-     * @return the within replication averages (simRunId, exp_name, response_name, rep_num, avg)
-     */
-    public final Result<Record5<Integer, String, String, Integer, Double>> getWithinRepAveragesAsResultSet(String responseName) {
-        Result<Record5<Integer, String, String, Integer, Double>> fetch = myDb.getDSLContext()
-                .select(WITHIN_REP_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.MODEL_ELEMENT_NAME,
-                        WITHIN_REP_STAT.REP_NUM, WITHIN_REP_STAT.AVERAGE)
-                .from(WITHIN_REP_STAT.join(SIMULATION_RUN).on(
-                        WITHIN_REP_STAT.SIM_RUN_ID_FK.eq(SIMULATION_RUN.ID)))
-                .where(WITHIN_REP_STAT.MODEL_ELEMENT_NAME.eq(responseName))
-                .orderBy(WITHIN_REP_STAT.SIM_RUN_ID_FK, WITHIN_REP_STAT.REP_NUM).fetch();
-        return fetch;
-    }
-
-    /**
-     * Builds a map to use with MultipleComparisonAnalyzer
+     * A map holding the values as an array for the within replication response values
+     * by simulation run
      *
-     * @param responseName the name of the response variable
-     * @return a Map with key as experiment name and replication averages in the array
+     * @param responseName the name of the response variable, time weighted variable or counter
+     * @return a Map with key as simulation id and replication value in the array
      */
-    public final Map<String, double[]> getWithRepAveragesAsMap(String responseName) {
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = getWithinRepAveragesAsResultSet(responseName);
-        Map<String, List<Double>> rMap = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_STAT.AVERAGE);
-        Map<String, double[]> cMap = new LinkedHashMap<>();
-        for (String s : rMap.keySet()) {
+    public final Map<Integer, double[]> getWithRepViewValuesAsMap(String responseName) {
+        Map<Integer, List<Double>> rMap = myDb.getDSLContext()
+                .selectFrom(WITHIN_REP_VIEW)
+                .where(WITHIN_REP_VIEW.ELEMENT_NAME.eq(responseName))
+                .fetch()
+                .intoGroups(WITHIN_REP_VIEW.SIM_RUN_ID_FK, WITHIN_REP_VIEW.VALUE);
+        Map<Integer, double[]> cMap = new LinkedHashMap<>();
+        for (Integer s : rMap.keySet()) {
             List<Double> doubles = rMap.get(s);
             double[] a = Doubles.toArray(doubles);
             cMap.put(s, a);
@@ -1117,36 +1343,124 @@ public class JSLDatabase {
     }
 
     /**
-     * @param counterName the name of the counter variable
-     * @return the ending replication count (simRunId, exp_name, counter_name, rep_num, count)
+     * This prepares a map that can be used with MultipleComparisonAnalyzer and
+     * returns the MultipleComparisonAnalyzer. If the set of
+     * simulation runs does not contain the provided experiment name, then an IllegalArgumentException
+     * occurs.  If there are multiple simulation runs with the same experiment name, then
+     * an IllegalArgumentException occurs. In other words, when running the experiments, the user
+     * must make the experiment names unique in order to this map to be built.
+     *
+     * @param expNames     The set of experiment names for with the responses need extraction, must not
+     *                     be null
+     * @param responseName the name of the response variable, time weighted variable or counter
+     * @return a configured MultipleComparisonAnalyzer
      */
-    public final Result<Record5<Integer, String, String, Integer, Double>> getEndReplicationCountsAsResultSet(String counterName) {
-        Result<Record5<Integer, String, String, Integer, Double>> fetch = myDb.getDSLContext()
-                .select(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK, SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME,
-                        WITHIN_REP_COUNTER_STAT.REP_NUM, WITHIN_REP_COUNTER_STAT.LAST_VALUE)
-                .from(WITHIN_REP_COUNTER_STAT.join(SIMULATION_RUN).on(
-                        WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK.eq(SIMULATION_RUN.ID)))
-                .where(WITHIN_REP_COUNTER_STAT.MODEL_ELEMENT_NAME.eq(counterName))
-                .orderBy(WITHIN_REP_COUNTER_STAT.SIM_RUN_ID_FK, WITHIN_REP_COUNTER_STAT.REP_NUM).fetch();
-        return fetch;
+    public final MultipleComparisonAnalyzer getMultipleComparisonAnalyserFor(Set<String> expNames,
+                                                                             String responseName) {
+        Map<String, double[]> map = getWithinRepViewValuesAsMapForExperiments(expNames, responseName);
+        MultipleComparisonAnalyzer mca = new MultipleComparisonAnalyzer(map);
+        mca.setName(responseName);
+        return mca;
     }
 
     /**
-     * Builds a map to use with MultipleComparisonAnalyzer
+     * This prepares a map that can be used with MultipleComparisonAnalyzer. If the set of
+     * simulation runs does not contain the provided experiment name, then an IllegalArgumentException
+     * occurs.  If there are multiple simulation runs with the same experiment name, then
+     * an IllegalArgumentException occurs. In other words, when running the experiments, the user
+     * must make the experiment names unique in order to this map to be built.
      *
-     * @param counterName the name of the counter variable
-     * @return a Map with key as experiment name and replication counts in the array
+     * @param expNames     The set of experiment names for with the responses need extraction, must not
+     *                     be null
+     * @param responseName the name of the response variable, time weighted variable or counter
+     * @return a map with key exp_name containing an array of values, each value from each replication
      */
-    public final Map<String, double[]> getEndReplicationCountsAsMap(String counterName) {
-        Result<Record5<Integer, String, String, Integer, Double>> resultSet = getEndReplicationCountsAsResultSet(counterName);
-        Map<String, List<Double>> rMap = resultSet.intoGroups(SIMULATION_RUN.EXP_NAME, WITHIN_REP_COUNTER_STAT.LAST_VALUE);
-        Map<String, double[]> cMap = new LinkedHashMap<>();
-        for (String s : rMap.keySet()) {
-            List<Double> doubles = rMap.get(s);
-            double[] a = Doubles.toArray(doubles);
-            cMap.put(s, a);
+    public final Map<String, double[]> getWithinRepViewValuesAsMapForExperiments(Set<String> expNames,
+                                                                                 String responseName) {
+        Objects.requireNonNull(expNames, "The set of experiment names was null");
+        Map<String, double[]> responseMap = new LinkedHashMap<>();
+        if (expNames.isEmpty()) {
+            return responseMap;
         }
-        return cMap;
+        if (responseName == null) {
+            return responseMap;
+        }
+
+        Map<Integer, double[]> valuesBySimID = getWithRepViewValuesAsMap(responseName);
+        for (String expName : expNames) {
+            List<Integer> simIDs = myDb.getDSLContext()
+                    .selectDistinct(WITHIN_REP_VIEW.SIM_RUN_ID_FK)
+                    .from(WITHIN_REP_VIEW)
+                    .where(WITHIN_REP_VIEW.EXP_NAME.eq(expName))
+                    .fetch()
+                    .getValues(WITHIN_REP_VIEW.SIM_RUN_ID_FK);
+            if (simIDs.isEmpty()) {
+                throw new IllegalArgumentException("There were no simulation runs with the experiment name: " + expName);
+            }
+            if (simIDs.size() > 1) {
+                throw new IllegalArgumentException("There were multiple simulation runs with the same experiment name: " + expName);
+            }
+            // must have 1 element in list
+            // there is a 1 to 1 mapping between simulation id's and experiment names
+            Integer simID = simIDs.get(0); //the sim id of the experiment
+            responseMap.put(expName, valuesBySimID.get(simID));
+        }
+
+        return responseMap;
+    }
+
+    /**
+     * @param tblsawTableName the name of the table saw table
+     * @return the within replication view records as a Tablesaw Table
+     * @throws SQLException an SQLException
+     */
+    public final Table getWithinRepViewRecordsAsTablesawTable(String tblsawTableName) throws SQLException {
+        return Table.read().db(getWithinRepViewRecordsAsResultSet(), tblsawTableName);
+    }
+
+    /**
+     * Squelches the SQLException
+     *
+     * @param tblsawTableName the name of the table saw table
+     * @return the within replication view records as a Tablesaw Table
+     */
+    public final Table getWithinRepViewRecordsAsTablesawTableNE(String tblsawTableName) {
+
+        Table table = null;
+        try {
+            table = Table.read().db(getWithinRepViewRecordsAsResultSet(), tblsawTableName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return table;
+    }
+
+    /**
+     * @param tblsawTableName the name of the table saw table
+     * @return the within replication view records as a Tablesaw Table
+     * @throws SQLException an SQLException
+     */
+    public final Table getAcrossRepViewRecordsAsTablesawTable(String tblsawTableName) throws SQLException {
+        return Table.read().db(getAcrossRepViewRecordsAsResultSet(), tblsawTableName);
+    }
+
+    /**
+     * Squelches the SQLException
+     *
+     * @param tblsawTableName the name of the table saw table
+     * @return the within replication view records as a Tablesaw Table
+     */
+    public final Table getAcrossRepViewRecordsAsTablesawTableNE(String tblsawTableName) {
+
+        Table table = null;
+        try {
+            table = Table.read().db(getAcrossRepViewRecordsAsResultSet(), tblsawTableName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return table;
     }
 
     /**
@@ -1175,24 +1489,6 @@ public class JSLDatabase {
         return table;
     }
 
-    /**
-     * @return a jooq Result of across replication statistics for all simulation runs
-     */
-    public final Result<AcrossRepStatRecord> getAcrossRepStatRecords() {
-        Result<AcrossRepStatRecord> acrossRepStatRecords = myDb.getDSLContext()
-                .selectFrom(ACROSS_REP_STAT).orderBy(ACROSS_REP_STAT.SIM_RUN_ID_FK,
-                        ACROSS_REP_STAT.ID,
-                        ACROSS_REP_STAT.MODEL_ELEMENT_NAME,
-                        ACROSS_REP_STAT.STAT_NAME).fetch();
-        return acrossRepStatRecords;
-    }
-
-    /**
-     * @return the across replication statistics as a JDBC ResultSet
-     */
-    public final ResultSet getAcrossRepStatRecordsAsResultSet() {
-        return getAcrossRepStatRecords().intoResultSet();
-    }
 
     /**
      * @param tblName the name of the Tablesaw table
@@ -1221,25 +1517,6 @@ public class JSLDatabase {
     }
 
     /**
-     * @return a jooq Result of batch statistics
-     */
-    public final Result<BatchStatRecord> getBatchStatRecords() {
-        Result<BatchStatRecord> batchStatRecords = myDb.getDSLContext()
-                .selectFrom(BATCH_STAT).orderBy(BATCH_STAT.SIM_RUN_ID_FK,
-                        BATCH_STAT.ID,
-                        BATCH_STAT.MODEL_ELEMENT_NAME,
-                        BATCH_STAT.STAT_NAME, BATCH_STAT.REP_NUM).fetch();
-        return batchStatRecords;
-    }
-
-    /**
-     * @return the batch statistics as a JDBC ResultSet
-     */
-    public final ResultSet getBatchStatRecordsAsResultSet() {
-        return getBatchStatRecords().intoResultSet();
-    }
-
-    /**
      * @param tblName the name of the Tablesaw table
      * @return the batch statistics as a Tablesaw Table
      */
@@ -1263,29 +1540,6 @@ public class JSLDatabase {
         }
 
         return table;
-    }
-
-    /**
-     * @return a jooq Result of across replication statistics for current simulation run
-     */
-    public final Result<AcrossRepStatRecord> getAcrossRepStatRecordsForCurrentSimulation() {
-        Result<AcrossRepStatRecord> acrossRepStatRecords = myDb.getDSLContext()
-                .selectFrom(ACROSS_REP_STAT)
-                .where(ACROSS_REP_STAT.SIM_RUN_ID_FK.eq(myCurrentSimRunRecord.getId()))
-                .orderBy(ACROSS_REP_STAT.SIM_RUN_ID_FK,
-                        ACROSS_REP_STAT.ID,
-                        ACROSS_REP_STAT.MODEL_ELEMENT_NAME,
-                        ACROSS_REP_STAT.STAT_NAME).fetch();
-        return acrossRepStatRecords;
-    }
-
-    /**
-     * @return a map keyed by model element name with the across rep stat record as the value
-     */
-    public final Map<String, AcrossRepStatRecord> getAcrossRepStatRecordsMapForCurrentSimulation() {
-        Map<String, AcrossRepStatRecord> map = getAcrossRepStatRecordsForCurrentSimulation()
-                .intoMap(ACROSS_REP_STAT.MODEL_ELEMENT_NAME);
-        return map;
     }
 
     /**

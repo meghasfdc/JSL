@@ -11,11 +11,16 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import jsl.utilities.jsldbsrc.tables.AcrossRepStat;
+import jsl.utilities.jsldbsrc.tables.AcrossRepView;
 import jsl.utilities.jsldbsrc.tables.BatchStat;
+import jsl.utilities.jsldbsrc.tables.BatchStatView;
 import jsl.utilities.jsldbsrc.tables.ModelElement;
 import jsl.utilities.jsldbsrc.tables.SimulationRun;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterStat;
+import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
+import jsl.utilities.jsldbsrc.tables.WithinRepResponseView;
 import jsl.utilities.jsldbsrc.tables.WithinRepStat;
+import jsl.utilities.jsldbsrc.tables.WithinRepView;
 
 import org.jooq.Catalog;
 import org.jooq.Table;
@@ -35,7 +40,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class JslDb extends SchemaImpl {
 
-    private static final long serialVersionUID = 1607742101;
+    private static final long serialVersionUID = -1751533744;
 
     /**
      * The reference instance of <code>JSL_DB</code>
@@ -48,9 +53,19 @@ public class JslDb extends SchemaImpl {
     public final AcrossRepStat ACROSS_REP_STAT = jsl.utilities.jsldbsrc.tables.AcrossRepStat.ACROSS_REP_STAT;
 
     /**
+     * The table <code>JSL_DB.ACROSS_REP_VIEW</code>.
+     */
+    public final AcrossRepView ACROSS_REP_VIEW = jsl.utilities.jsldbsrc.tables.AcrossRepView.ACROSS_REP_VIEW;
+
+    /**
      * The table <code>JSL_DB.BATCH_STAT</code>.
      */
     public final BatchStat BATCH_STAT = jsl.utilities.jsldbsrc.tables.BatchStat.BATCH_STAT;
+
+    /**
+     * The table <code>JSL_DB.BATCH_STAT_VIEW</code>.
+     */
+    public final BatchStatView BATCH_STAT_VIEW = jsl.utilities.jsldbsrc.tables.BatchStatView.BATCH_STAT_VIEW;
 
     /**
      * The table <code>JSL_DB.MODEL_ELEMENT</code>.
@@ -68,9 +83,24 @@ public class JslDb extends SchemaImpl {
     public final WithinRepCounterStat WITHIN_REP_COUNTER_STAT = jsl.utilities.jsldbsrc.tables.WithinRepCounterStat.WITHIN_REP_COUNTER_STAT;
 
     /**
+     * The table <code>JSL_DB.WITHIN_REP_COUNTER_VIEW</code>.
+     */
+    public final WithinRepCounterView WITHIN_REP_COUNTER_VIEW = jsl.utilities.jsldbsrc.tables.WithinRepCounterView.WITHIN_REP_COUNTER_VIEW;
+
+    /**
+     * The table <code>JSL_DB.WITHIN_REP_RESPONSE_VIEW</code>.
+     */
+    public final WithinRepResponseView WITHIN_REP_RESPONSE_VIEW = jsl.utilities.jsldbsrc.tables.WithinRepResponseView.WITHIN_REP_RESPONSE_VIEW;
+
+    /**
      * The table <code>JSL_DB.WITHIN_REP_STAT</code>.
      */
     public final WithinRepStat WITHIN_REP_STAT = jsl.utilities.jsldbsrc.tables.WithinRepStat.WITHIN_REP_STAT;
+
+    /**
+     * The table <code>JSL_DB.WITHIN_REP_VIEW</code>.
+     */
+    public final WithinRepView WITHIN_REP_VIEW = jsl.utilities.jsldbsrc.tables.WithinRepView.WITHIN_REP_VIEW;
 
     /**
      * No further instances allowed
@@ -98,10 +128,15 @@ public class JslDb extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             AcrossRepStat.ACROSS_REP_STAT,
+            AcrossRepView.ACROSS_REP_VIEW,
             BatchStat.BATCH_STAT,
+            BatchStatView.BATCH_STAT_VIEW,
             ModelElement.MODEL_ELEMENT,
             SimulationRun.SIMULATION_RUN,
             WithinRepCounterStat.WITHIN_REP_COUNTER_STAT,
-            WithinRepStat.WITHIN_REP_STAT);
+            WithinRepCounterView.WITHIN_REP_COUNTER_VIEW,
+            WithinRepResponseView.WITHIN_REP_RESPONSE_VIEW,
+            WithinRepStat.WITHIN_REP_STAT,
+            WithinRepView.WITHIN_REP_VIEW);
     }
 }

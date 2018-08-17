@@ -199,7 +199,7 @@ public class State implements IdentityIfc, StateAccessorIfc {
      * @return The identifier for the state.
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

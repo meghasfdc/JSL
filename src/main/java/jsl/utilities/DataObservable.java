@@ -31,7 +31,7 @@ public abstract class DataObservable extends Observable implements GetValueIfc, 
     //  ===========================================
     /** A counter to count the number of created to assign "unique" ids
      */
-    protected static long myIdCounter_;
+    protected static int myIdCounter_;
 
     /** An "enum" to indicate that a new value has just been made available to observers
      */
@@ -50,7 +50,7 @@ public abstract class DataObservable extends Observable implements GetValueIfc, 
 
     /** The id of this object
      */
-    protected long myId;
+    protected int myId;
 
     /** Holds the name of the statistic for reporting purposes.
      */
@@ -107,7 +107,7 @@ public abstract class DataObservable extends Observable implements GetValueIfc, 
      *
      * @return
      */
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

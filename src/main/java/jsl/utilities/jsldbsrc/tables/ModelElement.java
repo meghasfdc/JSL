@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ModelElement extends TableImpl<ModelElementRecord> {
 
-    private static final long serialVersionUID = 714227234;
+    private static final long serialVersionUID = -282595018;
 
     /**
      * The reference instance of <code>JSL_DB.MODEL_ELEMENT</code>
@@ -58,14 +58,14 @@ public class ModelElement extends TableImpl<ModelElementRecord> {
     public final TableField<ModelElementRecord, Integer> SIM_RUN_ID_FK = createField("SIM_RUN_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
+     * The column <code>JSL_DB.MODEL_ELEMENT.ELEMENT_ID</code>.
+     */
+    public final TableField<ModelElementRecord, Integer> ELEMENT_ID = createField("ELEMENT_ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
      * The column <code>JSL_DB.MODEL_ELEMENT.ELEMENT_NAME</code>.
      */
     public final TableField<ModelElementRecord, String> ELEMENT_NAME = createField("ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
-
-    /**
-     * The column <code>JSL_DB.MODEL_ELEMENT.ELEMENT_ID</code>.
-     */
-    public final TableField<ModelElementRecord, Long> ELEMENT_ID = createField("ELEMENT_ID", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.MODEL_ELEMENT.CLASS_NAME</code>.
@@ -73,9 +73,14 @@ public class ModelElement extends TableImpl<ModelElementRecord> {
     public final TableField<ModelElementRecord, String> CLASS_NAME = createField("CLASS_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
-     * The column <code>JSL_DB.MODEL_ELEMENT.PARENT_NAME_FK</code>.
+     * The column <code>JSL_DB.MODEL_ELEMENT.PARENT_ID_FK</code>.
      */
-    public final TableField<ModelElementRecord, String> PARENT_NAME_FK = createField("PARENT_NAME_FK", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
+    public final TableField<ModelElementRecord, Integer> PARENT_ID_FK = createField("PARENT_ID_FK", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>JSL_DB.MODEL_ELEMENT.PARENT_NAME</code>.
+     */
+    public final TableField<ModelElementRecord, String> PARENT_NAME = createField("PARENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
 
     /**
      * The column <code>JSL_DB.MODEL_ELEMENT.LEFT_COUNT</code>.
@@ -137,7 +142,7 @@ public class ModelElement extends TableImpl<ModelElementRecord> {
      */
     @Override
     public List<UniqueKey<ModelElementRecord>> getKeys() {
-        return Arrays.<UniqueKey<ModelElementRecord>>asList(Keys.ME_PRIM_KY);
+        return Arrays.<UniqueKey<ModelElementRecord>>asList(Keys.ME_PRIM_KY, Keys.ME_NAME_UNIQUE);
     }
 
     /**

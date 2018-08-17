@@ -23,7 +23,7 @@ public class Identity implements IdentityIfc {
 
     /** A counter to count the number of objects created to assign "unique" ids
      */
-    private static long myIdCounter_;
+    private int myIdCounter_;
 
     /** The name of this object
      */
@@ -31,7 +31,7 @@ public class Identity implements IdentityIfc {
 
     /** The id of this object
      */
-    private long myId;
+    private int myId;
 
     public Identity(){
         this(null);
@@ -56,7 +56,7 @@ public class Identity implements IdentityIfc {
      * @return
      */
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

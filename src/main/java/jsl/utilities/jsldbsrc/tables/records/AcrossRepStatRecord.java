@@ -25,7 +25,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AcrossRepStatRecord extends UpdatableRecordImpl<AcrossRepStatRecord> {
 
-    private static final long serialVersionUID = 997856226;
+    private static final long serialVersionUID = -1390967034;
 
     /**
      * Setter for <code>JSL_DB.ACROSS_REP_STAT.ID</code>.
@@ -42,17 +42,17 @@ public class AcrossRepStatRecord extends UpdatableRecordImpl<AcrossRepStatRecord
     }
 
     /**
-     * Setter for <code>JSL_DB.ACROSS_REP_STAT.MODEL_ELEMENT_NAME</code>.
+     * Setter for <code>JSL_DB.ACROSS_REP_STAT.ELEMENT_ID_FK</code>.
      */
-    public void setModelElementName(String value) {
+    public void setElementIdFk(Integer value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>JSL_DB.ACROSS_REP_STAT.MODEL_ELEMENT_NAME</code>.
+     * Getter for <code>JSL_DB.ACROSS_REP_STAT.ELEMENT_ID_FK</code>.
      */
-    public String getModelElementName() {
-        return (String) get(1);
+    public Integer getElementIdFk() {
+        return (Integer) get(1);
     }
 
     /**
@@ -389,11 +389,11 @@ public class AcrossRepStatRecord extends UpdatableRecordImpl<AcrossRepStatRecord
     /**
      * Create a detached, initialised AcrossRepStatRecord
      */
-    public AcrossRepStatRecord(Integer id, String modelElementName, Integer simRunIdFk, String statName, Double statCount, Double average, Double stdDev, Double stdErr, Double halfWidth, Double confLevel, Double minimum, Double maximum, Double weightedSum, Double sumOfWeights, Double weightedSsq, Double devSsq, Double lastValue, Double lastWeight, Double kurtosis, Double skewness, Double lag1Cov, Double lag1Corr, Double vonNeumanLag1Stat, Double numMissingObs) {
+    public AcrossRepStatRecord(Integer id, Integer elementIdFk, Integer simRunIdFk, String statName, Double statCount, Double average, Double stdDev, Double stdErr, Double halfWidth, Double confLevel, Double minimum, Double maximum, Double weightedSum, Double sumOfWeights, Double weightedSsq, Double devSsq, Double lastValue, Double lastWeight, Double kurtosis, Double skewness, Double lag1Cov, Double lag1Corr, Double vonNeumanLag1Stat, Double numMissingObs) {
         super(AcrossRepStat.ACROSS_REP_STAT);
 
         set(0, id);
-        set(1, modelElementName);
+        set(1, elementIdFk);
         set(2, simRunIdFk);
         set(3, statName);
         set(4, statCount);

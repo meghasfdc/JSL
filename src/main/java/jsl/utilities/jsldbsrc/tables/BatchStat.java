@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BatchStat extends TableImpl<BatchStatRecord> {
 
-    private static final long serialVersionUID = -1599609839;
+    private static final long serialVersionUID = -1692867710;
 
     /**
      * The reference instance of <code>JSL_DB.BATCH_STAT</code>
@@ -59,9 +59,9 @@ public class BatchStat extends TableImpl<BatchStatRecord> {
     public final TableField<BatchStatRecord, Integer> ID = createField("ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>JSL_DB.BATCH_STAT.MODEL_ELEMENT_NAME</code>.
+     * The column <code>JSL_DB.BATCH_STAT.ELEMENT_ID_FK</code>.
      */
-    public final TableField<BatchStatRecord, String> MODEL_ELEMENT_NAME = createField("MODEL_ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
+    public final TableField<BatchStatRecord, Integer> ELEMENT_ID_FK = createField("ELEMENT_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.BATCH_STAT.SIM_RUN_ID_FK</code>.
@@ -69,14 +69,14 @@ public class BatchStat extends TableImpl<BatchStatRecord> {
     public final TableField<BatchStatRecord, Integer> SIM_RUN_ID_FK = createField("SIM_RUN_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
-     * The column <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
-     */
-    public final TableField<BatchStatRecord, String> STAT_NAME = createField("STAT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
-
-    /**
      * The column <code>JSL_DB.BATCH_STAT.REP_NUM</code>.
      */
     public final TableField<BatchStatRecord, Integer> REP_NUM = createField("REP_NUM", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>JSL_DB.BATCH_STAT.STAT_NAME</code>.
+     */
+    public final TableField<BatchStatRecord, String> STAT_NAME = createField("STAT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510), this, "");
 
     /**
      * The column <code>JSL_DB.BATCH_STAT.STAT_COUNT</code>.
@@ -268,7 +268,7 @@ public class BatchStat extends TableImpl<BatchStatRecord> {
      */
     @Override
     public UniqueKey<BatchStatRecord> getPrimaryKey() {
-        return Keys.SQL180728165152670;
+        return Keys.SQL180815113710430;
     }
 
     /**
@@ -276,7 +276,7 @@ public class BatchStat extends TableImpl<BatchStatRecord> {
      */
     @Override
     public List<UniqueKey<BatchStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<BatchStatRecord>>asList(Keys.SQL180728165152670);
+        return Arrays.<UniqueKey<BatchStatRecord>>asList(Keys.SQL180815113710430);
     }
 
     /**

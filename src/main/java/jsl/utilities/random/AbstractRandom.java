@@ -15,8 +15,6 @@
  */
 package jsl.utilities.random;
 
-import java.util.HashMap;
-
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
 
@@ -28,11 +26,11 @@ public abstract class AbstractRandom implements RandomIfc, ControllableIfc {
 
     /** A counter to count the number of created to assign "unique" ids
      */
-    private static long myIdCounter_;
+    private static int myIdCounter_;
 
     /** The id of this object
      */
-    protected long myId;
+    protected int myId;
     
     /** Holds the name of the name of the object for the IdentityIfc
      */
@@ -68,7 +66,7 @@ public abstract class AbstractRandom implements RandomIfc, ControllableIfc {
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 

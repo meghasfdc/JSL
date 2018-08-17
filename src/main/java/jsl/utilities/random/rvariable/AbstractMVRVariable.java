@@ -40,7 +40,7 @@ abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return myIdentity.getId();
     }
 

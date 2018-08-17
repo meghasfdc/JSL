@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
 
-    private static final long serialVersionUID = 1860142611;
+    private static final long serialVersionUID = -1088892982;
 
     /**
      * The reference instance of <code>JSL_DB.ACROSS_REP_STAT</code>
@@ -59,9 +59,9 @@ public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
     public final TableField<AcrossRepStatRecord, Integer> ID = createField("ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>JSL_DB.ACROSS_REP_STAT.MODEL_ELEMENT_NAME</code>.
+     * The column <code>JSL_DB.ACROSS_REP_STAT.ELEMENT_ID_FK</code>.
      */
-    public final TableField<AcrossRepStatRecord, String> MODEL_ELEMENT_NAME = createField("MODEL_ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
+    public final TableField<AcrossRepStatRecord, Integer> ELEMENT_ID_FK = createField("ELEMENT_ID_FK", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.ACROSS_REP_STAT.SIM_RUN_ID_FK</code>.
@@ -223,7 +223,7 @@ public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
      */
     @Override
     public UniqueKey<AcrossRepStatRecord> getPrimaryKey() {
-        return Keys.SQL180728165152490;
+        return Keys.SQL180815113710350;
     }
 
     /**
@@ -231,7 +231,7 @@ public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
      */
     @Override
     public List<UniqueKey<AcrossRepStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<AcrossRepStatRecord>>asList(Keys.SQL180728165152490);
+        return Arrays.<UniqueKey<AcrossRepStatRecord>>asList(Keys.SQL180815113710350);
     }
 
     /**

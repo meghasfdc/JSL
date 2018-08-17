@@ -16,7 +16,6 @@
 package jsl.utilities.random.rng;
 
 import java.util.Arrays;
-import java.util.logging.Level;
 
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
@@ -646,7 +645,7 @@ public class RNStreamFactory extends Identity {
          * @return
          */
         @Override
-        public final long getId() {
+        public final int getId() {
             return (myId);
         }
 

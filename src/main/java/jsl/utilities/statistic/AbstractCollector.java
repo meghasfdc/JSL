@@ -16,7 +16,6 @@
 package jsl.utilities.statistic;
 
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.random.SampleIfc;
 
 import java.util.Arrays;
 
@@ -32,12 +31,12 @@ public abstract class AbstractCollector implements CollectorIfc, SaveDataIfc {
     /**
      * A counter to count the number of created to assign "unique" ids
      */
-    private static long myIdCounter_;
+    private static int myIdCounter_;
 
     /**
      * The id of this object
      */
-    protected long myId;
+    protected int myId;
 
     /**
      * Holds the name of the statistic for reporting purposes.
@@ -149,7 +148,7 @@ public abstract class AbstractCollector implements CollectorIfc, SaveDataIfc {
     }
 
     @Override
-    public final long getId() {
+    public final int getId() {
         return (myId);
     }
 
