@@ -26,6 +26,9 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
 
+    // https://mvnrepository.com/artifact/com.opencsv/opencsv
+    api group: 'com.opencsv', name: 'opencsv', version: '4.2'
+
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     api group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 

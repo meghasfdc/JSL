@@ -21,6 +21,8 @@
  */
 package jsl.utilities.excel;
 
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
 import jsl.utilities.dbutil.DatabaseIfc;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -50,6 +52,8 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -59,16 +63,23 @@ public class ExcelUtil {
 
     final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    public final static int DEFAULT_MAX_CHAR_IN_CELL = 512;
+
+    final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
+
     /**
      * Writes the supplied database to an Excel workbook with one sheet for
      * every table, squelching all exceptions. The workbook will have the same
      * name as the database
      *
-     * @param db the database to read data from
+     * @param db         the database to read data from
      * @param tableNames the list of names of tables in the database to write to Excel, must not be null
      */
     public static void runWriteDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames) {
-        runWriteDBAsExcelWorkbook(db, tableNames);
+        Objects.requireNonNull(db, "The supplied DatabaseIfc reference was null");
+        Objects.requireNonNull(tableNames, "The supplied list of table names was null");
+        runWriteDBAsExcelWorkbook(db, tableNames, Paths.get(db.getLabel()));
     }
 
     /**
@@ -76,7 +87,7 @@ public class ExcelUtil {
      * every table, squelching all exceptions
      *
      * @param db             the database to read data from
-     * @param tableNames the list of names of tables in the database to write to Excel, must not be null
+     * @param tableNames     the list of names of tables in the database to write to Excel, must not be null
      * @param pathToWorkbook the name of the workbook that is to be made
      */
     public static void runWriteDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames, Path pathToWorkbook) {
@@ -101,6 +112,8 @@ public class ExcelUtil {
      */
     public static void runWriteWorkbookToDatabase(Path pathToWorkbook, DatabaseIfc db,
                                                   List<String> tableNames) {
+        Objects.requireNonNull(db, "The supplied DatabaseIfc reference was null");
+        Objects.requireNonNull(tableNames, "The supplied list of table names was null");
         runWriteWorkbookToDatabase(pathToWorkbook, true, db, tableNames);
     }
 
@@ -127,13 +140,13 @@ public class ExcelUtil {
      * every table. This will produce an Excel file with the same name as the
      * database in the current working directory.
      *
-     * @param db the database to read data from
+     * @param db         the database to read data from
      * @param tableNames the list of names of tables in the database to write to Excel, must not be null
-     * @throws IOException           io exception
+     * @throws IOException io exception
      */
     public static void writeDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames)
             throws IOException {
-        writeDBAsExcelWorkbook(db, tableNames);
+        writeDBAsExcelWorkbook(db, tableNames, Paths.get(db.getLabel()));
     }
 
     /**
@@ -143,27 +156,27 @@ public class ExcelUtil {
      * the field names as the first row in the sheet.
      *
      * @param db             the database to read data from, must not be null
-     * @param tableNames the list of names of tables in the database to write to Excel, must not be null
+     * @param tableNames     the list of names of tables in the database to write to Excel, must not be null
      * @param pathToWorkbook the name of the workbook that was made
-     * @throws IOException           io exception
+     * @throws IOException io exception
      */
     public static void writeDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames, Path pathToWorkbook)
             throws IOException {
         Objects.requireNonNull(db, "The supplied DatabaseIfc reference was null");
         Objects.requireNonNull(tableNames, "The supplied list of table names was null");
-        if (tableNames.isEmpty()){
+        if (tableNames.isEmpty()) {
             LOG.warn("The supplied list of table names was empty");
             return;
         }
         List<String> tables = new ArrayList<>();
-        for(String tableName: tableNames){
-            if (db.containsTable(tableName)){
+        for (String tableName : tableNames) {
+            if (db.containsTable(tableName)) {
                 tables.add(tableName);
             } else {
                 LOG.warn("The supplied table name {} to write to Excel is not in database {}", tableName, db.getLabel());
             }
         }
-        if (tables.isEmpty()){
+        if (tables.isEmpty()) {
             LOG.warn("The supplied list of table names had no corresponding tables in database {}", db.getLabel());
             return;
         }
@@ -173,7 +186,10 @@ public class ExcelUtil {
             pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
         }
         LOG.info("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
+        //TODO consider using SXSSFWorkbook
         XSSFWorkbook workbook = new XSSFWorkbook();
+        //TODO this could be the inefficient code??
+        // https://poi.apache.org/components/spreadsheet/how-to.html#sxssf
         for (String tableName : tables) {
             Sheet sheet = workbook.createSheet(tableName);
             LOG.info("Writing table {} to Excel sheet.", tableName);
@@ -196,7 +212,7 @@ public class ExcelUtil {
      * @param pathToWorkbook the path to the workbook. Must be valid workbook with .xlsx extension
      * @param db             the database to write to
      * @param tableNames     the names of the sheets and tables in the order that needs to be written
-     * @throws IOException            an io exception
+     * @throws IOException an io exception
      */
     public static void writeWorkbookToDatabase(Path pathToWorkbook, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
@@ -212,7 +228,7 @@ public class ExcelUtil {
      * @param skipFirstRow   if true the first row of each sheet is skipped
      * @param db             the database to write to
      * @param tableNames     the names of the sheets and tables in the order that needs to be written
-     * @throws IOException            an io exception
+     * @throws IOException an io exception
      */
     public static void writeWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
@@ -227,12 +243,13 @@ public class ExcelUtil {
             LOG.error("The workbook has an invalid format");
             throw new IOException("The workbook has an invalid format. See Apache POI InvalidFormatException");
         }
+        //TODO consider using SXSSFWorkbook
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
-        LOG.info("Writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
+        LOG.info("Writing workbook {} to database {}", pathToWorkbook, db.getLabel());
         writeWorkbookToDatabase(wb, skipFirstRow, db, tableNames);
         //wb.close();
         pkg.close();
-        LOG.info("Completed writing workbook {} to database {}",  pathToWorkbook, db.getLabel());
+        LOG.info("Completed writing workbook {} to database {}", pathToWorkbook, db.getLabel());
     }
 
     /**
@@ -263,7 +280,7 @@ public class ExcelUtil {
      * @param tableNames   the names of the sheets and tables in the order that needs to be written
      * @throws IOException an io exception
      */
-    public static void writeWorkbookToDatabase(XSSFWorkbook wb, boolean skipFirstRow, DatabaseIfc db,
+    public static void writeWorkbookToDatabase(Workbook wb, boolean skipFirstRow, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
         if (wb == null) {
             throw new IllegalArgumentException("The workbook was null");
@@ -276,8 +293,8 @@ public class ExcelUtil {
         }
 
         for (String tableName : tableNames) {
-            XSSFSheet sheet = wb.getSheet(tableName);
-            if (sheet == null){
+            Sheet sheet = wb.getSheet(tableName);
+            if (sheet == null) {
                 LOG.info("Skipping table {} no corresponding sheet in workbook", tableName);
                 continue;
             }
@@ -286,7 +303,7 @@ public class ExcelUtil {
     }
 
     /**
-     * Wrties the sheet to the named table.  Automatically skips the first row of the sheet. Uses
+     * Writes the sheet to the named table.  Automatically skips the first row of the sheet. Uses
      * the name of the sheet as the name of the table. The table must exist in the database with that name.
      *
      * @param sheet the sheet to get the data from
@@ -309,7 +326,8 @@ public class ExcelUtil {
         writeSheetToTable(sheet, true, tableName, db);
     }
 
-    /** This method assumes that the tableName exists in the database or that a table with the same
+    /**
+     * This method assumes that the tableName exists in the database or that a table with the same
      * name as the sheet exists within the database and that the sheet has the appropriate structure
      * to be placed within the table in the database. If the table does not exist in the database
      * the method returns and logs a warning.
@@ -338,13 +356,149 @@ public class ExcelUtil {
         final Table<? extends Record> table = db.getTable(tableName);
         final Field<?>[] fields = table.fields();
         LOG.info("Reading sheet {} for table {} in database {}", sheet.getSheetName(), tableName, db.getLabel());
+        //TODO could this be a performance bottleneck? all in memory??
         final List<Object[]> lists = readSheetAsListOfObjects(sheet, fields, skipFirstRow);
         db.getDSLContext().loadInto(table).batchAll().loadArrays(lists.iterator()).fields(fields).execute();
         LOG.info("Wrote sheet {} for table {} into database {}", sheet.getSheetName(), tableName, db.getLabel());
     }
 
     /**
-     * @param sheet the sheet to process
+     * Assumes that the first row is a header for a CSV like file and
+     * returns the number of columns (1 for each header)
+     *
+     * @param sheet the sheet to write, must not be null
+     * @return the number of header columns
+     */
+    public static int getNumberColumnsForCSVHeader(Sheet sheet) {
+        Objects.requireNonNull(sheet, "The supplied sheet was null");
+        Row row = sheet.getRow(0);
+        if (row != null) {
+            return row.getLastCellNum();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Treats the columns as fields in a csv file, writes each row as a separate csv row
+     * in the resulting csv file. Uses default maximum cell size. Does not skip the first row.
+     * Writes to a CSV file with the same name as the sheet in the current working directory.
+     * The number of columns is determined by assuming that the first row contains
+     * the CSV header. If the sheet has no columns, then an exception is thrown.
+     *
+     * @param sheet the sheet to write, must not be null
+     * @throws IOException an IO exception
+     */
+    public static void writeSheetToCSV(Sheet sheet) throws IOException {
+        int numCols = getNumberColumnsForCSVHeader(sheet);
+        if (numCols <= 0) {
+            throw new IllegalStateException("There were no columns in the sheet to write out.");
+        }
+        writeSheetToCSV(sheet, numCols);
+    }
+
+    /**
+     * Treats the columns as fields in a csv file, writes each row as a separate csv row
+     * in the resulting csv file. Uses default maximum cell size. Does not skip the first row.
+     * Writes to a CSV file with the same name as the sheet in the current working directory.
+     * The number of columns is determined by assuming that the first row contains
+     * the CSV header. If the sheet has no columns, then an exception is thrown.
+     *
+     * @param sheet     the sheet to write, must not be null
+     * @param pathToCSVFile a Path to the file to write as csv, must not be null
+     * @throws IOException an IO exception
+     */
+    public static void writeSheetToCSV(Sheet sheet, Path pathToCSVFile) throws IOException {
+        int numCols = getNumberColumnsForCSVHeader(sheet);
+        if (numCols <= 0) {
+            throw new IllegalStateException("There were no columns in the sheet to write out.");
+        }
+        writeSheetToCSV(sheet, pathToCSVFile, numCols);
+    }
+
+    /**
+     * Treats the columns as fields in a csv file, writes each row as a separate csv row
+     * in the resulting csv file. Uses default maximum cell size. Does not skip the first row.
+     * Writes to a CSV file with the same name as the sheet in the current working directory.
+     *
+     * @param sheet  the sheet to write, must not be null
+     * @param numCol the number of columns to write from each row, must be at least 1
+     * @throws IOException an IO exception
+     */
+    public static void writeSheetToCSV(Sheet sheet, int numCol) throws IOException {
+        Objects.requireNonNull(sheet, "The supplied sheet was null");
+        String sheetName = sheet.getSheetName();
+        Path path = Paths.get(".").resolve(sheetName + ".csv");
+        writeSheetToCSV(sheet, false, path, numCol, DEFAULT_MAX_CHAR_IN_CELL);
+    }
+
+    /**
+     * Treats the columns as fields in a csv file, writes each row as a separate csv row
+     * in the resulting csv file. Uses default maximum cell size. Does not skip the first row
+     *
+     * @param sheet     the sheet to write, must not be null
+     * @param pathToCSV a Path to the file to write as csv, must not be null
+     * @param numCol    the number of columns to write from each row, must be at least 1
+     * @throws IOException an IO exception
+     */
+    public static void writeSheetToCSV(Sheet sheet, Path pathToCSV, int numCol) throws IOException {
+        writeSheetToCSV(sheet, false, pathToCSV, numCol, DEFAULT_MAX_CHAR_IN_CELL);
+    }
+
+    /**
+     * Treats the columns as fields in a csv file, writes each row as a separate csv row
+     * in the resulting csv file. Uses default maximum cell size.
+     *
+     * @param sheet        the sheet to write, must not be null
+     * @param skipFirstRow if true, the first row is skipped in the sheet
+     * @param pathToCSV    a Path to the file to write as csv, must not be null
+     * @param numCol       the number of columns to write from each row, must be at least 1
+     * @throws IOException an IO exception
+     */
+    public static void writeSheetToCSV(Sheet sheet, boolean skipFirstRow, Path pathToCSV,
+                                       int numCol) throws IOException {
+        writeSheetToCSV(sheet, skipFirstRow, pathToCSV, numCol, DEFAULT_MAX_CHAR_IN_CELL);
+    }
+
+    /**
+     * Treats the columns as fields in a csv file, writes each row as a separate csv row
+     * in the resulting csv file
+     *
+     * @param sheet        the sheet to write, must not be null
+     * @param skipFirstRow if true, the first row is skipped in the sheet
+     * @param pathToCSV    a Path to the file to write as csv, must not be null
+     * @param numCol       the number of columns to write from each row, must be at least 1
+     * @param maxChar      the maximum number of characters that can be in any cell, must be at least 1
+     * @throws IOException an IO exception
+     */
+    public static void writeSheetToCSV(Sheet sheet, boolean skipFirstRow, Path pathToCSV, int numCol,
+                                       int maxChar) throws IOException {
+        Objects.requireNonNull(sheet, "The supplied sheet was null");
+        Objects.requireNonNull(pathToCSV, "The supplied path was null");
+        if (numCol <= 0) {
+            throw new IllegalArgumentException("The number of columns must be >= 1");
+        }
+        if (maxChar <= 0) {
+            throw new IllegalArgumentException("The maximum number of characters must be >= 1");
+        }
+        Iterator<Row> rowIterator = sheet.rowIterator();
+        if (skipFirstRow) {
+            if (rowIterator.hasNext()) {
+                rowIterator.next();
+            }
+        }
+        FileWriter fileWriter = new FileWriter(pathToCSV.toFile());
+        ICSVWriter writer = new CSVWriterBuilder(fileWriter).build();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            String[] strings = readRowAsStringArray(row, numCol, maxChar);
+            writer.writeNext(strings);
+        }
+        writer.close();
+    }
+
+    /**
+     * @param sheet  the sheet to process
      * @param fields the fields associated with each row
      * @return a list of lists of the java objects representing each cell of each row of the sheet
      */
@@ -360,13 +514,13 @@ public class ExcelUtil {
         }
         List<List<Object>> list = new ArrayList<>();
         while (rowIterator.hasNext()) {
-            list.add(readRowAsObjects(rowIterator.next(), fields));
+            list.add(readRowAsObjectList(rowIterator.next(), fields));
         }
         return list;
     }
 
     /**
-     * @param sheet the sheet to process
+     * @param sheet  the sheet to process
      * @param fields the fields associated with each row
      * @return a list of the arrays of the java objects representing each cell of each row of the sheet
      */
@@ -383,19 +537,20 @@ public class ExcelUtil {
         List<Object[]> list = new ArrayList<>();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            list.add(readRowsAsObjectArray(row, fields));
+            list.add(readRowAsObjectArray(row, fields));
         }
         return list;
     }
 
-    /** Read a row assuming a fixed number of columns.  Cells that
-     *  are missing/null in the row are read as null objects.
+    /**
+     * Read a row assuming a fixed number of columns.  Cells that
+     * are missing/null in the row are read as null objects.
      *
      * @param row    the Excel row
      * @param fields the fields associated with each row
      * @return a list of java objects representing the contents of the cells
      */
-    public static List<Object> readRowAsObjects(Row row, Field<?>[] fields) {
+    public static List<Object> readRowAsObjectList(Row row, Field<?>[] fields) {
         if (row == null) {
             throw new IllegalArgumentException("The Row was null");
         }
@@ -409,11 +564,11 @@ public class ExcelUtil {
             Object obj = null;
             if (cell != null) {
                 obj = readCellAsObject(cell);
-                if (obj instanceof String){
+                if (obj instanceof String) {
                     int fieldLength = fields[i].getDataType().length();
-                    String s = (String)obj;
-                    if (s.length() > fieldLength){
-                        s = s.substring(0,fieldLength-1);
+                    String s = (String) obj;
+                    if (s.length() > fieldLength) {
+                        s = s.substring(0, fieldLength - 1);
                         obj = s;
                         LOG.warn("The cell {} was truncated to {} characters for field {}", cell.getStringCellValue(), fieldLength, fields[i].getName());
                     }
@@ -425,13 +580,158 @@ public class ExcelUtil {
     }
 
     /**
-     * @param row the Excel row
+     * @param row    the Excel row
      * @param fields the fields associated with each row
      * @return an array of java objects representing the contents of the cells within the row
      */
-    public static Object[] readRowsAsObjectArray(Row row, Field<?>[] fields) {
-        List<Object> objects = readRowAsObjects(row, fields);
+    public static Object[] readRowAsObjectArray(Row row, Field<?>[] fields) {
+        List<Object> objects = readRowAsObjectList(row, fields);
         return objects.toArray();
+    }
+
+    /**
+     * Read a row assuming a fixed number of columns.  Cells that
+     * are missing/null in the row are read as null objects.
+     *
+     * @param row    the Excel row
+     * @param numCol the number of columns in the row
+     * @return a list of java objects representing the contents of the cells
+     */
+    public static List<Object> readRowAsObjectList(Row row, int numCol) {
+        if (row == null) {
+            throw new IllegalArgumentException("The Row was null");
+        }
+        if (numCol <= 0) {
+            throw new IllegalArgumentException("The number of columns must be >= 1");
+        }
+        List<Object> list = new ArrayList<>();
+        for (int i = 0; i < numCol; i++) {
+            Cell cell = row.getCell(i);
+            Object obj = null;
+            if (cell != null) {
+                obj = readCellAsObject(cell);
+            }
+            list.add(obj);
+        }
+        return list;
+    }
+
+    /**
+     * @param row    the Excel row
+     * @param numCol the number of columns in the row
+     * @return an array of java objects representing the contents of the cells within the row
+     */
+    public static Object[] readRowAsObjectArray(Row row, int numCol) {
+        List<Object> objects = readRowAsObjectList(row, numCol);
+        return objects.toArray();
+    }
+
+    /**
+     * Read a row assuming a fixed number of columns.  Cells that
+     * are missing/null in the row are read as null Strings.
+     *
+     * @param row    the Excel row
+     * @param numCol the number of columns in the row
+     * @return a list of java objects representing the contents of the cells
+     */
+    public static List<String> readRowAsStringList(Row row, int numCol) {
+        return readRowAsStringList(row, numCol, DEFAULT_MAX_CHAR_IN_CELL);
+    }
+
+    /**
+     * Read a row assuming a fixed number of columns.  Cells that
+     * are missing/null in the row are read as null Strings.
+     *
+     * @param row     the Excel row
+     * @param numCol  the number of columns in the row
+     * @param maxChar the maximum number of characters permitted for any string
+     * @return a list of java Strings representing the contents of the cells
+     */
+    public static List<String> readRowAsStringList(Row row, int numCol, int maxChar) {
+        if (row == null) {
+            throw new IllegalArgumentException("The Row was null");
+        }
+        if (numCol <= 0) {
+            throw new IllegalArgumentException("The number of columns must be >= 1");
+        }
+        if (maxChar <= 0) {
+            throw new IllegalArgumentException("The maximum number of characters must be >= 1");
+        }
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < numCol; i++) {
+            Cell cell = row.getCell(i);
+            String s = null;
+            if (cell != null) {
+                s = readCellAsString(cell);
+                if (s.length() > maxChar) {
+                    s = s.substring(0, maxChar - 1);
+                    LOG.warn("The cell {} was truncated to {} characters", cell.getStringCellValue(), maxChar);
+                }
+            }
+            list.add(s);
+        }
+        return list;
+    }
+
+    /**
+     * Read a row assuming a fixed number of columns.  Cells that
+     * are missing/null in the row are read as null Strings.
+     *
+     * @param row    the Excel row
+     * @param numCol the number of columns in the row
+     * @return an array of java Strings representing the contents of the cells
+     */
+    public static String[] readRowAsStringArray(Row row, int numCol) {
+        return readRowAsStringArray(row, numCol, DEFAULT_MAX_CHAR_IN_CELL);
+    }
+
+    /**
+     * Read a row assuming a fixed number of columns.  Cells that
+     * are missing/null in the row are read as null Strings.
+     *
+     * @param row     the Excel row
+     * @param numCol  the number of columns in the row
+     * @param maxChar the maximum number of characters permitted for any string
+     * @return an array of java Strings representing the contents of the cells
+     */
+    public static String[] readRowAsStringArray(Row row, int numCol, int maxChar) {
+        List<String> list = readRowAsStringList(row, numCol, maxChar);
+        String[] strings = new String[list.size()];
+        return list.toArray(strings);
+    }
+
+    /**
+     * Reads the Excel cell and translates it into a String
+     *
+     * @param cell the Excel cell to read data from
+     * @return the data in the form of a Java String
+     */
+    public static String readCellAsString(Cell cell) {
+        if (cell == null) {
+            throw new IllegalArgumentException("The Cell was null");
+        }
+        switch (cell.getCellTypeEnum()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    Date date = cell.getDateCellValue();
+                    date.toInstant().toString();
+                    DATE_TIME_FORMATTER.format(date.toInstant());
+                    return DATE_TIME_FORMATTER.format(date.toInstant());
+                } else {
+                    double value = cell.getNumericCellValue();
+                    return Double.toString(value);
+                }
+            case BOOLEAN:
+                boolean value = cell.getBooleanCellValue();
+                Boolean.toString(value);
+                return Boolean.toString(value);
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return null;
+        }
     }
 
     /**
@@ -555,8 +855,8 @@ public class ExcelUtil {
         } else if (object instanceof Long) {
             Long x = (Long) object;
             cell.setCellValue(x.doubleValue());
-        } else if (object instanceof Short){
-            Short x = (Short)object;
+        } else if (object instanceof Short) {
+            Short x = (Short) object;
             cell.setCellValue(x.doubleValue());
         } else if (object instanceof java.sql.Date) {
             java.sql.Date x = (java.sql.Date) object;
@@ -577,7 +877,7 @@ public class ExcelUtil {
                     createHelper.createDataFormat().getFormat("h:mm:ss AM/PM"));
             cell.setCellStyle(cellStyle);
         } else if (object instanceof java.sql.Timestamp) {
-            java.sql.Timestamp x = (java.sql.Timestamp)object;
+            java.sql.Timestamp x = (java.sql.Timestamp) object;
             java.util.Date dateFromTimeStamp = Date.from(x.toInstant());
             double excelDate = DateUtil.getExcelDate(dateFromTimeStamp);
             cell.setCellValue(excelDate);
@@ -588,7 +888,7 @@ public class ExcelUtil {
             cell.setCellStyle(cellStyle);
         } else {
             LOG.error("Could not cast type {} to Excel type.", object.getClass().getName());
-            throw new ClassCastException("Could not cast database type to Excel type: " + object.getClass().getName() );
+            throw new ClassCastException("Could not cast database type to Excel type: " + object.getClass().getName());
         }
     }
 
@@ -602,13 +902,13 @@ public class ExcelUtil {
      *                         the sheet
      * @param sheetHandler     a sheet handler that knows how to process the sheet
      * @param sheetInputStream The stream to read the sheet-data from.
-     * @throws IOException  An IO exception from the parser,
-     *                      possibly from a byte stream or character stream
-     *                      supplied by the application.
+     * @throws IOException An IO exception from the parser,
+     *                     possibly from a byte stream or character stream
+     *                     supplied by the application.
      */
     static void processXSSFSheet(StylesTable styles, ReadOnlySharedStringsTable strings,
-                                        XSSFSheetXMLHandler.SheetContentsHandler sheetHandler,
-                                        InputStream sheetInputStream) throws IOException {
+                                 XSSFSheetXMLHandler.SheetContentsHandler sheetHandler,
+                                 InputStream sheetInputStream) throws IOException {
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
@@ -631,7 +931,7 @@ public class ExcelUtil {
      *
      * @param xlsxPackage  the xlsx package context for the workbook
      * @param sheetHandler the handler to process each sheet
-     * @throws IOException        If reading the data from the package fails.
+     * @throws IOException If reading the data from the package fails.
      */
     static void processAllXSSFSheets(OPCPackage xlsxPackage, XSSFSheetXMLHandler.SheetContentsHandler
             sheetHandler) throws IOException {
