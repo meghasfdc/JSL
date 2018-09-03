@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-  <info organisation="rossetti" module="JSL" revision="1.0-SNAPSHOT" status="integration" publication="20180817092425"/>
+  <info organisation="rossetti" module="JSL" revision="1.0-SNAPSHOT" status="integration" publication="20180829132024"/>
   <configurations>
     <conf name="api" visibility="private" extends="compile"/>
     <conf name="apiElements" visibility="private" extends="api,runtime"/>
@@ -28,6 +28,7 @@
     <artifact name="JSL" type="jar" ext="jar" conf="shadow" m:classifier="all"/>
   </publications>
   <dependencies>
+    <dependency org="com.opencsv" name="opencsv" rev="4.2" conf="api-&gt;default"/>
     <dependency org="org.apache.commons" name="commons-math3" rev="3.6.1" conf="api-&gt;default"/>
     <dependency org="tech.tablesaw" name="tablesaw-core" rev="0.21.0" conf="api-&gt;default"/>
     <dependency org="tech.tablesaw" name="tablesaw-plot" rev="0.21.0" conf="api-&gt;default"/>
