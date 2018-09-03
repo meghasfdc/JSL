@@ -465,9 +465,9 @@ public class JSLDatabase {
                         simName, expName);
                 JSL.LOGGER.error("You attempted to run a simulation for a run that has ");
                 JSL.LOGGER.error(" the same name and experiment without allowing its data to be cleared.");
-                JSL.LOGGER.error("You should consider using setClearDatabaseOptionForDefaultDatabase() on Simulation.");
+                JSL.LOGGER.error("You should consider using setClearDatabaseOption() on the database {}.", getDatabase().getLabel());
                 JSL.LOGGER.error("Or, you might change the name of the experiment before calling simulation.run().");
-                JSL.LOGGER.error("This error is to prevent you from accidentily losing data associated with simulation: {}, and experiment: {}",
+                JSL.LOGGER.error("This error is to prevent you from accidentally losing data associated with simulation: {}, and experiment: {}",
                         simName, expName);
                 throw new DataAccessException("A simulation run record already exists with the name " + simName + " and experiment name " + expName);
             }
