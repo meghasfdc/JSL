@@ -1071,8 +1071,7 @@ public class Model extends ModelElement {
     }
 
     /**
-     * Returns a reference to the Simulation or null. The reference to the
-     * Simulation will only be available after the Simulation is initialized.
+     * Returns a reference to the Simulation that contains this Model
      *
      * @return the Simulation
      */
@@ -1082,8 +1081,7 @@ public class Model extends ModelElement {
     }
 
     /**
-     * Returns a reference to the Executive or null. The reference to the
-     * Executive will only be available after the Simulation is initialized.
+     * Returns a reference to the Executive
      *
      * @return the executive
      */

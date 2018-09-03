@@ -2484,10 +2484,10 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
     }
 
     /**
-     * Returns a reference to the Simulation or null. The reference to the
-     * Simulation will only be available after the Simulation is initialized.
+     * Returns a reference to the Simulation that contains the model that contains
+     *  this ModelElement
      *
-     * @return a reference to the Simulation or null
+     * @return a reference to the Simulation
      */
     public Simulation getSimulation() {
         return getModel().getSimulation();

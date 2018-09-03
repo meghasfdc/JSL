@@ -302,8 +302,47 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
         myReplicationExecutionProcess.runNext();
     }
 
+    /** A convenience method for running a simulation
+     *
+     * @param numReps the number of replications
+     * @param runLength the length of the simulation replication
+     */
+    public final void run(int numReps, double runLength){
+        setNumberOfReplications(numReps);
+        setLengthOfReplication(runLength);
+        run();
+    }
+
+    /** A convenience method for running a simulation
+     *
+     * @param expName the name of the experiment
+     * @param numReps the number of replications
+     * @param runLength the length of the simulation replication
+     */
+    public final void run(String expName, int numReps, double runLength){
+        setExperimentName(expName);
+        setNumberOfReplications(numReps);
+        setLengthOfReplication(runLength);
+        run();
+    }
+
+    /** A convenience method for running a simulation
+     *
+     * @param expName the name of the experiment
+     * @param numReps the number of replications
+     * @param runLength the length of the simulation replication
+     * @param warmUp the length of the warm up period
+     */
+    public final void run(String expName, int numReps, double runLength, double warmUp){
+        setExperimentName(expName);
+        setNumberOfReplications(numReps);
+        setLengthOfReplication(runLength);
+        setLengthOfWarmUp(warmUp);
+        run();
+    }
+
     /**
-     * Runs all remaining replications
+     * Runs all remaining replications based on the current settings
      */
     @Override
     public final void run() {

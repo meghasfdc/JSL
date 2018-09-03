@@ -33,6 +33,8 @@ import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jooq.Field;
@@ -186,12 +188,14 @@ public class ExcelUtil {
             pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
         }
         LOG.info("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
-        //TODO consider using SXSSFWorkbook
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        //TODO this could be the inefficient code??
+       // XSSFWorkbook workbook = new XSSFWorkbook();
+        // using SXSSFWorkbook to speed up processing
         // https://poi.apache.org/components/spreadsheet/how-to.html#sxssf
+        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
         for (String tableName : tables) {
             Sheet sheet = workbook.createSheet(tableName);
+            // stopped auto sizing to speed up processing
+            //sheet.trackAllColumnsForAutoSizing();
             LOG.info("Writing table {} to Excel sheet.", tableName);
             writeTableAsExcelSheet(db, tableName, sheet);
         }
@@ -200,6 +204,7 @@ public class ExcelUtil {
         workbook.write(out);
         workbook.close();
         out.close();
+        workbook.dispose();
     }
 
     /**
@@ -792,6 +797,7 @@ public class ExcelUtil {
         for (Field field : fields) {
             Cell cell = header.createCell(i);
             cell.setCellValue(field.getName());
+            sheet.setColumnWidth(i, (field.getName().length()+2)*256);
             i++;
         }
         int rowCnt = 1;
@@ -800,11 +806,12 @@ public class ExcelUtil {
             writeRecordToSheet(record, row);
             rowCnt++;
         }
-        i = 0;
-        for (Field field : fields) {
-            sheet.autoSizeColumn(i);
-            i++;
-        }
+        // removed to speed up processing
+//        i = 0;
+//        for (Field field : fields) {
+//            sheet.autoSizeColumn(i);
+//            i++;
+//        }
 
     }
 
