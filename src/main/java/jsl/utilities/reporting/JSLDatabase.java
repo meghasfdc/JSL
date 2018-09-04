@@ -162,7 +162,7 @@ public class JSLDatabase {
     }
 
     /**
-     * The name of the database is created based on the name of the simulation via
+     * The name of the database created is based on the name of the simulation via
      * "JSLDb_" + simulation.getName();
      *
      * @param simulation      the simulation to be associated with the JSLDatabase, must not be null

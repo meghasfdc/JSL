@@ -71,7 +71,7 @@ public class ExcelUtil {
             .withZone(ZoneId.systemDefault());
 
     /**
-     * Writes the supplied database to an Excel workbook with one sheet for
+     * Runs writeDBAsExcelWorkbook() to write the supplied database to an Excel workbook with one sheet for
      * every table, squelching all exceptions. The workbook will have the same
      * name as the database
      *
@@ -85,7 +85,7 @@ public class ExcelUtil {
     }
 
     /**
-     * Writes the supplied database to an Excel workbook with one sheet for
+     * Runs writeDBAsExcelWorkbook() to write the supplied database to an Excel workbook with one sheet for
      * every table, squelching all exceptions
      *
      * @param db             the database to read data from
@@ -106,7 +106,8 @@ public class ExcelUtil {
     }
 
     /**
-     * Runs writeWorkbookToDatabase() squelching all exceptions. The first row of each sheet is skipped.
+     * Runs writeWorkbookToDatabase() squelching all exceptions. Read the workbook and writes it
+     * into the database.  The first row of each sheet is skipped.
      *
      * @param pathToWorkbook the path to the workbook. Must be valid workbook with .xlsx extension
      * @param db             the database to write to
@@ -120,7 +121,8 @@ public class ExcelUtil {
     }
 
     /**
-     * Runs writeWorkbookToDatabase() squelching all exceptions
+     * Runs writeWorkbookToDatabase() squelching all exceptions. Read the workbook and writes it
+     * into the database.  The first row of each sheet is skipped.
      *
      * @param pathToWorkbook the path to the workbook. Must be valid workbook with .xlsx extension
      * @param skipFirstRow   if true the first row of each sheet is skipped
@@ -269,7 +271,7 @@ public class ExcelUtil {
      * @param tableNames the names of the sheets and tables in the order that needs to be written
      * @throws IOException an io exception
      */
-    public static void writeWorkbookToDatabase(XSSFWorkbook wb, DatabaseIfc db,
+    public static void writeWorkbookToDatabase(Workbook wb, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
         writeWorkbookToDatabase(wb, true, db, tableNames);
     }

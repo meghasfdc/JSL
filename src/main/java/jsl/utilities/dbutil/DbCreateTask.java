@@ -45,6 +45,11 @@ public class DbCreateTask {
     }
 
     private Path myExcelInsertPath;
+    private Path pathToCreationScript;
+    private Path pathToTablesScript;
+    private Path pathToInsertScript;
+    private Path pathToAlterScript;
+
     private List<String> myInsertTableOrder = new ArrayList<>();
     private List<String> myCreationScriptCommands = new ArrayList<>();
     private List<String> myTableCommands = new ArrayList<>();
@@ -112,11 +117,19 @@ public class DbCreateTask {
         sb.append(System.lineSeparator());
         sb.append("state=").append(state);
         sb.append(System.lineSeparator());
+        sb.append("Creation script=").append(pathToCreationScript);
+        sb.append(System.lineSeparator());
         sb.append("Full Creation Script Commands=").append(!myCreationScriptCommands.isEmpty());
         sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("Tables script=").append(pathToTablesScript);
         sb.append("Table Commands=").append(!myTableCommands.isEmpty());
         sb.append(System.lineSeparator());
+        sb.append("Insert script=").append(pathToInsertScript);
+        sb.append(System.lineSeparator());
         sb.append("Insert Commands=").append(!myInsertCommands.isEmpty());
+        sb.append(System.lineSeparator());
+        sb.append("Alter script=").append(pathToAlterScript);
         sb.append(System.lineSeparator());
         sb.append("Alter Commands=").append(!myAlterCommands.isEmpty());
         sb.append(System.lineSeparator());
@@ -125,6 +138,8 @@ public class DbCreateTask {
         sb.append("Excel Insert Table Order= ");
         if (myInsertTableOrder.isEmpty()) {
             sb.append("None provided");
+        } else {
+            sb.append(System.lineSeparator());
         }
         for (String s : myInsertTableOrder) {
             sb.append("\t").append(s).append(System.lineSeparator());
@@ -140,6 +155,7 @@ public class DbCreateTask {
         if (builder.pathToCreationScript != null) {
             // full creation script provided
             type = Type.FULL_SCRIPT;
+            pathToCreationScript = builder.pathToCreationScript;
             myCreationScriptCommands = fillCommandsFromScript(builder.pathToCreationScript);
             if (myCreationScriptCommands.isEmpty()) {
                 state = State.NO_TABLES_ERROR;
@@ -149,6 +165,7 @@ public class DbCreateTask {
             if (builder.pathToTablesScript != null) {
                 // use script to create database structure
                 type = Type.TABLES;
+                pathToTablesScript = builder.pathToTablesScript;
                 myTableCommands = fillCommandsFromScript(builder.pathToTablesScript);
                 if (myTableCommands.isEmpty()) {
                     state = State.NO_TABLES_ERROR;
@@ -158,6 +175,7 @@ public class DbCreateTask {
                 if (builder.pathToInsertScript != null) {
                     // prefer insert via SQL script if it exists
                     type = Type.TABLES_INSERT;
+                    pathToInsertScript = builder.pathToInsertScript;
                     myInsertCommands = fillCommandsFromScript(builder.pathToInsertScript);
                 } else {
                     // could be Excel insert
@@ -169,6 +187,7 @@ public class DbCreateTask {
                 }
                 // now check for alter
                 if (builder.pathToAlterScript != null) {
+                    pathToAlterScript = builder.pathToAlterScript;
                     myAlterCommands = fillCommandsFromScript(builder.pathToAlterScript);
                     if (type == Type.TABLES_INSERT) {
                         type = Type.TABLES_INSERT_ALTER;
