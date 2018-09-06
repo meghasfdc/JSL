@@ -44,6 +44,25 @@ import jsl.utilities.random.distributions.Constant;
  * A ResourceUnit might have failures processes associated with it.
  * Failure processes must be consistent with the delay option of the resource.
  *
+ *
+ * A ResourceUnit may follow a Schedule. Any schedule changes of a schedule
+ * that the resource unit is using is interpreted as the need for an inactive period.
+ * Since a resource can follow multiple schedules, there may be conditions where
+ * multiple inactive periods are to be handled by the resource unit.  The basic
+ * rule is that a current inactive period is replaced by the newest incoming inactive period.
+ *
+ * If a resource unit is idle, the resource unit will become inactive upon getting a schedule change.
+ * If the resource unit is busy, when told to become inactive, it will wait until the
+ * busy period is over (unless preemption is permitted).  If there is already a waiting
+ * inactive period, the currently waiting inactive period is (silently) replaced by the newest inactive period.
+ * If the resource is failed when an inactive period occurs, and if the notice is delayable
+ * it will (silently) replace an already waiting inactive period and wait for the failure
+ * to end. If it is not delayable, it will be silently cancelled. If an inactive period
+ * occurs and the resource is already experiencing an inactive period the current inactive
+ * period is replaced (canceled) and the new inactive period started. The net effect is
+ * that the resource can only experience one inactive period at a time and newer inactive periods
+ * replace the current or waiting inactive period based on the state of the resource.
+ *
  * @author rossetti
  */
 public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
@@ -75,7 +94,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private JSLEvent myCurrentDownTimeEvent;
     private final ResponseVariable myUtil;
     private int myNumSeizes;
-    private ScheduleListener myScheduleListener;
+
     private final EndInactivePeriodAction myEndInactivePeriodAction = new EndInactivePeriodAction();
     private JSLEvent myCurrentInactivePeriodEvent;
     private final boolean myCollectStateStats;
@@ -93,6 +112,8 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     private Counter myNumFailures;
     private ResponseVariable myPreemptProb;
     private ResponseVariable myPreemptTime;
+
+    private final Map<Schedule, ScheduleChangeListenerIfc> mySchedules;
 
     /**
      * It is highly recommended that the Resource.Builder class be used to
@@ -122,6 +143,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
                         boolean stateStatOption, boolean requestStatOption,
                         Discipline requestQDiscipline, boolean requestQStatsOption) {
         super(parent, name);
+        mySchedules = new LinkedHashMap<>();
         myFailureDelayOption = failureDelayOption;
         myFailureQDiscipline = failuresQDiscipline;
         myFailureQStatOption = failureQStatOption;
@@ -1559,42 +1581,40 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
     /**
      * Tells the resource to listen and react to changes in the supplied
      * Schedule. Any scheduled items on the schedule will be interpreted as
-     * changes to make the resource become inactive. The resource can only
-     * listen to one Schedule.  An IllegalArgumentException is thrown if
-     * this resource unit is already using a schedule (i.e. isUsingSchedule() is true).
+     * changes to make the resource become inactive.  Note the implications
+     * of having more that one schedule in the class documentation.
      *
      * @param schedule the schedule to use, must not be null
-     * @return the ScheduleChangeListenerIfc for the ResourceUnit
      */
-    public final ScheduleChangeListenerIfc useSchedule(Schedule schedule) {
+    public final void useSchedule(Schedule schedule) {
         if (schedule == null) {
             throw new IllegalArgumentException("The supplied Schedule was null");
         }
-        if (isUsingSchedule()) {
-            throw new IllegalArgumentException("The ResourceUnit is already listening to a Schedule");
+        if (isUsingSchedule(schedule)) {
+            return;
         }
-        myScheduleListener = new ScheduleListener(schedule);
-        schedule.addScheduleChangeListener(myScheduleListener);
-        return myScheduleListener;
+        ScheduleListener scheduleListener = new ScheduleListener(schedule);
+        mySchedules.put(schedule,scheduleListener );
+        schedule.addScheduleChangeListener(scheduleListener);
     }
 
     /**
-     * @return true if already listening to a Schedule
+     * @return true if already using the supplied Schedule
      */
-    public final boolean isUsingSchedule() {
-        return myScheduleListener != null;
+    public final boolean isUsingSchedule(Schedule schedule) {
+        return mySchedules.containsKey(schedule);
     }
 
     /**
      *  If the resource is using a schedule, the resource stops listening for
      *  schedule changes and is no longer using a schedule
      */
-    public final void stopUsingSchedule(){
-        if (!isUsingSchedule()){
+    public final void stopUsingSchedule(Schedule schedule){
+        if (!isUsingSchedule(schedule)){
             return;
         }
-        myScheduleListener.mySchedule.deleteScheduleChangeListener(myScheduleListener);
-        myScheduleListener = null;
+        ScheduleChangeListenerIfc listenerIfc = mySchedules.remove(schedule);
+        schedule.deleteScheduleChangeListener(listenerIfc);
     }
 
     /**
