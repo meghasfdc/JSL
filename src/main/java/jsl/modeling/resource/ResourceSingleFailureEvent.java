@@ -392,9 +392,11 @@ public class ResourceSingleFailureEvent extends SchedulingElement {
     }
 
     private void startEvent(JSLEvent event) {
+        // scheduled when failure is to start
 //        System.out.printf("%f > starting the failure. %n", getTime());
-        // the start of the failure, tell all to start immediately
+
         failureStarted(event);
+        // the start of the failure, tell all to start immediately
         Set<SingleFailureEvent> singleFailureEvents = myFailures.values();
         for (SingleFailureEvent fe : singleFailureEvents) {
             fe.start();
