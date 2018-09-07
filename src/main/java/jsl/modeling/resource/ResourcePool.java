@@ -271,11 +271,11 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     /**
      * @return true if at least one unit in the pool uses a schedule
      */
-    public final boolean isUsingSchedule() {
+    public final boolean isUsingSchedule(Schedule schedule) {
         boolean option = false;
 
         for (ResourceUnit ru : myResources) {
-            if (ru.isUsingSchedule()) {
+            if (ru.isUsingSchedule(schedule)) {
                 return true;
             }
         }
@@ -347,7 +347,7 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
             throw new IllegalArgumentException("The supplied Schedule was null");
         }
         for (ResourceUnit unit : getUnits()) {
-            if (!unit.isUsingSchedule()) {
+            if (!unit.isUsingSchedule(schedule)) {
                 unit.useSchedule(schedule);
             }
         }

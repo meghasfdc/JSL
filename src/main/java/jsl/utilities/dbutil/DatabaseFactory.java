@@ -50,6 +50,18 @@ public class DatabaseFactory {
     }
 
     /**
+     *
+     * @param dbLabel a label for the database
+     * @param dataSource the data source for connections
+     * @return the created database
+     */
+    public static DatabaseIfc createEmbeddedDerbyDatabase(String dbLabel, DataSource dataSource){
+        Objects.requireNonNull(dataSource, "The data source was null");
+        Database db = new Database(dbLabel, dataSource, SQLDialect.DERBY);
+        return db;
+    }
+
+    /**
      * The database must already exist. It is not created. An exception is thrown if it does not exist.
      * Assumes that the named database is  in JSLDatabase.dbDir
      *
@@ -64,7 +76,7 @@ public class DatabaseFactory {
      * The database must already exist. It is not created. An exception is thrown if it does not exist.
      *
      * @param dbName the name of the embedded database, must not be null
-     * @param dbDir  a path to the directory to hold the database, must not be null
+     * @param dbDir  a path to the directory that holds the database, must not be null
      * @return the created database
      */
     public static DatabaseIfc getEmbeddedDerbyDatabase(String dbName, Path dbDir) {
