@@ -25,9 +25,10 @@ import java.util.Set;
 
 /**
  *  A FailureEvent models a one time failure process.  There is a time until the failure
- *  occurs and a duration for the failure.  When the process is started the first
- *  failure event is scheduled. If the process is not started then no first event is
- *  scheduled.  Stopping the process causes the first and only failure event to be cancelled.
+ *  occurs and a duration for the failure.  When the process is started the
+ *  failure event is scheduled. If the process is not started then no failure event
+ *  scheduled.  Stopping the process causes the failure event to be cancelled. If the failure event
+ *  occurs then the end of the duration of the event is scheduled.
  *
  *  Suspending the process causes the first and only failure event to be cancelled, if the process has
  *  been started.  If the process has been suspended, then this implies that it has
