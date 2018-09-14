@@ -714,9 +714,7 @@ public class ExcelUtil {
      * @return the data in the form of a Java String
      */
     public static String readCellAsString(Cell cell) {
-        if (cell == null) {
-            throw new IllegalArgumentException("The Cell was null");
-        }
+        Objects.requireNonNull(cell, "The Cell must not be null");
         switch (cell.getCellTypeEnum()) {
             case STRING:
                 return cell.getStringCellValue();
@@ -748,9 +746,7 @@ public class ExcelUtil {
      * @return the data in the form of a Java object
      */
     public static Object readCellAsObject(Cell cell) {
-        if (cell == null) {
-            throw new IllegalArgumentException("The Cell was null");
-        }
+        Objects.requireNonNull(cell, "The Cell must not be null");
         switch (cell.getCellTypeEnum()) {
             case STRING:
                 return cell.getStringCellValue().trim();
@@ -773,26 +769,37 @@ public class ExcelUtil {
      * Writes a table from the database to the Excel sheet. Includes the field names as the first row of
      * the sheet.
      *
-     * @param db        the database containing the table
-     * @param tableName the table to read from
-     * @param sheet     the Excel sheet to write to
+     * @param db        the database containing the table, must not be null
+     * @param tableName the table to read from, must not be null
+     * @param sheet     the Excel sheet to write to, must not be null
      */
     public static void writeTableAsExcelSheet(DatabaseIfc db, String tableName, Sheet sheet) {
-        if (db == null) {
-            throw new IllegalArgumentException("The database was null");
-        }
-        if (tableName == null) {
-            throw new IllegalArgumentException("The table was null");
-        }
-        if (sheet == null) {
-            throw new IllegalArgumentException("The sheet was null");
-        }
+        Objects.requireNonNull(db, "The database must not be null");
+        Objects.requireNonNull(sheet, "The workbook sheet must not be null");
+        Objects.requireNonNull(tableName, "The table name must not be null");
+
         if (!db.containsTable(tableName)) {
             LOG.warn("The supplied table name {} is not in database {}", tableName, db.getLabel());
             return;
         }
         Result<Record> records = db.selectAll(tableName);
+        if (records == null){
+            LOG.warn("The supplied table name {} resulted in a null Result<Record> nothing was written", tableName);
+            return;
+        }
+        writeResultRecordsAsExcelSheet(records, sheet);
+    }
 
+    /**
+     * Writes the results from a query to the Excel sheet. Includes the field names as the first row of
+     * the sheet.
+     *
+     * @param records the records from a select query, must not be null
+     * @param sheet the Excel sheet to write to, must not be null
+     */
+    public static void writeResultRecordsAsExcelSheet(Result<Record> records, Sheet sheet){
+        Objects.requireNonNull(records, "The Result records must not be null");
+        Objects.requireNonNull(sheet, "The workbook sheet must not be null");
         Field[] fields = records.fields();
         Row header = sheet.createRow(0);
         int i = 0;
@@ -808,28 +815,17 @@ public class ExcelUtil {
             writeRecordToSheet(record, row);
             rowCnt++;
         }
-        // removed to speed up processing
-//        i = 0;
-//        for (Field field : fields) {
-//            sheet.autoSizeColumn(i);
-//            i++;
-//        }
-
     }
 
     /**
-     * Writes a single row from the ResultSet to a row in the Excel Sheet
+     * Writes a single row from the ResultSet to a row in an Excel Sheet
      *
-     * @param record the Record to get the data
-     * @param row    the Excel row
+     * @param record the Record to get the data, must not be null
+     * @param row    the Excel row, must not be null
      */
-    protected static void writeRecordToSheet(Record record, Row row) {
-        if (record == null) {
-            throw new IllegalArgumentException("The record was null");
-        }
-        if (row == null) {
-            throw new IllegalArgumentException("The row was null");
-        }
+    public static void writeRecordToSheet(Record record, Row row) {
+        Objects.requireNonNull(record, "The supplied Record must not be null");
+        Objects.requireNonNull(row, "The supplied Row must not be null");
         Field<?>[] fields = record.fields();
         int c = 0;
         for (Field field : fields) {
