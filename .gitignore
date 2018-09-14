@@ -175,7 +175,8 @@ gradle-app.setting
 
 jslMessages/
 jslOutput/
-
+jarOutputDir/
+repos/
 
 settings\.gradle
 

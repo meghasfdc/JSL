@@ -102,7 +102,7 @@ jar {
 uploadArchives {
     repositories {
         flatDir {
-            dirs 'repos'
+            dirs 'jarOutputDir'
         }
     }
 }
@@ -110,7 +110,7 @@ uploadArchives {
 uploadShadow {
     repositories {
         flatDir {
-            dirs 'repos'
+            dirs 'jarOutputDir'
         }
     }
 }
