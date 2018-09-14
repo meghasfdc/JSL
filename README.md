@@ -2,6 +2,21 @@ The JSL repository.
 
 This is a Gradle based project.
 
+## JSL Documentation
+
+If you are looking for the JSL documentation you can find it here:
+
+https://rossetti.git-pages.uark.edu/JSL-Documentation/
+
+The repository for the documentation is here:
+
+https://git.uark.edu/rossetti/JSL-Documentation
+
+## JAR files
+The current jar files are found in the repos directory of the documentation site
+
+## Cloning and Setting Up a Project
+
 If you are using IntelliJ, you can use its clone repository functionality to 
 setup a working version. Here are the steps:
 

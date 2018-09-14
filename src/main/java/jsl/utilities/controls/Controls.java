@@ -22,7 +22,7 @@ import jsl.utilities.random.RandomIfc;
 /**
  * This class acts holds different types of Maps to allow named controls and
  * their associated values to be viewed and set. A named control
- * must be unique across all they different types. There should be
+ * must be unique across all the different types. There should be
  * a default value provided for each named control.
  * <p>
  * Implementors of ControllableIfc are responsible for making
