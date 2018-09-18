@@ -18,9 +18,10 @@ package test.modeling;
 import jsl.modeling.ExperimentGetIfc;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
  */
 public class SchedulingTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 

@@ -24,9 +24,9 @@ import jsl.modeling.ExperimentGetIfc;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.queue.QueueResponse;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -42,7 +42,7 @@ public class DriverLicenseBureauWithQTest {
 
     DriverLicenseBureauWithQ myDLB;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         mySim = new Simulation();

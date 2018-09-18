@@ -16,9 +16,10 @@
 package test.modeling;
 
 import jsl.modeling.Simulation;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -30,7 +31,7 @@ public class SimulationTest {
 
     //private ExperimentParameters myExp;
     //private Model myModel;
-    @Before
+    @BeforeEach
     public void setUp() {
 
         mySim = new Simulation();

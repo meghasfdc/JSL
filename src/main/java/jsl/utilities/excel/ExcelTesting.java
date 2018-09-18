@@ -26,6 +26,8 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+
+import jsl.utilities.reporting.JSL;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
@@ -42,15 +44,17 @@ import org.slf4j.LoggerFactory;
  */
 public class ExcelTesting {
 
-    public static Path excelDir = Paths.get(".", "jsl/utilities/excel");
-    final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static Path excelDir = JSL.ExcelDir;
+
+//    public static Path excelDir = Paths.get(".", "jsl/utilities/excel");
+    final static Logger logger = ExcelUtil.LOG;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, SQLException  {
 //        createWorkBookTest("testworkbook");
-//        readWorkBookTest("testworkbook");
+       readWorkBookTest("testworkbook");
 //        writeSheetAsCSVTest();
 //        writeWorkbookAsCSVTest();
 
@@ -112,7 +116,8 @@ public class ExcelTesting {
                 System.out.println(cell.getRawValue());
             }
 
-            pkg.close();
+            //pkg.close();
+            wb.close();
         } catch (InvalidFormatException | IOException ex) {
             logger.error("Error in readWorkBookTest()", ex);
         }

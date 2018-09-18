@@ -28,8 +28,10 @@ import java.util.Arrays;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamFactory.RNStream;
 import jsl.utilities.random.rng.RNStreamIfc;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** 
  *
@@ -39,7 +41,7 @@ public class RNStreamFactoryTest {
 
     RNStreamFactory f;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         System.out.println("Making new factory.");
         f = new RNStreamFactory();

@@ -25,10 +25,11 @@ import jsl.modeling.ExperimentGetIfc;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.StatisticalBatchingElement;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  *
  * @author rossetti
@@ -45,7 +46,7 @@ public class BatchingElementTest {
 
     StatisticalBatchingElement myBE;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         mySim = new Simulation();

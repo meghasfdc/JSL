@@ -23,12 +23,13 @@ import jsl.modeling.queue.QueueResponse;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.statistic.StatisticAccessorIfc;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -44,7 +45,7 @@ public class ModelElementTesting {
 
     DriverLicenseBureauWithQ myDLB;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         mySim = new Simulation();
@@ -66,7 +67,7 @@ public class ModelElementTesting {
         StringBuilder sb = new StringBuilder();
         myModel.getInitializationOrderAsString(sb);
         System.out.println(sb.toString());
-        assertTrue(true);
+        assertTrue (true);
     }
 
     @Test

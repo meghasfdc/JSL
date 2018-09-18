@@ -23,10 +23,9 @@ package test.random;
 import java.io.PrintWriter;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.StudentT;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import jsl.utilities.reporting.JSL;
 
 /**
@@ -40,13 +39,6 @@ public class TestStudentT {
     public TestStudentT() {
     }
 
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //

@@ -21,9 +21,10 @@ import jsl.modeling.Executive;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -36,7 +37,7 @@ public class ExecutiveTest {
     ActionListener a;
     Model m;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         s = new Simulation();
         m = s.getModel();

@@ -29,12 +29,10 @@ import ex.models.DTPFunctionalTest;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.SimulationReporter;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -48,19 +46,7 @@ public class DTPQueueTest {
     public DTPQueueTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         Simulation sim = new Simulation("Drive Through Pharmacy");
         // get the model

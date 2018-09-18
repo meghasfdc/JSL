@@ -27,12 +27,9 @@ import jsl.utilities.random.distributions.DEmpiricalCDF;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rng.RNStreamFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -43,21 +40,6 @@ public class TestDEmpirical {
     public TestDEmpirical() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:

@@ -19,26 +19,14 @@ package test.misc;
 import jsl.modeling.Simulation;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
-import org.junit.*;
-import static org.junit.Assert.*;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQ {
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     @Test
     public void test1() {

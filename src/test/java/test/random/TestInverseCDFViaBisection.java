@@ -18,8 +18,9 @@ package test.random;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Distribution;
 import jsl.utilities.random.distributions.Normal;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -30,21 +31,6 @@ public class TestInverseCDFViaBisection {
     public TestInverseCDFViaBisection() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //

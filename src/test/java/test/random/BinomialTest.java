@@ -20,8 +20,10 @@ import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Binomial;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -98,7 +100,7 @@ public class BinomialTest {
     */
     double precision = 0.000001;
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 

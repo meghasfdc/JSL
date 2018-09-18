@@ -227,7 +227,8 @@ public class ExcelUtil {
     }
 
     /**
-     * Writes the sheets of the workbook into database tables. The list of names is the names of the
+     * Opens the workbook for reading and writes the sheets of the workbook into database tables.
+     * The list of names is the names of the
      * sheets in the workbook and the names of the tables that need to be written. They are in the
      * order that is required for entering data so that no integrity constraints are violated.
      *
@@ -239,24 +240,47 @@ public class ExcelUtil {
      */
     public static void writeWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
+
+        XSSFWorkbook workbook = openExistingExcelWorkbook(pathToWorkbook);
+        if (workbook == null){
+            throw new IOException("There was a problem opening the workbook!");
+        }
+        LOG.info("Writing workbook {} to database {}", pathToWorkbook, db.getLabel());
+        writeWorkbookToDatabase(workbook, skipFirstRow, db, tableNames);
+        workbook.close();
+        LOG.info("Closed workbook {} ", pathToWorkbook);
+        LOG.info("Completed writing workbook {} to database {}", pathToWorkbook, db.getLabel());
+    }
+
+    /** IO exceptions are squelched in this method.  If there is a problem, then null is returned.
+     * Opens an Apache POI XSSFWorkbook instance. The user is responsible for closing the workbook
+     * when done.
+     *
+     * @param pathToWorkbook the path to a valid Excel xlsx workbook
+     * @return an Apache POI XSSFWorkbook or null if there was a problem opening the workbook.
+     */
+    public static XSSFWorkbook openExistingExcelWorkbook(Path pathToWorkbook){
         if (pathToWorkbook == null) {
             throw new IllegalArgumentException("The path to the workbook was null");
         }
         File file = pathToWorkbook.toFile();
+
         OPCPackage pkg = null;
         try {
             pkg = OPCPackage.open(file);
         } catch (InvalidFormatException e) {
-            LOG.error("The workbook has an invalid format");
-            throw new IOException("The workbook has an invalid format. See Apache POI InvalidFormatException");
+            LOG.error("The workbook has an invalid format. See Apache POI InvalidFormatException");
+            return null;
         }
         //TODO consider using SXSSFWorkbook
-        XSSFWorkbook wb = new XSSFWorkbook(pkg);
-        LOG.info("Writing workbook {} to database {}", pathToWorkbook, db.getLabel());
-        writeWorkbookToDatabase(wb, skipFirstRow, db, tableNames);
-        //wb.close();
-        pkg.close();
-        LOG.info("Completed writing workbook {} to database {}", pathToWorkbook, db.getLabel());
+        XSSFWorkbook wb = null;
+        try {
+            wb = new XSSFWorkbook(pkg);
+            LOG.info("Opened workbook at: {}",pathToWorkbook);
+        } catch (IOException e) {
+            LOG.error("There was an IO error when trying to open the workbook at: {}", pathToWorkbook);
+        }
+        return wb;
     }
 
     /**
@@ -345,7 +369,8 @@ public class ExcelUtil {
      * @param db           the database containing the table, must not be null
      * @throws IOException an io exception
      */
-    public static void writeSheetToTable(Sheet sheet, boolean skipFirstRow, String tableName, DatabaseIfc db) throws IOException {
+    public static void writeSheetToTable(Sheet sheet, boolean skipFirstRow, String tableName, DatabaseIfc db)
+            throws IOException {
         if (sheet == null) {
             throw new IllegalArgumentException("The Sheet was null");
         }

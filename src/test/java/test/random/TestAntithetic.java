@@ -18,8 +18,10 @@ package test.random;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.statistic.StatisticXY;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -27,7 +29,7 @@ import static org.junit.Assert.*;
  */
 public class TestAntithetic {
 
-    @Before
+    @BeforeEach
     public void setup() {
     }
 
