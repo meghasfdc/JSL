@@ -25,6 +25,7 @@ import java.util.Optional;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
 import jsl.modeling.elements.Schedule;
+import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.observers.ModelElementObserver;
 import jsl.utilities.random.rvariable.JSLRandom;
@@ -52,21 +53,27 @@ import jsl.utilities.random.rng.RNStreamIfc;
  * unitFailed(), unitBecameInactive() in order to react to state
  * changes on individual resource units.
  *
+ * The utilization of the pool is defined as the average number busy divided by
+ * the average number active. The average number active is the number of units
+ * minus the average number of inactive units and average number of failed units.
+ * Thus, we assume that resources cannot be busy if they are failed or inactive.
+ *
  * @author rossetti
  */
 public class ResourcePool extends ModelElement implements RandomElementIfc {
 
     protected final List<ResourceUnit> myResources;
     private ResourceUnitSelectionRuleIfc mySelectionRule;
-    protected ResourceUnitObserver myRUObserver;
-    protected TimeWeighted myNumBusy;
-    protected TimeWeighted myNumIdle;
+    protected final ResourceUnitObserver myRUObserver;
+    protected final TimeWeighted myNumBusy;
+    protected final TimeWeighted myNumIdle;
     protected TimeWeighted myNumFailed;
     protected TimeWeighted myNumInactive;
     private final boolean myPoolStatOption;
     private RNStreamIfc myRNG;
     protected boolean myResetStartStreamOption;
     protected boolean myResetNextSubStreamOption;
+    protected final ResponseVariable myUtilization;
 
     /**
      * Statistics option is false by default
@@ -122,6 +129,7 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
             myNumFailed = new TimeWeighted(this, getName() + ":NumFailed");
             myNumInactive = new TimeWeighted(this, getName() + ":NumInactive");
         }
+        myUtilization = new ResponseVariable(this, getName() +":Util");
     }
 
 
@@ -557,6 +565,30 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
     }
 
     /**
+     * This method should be overridden by subclasses that need actions
+     * performed when the replication ends and prior to the calling of
+     * afterReplication() . It is called when each replication ends and can be
+     * used to collect data from the the model element, etc.
+     */
+    @Override
+    protected void replicationEnded() {
+        super.replicationEnded();
+        double avgNumBusy = myNumBusy.getWithinReplicationStatistic().getAverage();
+
+        double avgNumInactive = 0.0;
+        if (myNumInactive != null){
+            avgNumInactive = myNumInactive.getWithinReplicationStatistic().getAverage();
+        }
+        double avgNumFailed = 0.0;
+        if (myNumInactive != null){
+            avgNumFailed = myNumFailed.getWithinReplicationStatistic().getAverage();
+        }
+
+        double util = avgNumBusy/(getNumUnits() - avgNumInactive - avgNumFailed);
+        myUtilization.setValue(util);
+    }
+
+    /**
      * after each replication reset the underlying random number generator to
      * the next
      * substream
@@ -576,9 +608,7 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
         protected void update(ModelElement m, Object arg) {
             super.update(m, arg);
             ResourceUnit ru = (ResourceUnit) m;
-            if (isPooledStatsOptionOn()) {
-                collectStateStatistics(ru);
-            }
+            collectStateStatistics(ru);
             resourceUnitChanged(ru);
         }
 
