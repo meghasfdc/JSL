@@ -36,13 +36,13 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
     // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-core
-    api group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.21.0'
+    api group: 'tech.tablesaw', name: 'tablesaw-core', version: '0.25.2'
 
     // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-plot
-    api group: 'tech.tablesaw', name: 'tablesaw-plot', version: '0.21.0'
+    api group: 'tech.tablesaw', name: 'tablesaw-jsplot', version: '0.25.2'
 
-    // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-smile
-    api group: 'tech.tablesaw', name: 'tablesaw-smile', version: '0.12.0'
+//    // https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-smile
+//    api group: 'tech.tablesaw', name: 'tablesaw-smile', version: '0.12.0'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     api group: 'com.google.guava', name: 'guava', version: '23.5-jre'

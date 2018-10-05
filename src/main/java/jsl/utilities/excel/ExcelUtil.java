@@ -194,11 +194,18 @@ public class ExcelUtil {
         // using SXSSFWorkbook to speed up processing
         // https://poi.apache.org/components/spreadsheet/how-to.html#sxssf
         SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+        int i = 0;
         for (String tableName : tables) {
-            Sheet sheet = workbook.createSheet(tableName);
+            i++;
+            String sheetName = tableName;
+            if (sheetName.length() > 31){
+                sheetName = "SheetForTable_" + i;
+                LOG.info("Table {} name exceeds 31 characters generating valid sheet name {}", tableName, sheetName);
+            }
+            Sheet sheet = workbook.createSheet(sheetName);
             // stopped auto sizing to speed up processing
             //sheet.trackAllColumnsForAutoSizing();
-            LOG.info("Writing table {} to Excel sheet.", tableName);
+            LOG.info("Writing table {} to Excel sheet.", sheetName);
             writeTableAsExcelSheet(db, tableName, sheet);
         }
 
