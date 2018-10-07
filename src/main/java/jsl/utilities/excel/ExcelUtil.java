@@ -166,11 +166,43 @@ public class ExcelUtil {
      */
     public static void writeDBAsExcelWorkbook(DatabaseIfc db, List<String> tableNames, Path pathToWorkbook)
             throws IOException {
+        //  if null make the name of the workbook the same as the database name
+        if (pathToWorkbook == null) {
+            Path currentDir = Paths.get(".");
+            pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
+        }
+        LOG.info("Writing database {} to Excel workbook file {}.", db.getLabel(), pathToWorkbook);
+
+        // XSSFWorkbook workbook = new XSSFWorkbook();
+        // using SXSSFWorkbook to speed up processing
+        // https://poi.apache.org/components/spreadsheet/how-to.html#sxssf
+        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+        fillWorkbookFromDatabase(db, tableNames, workbook);
+        FileOutputStream out = new FileOutputStream(pathToWorkbook.toFile());
+        workbook.write(out);
+        workbook.close();
+        out.close();
+        workbook.dispose();
+    }
+
+    /**
+     * Fills the supplied workbook from the database with one sheet for
+     * every table.  Each sheet of the workbook will have the field names as the first row in the sheet.
+     * If none of the tables are in the database then no sheets are written.  The workbook is just
+     * filled. It is not written to a file. The workbook object can continue to be used for additional
+     * development before being written to a file.
+     *
+     * @param db         the database to read data from, must not be null
+     * @param tableNames the list of names of tables in the database to write to the workbook, must not be null
+     * @param workbook   the workbook to fill, must not be null
+     * @return the workbook that was created, it may be empty
+     */
+    public static void fillWorkbookFromDatabase(DatabaseIfc db, List<String> tableNames, Workbook workbook) {
+        Objects.requireNonNull(db, "The supplied Workbook reference was null");
         Objects.requireNonNull(db, "The supplied DatabaseIfc reference was null");
         Objects.requireNonNull(tableNames, "The supplied list of table names was null");
         if (tableNames.isEmpty()) {
             LOG.warn("The supplied list of table names was empty");
-            return;
         }
         List<String> tables = new ArrayList<>();
         for (String tableName : tableNames) {
@@ -181,39 +213,25 @@ public class ExcelUtil {
             }
         }
         if (tables.isEmpty()) {
-            LOG.warn("The supplied list of table names had no corresponding tables in database {}", db.getLabel());
-            return;
+            LOG.warn("The supplied list of table names had no corresponding tables in database {}, nothing to write.",
+                    db.getLabel());
+        } else {
+            LOG.info("Filling workbook from database: {}.", db.getLabel());
         }
-        //  if null make the name of the workbook the same as the database name
-        if (pathToWorkbook == null) {
-            Path currentDir = Paths.get(".");
-            pathToWorkbook = currentDir.resolve(db.getLabel() + ".xlsx");
-        }
-        LOG.info("Writing database {} to Excel workbook {}.", db.getLabel(), pathToWorkbook);
-       // XSSFWorkbook workbook = new XSSFWorkbook();
-        // using SXSSFWorkbook to speed up processing
-        // https://poi.apache.org/components/spreadsheet/how-to.html#sxssf
-        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
         int i = 0;
         for (String tableName : tables) {
             i++;
             String sheetName = tableName;
-            if (sheetName.length() > 31){
+            if (sheetName.length() > 31) {
                 sheetName = "SheetForTable_" + i;
                 LOG.info("Table {} name exceeds 31 characters generating valid sheet name {}", tableName, sheetName);
             }
             Sheet sheet = workbook.createSheet(sheetName);
             // stopped auto sizing to speed up processing
             //sheet.trackAllColumnsForAutoSizing();
-            LOG.info("Writing table {} to Excel sheet.", sheetName);
+            LOG.info("Writing table {} to workbook sheet.", sheetName);
             writeTableAsExcelSheet(db, tableName, sheet);
         }
-
-        FileOutputStream out = new FileOutputStream(pathToWorkbook.toFile());
-        workbook.write(out);
-        workbook.close();
-        out.close();
-        workbook.dispose();
     }
 
     /**
@@ -249,7 +267,7 @@ public class ExcelUtil {
                                                List<String> tableNames) throws IOException {
 
         XSSFWorkbook workbook = openExistingExcelWorkbook(pathToWorkbook);
-        if (workbook == null){
+        if (workbook == null) {
             throw new IOException("There was a problem opening the workbook!");
         }
         LOG.info("Writing workbook {} to database {}", pathToWorkbook, db.getLabel());
@@ -259,14 +277,15 @@ public class ExcelUtil {
         LOG.info("Completed writing workbook {} to database {}", pathToWorkbook, db.getLabel());
     }
 
-    /** IO exceptions are squelched in this method.  If there is a problem, then null is returned.
+    /**
+     * IO exceptions are squelched in this method.  If there is a problem, then null is returned.
      * Opens an Apache POI XSSFWorkbook instance. The user is responsible for closing the workbook
      * when done.
      *
      * @param pathToWorkbook the path to a valid Excel xlsx workbook
      * @return an Apache POI XSSFWorkbook or null if there was a problem opening the workbook.
      */
-    public static XSSFWorkbook openExistingExcelWorkbook(Path pathToWorkbook){
+    public static XSSFWorkbook openExistingExcelWorkbook(Path pathToWorkbook) {
         if (pathToWorkbook == null) {
             throw new IllegalArgumentException("The path to the workbook was null");
         }
@@ -283,7 +302,7 @@ public class ExcelUtil {
         XSSFWorkbook wb = null;
         try {
             wb = new XSSFWorkbook(pkg);
-            LOG.info("Opened workbook at: {}",pathToWorkbook);
+            LOG.info("Opened workbook at: {}", pathToWorkbook);
         } catch (IOException e) {
             LOG.error("There was an IO error when trying to open the workbook at: {}", pathToWorkbook);
         }
@@ -443,7 +462,7 @@ public class ExcelUtil {
      * The number of columns is determined by assuming that the first row contains
      * the CSV header. If the sheet has no columns, then an exception is thrown.
      *
-     * @param sheet     the sheet to write, must not be null
+     * @param sheet         the sheet to write, must not be null
      * @param pathToCSVFile a Path to the file to write as csv, must not be null
      * @throws IOException an IO exception
      */
@@ -815,7 +834,7 @@ public class ExcelUtil {
             return;
         }
         Result<Record> records = db.selectAll(tableName);
-        if (records == null){
+        if (records == null) {
             LOG.warn("The supplied table name {} resulted in a null Result<Record> nothing was written", tableName);
             return;
         }
@@ -827,9 +846,9 @@ public class ExcelUtil {
      * the sheet.
      *
      * @param records the records from a select query, must not be null
-     * @param sheet the Excel sheet to write to, must not be null
+     * @param sheet   the Excel sheet to write to, must not be null
      */
-    public static void writeResultRecordsAsExcelSheet(Result<Record> records, Sheet sheet){
+    public static void writeResultRecordsAsExcelSheet(Result<Record> records, Sheet sheet) {
         Objects.requireNonNull(records, "The Result records must not be null");
         Objects.requireNonNull(sheet, "The workbook sheet must not be null");
         Field[] fields = records.fields();
@@ -838,7 +857,7 @@ public class ExcelUtil {
         for (Field field : fields) {
             Cell cell = header.createCell(i);
             cell.setCellValue(field.getName());
-            sheet.setColumnWidth(i, (field.getName().length()+2)*256);
+            sheet.setColumnWidth(i, (field.getName().length() + 2) * 256);
             i++;
         }
         int rowCnt = 1;
@@ -846,6 +865,51 @@ public class ExcelUtil {
             Row row = sheet.createRow(rowCnt);
             writeRecordToSheet(record, row);
             rowCnt++;
+        }
+    }
+
+    /**
+     * Writes the contents from a Tablesaw Table to the Excel sheet. Includes the column names as the first row of
+     * the sheet.
+     *
+     * @param table the Tablesaw Table, must not be null
+     * @param sheet the Excel sheet to write to, must not be null
+     */
+    public static void writeTablesawTableAsExcelSheet(tech.tablesaw.api.Table table, Sheet sheet) {
+        Objects.requireNonNull(table, "The Tablesaw table must not be null");
+        Objects.requireNonNull(sheet, "The workbook sheet must not be null");
+
+        List<String> columnNames = table.columnNames();
+        Row header = sheet.createRow(0);
+        int i = 0;
+        for (String name : columnNames) {
+            Cell cell = header.createCell(i);
+            cell.setCellValue(name);
+            sheet.setColumnWidth(i, (name.length() + 2) * 256);
+            i++;
+        }
+        Iterator<tech.tablesaw.api.Row> rowIterator = table.iterator();
+        int rowCnt = 1;
+        while (rowIterator.hasNext()) {
+            Row excelRow = sheet.createRow(rowCnt);
+            writeTablesawRowToSheet(rowIterator.next(), excelRow);
+            rowCnt++;
+        }
+    }
+
+    /**
+     * Writes a single row from a Tablesaw Table to a row in an Excel Sheet
+     *
+     * @param tableRow the Tablesaw row to get the data, must not be null
+     * @param excelRow the Excel row, must not be null
+     */
+    public static void writeTablesawRowToSheet(tech.tablesaw.api.Row tableRow, Row excelRow) {
+        Objects.requireNonNull(tableRow, "The supplied Tablesaq Row must not be null");
+        Objects.requireNonNull(excelRow, "The supplied Excel Row must not be null");
+        int columnCount = tableRow.columnCount();
+        for (int c = 0; c < columnCount; c++) {
+            Cell cell = excelRow.createCell(c);
+            writeCell(cell, tableRow.getObject(c));
         }
     }
 

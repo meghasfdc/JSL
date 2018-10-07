@@ -282,8 +282,8 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 //        JSLDatabase jslDatabase = JSLDatabase.getPostgresLocalHostJSLDatabase(sim,
 //                true, "test", "test", "test");
 
-        JSLDatabase jslDatabase = JSLDatabase.createPostgresLocalHostJSLDatabase(sim,
-                true, "test", "test", "test");
+//        JSLDatabase jslDatabase = JSLDatabase.createPostgresLocalHostJSLDatabase(sim,
+//                true, "test", "test", "test");
 
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(sim.getModel());
