@@ -121,8 +121,8 @@ public class DbCreateTask {
         sb.append(System.lineSeparator());
         sb.append("Full Creation Script Commands=").append(!myCreationScriptCommands.isEmpty());
         sb.append(System.lineSeparator());
-        sb.append(System.lineSeparator());
         sb.append("Tables script=").append(pathToTablesScript);
+        sb.append(System.lineSeparator());
         sb.append("Table Commands=").append(!myTableCommands.isEmpty());
         sb.append(System.lineSeparator());
         sb.append("Insert script=").append(pathToInsertScript);
