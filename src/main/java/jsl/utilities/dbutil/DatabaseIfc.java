@@ -1004,6 +1004,66 @@ public interface DatabaseIfc {
         }
     }
 
+    /** Drops the named schema from the database. If no such schema exist with the name, then nothing is done.
+     *
+     * @param schemaName the name of the schema to drop, must not be null
+     * @param tableNames the table names in the order that they must be dropped, must not be null
+     * @param viewNames the view names in the order that they must be dropped, must not be null
+     */
+    default void dropSchema(String schemaName, List<String> tableNames, List<String> viewNames){
+        Objects.requireNonNull(schemaName, "The schema name cannot be null");
+        Objects.requireNonNull(tableNames, "The list of table names cannot be null");
+        Objects.requireNonNull(viewNames, "The list of view names cannot be null");
+        if (containsSchema(schemaName)) {
+            // need to delete the schema and any tables/data
+            Schema schema = getSchema(schemaName);
+            DatabaseIfc.LOG.debug("The database {} contains the JSL schema {}", getLabel(), schema.getName());
+            DatabaseIfc.LOG.debug("Attempting to drop the schema {}....", schema.getName());
+
+            //first drop any views, then the tables
+            org.jooq.Table<?> table = null;
+            List<org.jooq.Table<?>> tables = schema.getTables();
+            DatabaseIfc.LOG.debug("Schema {} has jooq tables or views ... ", schema.getName());
+            for (org.jooq.Table<?> t : tables) {
+                DatabaseIfc.LOG.debug("table or view: {}", t.getName());
+            }
+            for (String name : viewNames) {
+                if (name == null){
+                    continue;
+                }
+                DatabaseIfc.LOG.debug("Checking for view {} ", name);
+                table = getTable(schema, name);
+                if (table != null) {
+                    getDSLContext().dropView(table).execute();
+                    DatabaseIfc.LOG.debug("Dropped view {} ", table.getName());
+                }
+            }
+            for (String name : tableNames) {
+                if (name == null){
+                    continue;
+                }
+                DatabaseIfc.LOG.debug("Checking for table {} ", name);
+                table = getTable(schema, name);
+                if (table != null) {
+                    getDSLContext().dropTable(table).execute();
+                    DatabaseIfc.LOG.debug("Dropped table {} ", table.getName());
+                }
+            }
+            getDSLContext().dropSchema(schema.getName()).execute(); // works
+            //db.getDSLContext().dropSchema(schema).execute(); // doesn't work
+            // db.getDSLContext().execute("drop schema jsl_db restrict"); //works
+            //boolean exec = db.executeCommand("drop schema jsl_db restrict");
+            DatabaseIfc.LOG.debug("Completed the dropping of the schema {}", schema.getName());
+        } else {
+            DatabaseIfc.LOG.debug("The database {} does not contain the schema {}", getLabel(), schemaName);
+            List<Schema> schemas = getDSLContext().meta().getSchemas();
+            DatabaseIfc.LOG.debug("The database {} has the following schemas", getLabel());
+            for (Schema s : schemas) {
+                DatabaseIfc.LOG.debug("schema: {}", s.getName());
+            }
+        }
+    }
+
     //TODO it cannot find org.jooq.util.ddl.DDLDatabase
 //    /** Runs jooq code generation based solely on a database creation script. Creates an in memory database, runs
 //     * the generation process, and places the generated code in the specified target package name and directory

@@ -406,48 +406,7 @@ public class JSLDatabase {
      * @param db the database to do the dropping action
      */
     public static void dropJSLDbSchema(Database db) {
-        if (db.containsSchema(getJSLSchemaName())) {
-            // need to delete the schema and any tables/data
-            Schema schema = db.getSchema(getJSLSchemaName());
-            DatabaseIfc.LOG.debug("The database {} contains the JSL schema {}", db.getLabel(), schema.getName());
-            DatabaseIfc.LOG.debug("Attempting to drop the schema {}....", schema.getName());
-
-            //first drop any views, then the tables
-            org.jooq.Table<?> table = null;
-            List<org.jooq.Table<?>> tables = schema.getTables();
-            DatabaseIfc.LOG.debug("Schema {} has jooq tables or views ... ", schema.getName());
-            for (org.jooq.Table<?> t : tables) {
-                DatabaseIfc.LOG.debug("table or view: {}", t.getName());
-            }
-            for (String name : JSLViewNames) {
-                DatabaseIfc.LOG.debug("Checking for view {} ", name);
-                table = db.getTable(schema, name);
-                if (table != null) {
-                    db.getDSLContext().dropView(table).execute();
-                    DatabaseIfc.LOG.debug("Dropped view {} ", table.getName());
-                }
-            }
-            for (String name : JSLTableNames) {
-                DatabaseIfc.LOG.debug("Checking for table {} ", name);
-                table = db.getTable(schema, name);
-                if (table != null) {
-                    db.getDSLContext().dropTable(table).execute();
-                    DatabaseIfc.LOG.debug("Dropped table {} ", table.getName());
-                }
-            }
-            db.getDSLContext().dropSchema(schema.getName()).execute(); // works
-            //db.getDSLContext().dropSchema(schema).execute(); // doesn't work
-            // db.getDSLContext().execute("drop schema jsl_db restrict"); //works
-            //boolean exec = db.executeCommand("drop schema jsl_db restrict");
-            DatabaseIfc.LOG.debug("Completed the dropping of the JSL schema {}", schema.getName());
-        } else {
-            DatabaseIfc.LOG.debug("The database {} does not contain the JSL schema {}", db.getLabel(), getJSLSchemaName());
-            List<Schema> schemas = db.getDSLContext().meta().getSchemas();
-            DatabaseIfc.LOG.debug("The database {} has the following schemas", db.getLabel());
-            for (Schema s : schemas) {
-                DatabaseIfc.LOG.debug("schema: {}", s.getName());
-            }
-        }
+        db.dropSchema(getJSLSchemaName(), JSLTableNames, JSLViewNames);
     }
 
     /**
