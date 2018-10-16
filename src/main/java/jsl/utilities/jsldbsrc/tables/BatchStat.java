@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BatchStat extends TableImpl<BatchStatRecord> {
 
-    private static final long serialVersionUID = -1692867710;
+    private static final long serialVersionUID = -6164014;
 
     /**
      * The reference instance of <code>JSL_DB.BATCH_STAT</code>
@@ -268,7 +268,7 @@ public class BatchStat extends TableImpl<BatchStatRecord> {
      */
     @Override
     public UniqueKey<BatchStatRecord> getPrimaryKey() {
-        return Keys.SQL180815113710430;
+        return Keys.SQL181016084244730;
     }
 
     /**
@@ -276,7 +276,7 @@ public class BatchStat extends TableImpl<BatchStatRecord> {
      */
     @Override
     public List<UniqueKey<BatchStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<BatchStatRecord>>asList(Keys.SQL180815113710430);
+        return Arrays.<UniqueKey<BatchStatRecord>>asList(Keys.SQL181016084244730);
     }
 
     /**
