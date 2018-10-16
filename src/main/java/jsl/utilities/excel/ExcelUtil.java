@@ -24,6 +24,8 @@ package jsl.utilities.excel;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import jsl.utilities.dbutil.DatabaseIfc;
+import jsl.utilities.dbutil.DbCreateTask;
+import jsl.utilities.math.JSLMath;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -47,6 +49,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import tech.tablesaw.columns.Column;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
@@ -888,30 +891,67 @@ public class ExcelUtil {
             sheet.setColumnWidth(i, (name.length() + 2) * 256);
             i++;
         }
-        Iterator<tech.tablesaw.api.Row> rowIterator = table.iterator();
+        // make all of the rows and their cells
+        int nCols = columnNames.size();
+        int nRows = getMaxColumnSize(table);
+        Cell[][] cells = new Cell[nRows][nCols];
         int rowCnt = 1;
-        while (rowIterator.hasNext()) {
+        // this makes cells even if the cell might not hold data
+        for (int r = 0; r < nRows; r++) {
             Row excelRow = sheet.createRow(rowCnt);
-            writeTablesawRowToSheet(rowIterator.next(), excelRow);
+            for (int c = 0; c < nCols; c++) {
+                cells[r][c] = excelRow.createCell(c);
+            }
             rowCnt++;
+        }
+        // now fill the cells from the rows of the columns of the table
+        for (int c = 0; c < nCols; c++) {
+            for (int r = 0; r < table.column(c).size(); r++) {
+                writeCell(cells[r][c], table.column(c).get(r));
+            }
         }
     }
 
     /**
-     * Writes a single row from a Tablesaw Table to a row in an Excel Sheet
-     *
-     * @param tableRow the Tablesaw row to get the data, must not be null
-     * @param excelRow the Excel row, must not be null
+     * @param table the Tablesaw Table, must not be null
+     * @return the sizes of all of the columns of the table (i.e. the number of elements in each column) as an array
      */
-    public static void writeTablesawRowToSheet(tech.tablesaw.api.Row tableRow, Row excelRow) {
-        Objects.requireNonNull(tableRow, "The supplied Tablesaq Row must not be null");
-        Objects.requireNonNull(excelRow, "The supplied Excel Row must not be null");
-        int columnCount = tableRow.columnCount();
-        for (int c = 0; c < columnCount; c++) {
-            Cell cell = excelRow.createCell(c);
-            writeCell(cell, tableRow.getObject(c));
+    public static int[] getColumnSizes(tech.tablesaw.api.Table table) {
+        Objects.requireNonNull(table, "The Tablesaw table must not be null");
+        List<Column<?>> columns = table.columns();
+        int[] sizes = new int[columns.size()];
+        int i = 0;
+        for (Column c : columns) {
+            sizes[i] = c.size();
+            i++;
         }
+        return sizes;
     }
+
+    /**
+     * @param table the Tablesaw Table, must not be null
+     * @return the size of the column that has the most elements
+     */
+    public static int getMaxColumnSize(tech.tablesaw.api.Table table) {
+        return JSLMath.getMax(getColumnSizes(table));
+    }
+
+    // removed because Tablesaw columns may have a differing number of rows within a table
+//    /**
+//     * Writes a single row from a Tablesaw Table to a row in an Excel Sheet
+//     *
+//     * @param tableRow the Tablesaw row to get the data, must not be null
+//     * @param excelRow the Excel row, must not be null
+//     */
+//    public static void writeTablesawRowToSheet(tech.tablesaw.api.Row tableRow, Row excelRow) {
+//        Objects.requireNonNull(tableRow, "The supplied Tablesaq Row must not be null");
+//        Objects.requireNonNull(excelRow, "The supplied Excel Row must not be null");
+//        int columnCount = tableRow.columnCount();
+//        for (int c = 0; c < columnCount; c++) {
+//            Cell cell = excelRow.createCell(c);
+//            writeCell(cell, tableRow.getObject(c));
+//        }
+//    }
 
     /**
      * Writes a single row from the ResultSet to a row in an Excel Sheet
