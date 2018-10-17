@@ -912,6 +912,24 @@ public class ExcelUtil {
         }
     }
 
+    /** Starts as the last row number of the sheet and looks up in the column to find the first non-null cell
+     *
+     * @param sheet the sheet holding the column, must not be null
+     * @param columnIndex the column index, must be 0 or greater, since POI is 0 based columns
+     * @return the number of rows that have data in the particular column as defined by not having
+     * a null cell.
+     */
+    public static int getColumnSize(Sheet sheet, int columnIndex){
+        Objects.requireNonNull(sheet, "The workbook sheet must not be null");
+
+        int lastRow = sheet.getLastRowNum();
+        while (lastRow >= 0 && sheet.getRow(lastRow).getCell(columnIndex) == null) {
+            lastRow--;
+        }
+        int columnSize = lastRow + 1;
+        return columnSize;
+    }
+
     /**
      * @param table the Tablesaw Table, must not be null
      * @return the sizes of all of the columns of the table (i.e. the number of elements in each column) as an array

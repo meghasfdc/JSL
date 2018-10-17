@@ -17,21 +17,25 @@ public class DatabaseFactoryTest {
 
     public static void main(String[] args) throws IOException {
 
-       // testDerbyLocalHost();
-       // testDataSourceConnection();
-       // testParsing();
-   //     testDatabaseCreation();
+        // testDerbyLocalHost();
+        // testDataSourceConnection();
+        // testParsing();
+        //     testDatabaseCreation();
         //testDerbyEmbeddedExisting();
- //       testExcelDbExport();
-  //      testExcelDbImport();
+        //       testExcelDbExport();
+        //      testExcelDbImport();
 
- //       metaDataTest();
+        //       metaDataTest();
 
-       // testPostgresLocalHost();
-        testPostgresLocalHostJSLDb();
+        // testPostgresLocalHost();
+        //testPostgresLocalHostJSLDb();
+
+//        testEmbeddedDerbyPropertiesFile();
+
+        testPostgresPropertiesFile();
     }
 
-    public static void testDataSourceConnection(){
+    public static void testDataSourceConnection() {
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
         String name = path.toAbsolutePath().toString();
 //        DataSource dataSource = DataSourceFactory.createClientDerbyDataSourceWithLocalHost(name,
@@ -46,7 +50,33 @@ public class DatabaseFactoryTest {
         }
 
     }
-    public static void testDerbyLocalHost(){
+
+    public static void testEmbeddedDerbyPropertiesFile(){
+        Path path = JSLDatabase.dbScriptsDir.resolve("embeddedDerbyDB.properties");
+
+        DataSource dataSource = DatabaseFactory.getDataSource(path);
+
+        System.out.println(dataSource);
+
+        DatabaseIfc testDb = new Database("SPDatabase", dataSource, SQLDialect.DERBY);
+
+        testDb.printAllTablesAsText("APP");
+    }
+
+    public static void testPostgresPropertiesFile(){
+        Path path = JSLDatabase.dbScriptsDir.resolve("postgresDB.properties");
+
+        DataSource dataSource = DatabaseFactory.getDataSource(path);
+
+        System.out.println(dataSource);
+
+        DatabaseIfc testDb = new Database("SPDatabase", dataSource, SQLDialect.POSTGRES);
+
+        testDb.printAllTablesAsText("public");
+    }
+
+
+    public static void testDerbyLocalHost() {
         //note the server must be started for this to work
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
         String name = path.toAbsolutePath().toString();
@@ -57,14 +87,14 @@ public class DatabaseFactoryTest {
 
         List<String> jsl_db = db.getTableNames("JSL_DB");
 
-        for(String s: jsl_db){
+        for (String s : jsl_db) {
             System.out.println(s);
         }
         System.out.println();
         db.printTableAsText("ACROSS_REP_STAT");
     }
 
-    public static void testPostgresLocalHost(){
+    public static void testPostgresLocalHost() {
         String dbName = "test";
         String user = "test";
         String pw = "test";
@@ -79,7 +109,7 @@ public class DatabaseFactoryTest {
         db.printTableAsText("s");
     }
 
-    public static void testPostgresLocalHostJSLDb(){
+    public static void testPostgresLocalHostJSLDb() {
         String dbName = "test";
         String user = "test";
         String pw = "test";
@@ -103,12 +133,12 @@ public class DatabaseFactoryTest {
         db.executeScript(pathToCreationScript);
         List<String> jsl_db = db.getTableNames("JSL_DB");
 
-        for(String s: jsl_db){
+        for (String s : jsl_db) {
             System.out.println(s);
         }
     }
 
-    public static void testDerbyEmbeddedExisting(){
+    public static void testDerbyEmbeddedExisting() {
         Path path = JSLDatabase.dbDir.resolve("JSLDb_DLB_with_Q");
         DatabaseIfc db = DatabaseFactory.getEmbeddedDerbyDatabase("JSLDb_DLB_with_Q");
 //        DataSource dataSource = DatabaseFactory.createEmbeddedDerbyDataSource(path);
@@ -117,7 +147,7 @@ public class DatabaseFactoryTest {
 
         List<String> jsl_db = db.getTableNames("JSL_DB");
 
-        for(String s: jsl_db){
+        for (String s : jsl_db) {
             System.out.println(s);
         }
         db.printTableAsText("ACROSS_REP_STAT");
@@ -131,7 +161,7 @@ public class DatabaseFactoryTest {
         List<String> lines = DatabaseIfc.parseQueriesInSQLScript(pathToCreationScript);
         //List<String> lines = Files.readAllLines(pathToCreationScript, StandardCharsets.UTF_8);
         StringBuilder sb = new StringBuilder();
-        for(String s: lines){
+        for (String s : lines) {
             sb.append(s).append(";").append(System.lineSeparator());
         }
 //        System.out.println(sb);
@@ -139,7 +169,7 @@ public class DatabaseFactoryTest {
         Iterator<Query> iterator = queries.iterator();
 
         int i = 1;
-        for(String s: lines){
+        for (String s : lines) {
             System.out.println("Line " + i);
             System.out.print("Original:    ");
             System.out.println(s);
@@ -161,7 +191,7 @@ public class DatabaseFactoryTest {
         // queries.executeBatch();
     }
 
-    public static void testDatabaseCreation(){
+    public static void testDatabaseCreation() {
         Path path = JSLDatabase.dbDir.resolve("TestCreationTaskDb");
         String name = path.toAbsolutePath().toString();
         // just create it
@@ -222,14 +252,14 @@ public class DatabaseFactoryTest {
         db.printAllTablesAsText("APP");
     }
 
-    public static void metaDataTest(){
+    public static void metaDataTest() {
 
         DatabaseIfc sp = DatabaseFactory.getEmbeddedDerbyDatabase("SP");
         Meta meta = sp.getDSLContext().meta();
 
         System.out.println("The catalogs are:");
         List<Catalog> catalogs = meta.getCatalogs();
-        for(Catalog c: catalogs){
+        for (Catalog c : catalogs) {
             System.out.println(c);
         }
         List<Schema> schemas = meta.getSchemas();

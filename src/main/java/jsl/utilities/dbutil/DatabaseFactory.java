@@ -289,6 +289,18 @@ public class DatabaseFactory {
     }
 
     /**
+     *
+     * @param pathToPropertiesFile must not be null
+     * @return a DataSource for making a database
+     */
+    public static DataSource getDataSource(Path pathToPropertiesFile){
+        Objects.requireNonNull(pathToPropertiesFile, "The properties file path must not be null");
+        HikariConfig config = new HikariConfig(pathToPropertiesFile.toString());
+        HikariDataSource ds = new HikariDataSource(config);
+        return ds;
+    }
+
+    /**
      * Duplicates the database into a new database with the supplied name and directory.
      * Assumes that the source database has no active connections and performs a file system copy
      *
