@@ -900,7 +900,7 @@ public class ExcelUtil {
         for (int r = 0; r < nRows; r++) {
             Row excelRow = sheet.createRow(rowCnt);
             for (int c = 0; c < nCols; c++) {
-                cells[r][c] = excelRow.createCell(c);
+                cells[r][c] = excelRow.createCell(c, CellType.BLANK);
             }
             rowCnt++;
         }
@@ -923,11 +923,28 @@ public class ExcelUtil {
         Objects.requireNonNull(sheet, "The workbook sheet must not be null");
 
         int lastRow = sheet.getLastRowNum();
-        while (lastRow >= 0 && sheet.getRow(lastRow).getCell(columnIndex) == null) {
+        while (lastRow >= 0 && isCellEmpty(sheet.getRow(lastRow).getCell(columnIndex))) {
             lastRow--;
         }
         int columnSize = lastRow + 1;
         return columnSize;
+    }
+
+    /**
+     *
+     * @param cell the cell to check
+     * @return true if it null or blank or string and empty
+     */
+    public static boolean isCellEmpty(final Cell cell) {
+        if (cell == null || cell.getCellTypeEnum() == CellType.BLANK) {
+            return true;
+        }
+
+        if (cell.getCellTypeEnum() == CellType.STRING && cell.getStringCellValue().isEmpty()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
