@@ -19,6 +19,12 @@ package jsl.utilities.statistic;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/** A statistical run is a sequence of objects that are determined equal based on
+ *  a comparator.  A single item is a run of length 1.  A set of items that are all the
+ *  same are considered a single run. The set (0, 1, 1, 1, 0) has 3 runs.
+ *
+ * @param <T> the type of object associated with the statistical run
+ */
 public class StatisticalRun<T> {
 
     private final int myStartingIndex;
