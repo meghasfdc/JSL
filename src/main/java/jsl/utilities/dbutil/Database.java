@@ -17,11 +17,14 @@
 package jsl.utilities.dbutil;
 
 import org.jooq.*;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Objects;
-
+import org.jooq.tools.jdbc.JDBCUtils;
 /**
  * A concrete implementation of the DatabaseIfc interface.
  * <p>
@@ -44,18 +47,46 @@ public class Database implements DatabaseIfc {
     private String myDefaultSchemaName;
     private DSLContext myDSLContext;
 
+    /** Create a Database.  The SQLDialect is guessed based on establishing a connection
+     * with the supplied DataSource. If the dialect cannot be guessed then an exception will occur.
+     * This can be checked prior to the call by using:
+     *
+     *  <a href= "https://www.jooq.org/javadoc/latest/org/jooq/tools/jdbc/JDBCUtils.html#dialect-java.sql.Connection-"> Reference to JDBCUtils</a>
+     *
+     * @param dbLabel    a string representing a label for the database must not be null. This label
+     *                   may or may not have any relation to the actual name of the database. This is
+     *                   used for labeling purposes.
+     * @param dataSource the DataSource backing the database, must not be null
+     */
+    public Database(String dbLabel, DataSource dataSource) {
+        this(dbLabel, dataSource, null);
+    }
+
     /**
      * @param dbLabel    a string representing a label for the database must not be null. This label
      *                   may or may not have any relation to the actual name of the database. This is
      *                   used for labeling purposes.
      * @param dataSource the DataSource backing the database, must not be null
-     * @param dialect    the SLQ dialect for this type of database, must not null, it obviously must
+     * @param dialect    the SLQ dialect for this type of database. It obviously must
      *                   be consistent with the database referenced by the connection
      */
     public Database(String dbLabel, DataSource dataSource, SQLDialect dialect) {
         Objects.requireNonNull(dbLabel, "The database name was null");
         Objects.requireNonNull(dataSource, "The database source was null");
-        Objects.requireNonNull(dialect, "The database dialect was null");
+        if (dialect == null){
+            try {
+                Connection connection = dataSource.getConnection();
+                dialect = JDBCUtils.dialect(connection);
+                connection.close();
+                if (dialect == SQLDialect.DEFAULT){
+                    dialect = null;
+                }
+                Objects.requireNonNull(dialect, "The database dialect was null");
+            } catch (SQLException e) {
+                LOG.error("Could not establish connection to database {} to determine SQLDialect", dbLabel);
+                throw new DataAccessException("Could not establish database connection to determine SQLDialect");
+            }
+        }
         myLabel = dbLabel;
         myDataSource = dataSource;
         mySQLDialect = dialect;

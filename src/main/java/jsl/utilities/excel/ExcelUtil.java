@@ -198,7 +198,6 @@ public class ExcelUtil {
      * @param db         the database to read data from, must not be null
      * @param tableNames the list of names of tables in the database to write to the workbook, must not be null
      * @param workbook   the workbook to fill, must not be null
-     * @return the workbook that was created, it may be empty
      */
     public static void fillWorkbookFromDatabase(DatabaseIfc db, List<String> tableNames, Workbook workbook) {
         Objects.requireNonNull(db, "The supplied Workbook reference was null");

@@ -23,6 +23,7 @@ import org.jooq.util.GenerationTool;
 import org.jooq.util.jaxb.Generator;
 import org.jooq.util.jaxb.Property;
 import org.jooq.util.jaxb.Target;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
