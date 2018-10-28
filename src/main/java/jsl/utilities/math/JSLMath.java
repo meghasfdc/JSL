@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import jsl.utilities.random.distributions.Gamma;
+import jsl.utilities.statistic.Statistic;
 
 /**
  * This class implements additional mathematical functions and determines the
@@ -166,9 +167,9 @@ public final class JSLMath {
      * between them is less than the default numerical precision. This value has
      * been defined as the square root of the machine precision
      *
-     * @return
+     * @return the default numerical precision
      */
-    public final static double getDefaultNumericalPrecision() {
+    public static double getDefaultNumericalPrecision() {
         if (defaultNumericalPrecision == 0) {
             defaultNumericalPrecision = Math.sqrt(getMachinePrecision());
         }
@@ -181,9 +182,9 @@ public final class JSLMath {
      * and thus a change will change it for any algorithm that depends on this
      * constant
      *
-     * @return
+     * @return the maximum number of iterations
      */
-    public final static int getMaxNumIterations() {
+    public static int getMaxNumIterations() {
         return (maxNumIterations);
     }
 
@@ -193,11 +194,11 @@ public final class JSLMath {
      * and thus a change will change it for any algorithm that depends on this
      * constant
      *
-     * @param iterations
+     * @param iterations the number of iterations
      */
-    public final static void setMaxNumIterations(int iterations) {
+    public static void setMaxNumIterations(int iterations) {
         if (iterations <= 0) {
-            throw new IllegalArgumentException("The number of iterations must be > 0, recommeded at least 100.");
+            throw new IllegalArgumentException("The number of iterations must be > 0, recommended at least 100.");
         }
         maxNumIterations = iterations;
     }
@@ -211,7 +212,7 @@ public final class JSLMath {
      * @return boolean    true if the difference between a and b is less than the
      * default numerical precision
      */
-    public final static boolean equal(double a, double b) {
+    public static boolean equal(double a, double b) {
         return equal(a, b, getDefaultNumericalPrecision());
     }
 
@@ -225,7 +226,7 @@ public final class JSLMath {
      * @return boolean    true if the relative difference between a and b is less
      * than precision
      */
-    public final static boolean equal(double a, double b, double precision) {
+    public static boolean equal(double a, double b, double precision) {
         double norm = Math.max(Math.abs(a), Math.abs(b));
         return norm < precision || Math.abs(a - b) < precision * norm;
     }
@@ -233,21 +234,21 @@ public final class JSLMath {
     /**
      * Returns true if Math.abs(a-b) &lt; precision
      *
-     * @param a
-     * @param b
-     * @param precision
-     * @return
+     * @param a the first number
+     * @param b the second number
+     * @param precision the precision to check
+     * @return true if within the precision
      */
-    public final static boolean within(double a, double b, double precision) {
+    public static boolean within(double a, double b, double precision) {
         return Math.abs(a - b) < precision;
     }
 
     /**
      * Computes the largest exponent argument
      *
-     * @return
+     * @return the largest exponent argument
      */
-    public final static double getLargestExponentialArgument() {
+    public static double getLargestExponentialArgument() {
         if (largestExponentialArgument == 0) {
             largestExponentialArgument = Math.log(getLargestNumber());
         }
@@ -257,9 +258,9 @@ public final class JSLMath {
     /**
      * Computes the smallest exponent argument
      *
-     * @return
+     * @return the smallest exponent argument
      */
-    public final static double getSmallestExponentialArgument() {
+    public static double getSmallestExponentialArgument() {
         if (smallestExponentialArgument == 0) {
             smallestExponentialArgument = Math.log(getSmallestNumber());
             //smallestExponentialArgument = Math.log(getSmallNumber());
@@ -270,9 +271,9 @@ public final class JSLMath {
     /**
      * Gets the largest positive number that can be represented
      *
-     * @return
+     * @return the largest positive number that can be represented
      */
-    public final static double getLargestNumber() {
+    public static double getLargestNumber() {
         if (largestNumber == 0) {
             computeLargestNumber();
         }
@@ -282,9 +283,9 @@ public final class JSLMath {
     /**
      * Gets the largest positive number that when added to 1 yields 1
      *
-     * @return
+     * @return the largest positive number that when added to 1 yields 1
      */
-    public final static double getMachinePrecision() {
+    public static double getMachinePrecision() {
         if (machinePrecision == 0) {
             computeMachinePrecision();
         }
@@ -294,9 +295,9 @@ public final class JSLMath {
     /**
      * Gets the largest positive number that when subtracted from 1 yield 1
      *
-     * @return
+     * @return the largest positive number that when subtracted from 1 yield 1
      */
-    public final static double getNegativeMachinePrecision() {
+    public static double getNegativeMachinePrecision() {
         if (negativeMachinePrecision == 0) {
             computeNegativeMachinePrecision();
         }
@@ -306,9 +307,9 @@ public final class JSLMath {
     /**
      * Gets the radix of the floating point representation
      *
-     * @return
+     * @return the radix of the floating point representation
      */
-    public final static int getRadix() {
+    public static int getRadix() {
         if (radix == 0) {
             computeRadix();
         }
@@ -318,9 +319,9 @@ public final class JSLMath {
     /**
      * Gets the smallest positive number different from 0.0
      *
-     * @return
+     * @return the smallest positive number different from 0.0
      */
-    public final static double getSmallestNumber() {
+    public static double getSmallestNumber() {
         if (smallestNumber == 0) {
             computeSmallestNumber();
         }
@@ -331,9 +332,9 @@ public final class JSLMath {
      * Computes and prints the mathematical precision parameters to the supplied
      * PrintStream
      *
-     * @param printStream
+     * @param printStream the stream to write to
      */
-    public final static void printParameters(PrintStream printStream) {
+    public static void printParameters(PrintStream printStream) {
         printStream.println("\nFloating-point machine parameters");
         printStream.println("---------------------------------");
         printStream.println("radix = " + getRadix());
@@ -354,9 +355,8 @@ public final class JSLMath {
 
     /**
      * Resets the constants. They will be recomputed at next usage
-     * <p>
      */
-    public final static void reset() {
+    public static void reset() {
         defaultNumericalPrecision = 0;
         smallNumber = 0;
         radix = 0;
@@ -374,7 +374,7 @@ public final class JSLMath {
      * @param scale defining the rounding scale
      * @return rounded value
      */
-    public final static double roundTo(double value, double scale) {
+    public static double roundTo(double value, double scale) {
         return Math.round(value / scale) * scale;
     }
 
@@ -386,7 +386,7 @@ public final class JSLMath {
      *                      otherwise double scale is used.
      * @return a number rounded upward to the next scale value.
      */
-    public final static double roundToScale(double value, boolean integerValued) {
+    public static double roundToScale(double value, boolean integerValued) {
         double[] scaleValues;
         int orderOfMagnitude = (int) Math.floor(Math.log(value) / Math.log(10.0));
         if (integerValued) {
@@ -415,9 +415,10 @@ public final class JSLMath {
      * Returns the number that can be added to some value without noticeably
      * changing the result of the computation
      *
-     * @return
+     * @return the number that can be added to some value without noticeably
+     *       changing the result of the computation
      */
-    public final static double getSmallNumber() {
+    public static double getSmallNumber() {
         if (smallNumber == 0) {
             smallNumber = Math.sqrt(getSmallestNumber());
         }
@@ -428,10 +429,10 @@ public final class JSLMath {
      * Get the sign of the number based on the equal() method Equal is 0.0,
      * positive is 1.0, negative is -1.0
      *
-     * @param x
-     * @return
+     * @param x the number
+     * @return the sign of the number
      */
-    public final static double sign(double x) {
+    public static double sign(double x) {
         if (equal(0.0, x)) {
             return (0.0);
         }
@@ -450,7 +451,7 @@ public final class JSLMath {
      * @param n The number to take the factorial of
      * @return The factorial of the number.
      */
-    public final static double factorial(int n) {
+    public static double factorial(int n) {
         if (n < 0) {
             throw new IllegalArgumentException("Argument must be > 0");
         }
@@ -473,9 +474,9 @@ public final class JSLMath {
      *
      * @param n The total number of distinct items
      * @param k The number of subsets
-     * @return
+     * @return the binomial coefficient
      */
-    public static final double binomialCoefficient(int n, int k) {
+    public static double binomialCoefficient(int n, int k) {
         return (Math.floor(0.5 + Math.exp(logFactorial(n) - logFactorial(k) - logFactorial(n - k))));
     }
 
@@ -483,9 +484,9 @@ public final class JSLMath {
      * Computes the natural logarithm of the factorial operator. ln(n!)
      *
      * @param n The value to be operated on.
-     * @return
+     * @return the log of the factorial
      */
-    public static final double logFactorial(int n) {
+    public static double logFactorial(int n) {
         if (n < 0) {
             throw new IllegalArgumentException("Argument must be > 0");
         }
@@ -511,7 +512,7 @@ public final class JSLMath {
      * Returns the index associated with the minimum element in the array For
      * ties, this returns the first found
      *
-     * @param x
+     * @param x the array
      * @return the index associated with the minimum element
      */
     public static int getIndexOfMin(double[] x) {
@@ -527,7 +528,7 @@ public final class JSLMath {
     }
 
     /**
-     * @param x
+     * @param x the array
      * @return the minimum value in the array
      */
     public static double getMin(double[] x) {
@@ -538,7 +539,7 @@ public final class JSLMath {
      * Returns the index associated with the maximum element in the array For
      * ties, this returns the first found
      *
-     * @param x
+     * @param x the array
      * @return the index associated with the maximum element
      */
     public static int getIndexOfMax(double[] x) {
@@ -554,7 +555,7 @@ public final class JSLMath {
     }
 
     /**
-     * @param x
+     * @param x the array
      * @return the maximum value in the array
      */
     public static double getMax(double[] x) {
@@ -565,7 +566,7 @@ public final class JSLMath {
      * Returns the index associated with the minimum element in the array For
      * ties, this returns the first found
      *
-     * @param x
+     * @param x the array
      * @return the index associated with the minimum element
      */
     public static int getIndexOfMin(int[] x) {
@@ -662,7 +663,37 @@ public final class JSLMath {
     }
 
     /**
-     * @param x
+     *
+     * @param array the array to operate on
+     * @return getMax() - getMin()
+     */
+    public static double getRange(double[] array){
+        double max = getMax(array);
+        double min = getMin(array);
+        return max - min;
+    }
+
+    /**
+     * Returns a new array that has been scaled so that the values are between
+     * the minimum and maximum values of the supplied array
+     *
+     * @param array the array to scale, must not be null
+     * @return the scaled array
+     */
+    public static double[] getMinMaxScaledArray(double[] array) {
+        Objects.requireNonNull(array, "The array cannot be null");
+        double max = getMax(array);
+        double min = getMin(array);
+        double range = max - min;
+        double[] x = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            x[i] = (array[i] - min) / range;
+        }
+        return x;
+    }
+
+    /**
+     * @param x the array
      * @return the maximum value in the array
      */
     public static long getMax(long[] x) {
@@ -692,11 +723,11 @@ public final class JSLMath {
         if (index < 0) {
             throw new IllegalArgumentException("The index must be >= 0");
         }
-        if (index > fromA.length - 1) {
-            throw new IllegalArgumentException("The index must be <= fromA.length-1");
-        }
         if (fromA == null) {
             throw new IllegalArgumentException("The fromA array was null.");
+        }
+        if (index > fromA.length - 1) {
+            throw new IllegalArgumentException("The index must be <= fromA.length-1");
         }
         if (toB == null) {
             throw new IllegalArgumentException("The toB array was null.");
@@ -841,7 +872,6 @@ public final class JSLMath {
     /**
      * Returns a list of the elements that are of the same type as the target
      * class.
-     * <p>
      * Usage: getElements(objects, String.class);
      *
      * @param <T>         the type of the element to search for
@@ -855,7 +885,6 @@ public final class JSLMath {
         List<T> stuff = new ArrayList<>();
 
         for (Object obj : objects) {
-
             if (targetClass.isInstance(obj)) {
                 stuff.add((T) obj);
             }
