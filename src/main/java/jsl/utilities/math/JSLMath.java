@@ -15,14 +15,12 @@
  */
 package jsl.utilities.math;
 
+import jsl.utilities.random.distributions.Gamma;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import jsl.utilities.random.distributions.Gamma;
-import jsl.utilities.statistic.Statistic;
 
 /**
  * This class implements additional mathematical functions and determines the
