@@ -24,89 +24,100 @@ import jsl.utilities.reporting.JSL;
 
 public class RNStreamFactory extends Identity {
 
+    //TODO is this default stream necessary? only usefulness appears to be in Constant in distribution package.
     private static RNStreamIfc DEFAULT_RNG;
 
     private static RNStreamFactory DefaultFactory = new RNStreamFactory("Default");
-
-    private RNGStreamManager myStreamManager;
 
     /**
      * A counter to count the number of created streams
      */
     private static int myStreamCounter_ = 0;
 
-    private final double a12 = 1403580.0;
+    private static final double a12 = 1403580.0;
 
-    private final double a13n = 810728.0;
+    private static final double a13n = 810728.0;
 
-    private final double a21 = 527612.0;
+    private static final double a21 = 527612.0;
 
-    private final double a23n = 1370589.0;
+    private static final double a23n = 1370589.0;
 
-    private final double machinePrecision = JSLMath.getMachinePrecision();
+    private static final double machinePrecision = JSLMath.getMachinePrecision();
 
-    private final double norm = 2.328306549295727688e-10;
+    private static final double norm = 2.328306549295727688e-10;
 
-    private final double invtwo24 = 5.9604644775390625e-8;
+    private static final double invtwo24 = 5.9604644775390625e-8;
 
-    private final double InvA1[][] = { // Inverse of A1p0
+    private static final double m1 = 4294967087.0;
+
+    private static final double m2 = 4294944443.0;
+
+    private static final double two17 = 131072.0;
+
+    private static final double two53 = 9007199254740992.0;
+
+    // the array elements are not mutated
+    private static final double InvA1[][] = { // Inverse of A1p0
             {184888585.0, 0.0, 1945170933.0},
             {1.0, 0.0, 0.0},
             {0.0, 1.0, 0.0}
     };
 
-    private final double InvA2[][] = { // Inverse of A2p0
+    // the array elements are not mutated
+    private static final double InvA2[][] = { // Inverse of A2p0
             {0.0, 360363334.0, 4225571728.0},
             {1.0, 0.0, 0.0},
             {0.0, 1.0, 0.0}
     };
 
-    private final double A1p0[][] = {
+    // the array elements are not mutated
+    private static final double A1p0[][] = {
             {0.0, 1.0, 0.0},
             {0.0, 0.0, 1.0},
             {-810728.0, 1403580.0, 0.0}
     };
 
-    private final double A2p0[][] = {
+    // the array elements are not mutated
+    private static final double A2p0[][] = {
             {0.0, 1.0, 0.0},
             {0.0, 0.0, 1.0},
             {-1370589.0, 0.0, 527612.0}
     };
 
-    private final double A1p76[][] = {
+    // the array elements are not mutated
+    private static final double A1p76[][] = {
             {82758667.0, 1871391091.0, 4127413238.0},
             {3672831523.0, 69195019.0, 1871391091.0},
             {3672091415.0, 3528743235.0, 69195019.0}
     };
 
-    private final double A2p76[][] = {
+    // the array elements are not mutated
+    private static final double A2p76[][] = {
             {1511326704.0, 3759209742.0, 1610795712.0},
             {4292754251.0, 1511326704.0, 3889917532.0},
             {3859662829.0, 4292754251.0, 3708466080.0}
     };
 
-    private final double A1p127[][] = {
+    // the array elements are not mutated
+    private static final double A1p127[][] = {
             {2427906178.0, 3580155704.0, 949770784.0},
             {226153695.0, 1230515664.0, 3580155704.0},
             {1988835001.0, 986791581.0, 1230515664.0}
     };
 
-    private final double A2p127[][] = {
+    // the array elements are not mutated
+    private static final double A2p127[][] = {
             {1464411153.0, 277697599.0, 1610723613.0},
             {32183930.0, 1464411153.0, 1022607788.0},
             {2824425944.0, 32183930.0, 2093834863.0}
     };
 
-    private final double m1 = 4294967087.0;
-
-    private final double m2 = 4294944443.0;
-
-    private final double two17 = 131072.0;
-
-    private final double two53 = 9007199254740992.0;
+    private RNGStreamManager myStreamManager;
 
     /**
      * Default seed of the package and seed for the next stream to be created.
+     * This represents the state of the factory. This array changes
+     * as streams are created. Here it is initialized to the default starting point.
      */
     private double nextSeed[] = {12345, 12345, 12345, 12345, 12345, 12345};
 
@@ -244,23 +255,23 @@ public class RNStreamFactory extends Identity {
         return sb.toString();
     }
 
-    /* Compute (a*s + c) MOD m ; m must be < 2^35 */
-    /* Works also for s, c < 0.                   */
-    private double multModM(double a, double s, double c, double m) {
-        double v;
+    /* Compute (a*s + c) MOD m ; m must be less than 2^35
+     * Works also for s, c less than 0.                   */
+    private static double multModM(double a, double s, double c, double m) {
         int a1;
-        v = a * s + c;
+        double v = a * s + c;
         if (v >= two53 || v <= -two53) {
             a1 = (int) (a / two17);
-            a -= a1 * two17;
+            double a0 = a - a1 * two17;
             v = a1 * s;
             a1 = (int) (v / m);
             v -= a1 * m;
-            v = v * two17 + a * s + c;
+            v = v * two17 + a0 * s + c;
         }
         a1 = (int) (v / m);
-        if ((v -= a1 * m) < 0.0) {
-            return v += m;
+        v = v - a1 * m;
+        if (v < 0.0) {
+            return v + m;
         } else {
             return v;
         }
@@ -268,24 +279,27 @@ public class RNStreamFactory extends Identity {
 
     /* Returns v = A*s MOD m.  Assumes that -m < s[i] < m. */
     /* Works even if v = s.                                */
-    private void matVecModM(double A[][], double s[], double v[], double m) {
-        int i;
+    //TODO this method mutates the array v
+    // A, s, m are unchanged
+    private static void matVecModM(double A[][], double s[], double v[], double m) {
         double x[] = new double[3];
-        for (i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             x[i] = multModM(A[i][0], s[0], 0.0, m);
             x[i] = multModM(A[i][1], s[1], x[i], m);
             x[i] = multModM(A[i][2], s[2], x[i], m);
         }
-        for (i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             v[i] = x[i];
         }
     }
 
     /* Returns C = A*B MOD m */
     /* Note: work even if A = C or B = C or A = B = C.         */
-    private void matMatModM(double A[][], double B[][], double C[][], double m) {
+    // A is not mutated, B is not mutated, C is mutated
+    private static void matMatModM(double A[][], double B[][], double C[][], double m) {
         int i, j;
-        double V[] = new double[3], W[][] = new double[3][3];
+        double V[] = new double[3];
+        double W[][] = new double[3][3];
         for (i = 0; i < 3; ++i) {
             for (j = 0; j < 3; ++j) {
                 V[j] = B[j][i];
@@ -303,7 +317,8 @@ public class RNStreamFactory extends Identity {
     }
 
     /* Compute matrix B = (A^(2^e) Mod m);  works even if A = B */
-    private void matTwoPowModM(double A[][], double B[][], double m, int e) {
+    // A is copied to B, B is mutated
+    private static void matTwoPowModM(double A[][], double B[][], double m, int e) {
         int i, j;
         /* initialize: B = A */
         if (A != B) {
@@ -320,7 +335,8 @@ public class RNStreamFactory extends Identity {
     }
 
     /* Compute matrix D = A^c Mod m ;  works even if A = B */
-    private void matPowModM(double A[][], double B[][], double m, int c) {
+    // A is copied to W, W is used to compute B, B is mutated
+    private static void matPowModM(double A[][], double B[][], double m, int c) {
         int i, j;
         int n = c;
         double W[][] = new double[3][3];
@@ -473,7 +489,7 @@ public class RNStreamFactory extends Identity {
         return true;                     // SUCCESS
     }
 
-    private int CheckSeed(long seed[]) {
+    private static int CheckSeed(long seed[]) {
         /* Check that the seeds are legitimate values. Returns 0 if legal seeds,
         -1 otherwise. */
         int i;
