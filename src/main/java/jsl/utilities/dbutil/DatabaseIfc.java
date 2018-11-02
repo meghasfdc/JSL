@@ -19,6 +19,8 @@ package jsl.utilities.dbutil;
 import jsl.utilities.excel.ExcelUtil;
 import jsl.utilities.reporting.JSL;
 import org.jooq.*;
+import org.jooq.exception.DataAccessException;
+import org.jooq.tools.jdbc.JDBCUtils;
 import org.jooq.util.GenerationTool;
 import org.jooq.util.jaxb.Generator;
 import org.jooq.util.jaxb.Property;
@@ -36,6 +38,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,8 +119,9 @@ public interface DatabaseIfc {
         return getDSLContext().settings().isExecuteLogging();
     }
 
-    /** It is best to use this method within a try-with-resource construct
-     *  This method calls the DataSource for a connection. You are responsible for closing the connection.
+    /**
+     * It is best to use this method within a try-with-resource construct
+     * This method calls the DataSource for a connection. You are responsible for closing the connection.
      *
      * @return a connection to the database
      */
@@ -182,11 +186,13 @@ public interface DatabaseIfc {
         return schemas.contains(schema);
     }
 
-    /** The name of the schema is first checked for an exact lexicographical match.
-     *  If a match occurs, the schema is returned.  If a lexicographical match fails,
-     *  then a check for a match ignoring the case of the string is performed.
-     *  This is done because SQL identifier names should be case insensitive.
-     *  If neither matches then null is returned.
+    /**
+     * The name of the schema is first checked for an exact lexicographical match.
+     * If a match occurs, the schema is returned.  If a lexicographical match fails,
+     * then a check for a match ignoring the case of the string is performed.
+     * This is done because SQL identifier names should be case insensitive.
+     * If neither matches then null is returned.
+     *
      * @param schemaName the schema name to find
      * @return the jooq schema for the name or null
      */
@@ -198,7 +204,7 @@ public interface DatabaseIfc {
         for (Schema s : schemas) {
             if (s.getName().equals(schemaName)) {
                 return s;
-            } else if (s.getName().equalsIgnoreCase(schemaName)){
+            } else if (s.getName().equalsIgnoreCase(schemaName)) {
                 return s;
             }
         }
@@ -224,11 +230,12 @@ public interface DatabaseIfc {
         return getTable(tableName) != null;
     }
 
-    /** The name of the table is first checked for an exact lexicographical match.
-     *  If a match occurs, the table is returned.  If a lexicographical match fails,
-     *  then a check for a match ignoring the case of the string is performed.
-     *  This is done because SQL identifier names should be case insensitive.
-     *  If neither matches then null is returned.
+    /**
+     * The name of the table is first checked for an exact lexicographical match.
+     * If a match occurs, the table is returned.  If a lexicographical match fails,
+     * then a check for a match ignoring the case of the string is performed.
+     * This is done because SQL identifier names should be case insensitive.
+     * If neither matches then null is returned.
      *
      * @param tableName the unqualified table name to find as a string
      * @return the jooq Table representation or null if not found
@@ -240,20 +247,21 @@ public interface DatabaseIfc {
         for (Table<?> t : tables) {
             if (t.getName().equals(tableName)) {
                 return t;
-            } else if (t.getName().equalsIgnoreCase(tableName)){
+            } else if (t.getName().equalsIgnoreCase(tableName)) {
                 return t;
             }
         }
         return null;
     }
 
-    /** The name of the table is first checked for an exact lexicographical match.
-     *  If a match occurs, the table is returned.  If a lexicographical match fails,
-     *  then a check for a match ignoring the case of the string is performed.
-     *  This is done because SQL identifier names should be case insensitive.
-     *  If neither matches then null is returned.
+    /**
+     * The name of the table is first checked for an exact lexicographical match.
+     * If a match occurs, the table is returned.  If a lexicographical match fails,
+     * then a check for a match ignoring the case of the string is performed.
+     * This is done because SQL identifier names should be case insensitive.
+     * If neither matches then null is returned.
      *
-     * @param schema the schema to check, must not be null
+     * @param schema    the schema to check, must not be null
      * @param tableName the unqualified table name to find as a string
      * @return the jooq Table representation or null if not found
      */
@@ -261,13 +269,13 @@ public interface DatabaseIfc {
         Objects.requireNonNull(schema, "The schema was null");
         //LOG.debug("Looking for table {}",tableName);
         Table<?> table = schema.getTable(tableName);
-        if (table == null){
+        if (table == null) {
             // try all upper case
-             table = schema.getTable(tableName.toUpperCase());
-             if (table == null){
-                 // try all lower case
-                 table = schema.getTable(tableName.toLowerCase());
-             }
+            table = schema.getTable(tableName.toUpperCase());
+            if (table == null) {
+                // try all lower case
+                table = schema.getTable(tableName.toLowerCase());
+            }
         }
         return table;
     }
@@ -662,23 +670,23 @@ public interface DatabaseIfc {
     }
 
     /**
-     *
      * @return returns a DbCreateTask that can be configured to execute on the database
      */
-    default DbCreateTask.DbCreateTaskFirstStepIfc create(){
+    default DbCreateTask.DbCreateTaskFirstStepIfc create() {
         return new DbCreateTask.DbCreateTaskBuilder(this);
     }
 
-    /** Executes a single command on an database connection
+    /**
+     * Executes a single command on an database connection
      *
      * @param cmd a valid SQL command
      * @return true if the command executed without an SQLException
      */
-    default boolean executeCommand(String cmd){
+    default boolean executeCommand(String cmd) {
         boolean flag = false;
-        try (Connection con = getConnection()){
+        try (Connection con = getConnection()) {
             flag = executeCommand(con, cmd);
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             LOG.error("SQLException when executing {}", cmd, ex);
         }
         return flag;
@@ -959,14 +967,14 @@ public interface DatabaseIfc {
      * Runs jooq code generation on the database at the supplied creation script.
      * Places generated source files in named package with the main java source
      *
-     * @param pathToCreationScript  a path to a valid database creation script, must not be null
-     * @param schemaName  the name of the schema for which tables need to be generated, must not be null
-     * @param pkgDirName  the directory that holds the target package, must not be null
-     * @param packageName name of package to be created to hold generated code, must not be null
+     * @param pathToCreationScript a path to a valid database creation script, must not be null
+     * @param schemaName           the name of the schema for which tables need to be generated, must not be null
+     * @param pkgDirName           the directory that holds the target package, must not be null
+     * @param packageName          name of package to be created to hold generated code, must not be null
      */
     public static void jooqCodeGeneration(Path pathToCreationScript, String schemaName,
                                           String pkgDirName, String packageName) throws Exception {
-        Objects.requireNonNull(pathToCreationScript,"The path to the creation script was null");
+        Objects.requireNonNull(pathToCreationScript, "The path to the creation script was null");
         Objects.requireNonNull(schemaName, "The schema name was null");
         Objects.requireNonNull(pkgDirName, "The package directory was null");
         Objects.requireNonNull(packageName, "The package name was null");
@@ -996,7 +1004,7 @@ public interface DatabaseIfc {
      * @param packageName name of package to be created to hold generated code, must not be null
      */
     public static void runJooQCodeGenerationDerbyDatabase(DataSource dataSource, String schemaName,
-                                             String pkgDirName, String packageName) {
+                                                          String pkgDirName, String packageName) {
         try {
             jooqCodeGenerationDerbyDatabase(dataSource, schemaName, pkgDirName, packageName);
         } catch (Exception e) {
@@ -1005,13 +1013,14 @@ public interface DatabaseIfc {
         }
     }
 
-    /** Drops the named schema from the database. If no such schema exist with the name, then nothing is done.
+    /**
+     * Drops the named schema from the database. If no such schema exist with the name, then nothing is done.
      *
      * @param schemaName the name of the schema to drop, must not be null
      * @param tableNames the table names in the order that they must be dropped, must not be null
-     * @param viewNames the view names in the order that they must be dropped, must not be null
+     * @param viewNames  the view names in the order that they must be dropped, must not be null
      */
-    default void dropSchema(String schemaName, List<String> tableNames, List<String> viewNames){
+    default void dropSchema(String schemaName, List<String> tableNames, List<String> viewNames) {
         Objects.requireNonNull(schemaName, "The schema name cannot be null");
         Objects.requireNonNull(tableNames, "The list of table names cannot be null");
         Objects.requireNonNull(viewNames, "The list of view names cannot be null");
@@ -1029,7 +1038,7 @@ public interface DatabaseIfc {
                 DatabaseIfc.LOG.debug("table or view: {}", t.getName());
             }
             for (String name : viewNames) {
-                if (name == null){
+                if (name == null) {
                     continue;
                 }
                 DatabaseIfc.LOG.debug("Checking for view {} ", name);
@@ -1040,7 +1049,7 @@ public interface DatabaseIfc {
                 }
             }
             for (String name : tableNames) {
-                if (name == null){
+                if (name == null) {
                     continue;
                 }
                 DatabaseIfc.LOG.debug("Checking for table {} ", name);
@@ -1062,6 +1071,27 @@ public interface DatabaseIfc {
             for (Schema s : schemas) {
                 DatabaseIfc.LOG.debug("schema: {}", s.getName());
             }
+        }
+    }
+
+    /**  Attempts to determine the SQLDialect for the data source
+     *  <a href= "https://www.jooq.org/javadoc/latest/org/jooq/tools/jdbc/JDBCUtils.html#dialect-java.sql.Connection-"> Reference to JDBCUtils</a>
+     *
+     * @param dataSource the data source, must not null
+     * @return the SQLDialect wrapped in an Optional, may be null if no connection could be established to
+     * determine the dialect.
+     */
+    public static Optional<SQLDialect> getSQLDialect(DataSource dataSource) {
+        Objects.requireNonNull(dataSource, "The database source was null");
+        SQLDialect dialect = null;
+        try {
+            Connection connection = dataSource.getConnection();
+            dialect = JDBCUtils.dialect(connection);
+            connection.close();
+            return Optional.of(dialect);
+        } catch (SQLException e) {
+            LOG.warn("Could not establish connection to data sources to determine SQLDialect");
+            return Optional.ofNullable(dialect);
         }
     }
 
