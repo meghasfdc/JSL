@@ -220,7 +220,7 @@ public class QueueResponse implements QueueListenerIfc {
     /**
      * Allows for the collection of across replication statistics on the average
      * maximum time spent in queue
-     * <p>
+     *
      */
     public final void turnOnAcrossReplicationMaxTimeInQueueCollection() {
         myTimeInQ.turnOnAcrossReplicationMaxCollection();
@@ -229,7 +229,7 @@ public class QueueResponse implements QueueListenerIfc {
     /**
      * Allows for the collection of across replication statistics on the average
      * maximum number in queue
-     * <p>
+     *
      */
     public final void turnOnAcrossReplicationMaxNumInQueueCollection() {
         myNumInQ.turnOnAcrossReplicationMaxCollection();
@@ -238,7 +238,7 @@ public class QueueResponse implements QueueListenerIfc {
     /**
      * A convenience method to turn on collection of both the maximum time in
      * queue and the maximum number in queue
-     * <p>
+     *
      */
     public final void turnOnAcrossReplicationMaxCollection() {
         turnOnAcrossReplicationMaxTimeInQueueCollection();

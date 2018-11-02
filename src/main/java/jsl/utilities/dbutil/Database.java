@@ -24,6 +24,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
+
 import org.jooq.tools.jdbc.JDBCUtils;
 /**
  * A concrete implementation of the DatabaseIfc interface.
@@ -73,18 +75,18 @@ public class Database implements DatabaseIfc {
     public Database(String dbLabel, DataSource dataSource, SQLDialect dialect) {
         Objects.requireNonNull(dbLabel, "The database name was null");
         Objects.requireNonNull(dataSource, "The database source was null");
+
         if (dialect == null){
-            try {
-                Connection connection = dataSource.getConnection();
-                dialect = JDBCUtils.dialect(connection);
-                connection.close();
+            Optional<SQLDialect> optionalSQLDialect = DatabaseIfc.getSQLDialect(dataSource);
+            if (optionalSQLDialect.isPresent()){
+                dialect = optionalSQLDialect.get();
                 if (dialect == SQLDialect.DEFAULT){
-                    dialect = null;
+                    LOG.error("Could not determine SQLDialect for database {}", dbLabel);
+                    throw new DataAccessException("Could not determine the SQLDialect for database " + dbLabel);
                 }
-                Objects.requireNonNull(dialect, "The database dialect was null");
-            } catch (SQLException e) {
+            } else {
                 LOG.error("Could not establish connection to database {} to determine SQLDialect", dbLabel);
-                throw new DataAccessException("Could not establish database connection to determine SQLDialect");
+                throw new DataAccessException("Could not establish database connection to determine SQLDialect for database " + dbLabel);
             }
         }
         myLabel = dbLabel;

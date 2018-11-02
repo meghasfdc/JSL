@@ -263,7 +263,21 @@ public class DatabaseFactory {
      * @return the DataSource for getting connections
      */
     public static DataSource getPostGresDataSource(String dbServerName, String dbName, String user,
-                                                                 String pWord){
+                                                   String pWord){
+        return getPostGresDataSource(dbServerName, dbName, user, pWord, 5432);
+    }
+
+    /**
+     *
+     * @param dbServerName the name of the database server, must not be null
+     * @param dbName the name of the database, must not be null
+     * @param user the user
+     * @param pWord the password
+     * @param portNumber a valid port number
+     * @return the DataSource for getting connections
+     */
+    public static DataSource getPostGresDataSource(String dbServerName, String dbName, String user,
+                                                                 String pWord, int portNumber){
         Objects.requireNonNull(dbServerName, "The name to the database server must not be null");
         Objects.requireNonNull(dbName, "The path name to the database must not be null");
         Properties props = new Properties();
@@ -272,6 +286,7 @@ public class DatabaseFactory {
         props.setProperty("dataSource.password", pWord);
         props.setProperty("dataSource.databaseName", dbName);
         props.setProperty("dataSource.serverName", dbServerName);
+        props.setProperty("dataSource.portNumber", Integer.toString(portNumber));
         return getDataSource(props);
     }
 
