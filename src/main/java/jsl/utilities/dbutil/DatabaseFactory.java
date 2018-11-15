@@ -1,5 +1,7 @@
 package jsl.utilities.dbutil;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.MoreFiles;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jsl.utilities.reporting.JSLDatabase;
@@ -12,9 +14,8 @@ import org.jooq.exception.DataAccessException;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
@@ -390,5 +391,57 @@ public class DatabaseFactory {
         FileUtils.copyDirectory(source, target);
         s.executeUpdate("CALL SYSCS_UTIL.SYSCS_UNFREEZE_DATABASE()");
         s.close();
+    }
+
+    /** There is no way to guarantee with 100 percent certainty that the path
+     *  is in fact a embedded derby database because someone could be faking
+     *  the directory structure.  The database directory of an embedded derby database
+     *  must have a service.properties file, a log directory, and a seg0 directory.
+     *  If these exist and the supplied path is a directory, then the method
+     *  returns true.
+     *
+     * @param path the path to check, must not be null
+     * @return true if it could be an embedded derby database
+     */
+    public static boolean isEmbeddedDerbyDatabase(Path path) {
+        Objects.requireNonNull(path, "The supplied path was null");
+        // the path itself must be a directory not a file
+        if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
+            // not a directory cannot be an embedded derby database
+            return false;
+        }
+        // the path is a directory, could be a embedded derby database
+        // it must have log directory, a seg0 directory and a services.properties file
+        Path log = path.resolve("log");
+        // log must exist and be a directory
+        if (!Files.isDirectory(log, LinkOption.NOFOLLOW_LINKS)){
+            // no log directory, can't be embedded derby db
+            return false;
+        }
+        // seq0 must exist and be a directory
+        Path seg0 = path.resolve("seg0");
+        if (!Files.isDirectory(seg0, LinkOption.NOFOLLOW_LINKS)){
+            // no seg0 directory, can't be embedded derby db
+            return false;
+        }
+        // service.properties must exist and be a file
+        Path sp = path.resolve("service.properties");
+        if (!Files.isRegularFile(sp, LinkOption.NOFOLLOW_LINKS)){
+            // no service.properties file, can't be embedded derby db
+            return false;
+        }
+        // likely to be be embedded derby db
+        return true;
+    }
+
+    /** A convenience method for those that use File instead of Path.
+     *  Calls isEmbeddedDerbyDatabase(file.toPath())
+     *
+     * @param file the file to check, must not be null
+     * @return true if it could be an embedded derby database
+     */
+    public static boolean isEmbeddedDerbyDatabase(File file) {
+        Objects.requireNonNull(file, "The supplied file was null");
+        return isEmbeddedDerbyDatabase(file.toPath());
     }
 }
