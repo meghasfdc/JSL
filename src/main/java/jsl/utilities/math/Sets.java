@@ -24,12 +24,28 @@ import java.util.TreeSet;
  */
 public class Sets {
 
+    /** Use Google Guava Sets instead
+     *
+     * @param setA a set
+     * @param setB another set
+     * @param <T> the type in the set
+     * @return a set representing the union
+     */
+    @Deprecated
     public static <T> Set<T> union(Set<T> setA, Set<T> setB) {
         Set<T> tmp = new TreeSet<>(setA);
         tmp.addAll(setB);
         return tmp;
     }
 
+    /** Use Google Guava Sets instead
+     *
+     * @param setA a set
+     * @param setB another set
+     * @param <T> the type in the set
+     * @return a set representing the intersection
+     */
+    @Deprecated
     public static <T> Set<T> intersection(Set<T> setA, Set<T> setB) {
         Set<T> tmp = new TreeSet<>();
         for (T x : setA) {
@@ -40,12 +56,28 @@ public class Sets {
         return tmp;
     }
 
+    /** Use Google Guava Sets instead
+     *
+     * @param setA a set
+     * @param setB another set
+     * @param <T> the type in the set
+     * @return a set representing the set difference
+     */
+    @Deprecated
     public static <T> Set<T> difference(Set<T> setA, Set<T> setB) {
         Set<T> tmp = new TreeSet<>(setA);
         tmp.removeAll(setB);
         return tmp;
     }
 
+    /** Use Google Guava Sets instead
+     *
+     * @param setA a set
+     * @param setB another set
+     * @param <T> the type in the set
+     * @return a set representing the symmetric difference
+     */
+    @Deprecated
     public static <T> Set<T> symDifference(Set<T> setA, Set<T> setB) {
         Set<T> tmpA;
         Set<T> tmpB;
