@@ -7,6 +7,7 @@ import org.jooq.*;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -32,7 +33,19 @@ public class DatabaseFactoryTest {
 
 //        testEmbeddedDerbyPropertiesFile();
 
-        testPostgresPropertiesFile();
+//        testPostgresPropertiesFile();
+
+//        testSPDatabaseCreation();
+        testDatabaseCreation();
+    }
+
+    public static void testDatabaseCreation(){
+        Path path = Paths.get("/Users/rossetti/Documents/Development/Temp");
+        String name = "manuel";
+        DatabaseIfc database = DatabaseFactory.createEmbeddedDerbyDatabase(name, path);
+        database.getDatabaseMetaData();
+
+
     }
 
     public static void testDataSourceConnection() {
@@ -191,7 +204,7 @@ public class DatabaseFactoryTest {
         // queries.executeBatch();
     }
 
-    public static void testDatabaseCreation() {
+    public static void testSPDatabaseCreation() {
         Path path = JSLDatabase.dbDir.resolve("TestCreationTaskDb");
         String name = path.toAbsolutePath().toString();
         // just create it

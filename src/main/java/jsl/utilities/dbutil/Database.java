@@ -94,6 +94,8 @@ public class Database implements DatabaseIfc {
         mySQLDialect = dialect;
         myDSLContext = DSL.using(dataSource, dialect);
         setJooQDefaultExecutionLoggingOption(false);
+        // force it to be made by establishing a connection to get the meta data
+        getDatabaseMetaData();
     }
 
     @Override

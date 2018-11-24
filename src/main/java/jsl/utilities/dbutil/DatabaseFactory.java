@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
@@ -51,12 +52,11 @@ public class DatabaseFactory {
     }
 
     /**
-     *
-     * @param dbLabel a label for the database
+     * @param dbLabel    a label for the database
      * @param dataSource the data source for connections
      * @return the created database
      */
-    public static DatabaseIfc createEmbeddedDerbyDatabase(String dbLabel, DataSource dataSource){
+    public static DatabaseIfc createEmbeddedDerbyDatabase(String dbLabel, DataSource dataSource) {
         Objects.requireNonNull(dataSource, "The data source was null");
         Database db = new Database(dbLabel, dataSource, SQLDialect.DERBY);
         return db;
@@ -89,6 +89,22 @@ public class DatabaseFactory {
         }
         DataSource ds = createEmbeddedDerbyDataSource(pathToDb, false);
         Database db = new Database(dbName, ds, SQLDialect.DERBY);
+        return db;
+    }
+
+    /**
+     * The database must already exist. It is not created. An exception is thrown if it does not exist.
+     *
+     * @param pathToDb  the full path to the directory that is the database, must not be null
+     * @return the created database
+     */
+    public static DatabaseIfc getEmbeddedDerbyDatabase(Path pathToDb) {
+        Objects.requireNonNull(pathToDb, "The path to the database must not be null");
+        if (!isEmbeddedDerbyDatabaseExists(pathToDb)) {
+            throw new IllegalStateException("The database does not exist at location " + pathToDb);
+        }
+        DataSource ds = createEmbeddedDerbyDataSource(pathToDb, false);
+        Database db = new Database(pathToDb.getFileName().toString(), ds, SQLDialect.DERBY);
         return db;
     }
 
@@ -127,7 +143,9 @@ public class DatabaseFactory {
         return Files.exists(fullPath);
     }
 
-    /**
+    /** This does not check if the database is shutdown.  It simply removes the
+     *  database from the file system.  If it doesn't exist, then nothing happends.
+     *
      * @param pathToDb the path to the embedded database on disk
      */
     public static void deleteEmbeddedDerbyDatabase(Path pathToDb) {
@@ -209,13 +227,99 @@ public class DatabaseFactory {
         if (create) {
             Path path = Paths.get(dbName);
             DatabaseIfc.LOG.info("Create option is on for {}", dbName);
-            if (isEmbeddedDerbyDatabaseExists(path)){
+            if (isEmbeddedDerbyDatabaseExists(path)) {
                 DatabaseIfc.LOG.info("Database already exists at location {}", dbName);
                 deleteEmbeddedDerbyDatabase(path);
             }
             ds.setCreateDatabase("create");
         }
         DatabaseIfc.LOG.info("Created an embedded Derby data source for {}", dbName);
+        return ds;
+    }
+
+    /** Sends a shutdown connection to the database.
+     *
+     * @param pathToDb a path to the database, must not be null
+      * @return true if successfully shutdown
+     */
+    public static boolean shutDownEmbeddedDerbyDatabase(Path pathToDb) {
+        return shutDownEmbeddedDerbyDatabase(pathToDb, null, null);
+    }
+
+    /** Sends a shutdown connection to the database.
+     *
+     * @param pathToDb a path to the database, must not be null
+     * @param user     a user name, can be null
+     * @param pWord    a password, can be null
+     * @return true if successfully shutdown
+     */
+    public static boolean shutDownEmbeddedDerbyDatabase(Path pathToDb, String user, String pWord) {
+        DataSource dataSource = shutDownEmbeddedDerbyDataSource(pathToDb, user, pWord);
+        try (Connection connection = dataSource.getConnection()) {
+        } catch (SQLException e) {
+            if ("08006".equals(e.getSQLState())) {
+                DatabaseIfc.LOG.info("Derby shutdown succeeded. SQLState={}", e.getSQLState());
+                return true;
+            }
+            DatabaseIfc.LOG.error("Derby shutdown failed", e);
+        }
+        return false;
+    }
+
+    /**
+     * Creates a data source that can be used to shut down an embedded derby database upon
+     * first connection.
+     *
+     * @param pathToDb a path to the database, must not be null
+     * @return the created DataSource
+     */
+    public static DataSource shutDownEmbeddedDerbyDataSource(Path pathToDb) {
+        return shutDownEmbeddedDerbyDataSource(pathToDb, null, null);
+    }
+
+    /**
+     * Creates a data source that can be used to shut down an embedded derby database upon
+     * first connection.
+     *
+     * @param pathToDb a path to the database, must not be null
+     * @param user     a user name, can be null
+     * @param pWord    a password, can be null
+     * @return the created DataSource
+     */
+    public static DataSource shutDownEmbeddedDerbyDataSource(Path pathToDb, String user, String pWord) {
+        return shutDownEmbeddedDerbyDataSource(pathToDb.toString(), user, pWord);
+    }
+
+    /**
+     * Creates a data source that can be used to shut down an embedded derby database upon
+     * first connection.
+     *
+     * @param dbName the path to the database, must not be null
+     * @return the created DataSource
+     */
+    public static DataSource shutDownEmbeddedDerbyDataSource(String dbName) {
+        return shutDownEmbeddedDerbyDataSource(dbName, null, null);
+    }
+
+    /**
+     * Creates a data source that can be used to shut down an embedded derby database upon
+     * first connection.
+     *
+     * @param dbName the path to the database, must not be null
+     * @param user   a user name, can be null
+     * @param pWord  a password, can be null
+     * @return the created DataSource
+     */
+    public static DataSource shutDownEmbeddedDerbyDataSource(String dbName, String user, String pWord) {
+        Objects.requireNonNull(dbName, "The path name to the database must not be null");
+        EmbeddedDataSource ds = new EmbeddedDataSource();
+        ds.setDatabaseName(dbName);
+        if (user != null)
+            ds.setUser(user);
+        if (pWord != null)
+            ds.setPassword(pWord);
+        ds.setShutdownDatabase("shutdown");
+        DatabaseIfc.LOG.info("Created an embedded Derby shutdown data source for {}", dbName);
         return ds;
     }
 
@@ -245,40 +349,39 @@ public class DatabaseFactory {
     }
 
     /**
-     *
      * @param dbName the name of the database, must not be null
-     * @param user the user
-     * @param pWord the password
+     * @param user   the user
+     * @param pWord  the password
      * @return the DataSource for getting connections
      */
     public static DataSource getPostGresDataSourceWithLocalHost(String dbName, String user, String pWord) {
         return getPostGresDataSource("localhost", dbName, user, pWord);
     }
 
-    /** Assumes standard PostGres port
+    /**
+     * Assumes standard PostGres port
      *
      * @param dbServerName the name of the database server, must not be null
-     * @param dbName the name of the database, must not be null
-     * @param user the user
-     * @param pWord the password
+     * @param dbName       the name of the database, must not be null
+     * @param user         the user
+     * @param pWord        the password
      * @return the DataSource for getting connections
      */
     public static DataSource getPostGresDataSource(String dbServerName, String dbName, String user,
-                                                   String pWord){
+                                                   String pWord) {
         return getPostGresDataSource(dbServerName, dbName, user, pWord, 5432);
     }
 
     /**
-     *
      * @param dbServerName the name of the database server, must not be null
-     * @param dbName the name of the database, must not be null
-     * @param user the user
-     * @param pWord the password
-     * @param portNumber a valid port number
+     * @param dbName       the name of the database, must not be null
+     * @param user         the user
+     * @param pWord        the password
+     * @param portNumber   a valid port number
      * @return the DataSource for getting connections
      */
     public static DataSource getPostGresDataSource(String dbServerName, String dbName, String user,
-                                                                 String pWord, int portNumber){
+                                                   String pWord, int portNumber) {
         Objects.requireNonNull(dbServerName, "The name to the database server must not be null");
         Objects.requireNonNull(dbName, "The path name to the database must not be null");
         Properties props = new Properties();
@@ -291,13 +394,14 @@ public class DatabaseFactory {
         return getDataSource(props);
     }
 
-    /** Assumes that the properties are appropriately configured to create a DataSource
-     *  via  HikariCP
+    /**
+     * Assumes that the properties are appropriately configured to create a DataSource
+     * via  HikariCP
      *
      * @param properties the properties
      * @return a pooled connection DataSource
      */
-    public static DataSource getDataSource(Properties properties){
+    public static DataSource getDataSource(Properties properties) {
         Objects.requireNonNull(properties, "The properties must not be null");
         HikariConfig config = new HikariConfig(properties);
         HikariDataSource ds = new HikariDataSource(config);
@@ -305,11 +409,10 @@ public class DatabaseFactory {
     }
 
     /**
-     *
      * @param pathToPropertiesFile must not be null
      * @return a DataSource for making a database
      */
-    public static DataSource getDataSource(Path pathToPropertiesFile){
+    public static DataSource getDataSource(Path pathToPropertiesFile) {
         Objects.requireNonNull(pathToPropertiesFile, "The properties file path must not be null");
         HikariConfig config = new HikariConfig(pathToPropertiesFile.toString());
         HikariDataSource ds = new HikariDataSource(config);
@@ -393,12 +496,13 @@ public class DatabaseFactory {
         s.close();
     }
 
-    /** There is no way to guarantee with 100 percent certainty that the path
-     *  is in fact a embedded derby database because someone could be faking
-     *  the directory structure.  The database directory of an embedded derby database
-     *  must have a service.properties file, a log directory, and a seg0 directory.
-     *  If these exist and the supplied path is a directory, then the method
-     *  returns true.
+    /**
+     * There is no way to guarantee with 100 percent certainty that the path
+     * is in fact a embedded derby database because someone could be faking
+     * the directory structure.  The database directory of an embedded derby database
+     * must have a service.properties file, a log directory, and a seg0 directory.
+     * If these exist and the supplied path is a directory, then the method
+     * returns true.
      *
      * @param path the path to check, must not be null
      * @return true if it could be an embedded derby database
@@ -406,7 +510,7 @@ public class DatabaseFactory {
     public static boolean isEmbeddedDerbyDatabase(Path path) {
         Objects.requireNonNull(path, "The supplied path was null");
         // the path itself must be a directory not a file
-        if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
+        if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
             // not a directory cannot be an embedded derby database
             return false;
         }
@@ -414,19 +518,19 @@ public class DatabaseFactory {
         // it must have log directory, a seg0 directory and a services.properties file
         Path log = path.resolve("log");
         // log must exist and be a directory
-        if (!Files.isDirectory(log, LinkOption.NOFOLLOW_LINKS)){
+        if (!Files.isDirectory(log, LinkOption.NOFOLLOW_LINKS)) {
             // no log directory, can't be embedded derby db
             return false;
         }
         // seq0 must exist and be a directory
         Path seg0 = path.resolve("seg0");
-        if (!Files.isDirectory(seg0, LinkOption.NOFOLLOW_LINKS)){
+        if (!Files.isDirectory(seg0, LinkOption.NOFOLLOW_LINKS)) {
             // no seg0 directory, can't be embedded derby db
             return false;
         }
         // service.properties must exist and be a file
         Path sp = path.resolve("service.properties");
-        if (!Files.isRegularFile(sp, LinkOption.NOFOLLOW_LINKS)){
+        if (!Files.isRegularFile(sp, LinkOption.NOFOLLOW_LINKS)) {
             // no service.properties file, can't be embedded derby db
             return false;
         }
@@ -434,8 +538,9 @@ public class DatabaseFactory {
         return true;
     }
 
-    /** A convenience method for those that use File instead of Path.
-     *  Calls isEmbeddedDerbyDatabase(file.toPath())
+    /**
+     * A convenience method for those that use File instead of Path.
+     * Calls isEmbeddedDerbyDatabase(file.toPath())
      *
      * @param file the file to check, must not be null
      * @return true if it could be an embedded derby database
