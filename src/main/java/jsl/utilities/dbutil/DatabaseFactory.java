@@ -128,7 +128,7 @@ public class DatabaseFactory {
             return false;
         }
         Path pathToDb = dbDir.resolve(dbName);
-        return Files.exists(pathToDb);
+        return isEmbeddedDerbyDatabaseExists(pathToDb);
     }
 
     /**
