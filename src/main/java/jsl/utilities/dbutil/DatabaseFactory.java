@@ -96,7 +96,7 @@ public class DatabaseFactory {
      * The database must already exist. It is not created. An exception is thrown if it does not exist.
      *
      * @param pathToDb  the full path to the directory that is the database, must not be null
-     * @return the created database
+     * @return the database
      */
     public static DatabaseIfc getEmbeddedDerbyDatabase(Path pathToDb) {
         Objects.requireNonNull(pathToDb, "The path to the database must not be null");
