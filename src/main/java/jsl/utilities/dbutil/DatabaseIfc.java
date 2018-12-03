@@ -644,7 +644,7 @@ public interface DatabaseIfc {
     /**
      * Writes the tables in the supplied list to an Excel workbook, if they exist in the database.
      *
-     * @param tableNames  a list of table names that should be written toe Excel, must not be null
+     * @param tableNames  a list of table names that should be written to Excel, must not be null
      * @param wbName      name of the workbook, if null uses name of database
      * @param wbDirectory directory of the workbook, if null uses the working directory
      */
