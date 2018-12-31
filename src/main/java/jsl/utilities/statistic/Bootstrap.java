@@ -22,7 +22,7 @@ import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.robj.DPopulation;
 import jsl.utilities.random.rvariable.EmpiricalRV;
@@ -45,7 +45,7 @@ import java.util.List;
  * Hyndman, R. J. and Fan, Y. (1996) Sample quantiles in statistical packages,
  * American Statistician 50, 361–365 as the default.  This can be changed by the user.
  */
-public class Bootstrap implements IdentityIfc, RandomStreamIfc {
+public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
 
     /**
      * A counter to count the number of created to assign "unique" ids

@@ -17,8 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.modeling.JSLTooManyIterationsException;
 import jsl.utilities.Interval;
-import jsl.utilities.math.*;
-import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GammaRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
@@ -62,7 +61,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
     /** Creates new Gamma with shape 1.0, scale 1.0
      */
     public Gamma() {
-        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, 1.0, null);
     }
 
     /** Constructs a gamma distribution with
@@ -70,16 +69,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the shape and scale
      */
     public Gamma(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a gamma distribution with
-     * shape = parameters[0] and scale = parameters[1]
-     * @param parameters An array with the shape and scale
-     * @param rng
-     */
-    public Gamma(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
+        this(parameters[0], parameters[1], null);
     }
 
     /** Constructs a gamma distribution with supplied shape and scale
@@ -88,51 +78,25 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * @param scale The scale parameter of the distribution
      */
     public Gamma(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
+        this(shape, scale, null);
     }
 
     /** Constructs a gamma distribution with supplied shape and scale
      *
      * @param shape The shape parameter of the distribution
      * @param scale The scale parameter of the distribution
-     * @param rng a RngIfc
+     * @param name an optional name/label
      */
-    public Gamma(double shape, double scale, RNStreamIfc rng) {
-        super(rng);
+    public Gamma(double shape, double scale, String name) {
+        super(name);
         setNorm(scale, shape);
         setShape(shape);
         setScale(scale);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Gamma newInstance() {
         return (new Gamma(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Gamma newInstance(RNStreamIfc rng) {
-        return (new Gamma(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Gamma newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -165,36 +129,53 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
     /** Gets the shape
      * @return The shape parameter as a double
      */
-    public double getShape() {
+    public final double getShape() {
         return myShape;
     }
 
     /** Gets the scale parameter
      * @return The scale parameter as a double
      */
-    public double getScale() {
+    public final double getScale() {
         return myScale;
     }
 
     @Override
-    public double getMean() {
+    public final double getMean() {
         return myShape * myScale;
     }
 
-    public double getMoment2() {
+    /**
+     *
+     * @return the 2nd moment
+     */
+    public final double getMoment2() {
         // theta is scale, alpha is shape
         return myScale * getMean() * (myShape + 1.0);
     }
 
-    public double getMoment3() {
+    /**
+     *
+     * @return the 3rd moment
+     */
+    public final double getMoment3() {
         return myScale * getMoment2() * (myShape + 2.0);
     }
 
-    public double getMoment4() {
+    /**
+     *
+     * @return the 4th moment
+     */
+    public final double getMoment4() {
         return myScale * getMoment3() * (myShape + 3.0);
     }
 
-    public double getMoment(int n) {
+    /**
+     *
+     * @param n the desired moment
+     * @return the nth moment
+     */
+    public final double getMoment(int n) {
         if (n < 1) {
             throw new IllegalArgumentException("The moment should be >= 1");
         }
@@ -299,75 +280,6 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      */
     public final double getSkewness() {
         return (2.0 / Math.sqrt(myShape));
-    }
-
-    /** Provides a random number via the standard acceptance rejection technique
-     *  see Law and Kelton for the algorithm
-     * @return double a random number distributed according to the receiver.
-     */
-    public final double randomViaAcceptanceRejection() {
-        double r;
-
-        if (myShape > 1) {
-            r = randomForAlphaGreaterThan1();
-        } else if (myShape < 1) {
-            r = randomForAlphaLessThan1();
-        } else {
-            r = randomForAlphaEqual1();
-        }
-
-        return r * myScale;
-    }
-
-    /**
-     * @return double
-     */
-    private double randomForAlphaEqual1() {
-        return -Math.log(1 - myRNG.randU01());
-    }
-
-    /**
-     * @return double
-     */
-    private double randomForAlphaGreaterThan1() {
-        double u1, u2, v, y, z, w;
-        double a = Math.sqrt(2 * myShape - 1);
-        double b = myShape - Math.log(4.0);
-        double q = myShape + 1 / a;
-        double d = 1 + Math.log(4.5);
-        while (true) {
-            u1 = myRNG.randU01();
-            u2 = myRNG.randU01();
-            v = a * Math.log(u1 / (1 - u1));
-            y = myShape * Math.exp(v);
-            z = u1 * u1 * u2;
-            w = b + q * v - y;
-            if (w + d - 4.5 * z >= 0 || w >= Math.log(z)) {
-                return y;
-            }
-        }
-    }
-
-    /**
-     * @return double
-     */
-    private double randomForAlphaLessThan1() {
-        double p, y;
-        double b = (Math.E + myShape) / Math.E;
-
-        while (true) {
-            p = myRNG.randU01() * b;
-            if (p > 1) {
-                y = -Math.log((b - p) / myShape);
-                if (myRNG.randU01() <= Math.pow(y, myShape - 1)) {
-                    return y;
-                }
-            }
-            y = Math.pow(p, 1 / myShape);
-            if (myRNG.randU01() <= Math.exp(-y)) {
-                return y;
-            }
-        }
     }
 
     /** The inverse CDF of the chi-square distribution
@@ -652,8 +564,8 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * Psi ( Digamma ) Function,
      * Applied Statistics,
      * Volume 25, Number 3, 1976, pages 315-317.
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the function value
      */
     public static double diGammaFunction(double x) {
         if (x < 0.0) {
@@ -703,8 +615,8 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      *
      * http://www.cog.brown.edu/~mj/code/digamma.c
      *
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the function value
      */
     public static double digamma(double x) {
         if (x < 0.0) {
@@ -724,11 +636,11 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
 
     /** Evaluates the incomplete gamma series
      *
-     * @param x
-     * @param alpha
-     * @param maxIterations
-     * @param eps
-     * @return
+     * @param x the value to evaluate
+     * @param alpha the shape
+     * @param maxIterations the max number of iterations
+     * @param eps the machine epsilon
+     * @return the value of the incomplete gamma series
      */
     private static double incGammaSeries(double x, double alpha, int maxIterations, double eps) {
         int n;
@@ -758,11 +670,11 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
 
     /** Evaluates the incomplete gamma fraction
      *
-     * @param x
-     * @param alpha
-     * @param maxIterations
-     * @param eps
-     * @return
+     * @param x the value to evaluate
+     * @param alpha the shape
+     * @param maxIterations the max number of iterations
+     * @param eps the machine epsilon
+     * @return the value of the incomplete gamma fraction
      */
     private static double incGammaFraction(double x, double alpha, int maxIterations, double eps) {
         int n;
@@ -817,7 +729,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
 
     /** Gets the maximum number of iterations for the gamma functions
      * 
-     * @return
+     * @return the maximum number of iterations
      */
     public final int getMaxNumIterations() {
         return (myMaxIterations);
@@ -825,7 +737,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
 
     /** Sets the maximum number of iterations for the gamma functions
      * 
-     * @param iterations
+     * @param iterations the maximum number of iterations
      */
     public final void setMaxNumIterations(int iterations) {
         if (iterations < DEFAULT_MAX_ITERATIONS) {
@@ -837,7 +749,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
 
     /** Gets the numerical precision used in computing the gamma functions
      * 
-     * @return
+     * @return the numerical precision
      */
     public final double getNumericalPrecision() {
         return (myNumericalPrecision);
@@ -845,7 +757,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
 
     /** Sets the numerical precision used in computing the gamma functions
      * 
-     * @param precision
+     * @param precision the numerical precision
      */
     public final void setNumericalPrecision(double precision) {
         if (precision < JSLMath.getMachinePrecision()) {
@@ -885,7 +797,7 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
      * 
      * @param mean must be &gt; 0
      * @param var must be &gt; 0
-     * @return
+     * @return the parameter array
      */
     public static double[] getParametersFromMeanAndVariance(double mean, double var) {
         if (mean <= 0.0) {

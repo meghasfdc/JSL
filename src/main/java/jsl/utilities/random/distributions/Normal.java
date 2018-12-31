@@ -28,7 +28,6 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  */
 public class Normal extends Distribution implements ContinuousDistributionIfc,
         LossFunctionDistributionIfc, InverseCDFIfc, GetRVariableIfc {
-    // private attributes
 
     private double myMean;
 
@@ -36,34 +35,30 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
 
     private double myStdDev;
 
-    private double nextNormal = 0.0;
+    private static final double baseNorm = Math.sqrt(2 * Math.PI);
 
-    private boolean nextNormalFlag = false;
+    private static final double errorFunctionConstant = 0.2316419;
 
-    private static double baseNorm = Math.sqrt(2 * Math.PI);
+    private static final double[] coeffs = {0.31938153, -0.356563782, 1.781477937, -1.821255978, 1.330274429};
 
-    private static double errorFunctionConstant = 0.2316419;
-
-    private static double[] coeffs = {0.31938153, -0.356563782, 1.781477937, -1.821255978, 1.330274429};
-
-    private static double[] a = {-3.969683028665376e+01, 2.209460984245205e+02,
+    private static final double[] a = {-3.969683028665376e+01, 2.209460984245205e+02,
         -2.759285104469687e+02, 1.383577518672690e+02,
         -3.066479806614716e+01, 2.506628277459239e+00};
 
-    private static double[] b = {-5.447609879822406e+01, 1.615858368580409e+02,
+    private static final double[] b = {-5.447609879822406e+01, 1.615858368580409e+02,
         -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01};
 
-    private static double[] c = {-7.784894002430293e-03, -3.223964580411365e-01,
+    private static final double[] c = {-7.784894002430293e-03, -3.223964580411365e-01,
         -2.400758277161838e+00, -2.549732539343734e+00,
         4.374664141464968e+00, 2.938163982698783e+00};
 
-    private static double[] d = {7.784695709041462e-03, 3.224671290700398e-01,
+    private static final double[] d = {7.784695709041462e-03, 3.224671290700398e-01,
         2.445134137142996e+00, 3.754408661907416e+00};
 
     /** Constructs a normal distribution with mean 0.0 and variance 1.0
      */
     public Normal() {
-        this(0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 1.0, null);
     }
 
     /** Constructs a normal distribution with
@@ -71,16 +66,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the mean and variance
      */
     public Normal(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a normal distribution with
-     * mean = parameters[0] and variance = parameters[1]
-     * @param parameters An array with the mean and variance
-     * @param rng
-     */
-    public Normal(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
+        this(parameters[0], parameters[1], null);
     }
 
     /** Constructs a normal distribution with mean and variance.
@@ -89,50 +75,24 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param variance must be &gt; 0
      */
     public Normal(double mean, double variance) {
-        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, variance, null);
     }
 
     /** Constructs a normal distribution with mean and variance.
      *
      * @param mean of the distribution
      * @param variance must be &gt; 0
-     * @param rng A RngIfc
+     * @param name an optional name/label
      */
-    public Normal(double mean, double variance, RNStreamIfc rng) {
-        super(rng);
+    public Normal(double mean, double variance, String name) {
+        super(name);
         setMean(mean);
         setVariance(variance);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Normal newInstance() {
         return (new Normal(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Normal newInstance(RNStreamIfc rng) {
-        return (new Normal(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Normal newAntitheticInstance() {
-        RNStreamIfc ac = myRNG.newAntitheticInstance();
-        return newInstance(ac);
     }
 
     @Override
@@ -170,34 +130,6 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
         return myVar;
     }
 
-    /** Gets a random variate from this normal distribution
-     *  via the polar method.
-     *
-     * @return a normally distributed random variate
-     */
-    public final double polarMethodRandomVariate() {
-        if (nextNormalFlag == true) {
-            nextNormalFlag = false;
-            return (myMean + myStdDev * nextNormal);
-        } else {
-            double u1, u2;
-            double v1, v2;
-            double w, y;
-            do {
-                u1 = myRNG.randU01();
-                u2 = myRNG.randU01();
-                v1 = 2.0 * u1 - 1.0;
-                v2 = 2.0 * u2 - 1.0;
-                w = v1 * v1 + v2 * v2;
-            } while (w > 1.0);
-            y = Math.sqrt((-2.0 * Math.log(w) / w));
-
-            nextNormal = v2 * y;
-            nextNormalFlag = true;
-            return (myMean + myStdDev * (v1 * y));
-        }
-    }
-
     /** Computes the cumulative distribution function for a standard
      *  normal distribution
      *  from Abramovitz  and Stegun, see also Didier H. Besset
@@ -206,7 +138,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param z the z-ordinate to be evaluated
      * @return the P(Z&lt;=z) for standard normal
      */
-    public final static double stdNormalCDF(double z) {
+    public static double stdNormalCDF(double z) {
 
         if (z == 0) {
             return 0.5;
@@ -228,7 +160,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param z the z-ordinate to be evaluated
      * @return the f(z) for standard normal
      */
-    public final static double stdNormalPDF(double z) {
+    public static double stdNormalPDF(double z) {
         return (Math.exp(-0.5 * z * z) / baseNorm);
     }
 
@@ -243,7 +175,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * p = 1.0 returns Double.POSITIVE_INFINITY
      * @return the "z" value associated with the p
      */
-    public final static double stdNormalInvCDF(double p) {
+    public static double stdNormalInvCDF(double p) {
         if ((p < 0.0) || (p > 1.0)) {
             throw new IllegalArgumentException("Supplied probability was " + p + " Probability must be (0,1)");
         }
@@ -297,7 +229,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param z The value to be evaluated
      * @return The probability, 1-P{X&lt;=z}
      */
-    public static final double stdNormalComplementaryCDF(double z) {
+    public static double stdNormalComplementaryCDF(double z) {
         return (1.0 - stdNormalCDF(z));
     }
 
@@ -306,7 +238,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param z The value to be evaluated
      * @return The loss function value, E[max(Z-z,0)]
      */
-    public static final double stdNormalFirstOrderLossFunction(double z) {
+    public static double stdNormalFirstOrderLossFunction(double z) {
         return (-z * stdNormalComplementaryCDF(z) + stdNormalPDF(z));
     }
 
@@ -315,7 +247,7 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
      * @param z The value to be evaluated
      * @return The loss function value, (1/2)E[max(Z-z,0)*max(Z-z-1,0)]
      */
-    public final static double stdNormalSecondOrderLossFunction(double z) {
+    public final double stdNormalSecondOrderLossFunction(double z) {
         return (0.5 * ((z * z + 1.0) * stdNormalComplementaryCDF(z) - z * stdNormalPDF(z)));
     }
 
@@ -330,13 +262,6 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
         return (stdNormalPDF(z)/myStdDev);
     }
 
-    /** Provides the inverse cumulative distribution function for the distribution
-     * @param p The probability to be evaluated for the inverse, p must be [0,1] or
-     * an IllegalArgumentException is thrown
-     * p = 0.0 returns Double.NEGATIVE_INFINTITY
-     * p = 1.0 returns Double.POSITIVE_INFINITY
-     * @return The inverse cdf evaluated at p
-     */
     @Override
     public final double invCDF(double p) {
         double z = stdNormalInvCDF(p);
@@ -357,31 +282,16 @@ public class Normal extends Distribution implements ContinuousDistributionIfc,
         return (0.0);
     }
 
-    /** Computes the complementary cumulative probability
-     * distribution function for given value of x
-     * @param x The value to be evaluated
-     * @return The probability, 1-P{X&lt;=x}
-     */
     @Override
     public double complementaryCDF(double x) {
         return (stdNormalComplementaryCDF((x - myMean) / myStdDev));
     }
 
-    /** Computes the first order loss function for the
-     * distribution function for given value of x, G1(x) = E[max(X-x,0)]
-     * @param x The value to be evaluated
-     * @return The loss function value, E[max(X-x,0)]
-     */
     @Override
     public double firstOrderLossFunction(double x) {
         return (myStdDev * stdNormalFirstOrderLossFunction((x - myMean) / myStdDev));
     }
 
-    /** Computes the 2nd order loss function for the
-     * distribution function for given value of x, G2(x) = (1/2)E[max(X-x,0)*max(X-x-1,0)]
-     * @param x The value to be evaluated
-     * @return The loss function value, (1/2)E[max(X-x,0)*max(X-x-1,0)]
-     */
     @Override
     public double secondOrderLossFunction(double x) {
         return (myVar * stdNormalSecondOrderLossFunction((x - myMean) / myStdDev));

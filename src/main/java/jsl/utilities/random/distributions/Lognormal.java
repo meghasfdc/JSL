@@ -22,7 +22,7 @@ import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.LognormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
-/** Models lognormally distributed random variables
+/** Models the lognormal distribution
  *  This distribution is commonly use to model the time of a task
  *
  */
@@ -40,7 +40,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
     /** Constructs a lognormal distribution with mean 1.0 and variance 1.0
      */
     public Lognormal() {
-        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, 1.0, null);
     }
 
     /** Constructs a lognormal distribution with
@@ -48,16 +48,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @param parameters An array with the mean and variance
      */
     public Lognormal(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a lognormal distribution with
-     * mean = parameters[0] and variance = parameters[1]
-     * @param parameters An array with the mean and variance
-     * @param rng
-     */
-    public Lognormal(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
+        this(parameters[0], parameters[1], null);
     }
 
     /** Constructs a lognormal distribution with
@@ -69,7 +60,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      * @param variance must be &gt; 0
      */
     public Lognormal(double mean, double variance) {
-        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, variance, null);
     }
 
     /** Constructs a lognormal distribution with
@@ -79,42 +70,16 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
      *
      * @param mean must be &gt; 0
      * @param variance must be &gt; 0
-     * @param rng A RngIfc
+     * @param name an optional name/lable
      */
-    public Lognormal(double mean, double variance, RNStreamIfc rng) {
-        super(rng);
+    public Lognormal(double mean, double variance, String name) {
+        super(name);
         setParameters(mean, variance);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Lognormal newInstance() {
         return (new Lognormal(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Lognormal newInstance(RNStreamIfc rng) {
-        return (new Lognormal(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Lognormal newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -153,6 +118,10 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
         return myMean;
     }
 
+    /**
+     *
+     * @return the 3rd moment
+     */
     public final double getMoment3() {
         double calculatingM = (-(1 / 2) * Math.log((myVar / (myMean * myMean * myMean * myMean)) + 1));
         double calculatingS = Math.log((myVar / (myMean * myMean)) + (myMean * myMean));
@@ -160,6 +129,10 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
         return Math.exp((3 * calculatingM) + (9 * calculatingS / 2));
     }
 
+    /**
+     *
+     * @return the 4th moment
+     */
     public final double getMoment4() {
         double calculatingM = (-(1 / 2) * Math.log((myVar / (myMean * myMean * myMean * myMean)) + 1));
         double calculatingS = Math.log((myVar / (myMean * myMean)) + (myMean * myMean));
@@ -182,7 +155,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
 
     /** The mean of the underlying normal
      *
-     * @return
+     * @return mean of the underlying normal
      */
     public final double getNormalMean() {
         return myNormalMu;
@@ -190,7 +163,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
 
     /** The variance of the underlying normal
      *
-     * @return
+     * @return variance of the underlying normal
      */
     public final double getNormalVariance() {
         return myNormalSigma * myNormalSigma;
@@ -198,7 +171,7 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
 
     /** The standard deviation of the underlying normal
      *
-     * @return
+     * @return standard deviation of the underlying normal
      */
     public final double getNormalStdDev() {
         return myNormalSigma;
@@ -213,14 +186,6 @@ public class Lognormal extends Distribution implements ContinuousDistributionIfc
         return (Normal.stdNormalCDF(z));
     }
 
-    /** Provides the inverse cumulative distribution function for the distribution
-     * @param p The probability to be evaluated for the inverse, p must be [0,1] or
-     * an IllegalArgumentException is thrown
-     * p = 0.0 returns 0.0
-     * p = 1.0 returns Double.POSITIVE_INFINITY
-     * 
-     * @return The inverse cdf evaluated at prob
-     */
     @Override
     public final double invCDF(double p) {
         if ((p < 0.0) || (p > 1.0)) {

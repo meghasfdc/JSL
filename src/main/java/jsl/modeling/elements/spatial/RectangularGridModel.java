@@ -22,6 +22,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  * This class can be used to hold ModelElements that can be in a
@@ -68,7 +69,7 @@ public class RectangularGridModel extends SchedulingElement {
             double width, double height, int numRows, int numCols, String name) {
         super(parent, name);
         setGrid(x, y, width, height, numRows, numCols);
-        myUniformRV = new RandomVariable(this, new Uniform());
+        myUniformRV = new RandomVariable(this, new UniformRV());
         getGrid().addObserver(new PositionObserver());
     }
 

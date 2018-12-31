@@ -15,12 +15,16 @@
  */
 package jsl.modeling.elements;
 
-import java.util.*;
-
-import jsl.modeling.*;
+import jsl.modeling.JSLEvent;
+import jsl.modeling.ModelElement;
+import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 /** A TimedAction represents a set of actions associated with an event that
  *  can be repeated at regular intervals.  Each TimedAction
@@ -56,7 +60,7 @@ public class TimedAction extends SchedulingElement {
      * @param parent
      */
     public TimedAction(ModelElement parent) {
-        this(parent, Constant.POSITIVE_INFINITY, true, true, null);
+        this(parent, ConstantRV.POSITIVE_INFINITY, true, true, null);
     }
 
     /**
@@ -64,7 +68,7 @@ public class TimedAction extends SchedulingElement {
      * @param time
      */
     public TimedAction(ModelElement parent, double time) {
-        this(parent, new Constant(time), true, true, null);
+        this(parent, new ConstantRV(time), true, true, null);
     }
 
     /**
@@ -73,7 +77,7 @@ public class TimedAction extends SchedulingElement {
      *  @param name
      */
     public TimedAction(ModelElement parent, double time, String name) {
-        this(parent, new Constant(time), true, true, name);
+        this(parent, new ConstantRV(time), true, true, name);
     }
 
     /**
@@ -123,7 +127,7 @@ public class TimedAction extends SchedulingElement {
      * @param time
      */
     public final void setTimeBetweenActionsInitialRandomSource(double time) {
-        setTimeBetweenActionsInitialRandomSource(new Constant(time));
+        setTimeBetweenActionsInitialRandomSource(new ConstantRV(time));
     }
 
     /** Sets the time between actions for all replications
@@ -149,7 +153,7 @@ public class TimedAction extends SchedulingElement {
      * @param time
      */
     public final void setTimeBetweenActions(double time) {
-        setTimeBetweenActions(new Constant(time));
+        setTimeBetweenActions(new ConstantRV(time));
     }
 
     /** Sets the time between actions for the current replication

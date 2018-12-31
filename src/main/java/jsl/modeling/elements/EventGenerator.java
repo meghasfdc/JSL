@@ -15,11 +15,13 @@
  */
 package jsl.modeling.elements;
 
-import jsl.modeling.*;
-import jsl.modeling.elements.variable.*;
+import jsl.modeling.JSLEvent;
+import jsl.modeling.ModelElement;
+import jsl.modeling.SchedulingElement;
+import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.random.*;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 /**
  * This class allows for the periodic generation of events similar to that
@@ -158,7 +160,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      * @param parent
      */
     public EventGenerator(ModelElement parent) {
-        this(parent, null, Constant.ZERO, Constant.POSITIVE_INFINITY, 
+        this(parent, null, ConstantRV.ZERO, ConstantRV.POSITIVE_INFINITY,
                 Long.MAX_VALUE, Double.POSITIVE_INFINITY, null);
     }
 
@@ -173,7 +175,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      * the generated event.
      */
     public EventGenerator(ModelElement parent, EventGeneratorActionIfc listener) {
-        this(parent, listener, Constant.ZERO, Constant.POSITIVE_INFINITY, 
+        this(parent, listener, ConstantRV.ZERO, ConstantRV.POSITIVE_INFINITY,
                 Long.MAX_VALUE, Double.POSITIVE_INFINITY, null);
     }
 
@@ -189,7 +191,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      * @param name The name of the generator.
      */
     public EventGenerator(ModelElement parent, EventGeneratorActionIfc listener, String name) {
-        this(parent, listener, Constant.ZERO, Constant.POSITIVE_INFINITY, 
+        this(parent, listener, ConstantRV.ZERO, ConstantRV.POSITIVE_INFINITY,
                 Long.MAX_VALUE, Double.POSITIVE_INFINITY, name);
     }
 
@@ -208,7 +210,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      */
     public EventGenerator(ModelElement parent,
             EventGeneratorActionIfc listener, RandomIfc timeUntilFirst) {
-        this(parent, listener, timeUntilFirst, Constant.POSITIVE_INFINITY, 
+        this(parent, listener, timeUntilFirst, ConstantRV.POSITIVE_INFINITY,
                 Long.MAX_VALUE, Double.POSITIVE_INFINITY, null);
     }
 
@@ -229,7 +231,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      */
     public EventGenerator(ModelElement parent,
             EventGeneratorActionIfc listener, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext) {
+                          RandomIfc timeUntilNext) {
         this(parent, listener, timeUntilFirst, timeUntilNext, 
                 Long.MAX_VALUE, Double.POSITIVE_INFINITY, null);
     }
@@ -245,7 +247,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      * first event.
      */
     public EventGenerator(ModelElement parent, RandomIfc timeUntilFirst) {
-        this(parent, null, timeUntilFirst, Constant.POSITIVE_INFINITY, 
+        this(parent, null, timeUntilFirst, ConstantRV.POSITIVE_INFINITY,
                 Long.MAX_VALUE, Double.POSITIVE_INFINITY, null);
     }
 
@@ -263,7 +265,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      *
      */
     public EventGenerator(ModelElement parent, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext) {
+                          RandomIfc timeUntilNext) {
         this(parent, null, timeUntilFirst, timeUntilNext, Long.MAX_VALUE, 
                 Double.POSITIVE_INFINITY, null);
     }
@@ -283,7 +285,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      *
      */
     public EventGenerator(ModelElement parent, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext, String name) {
+                          RandomIfc timeUntilNext, String name) {
         this(parent, null, timeUntilFirst, timeUntilNext, Long.MAX_VALUE,
                 Double.POSITIVE_INFINITY, name);
     }
@@ -306,7 +308,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      */
     public EventGenerator(ModelElement parent,
             EventGeneratorActionIfc listener, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext, String name) {
+                          RandomIfc timeUntilNext, String name) {
         this(parent, listener, timeUntilFirst, timeUntilNext, Long.MAX_VALUE,
                 Double.POSITIVE_INFINITY, name);
     }
@@ -332,7 +334,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      */
     public EventGenerator(ModelElement parent,
             EventGeneratorActionIfc listener, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext, long maxNum) {
+                          RandomIfc timeUntilNext, long maxNum) {
         this(parent, listener, timeUntilFirst, timeUntilNext, maxNum, 
                 Double.POSITIVE_INFINITY, null);
     }
@@ -364,7 +366,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      */
     public EventGenerator(ModelElement parent,
             EventGeneratorActionIfc listener, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext, long maxNum, double timeUntilLast) {
+                          RandomIfc timeUntilNext, long maxNum, double timeUntilLast) {
         this(parent, listener, timeUntilFirst, timeUntilNext, maxNum, timeUntilLast, null);
     }
 
@@ -395,7 +397,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
      */
     public EventGenerator(ModelElement parent,
             EventGeneratorActionIfc listener, RandomIfc timeUntilFirst,
-            RandomIfc timeUntilNext, long maxNum, double timeUntilLast, String name) {
+                          RandomIfc timeUntilNext, long maxNum, double timeUntilLast, String name) {
         super(parent, name);
 
         setAfterReplicationOption(false);
@@ -407,14 +409,14 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
         myNextEvent = null;
 
         if (timeUntilFirst == null) {
-            timeUntilFirst = Constant.ZERO;
+            timeUntilFirst = ConstantRV.ZERO;
         }
 
         setInitialTimeUntilFirstEvent(timeUntilFirst);
         myTimeUntilFirstEventRV = new RandomVariable(this, timeUntilFirst, getName() + ":TimeUntilFirstRV");
 
         if (timeUntilNext == null) {
-            timeUntilNext = Constant.POSITIVE_INFINITY;
+            timeUntilNext = ConstantRV.POSITIVE_INFINITY;
         }
 
         setInitialTimeBetweenEventsAndMaxNumEvents(timeUntilNext, maxNum);
@@ -459,7 +461,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
 
         private final ModelElement parent;
         private EventGeneratorActionIfc action;
-        private RandomIfc timeUntilFirst = Constant.ZERO;
+        private RandomIfc timeUntilFirst = ConstantRV.ZERO;
         private RandomIfc timeBtwEvents;
         private long maxNum = Long.MAX_VALUE;
         private String name;
@@ -704,7 +706,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
         }
 
         if (maxNumEvents == Long.MAX_VALUE) {
-            if (timeBtwEvents instanceof Constant) {
+            if (timeBtwEvents instanceof ConstantRV) {
                 if (timeBtwEvents.getValue() == 0.0) {
                     throw new IllegalArgumentException("Maximum number of actions is infinite and time between actions is 0.0");
                 }
@@ -748,7 +750,7 @@ public class EventGenerator extends SchedulingElement implements EventGeneratorI
 //		System.out.println("^^^^^^^^^^^^^^^^  In setTimeBetweenEventsForReplication() for " + getName());
 //		System.out.println("timeBtwEvents " + timeBtwEvents + " maxNumEvents = " + maxNumEvents);
         if (maxNumEvents == Long.MAX_VALUE) {
-            if (timeBtwEvents instanceof Constant) {
+            if (timeBtwEvents instanceof ConstantRV) {
                 if (timeBtwEvents.getValue() == 0.0) {
                     throw new IllegalArgumentException("Maximum number of actions is infinite and time between actions is 0.0");
                 }

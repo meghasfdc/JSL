@@ -21,10 +21,10 @@
  */
 package ex.montecarlo;
 
-import jsl.utilities.random.distributions.Beta;
-import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.BetaRV;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.UniformRV;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -37,12 +37,13 @@ public class CashFlowExample {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Uniform S = new Uniform(90.0,100.0);
-        Normal C = new Normal(100.0, 10.0*10.0);
-        Normal Y = new Normal(300.0, 50.0*50.0);
-        double[] p = {4.0, 0.3, 5.0, 0.7, 6.0, 0.8, 7.0, 1.0};
-        DEmpiricalCDF N = new DEmpiricalCDF(p);
-        Beta b = new Beta(5.0, 1.5);
+        UniformRV S = new UniformRV(90.0,100.0);
+        NormalRV C = new NormalRV(100.0, 10.0*10.0);
+        NormalRV Y = new NormalRV(300.0, 50.0*50.0);
+        double[] values = {4.0, 5.0, 6.0, 7.0};
+        double[] cdf = {0.3, 0.7, 0.8, 1.0};
+        DEmpiricalRV N = new DEmpiricalRV(values, cdf);
+        BetaRV b = new BetaRV(5.0, 1.5);
         Statistic npvStat = new Statistic("NPV");
         Statistic npvLT0Stat = new Statistic("P(NPV < 0)");
         int r = 1910;

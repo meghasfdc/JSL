@@ -22,7 +22,7 @@ import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 import jsl.utilities.reporting.JSL;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
@@ -336,7 +336,7 @@ abstract public class AbstractMover extends SpatialModelElement implements Mover
         myVelFactor = 1.0;
         myNumTrips = 0;
         myTripLimit = Integer.MAX_VALUE;
-        myVelocity = new RandomVariable(this, Constant.ONE);
+        myVelocity = new RandomVariable(this, ConstantRV.ONE);
         myPosition = new Vector3D();
         myDirection = new Vector3D();
         myDestination = new Vector3D();

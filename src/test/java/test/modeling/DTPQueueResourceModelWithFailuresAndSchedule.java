@@ -15,26 +15,20 @@
  */
 package test.modeling;
 
-import jsl.modeling.JSLEvent;
-import jsl.modeling.Model;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.SimulationReporter;
+import jsl.modeling.*;
+import jsl.modeling.elements.Schedule;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.modeling.elements.Schedule;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
 import jsl.modeling.resource.Request;
 import jsl.modeling.resource.Request.PreemptionRule;
-import jsl.modeling.resource.RequestReactorAdapter;
 import jsl.modeling.resource.RequestReactorIfc;
 import jsl.modeling.resource.ResourceUnit;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.JSL;
 
 public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElement {
@@ -53,7 +47,7 @@ public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElem
     private final RequestReactor myRequestUser = new RequestReactor();
 
     public DTPQueueResourceModelWithFailuresAndSchedule(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DTPQueueResourceModelWithFailuresAndSchedule(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
@@ -78,8 +72,8 @@ public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElem
         myResource.useSchedule(s);
 
         //Constant c1 = new Constant(0.5);
-        Constant c1 = new Constant(100.0);
-        myResource.addTimeBasedFailure(Constant.TWO, c1);
+        ConstantRV c1 = new ConstantRV(100.0);
+        myResource.addTimeBasedFailure(ConstantRV.TWO, c1);
         //       myResource.addTimeBasedFailure(Constant.TWO, c1, false);
         // myResource = new ResourceUnit.Builder(this).name("Server").builder();
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
@@ -243,8 +237,8 @@ public class DTPQueueResourceModelWithFailuresAndSchedule extends SchedulingElem
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DTPQueueResourceModelWithFailuresAndSchedule driveThroughPharmacy = new DTPQueueResourceModelWithFailuresAndSchedule(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

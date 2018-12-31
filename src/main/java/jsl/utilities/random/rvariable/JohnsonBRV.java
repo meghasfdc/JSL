@@ -102,7 +102,7 @@ public final class JohnsonBRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rJohnsonB(myAlpha1, myAlpha2, myMin, myMax, myRNG);
+        double v = JSLRandom.rJohnsonB(myAlpha1, myAlpha2, myMin, myMax, myRNStream);
         return v;
     }
 

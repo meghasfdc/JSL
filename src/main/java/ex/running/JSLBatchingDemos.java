@@ -28,6 +28,7 @@ import jsl.modeling.StatisticalBatchingElement;
 import jsl.modeling.elements.variable.TWBatchingElement;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.Statistic;
 
@@ -52,8 +53,8 @@ public class JSLBatchingDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(1.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(0.7));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(1.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(0.7));
 
         // create the batching element for the simulation
         StatisticalBatchingElement be = new StatisticalBatchingElement(m);
@@ -83,8 +84,8 @@ public class JSLBatchingDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(1.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(0.7));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(1.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(0.7));
 
          // create the batching element for the simulation
         StatisticalBatchingElement be = new StatisticalBatchingElement(m);

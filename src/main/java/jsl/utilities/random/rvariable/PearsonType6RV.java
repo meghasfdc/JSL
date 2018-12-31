@@ -80,7 +80,7 @@ public final class PearsonType6RV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rPearsonType6(myAlpha1, myAlpha2, myBeta, myRNG);
+        double v = JSLRandom.rPearsonType6(myAlpha1, myAlpha2, myBeta, myRNStream);
         return v;
     }
 

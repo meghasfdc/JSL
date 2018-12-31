@@ -23,6 +23,8 @@ package jsl.utilities.statistic;
 import java.util.Arrays;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /** Tabulates the proportion and frequency for a random variable X &gt; a(i)
  *  where a(i) are thresholds.
@@ -190,7 +192,7 @@ public class ExceedanceEstimator extends AbstractCollector {
 
     public static void main(String[] args) {
 
-        Uniform du = new Uniform(0, 100);
+        UniformRV du = new UniformRV(0, 100);
 
         double[] t = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0};
         ExceedanceEstimator f = new ExceedanceEstimator(t);
@@ -199,7 +201,7 @@ public class ExceedanceEstimator extends AbstractCollector {
         System.out.println("Testing");
         System.out.println(f);
 
-        Normal n = new Normal();
+        NormalRV n = new NormalRV();
         ExceedanceEstimator e = new ExceedanceEstimator(Normal.stdNormalInvCDF(0.95));
         e.collect(n.sample(10000));
         System.out.println(e);

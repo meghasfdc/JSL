@@ -24,7 +24,9 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
+
+import java.util.List;
 
 /**
  *
@@ -36,13 +38,14 @@ public class NWayByChanceEntitySender extends EntityReceiver {
 
      private RandomVariable myTime;
 
-    public NWayByChanceEntitySender(ModelElement parent) {
-        this(parent, null, null);
+    public NWayByChanceEntitySender(ModelElement parent, List<GetEntityReceiverIfc> elements, double[] cdf) {
+        this(parent, elements, cdf, null, null);
     }
 
-    public NWayByChanceEntitySender(ModelElement parent, RandomIfc time, String name) {
+    public NWayByChanceEntitySender(ModelElement parent, List<GetEntityReceiverIfc> elements, double[] cdf,
+                                    RandomIfc time, String name) {
         super(parent, name);
-        mySelector = new RandomElement<GetEntityReceiverIfc>(this);
+        mySelector = new RandomElement<GetEntityReceiverIfc>(this, elements, cdf);
         setTransferTime(time);
         setEntitySender(new Sender());
     }
@@ -52,7 +55,7 @@ public class NWayByChanceEntitySender extends EntityReceiver {
      * @param time 
      */
     public final void setTransferTime(double time) {
-        setTransferTime(new Constant(time));
+        setTransferTime(new ConstantRV(time));
     }
 
     /** If the supplied value is null, then zero is used for the time
@@ -61,7 +64,7 @@ public class NWayByChanceEntitySender extends EntityReceiver {
      */
     public final void setTransferTime(RandomIfc time) {
         if (time == null){
-            time = Constant.ZERO;
+            time = ConstantRV.ZERO;
         }
         if (myTime == null) {
             myTime = new RandomVariable(this, time);
@@ -112,14 +115,6 @@ public class NWayByChanceEntitySender extends EntityReceiver {
 
     public final void advanceToNextSubstream() {
         mySelector.advanceToNextSubstream();
-    }
-
-    public final void addLast(GetEntityReceiverIfc obj) {
-        mySelector.addLast(obj);
-    }
-
-    public final void add(GetEntityReceiverIfc obj, double p) {
-        mySelector.add(obj, p);
     }
 
     @Override

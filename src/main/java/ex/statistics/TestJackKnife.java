@@ -18,6 +18,8 @@ package ex.statistics;
 
 import jsl.utilities.random.distributions.Lognormal;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.LognormalRV;
+import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.statistic.EstimatorIfc;
 import jsl.utilities.statistic.JackKnifeEstimator;
 
@@ -29,7 +31,7 @@ public class TestJackKnife {
     }
 
     public static void example1(){
-        Normal n = new Normal(10, 3);
+        NormalRV n = new NormalRV(10, 3);
 
         JackKnifeEstimator bs = new JackKnifeEstimator(n.sample(50), new EstimatorIfc.Average());
 
@@ -37,7 +39,7 @@ public class TestJackKnife {
     }
 
     public static void example2(){
-        Lognormal n = new Lognormal(10, 3);
+        LognormalRV n = new LognormalRV(10, 3);
 
         JackKnifeEstimator bs = new JackKnifeEstimator(
                 n.sample(50), new EstimatorIfc.Minimum());

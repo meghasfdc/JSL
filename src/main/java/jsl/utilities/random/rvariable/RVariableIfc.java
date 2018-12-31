@@ -16,11 +16,12 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.GetValueIfc;
 import jsl.utilities.PreviousValueIfc;
-import jsl.utilities.controls.Controls;
+import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.SampleIfc;
-import jsl.utilities.random.rng.*;
+import jsl.utilities.random.rng.GetRandomNumberStreamIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.SetRandomNumberStreamIfc;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.DoubleStream;
@@ -35,8 +36,8 @@ import java.util.stream.DoubleStream;
  *
  * The preferred approach to creating random variables is to sub-class AbstractRVariable.
  */
-public interface RVariableIfc extends GetValueIfc, RandomStreamIfc,
-        SampleIfc, NewAntitheticInstanceIfc, PreviousValueIfc, DoubleSupplier {
+public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanceIfc,
+        PreviousValueIfc, DoubleSupplier, SetRandomNumberStreamIfc, GetRandomNumberStreamIfc {
 
     /**
      * The set of pre-defined distribution types
@@ -57,12 +58,12 @@ public interface RVariableIfc extends GetValueIfc, RandomStreamIfc,
 
     /**
      * @param rng the RNStreamIfc to use
-     * @return a new instance with same parameter value
+     * @return a new instance with same parameter values
      */
     RVariableIfc newInstance(RNStreamIfc rng);
 
     /**
-     * @return a new instance with same parameter value, with a different stream
+     * @return a new instance with same parameter values, with a different stream
      */
     default RVariableIfc newInstance() {
         return newInstance(JSLRandom.getRNStream());

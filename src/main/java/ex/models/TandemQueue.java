@@ -29,6 +29,7 @@ import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  * Arriving customers choose randomly to two stations.  
@@ -67,9 +68,9 @@ public class TandemQueue extends SchedulingElement {
 
     public TandemQueue(ModelElement parent, String name) {
         super(parent, name);
-        myTBA = new RandomVariable(this, new Exponential(1.0/1.1));
-        myST1 = new RandomVariable(this, new Exponential(0.8));
-        myST2 = new RandomVariable(this, new Exponential(0.7));
+        myTBA = new RandomVariable(this, new ExponentialRV(1.0/1.1));
+        myST1 = new RandomVariable(this, new ExponentialRV(0.8));
+        myST2 = new RandomVariable(this, new ExponentialRV(0.7));
         myArrivalGenerator = new EventGenerator(this, new Arrivals(), myTBA, myTBA);
         myStation1 = new SingleQueueStation(this, myST1, "Station1");
         myStation2 = new SingleQueueStation(this, myST2, "Station2");

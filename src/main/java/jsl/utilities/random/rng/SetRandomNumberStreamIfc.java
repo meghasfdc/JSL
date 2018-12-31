@@ -16,12 +16,12 @@
 
 package jsl.utilities.random.rng;
 
-public interface SetRngIfc {
+public interface SetRandomNumberStreamIfc {
 
     /**
-     * Sets the underlying random number generator
+     * Sets the underlying random number stream
      *
-     * @param rng the reference to the random number generator, must not be null
+     * @param stream the reference to the random number stream, must not be null
      */
-    void setRandomNumberGenerator(RNStreamIfc rng);
+    void setRandomNumberStream(RNStreamIfc stream);
 }

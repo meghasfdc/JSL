@@ -63,13 +63,13 @@ public final class BernoulliRV extends AbstractRVariable {
 
     @Override
     protected final double generate(){
-        double v = JSLRandom.rBernoulli(myProbSuccess, myRNG);
+        double v = JSLRandom.rBernoulli(myProbSuccess, myRNStream);
         return v;
     }
 
     /** Returns a randomly generated boolean according to the Bernoulli distribution
      *
-     * @return
+     * @return a randomly generated boolean
      */
     public final boolean getBoolean() {
         if (getValue() == 0.0) {
@@ -77,6 +77,22 @@ public final class BernoulliRV extends AbstractRVariable {
         } else {
             return (true);
         }
+    }
+
+    /** Returns a boolean array filled via getBoolean()
+     *
+     * @param n the generate size, must be at least 1
+     * @return the array
+     */
+    public final boolean[] getBooleanSample(int n){
+        if (n <= 0){
+            throw new IllegalArgumentException("The generate size must be > 0");
+        }
+        boolean[] b = new boolean[n];
+        for(int i=0;i<n;i++){
+            b[i] = getBoolean();
+        }
+        return b;
     }
 
     /**

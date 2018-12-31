@@ -19,6 +19,7 @@ import jsl.utilities.random.distributions.Beta;
 import jsl.utilities.random.distributions.Distribution;
 import jsl.utilities.random.distributions.Lognormal;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.StatisticXY;
@@ -32,7 +33,7 @@ public class BivariateNORTACorrelationEvaluator {
 	/** Standard normal
 	 * 
 	 */
-	protected Normal snd;
+	protected NormalRV snd;
 	
 	/** The distribution from which we want the
 	 *  correlated random variates
@@ -100,7 +101,7 @@ public class BivariateNORTACorrelationEvaluator {
 		setSampleSize(sampleSize);
 		setNumberOfReplications(numReps);
 		setAntitheticFlag(antitheticFlag);	
-		snd = new Normal();
+		snd = new NormalRV();
 	}
 	
 	/**
@@ -377,8 +378,8 @@ public class BivariateNORTACorrelationEvaluator {
 		for(int i=1;i<=sampleSize;i++){
 			double z1 = snd.getValue();
 			double z2 = myCorr*z1 + Math.sqrt(1.0-myCorr*myCorr)*snd.getValue();
-			double u1 = snd.cdf(z1);
-			double u2 = snd.cdf(z2);
+			double u1 = Normal.stdNormalCDF(z1);
+			double u2 = Normal.stdNormalCDF(z2);
 			double x = myD1.invCDF(u1);
 			double y= myD2.invCDF(u2);
 			statXY.collectXY(x, y);			

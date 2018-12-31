@@ -17,20 +17,14 @@
 
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.NewInstanceIfc;
+import jsl.utilities.random.rvariable.GetRVariableIfc;
 
 /**
  * Represents the basic interface that all probability distributions must implement.
  *
  */
-public interface DistributionIfc extends RandomIfc, DistributionFunctionIfc {
-   
-	/** Returns the underlying random number generator
-	 * 
-	 * @return
-	 */
-	public RNStreamIfc getRandomNumberGenerator();
+public interface DistributionIfc extends DistributionFunctionIfc, NewInstanceIfc {
 
 }
 

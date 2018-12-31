@@ -21,7 +21,7 @@
  */
 package ex.montecarlo;
 
-import jsl.utilities.random.distributions.DEmpiricalCDF;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -38,8 +38,9 @@ public class NewsVendorExample {
         double s = 0.25; //sales price
         double c = 0.15; // unit cost
         double u = 0.02; //salvage value
-        double[] pm = {5, 0.1, 10, 0.3, 40, 0.6, 45, 0.8, 50, 0.9, 55, 0.95, 60, 1.0};
-        DEmpiricalCDF dCDF = new DEmpiricalCDF(pm);
+        double[] values = {5, 10, 40, 45, 50, 55, 60};
+        double[] cdf = {0.1, 0.3, 0.6, 0.8, 0.9, 0.95, 1.0};
+        DEmpiricalRV dCDF = new DEmpiricalRV(values, cdf);
         Statistic stat = new Statistic("Profit");
         double n = 1994; // sampel size
         for (int i = 1; i <= n; i++) {

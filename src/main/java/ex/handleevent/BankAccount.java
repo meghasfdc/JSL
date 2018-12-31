@@ -15,18 +15,13 @@
  */
 package ex.handleevent;
 
-import jsl.modeling.JSLEvent;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.SimulationReporter;
+import jsl.modeling.*;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.welch.WelchDataCollectorTW;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Lognormal;
-import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.LognormalRV;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  *
@@ -64,13 +59,13 @@ public class BankAccount extends SchedulingElement {
         // create an initialize the balance
         myBalance = new TimeWeighted(this, 150.0, "Balance");
         //myBalance.turnOnTrace();
-        myTBFreqPayments = new RandomVariable(this, new Uniform(7.0, 10.0));
-        myTBOccasionalPayments = new RandomVariable(this, new Uniform(25.0, 35.0));
-        myTBWithdrawals = new RandomVariable(this, new Exponential(1.0));
-        myFreqPaymentSize = new RandomVariable(this, new Exponential(16.0));
-        myOccasionalPaymentSize = new RandomVariable(this, new Constant(100.0));
+        myTBFreqPayments = new RandomVariable(this, new UniformRV(7.0, 10.0));
+        myTBOccasionalPayments = new RandomVariable(this, new UniformRV(25.0, 35.0));
+        myTBWithdrawals = new RandomVariable(this, new ExponentialRV(1.0));
+        myFreqPaymentSize = new RandomVariable(this, new ExponentialRV(16.0));
+        myOccasionalPaymentSize = new RandomVariable(this, new ConstantRV(100.0));
         // used lognormal to prevent negative withdrawals
-        myWithdrawalSize = new RandomVariable(this, new Lognormal(5.0, 1.0));
+        myWithdrawalSize = new RandomVariable(this, new LognormalRV(5.0, 1.0));
     }
 
     @Override

@@ -52,7 +52,7 @@ public class Triangular extends Distribution implements
      * min = 0.0, mode = 0.0, and max = 1.0
      */
     public Triangular() {
-        this(0.0, 0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 0.0, 1.0, null);
     }
 
     /** Constructs a Triangular distribution with
@@ -60,16 +60,7 @@ public class Triangular extends Distribution implements
      * @param parameters The array of parameters
      */
     public Triangular(double[] parameters) {
-        this(parameters[0], parameters[1], parameters[2], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a Triangular distribution with
-     * min = parameters[0], mode = parameters[1], max = parameters[2]
-     * @param parameters The array of parameters
-     * @param rng
-     */
-    public Triangular(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], parameters[2], rng);
+        this(parameters[0], parameters[1], parameters[2], null);
     }
 
     /** Constructs a Triangular distribution with min, mode, and max
@@ -79,7 +70,7 @@ public class Triangular extends Distribution implements
      * @param max The maximum value of the distribution
      */
     public Triangular(double min, double mode, double max) {
-        this(min, mode, max, RNStreamFactory.getDefaultFactory().getStream());
+        this(min, mode, max, null);
     }
 
     /** Constructs a Triangular distribution with min, mode, and max
@@ -87,42 +78,16 @@ public class Triangular extends Distribution implements
      * @param min The minimum value of the distribution
      * @param mode The mode of the distribution
      * @param max The maximum value of the distribution
-     * @param rng A RngIfc
+     * @param name an optional label/name
      */
-    public Triangular(double min, double mode, double max, RNStreamIfc rng) {
-        super(rng);
+    public Triangular(double min, double mode, double max, String name) {
+        super(name);
         setParameters(min, mode, max);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Triangular newInstance() {
         return (new Triangular(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Triangular newInstance(RNStreamIfc rng) {
-        return (new Triangular(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Triangular newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -162,8 +127,8 @@ public class Triangular extends Distribution implements
      * min = param[0]
      * mode = param[1]
      *  max = param[2]
-     * @param param
-     * @return
+     * @param param the parameter array
+     * @return true if the parameters are valid
      */
     public static boolean checkParameters(double[] param) {
         if (param == null) {
@@ -191,14 +156,26 @@ public class Triangular extends Distribution implements
         return true;
     }
 
+    /**
+     *
+     * @return the minimum of the distribution
+     */
     public final double getMinimum() {
         return (myMin);
     }
 
+    /**
+     *
+     * @return the mode of the distribution
+     */
     public final double getMode() {
         return (myMode);
     }
 
+    /**
+     *
+     * @return the maximum of the distribution
+     */
     public final double getMaximum() {
         return (myMax);
     }
@@ -208,12 +185,20 @@ public class Triangular extends Distribution implements
         return (myMin + myMax + myMode) / 3.0;
     }
 
+    /**
+     *
+     * @return the 3rd moment
+     */
     public final double getMoment3() {
-        return (1 / 10) * ((myMin * myMin * myMin) + (myMode * myMode * myMode) + (myMax * myMax * myMax) + (myMin * myMin * myMode) + (myMin * myMin * myMax) + (myMode * myMode * myMin) + (myMode * myMode * myMax) + (myMax * myMax * myMin) + (myMax * myMax * myMode) + (myMin * myMode * myMax));
+        return (1.0 / 10.0) * ((myMin * myMin * myMin) + (myMode * myMode * myMode) + (myMax * myMax * myMax) + (myMin * myMin * myMode) + (myMin * myMin * myMax) + (myMode * myMode * myMin) + (myMode * myMode * myMax) + (myMax * myMax * myMin) + (myMax * myMax * myMode) + (myMin * myMode * myMax));
     }
 
+    /**
+     *
+     * @return the 4th moment
+     */
     public final double getMoment4() {
-        return ((1 / 135) * ((myMin * myMin + myMode * myMode + myMax * myMax - myMin * myMode - myMin * myMax - myMode * myMax) * (myMin * myMin + myMode * myMode + myMax * myMax - myMin * myMode - myMin * myMax - myMode * myMax)) + 4 * ((1 / 270) * (myMin + myMode - (2 * myMax)) * (myMin + myMax - (2 * myMode)) * (myMode + myMax - (2 * myMin)) * ((myMin + myMode + myMax) / 3)) + ((1 / 3) * (myMin * myMin + myMode * myMode + myMax * myMax - myMin * myMode - myMin * myMax - myMode * myMax) * ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3)) + ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3));
+        return ((1.0 / 135.0) * ((myMin * myMin + myMode * myMode + myMax * myMax - myMin * myMode - myMin * myMax - myMode * myMax) * (myMin * myMin + myMode * myMode + myMax * myMax - myMin * myMode - myMin * myMax - myMode * myMax)) + 4 * ((1 / 270) * (myMin + myMode - (2 * myMax)) * (myMin + myMax - (2 * myMode)) * (myMode + myMax - (2 * myMin)) * ((myMin + myMode + myMax) / 3)) + ((1 / 3) * (myMin * myMin + myMode * myMode + myMax * myMax - myMin * myMode - myMin * myMax - myMode * myMax) * ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3)) + ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3) * ((myMin + myMode + myMax) / 3));
     }
 
     @Override
@@ -294,13 +279,6 @@ public class Triangular extends Distribution implements
 
     }
 
-    /** Returns the inverse cumulative distribution function of the triangular distribution
-     * throws IllegalArgumentException if the value of the argument passed is beyond the range [0,1]
-     *
-     * @param p the cumulative probability that requires the corresponding point
-     * @return double the value in the triangular distribution at which the cumulative distribution funtion equals the value of p
-     *
-     */
     @Override
     public final double invCDF(double p) {
         if ((p < 0.0) || (p > 1.0)) {
@@ -348,7 +326,7 @@ public class Triangular extends Distribution implements
     public final double getSkewness() {
         double mu3 = -(myMin + myMax - 2.0 * myMode) * (myMin + myMode - 2.0 * myMax) * (myMax + myMode - 2.0 * myMin) / 270.0;
         double mu2 = getVariance();
-        return (mu3 / Math.pow(mu2, (3 / 2)));
+        return (mu3 / Math.pow(mu2, (3.0 / 2.0)));
     }
 
     /** Sets the parameters for the distribution

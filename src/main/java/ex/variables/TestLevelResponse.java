@@ -22,12 +22,15 @@ import jsl.modeling.Simulation;
 import jsl.modeling.elements.variable.LevelResponse;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.elements.variable.Variable;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.NormalRV;
 
 
 public class TestLevelResponse extends ModelElement {
 
     private RandomVariable myRV;
+    private Variable myVariable;
 
     private LevelResponse myLR;
 
@@ -39,8 +42,9 @@ public class TestLevelResponse extends ModelElement {
 
     public TestLevelResponse(ModelElement parent, String name) {
         super(parent, name);
-        myRV = new RandomVariable(this, new Normal());
-        myLR = new LevelResponse(myRV, 0.0);
+        myRV = new RandomVariable(this, new NormalRV());
+        myVariable = new Variable(this, "Level Variable");
+        myLR = new LevelResponse(myVariable, 0.0);
         myR = new ResponseVariable(this, "Observations");
     }
 
@@ -52,6 +56,7 @@ public class TestLevelResponse extends ModelElement {
     protected void variableUpdate(JSLEvent evnt){
 
         double x = myRV.getValue();
+        myVariable.setValue(x);
         myR.setValue(x);
         schedule(this::variableUpdate).in(1.0).units();
         //System.out.println("in variable update");

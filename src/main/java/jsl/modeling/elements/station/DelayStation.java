@@ -18,10 +18,10 @@ package jsl.modeling.elements.station;
 import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
-import jsl.modeling.queue.QObject;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.modeling.queue.QObject;
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
@@ -36,7 +36,7 @@ public class DelayStation extends Station {
     private EndDelayAction myEndDelayAction;
 
     public DelayStation(ModelElement parent) {
-        this(parent, Constant.ZERO, null, null);
+        this(parent, ConstantRV.ZERO, null, null);
     }
 
     public DelayStation(ModelElement parent, GetValueIfc sd) {
@@ -44,7 +44,7 @@ public class DelayStation extends Station {
     }
 
     public DelayStation(ModelElement parent, String name) {
-        this(parent, Constant.ZERO, null, name);
+        this(parent, ConstantRV.ZERO, null, name);
     }
 
     public DelayStation(ModelElement parent, GetValueIfc sd, String name) {

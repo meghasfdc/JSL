@@ -24,6 +24,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Bernoulli;
+import jsl.utilities.random.rvariable.BernoulliRV;
 
 /** This model element randomly selects between two receivers 
  *  (objects that implement ReceiveQObjectIfc) and sends the
@@ -51,7 +52,7 @@ public class TwoWayByChanceQObjectSender extends ModelElement implements SendQOb
         super(parent, name);
         setFirstReceiver(r1);
         setSecondReceiver(r2);
-        myRV = new RandomVariable(this, new Bernoulli(p));
+        myRV = new RandomVariable(this, new BernoulliRV(p));
     }
 
     public final void setFirstReceiver(ReceiveQObjectIfc r1) {

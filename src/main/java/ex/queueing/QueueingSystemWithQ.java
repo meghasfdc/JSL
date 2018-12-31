@@ -15,36 +15,31 @@
  */
 package ex.queueing;
 
-import java.io.PrintWriter;
-import java.util.Optional;
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.queue.QObject;
-import jsl.modeling.queue.Queue;
+import jsl.modeling.*;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.reporting.JSL;
-import jsl.modeling.SimulationReporter;
-import jsl.modeling.StatisticalBatchingElement;
+import jsl.modeling.queue.QObject;
+import jsl.modeling.queue.Queue;
 import jsl.modeling.queue.QueueResponse;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.reporting.JSL;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 
-public class SingleQueueStation extends SchedulingElement {
+import java.io.PrintWriter;
+import java.util.Optional;
+
+public class QueueingSystemWithQ extends SchedulingElement {
 
     private int myNumServers;
 
     private Queue myWaitingQ;
 
-    private DistributionIfc myServiceDistribution;
+    private RVariableIfc myServiceDistribution;
 
-    private DistributionIfc myArrivalDistribution;
+    private RVariableIfc myArrivalDistribution;
 
     private RandomVariable myServiceRV;
 
@@ -60,11 +55,11 @@ public class SingleQueueStation extends SchedulingElement {
 
     private ResponseVariable mySysTime;
 
-    public SingleQueueStation(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+    public QueueingSystemWithQ(ModelElement parent) {
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
-    public SingleQueueStation(ModelElement parent, int numServers, DistributionIfc ad, DistributionIfc sd) {
+    public QueueingSystemWithQ(ModelElement parent, int numServers, RVariableIfc ad, RVariableIfc sd) {
         super(parent);
 
         setNumberOfServers(numServers);
@@ -95,7 +90,7 @@ public class SingleQueueStation extends SchedulingElement {
         myNumServers = n;
     }
 
-    public final void setServiceDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setServiceDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Service Time Distribution was null!");
@@ -112,7 +107,7 @@ public class SingleQueueStation extends SchedulingElement {
 
     }
 
-    public final void setArrivalDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setArrivalDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Arrival Time Distribution was null!");
@@ -188,7 +183,7 @@ public class SingleQueueStation extends SchedulingElement {
 
     public static void main(String[] args) {
 
-        System.out.println("SingleQueueStation Model");
+        System.out.println("QueueingSystemWithQ Model");
 
         runExperiment();
 
@@ -198,10 +193,10 @@ public class SingleQueueStation extends SchedulingElement {
 
     public static void runReplication() {
 
-        Simulation sim = new Simulation("SingleQueueStation");
+        Simulation sim = new Simulation("QueueingSystemWithQ");
 
         // create the model element and attach it to the main model
-        new SingleQueueStation(sim.getModel());
+        new QueueingSystemWithQ(sim.getModel());
 
         sim.setLengthOfReplication(20000.0);
         sim.setLengthOfWarmUp(5000.0);
@@ -217,10 +212,10 @@ public class SingleQueueStation extends SchedulingElement {
 
     public static void runBatchReplication() {
 
-        Simulation sim = new Simulation("SingleQueueStation");
+        Simulation sim = new Simulation("QueueingSystemWithQ");
 
         // create the model element and attach it to the main model
-        new SingleQueueStation(sim.getModel());
+        new QueueingSystemWithQ(sim.getModel());
 
         sim.turnOnStatisticalBatching();
         StatisticalBatchingElement be = sim.getStatisticalBatchingElement().get();
@@ -242,10 +237,10 @@ public class SingleQueueStation extends SchedulingElement {
 
     public static void runExperiment() {
 
-        Simulation sim = new Simulation("SingleQueueStation");
+        Simulation sim = new Simulation("QueueingSystemWithQ");
 
         // create the model element and attach it to the main model
-        new SingleQueueStation(sim.getModel());
+        new QueueingSystemWithQ(sim.getModel());
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

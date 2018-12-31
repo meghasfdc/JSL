@@ -64,7 +64,7 @@ public final class PoissonRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rPoisson(mean, myRNG);
+        double v = JSLRandom.rPoisson(mean, myRNStream);
         return v;
     }
 

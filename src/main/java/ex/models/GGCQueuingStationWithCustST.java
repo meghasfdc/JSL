@@ -37,6 +37,7 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  *
@@ -100,8 +101,8 @@ public class GGCQueuingStationWithCustST extends ModelElement {
         // get the model
         Model m = sim.getModel();
         // add system to the main model
-        Exponential tba = new Exponential(1);
-        Exponential st = new Exponential(.8);
+        ExponentialRV tba = new ExponentialRV(1);
+        ExponentialRV st = new ExponentialRV(.8);
         int ns = 2;
         GGCQueuingStationWithCustST system = new GGCQueuingStationWithCustST(m, tba, st, ns);
         // set the parameters of the experiment

@@ -76,7 +76,7 @@ public final class PearsonType5RV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rPearsonType5(myShape, myScale, myRNG);
+        double v = JSLRandom.rPearsonType5(myShape, myScale, myRNStream);
         return v;
     }
 

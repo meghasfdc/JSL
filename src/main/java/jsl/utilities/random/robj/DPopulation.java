@@ -15,8 +15,10 @@
  */
 package jsl.utilities.random.robj;
 
+import jsl.utilities.NewInstanceIfc;
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
+import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
@@ -27,7 +29,7 @@ import jsl.utilities.random.rvariable.JSLRandom;
  * @author rossetti
  *
  */
-public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
+public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc, ParametersIfc, NewInstanceIfc {
 
     /** A counter to count the number of created to assign "unique" ids
      */
@@ -121,7 +123,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc {
      * @param rng
      * @return
      */
-    @Override
+//    @Override
     public final DPopulation newInstance(RNStreamIfc rng) {
         return (new DPopulation(getParameters(), rng));
     }

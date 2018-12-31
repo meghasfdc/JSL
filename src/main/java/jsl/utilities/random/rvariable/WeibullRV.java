@@ -76,7 +76,7 @@ public final class WeibullRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rWeibull(myShape, myScale, myRNG);
+        double v = JSLRandom.rWeibull(myShape, myScale, myRNStream);
         return v;
     }
 

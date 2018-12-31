@@ -19,6 +19,8 @@ package jsl.utilities.rootfinding;
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -27,13 +29,13 @@ import jsl.utilities.statistic.Statistic;
  */
 public class SATestFunction implements FunctionIfc {
 
-	protected DistributionIfc myNoise;
+	protected RVariableIfc myNoise;
 	
 	/**
 	 * 
 	 */
 	public SATestFunction() {
-		myNoise = new Normal(0.0, 1.0);
+		myNoise = new NormalRV(0.0, 1.0);
 	}
 
 	/* (non-Javadoc)

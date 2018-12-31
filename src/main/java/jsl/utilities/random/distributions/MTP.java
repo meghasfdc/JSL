@@ -37,36 +37,39 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
 
     double[] parameter;
 
+    /**
+     *  defaults mixing prob = 0.5, shift = 0.0, rate = 1.0
+     */
     public MTP() {
-        this(0.5, 0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.5, 0.0, 1.0, null);
     }
 
     /** Constructs an MTP with mixing probabilities 1-mixProb and mixProb with shifts of
      * shift and shift+1 with rates equal to rate
-     * @param mixProb
-     * @param shift
-     * @param rate
+     * @param mixProb the mixing probability
+     * @param shift the shift
+     * @param rate the rate
      */
     public MTP(double mixProb, double shift, double rate) {
-        this(mixProb, shift, rate, RNStreamFactory.getDefaultFactory().getStream());
+        this(mixProb, shift, rate, null);
     }
 
     /** Constructs an MTP using the supplied parameters
      *
-     * @param mixProb
-     * @param shift
-     * @param rate
-     * @param rng
+     * @param mixProb the mixing probability
+     * @param shift the shift
+     * @param rate the rate
+     * @param name an optional name/label
      */
-    public MTP(double mixProb, double shift, double rate, RNStreamIfc rng) {
-        super(rng);
+    public MTP(double mixProb, double shift, double rate, String name) {
+        super(name);
         myMixProb1 = mixProb;
         myMixProb2 = 1 - myMixProb1;
         myMean = rate;
         //System.out.println("Mean1: "+myMean1);
         //System.out.println("Mean2: "+myMean2);
-        SD1 = new ShiftedLossFunctionDistribution(new Poisson(rate, myRNG), shift);
-        SD2 = new ShiftedLossFunctionDistribution(new Poisson(rate, myRNG), shift + 1);
+        SD1 = new ShiftedLossFunctionDistribution(new Poisson(rate), shift);
+        SD2 = new ShiftedLossFunctionDistribution(new Poisson(rate), shift + 1);
     }
 
     /** Constructs an MTP with array of parameters
@@ -75,24 +78,10 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      * parameters[0] - mixing probability;
      * parameters[1] - shift;
      * parameters[2] - rate;
-     * @param parameters
+     * @param parameters the parameter array
      */
     public MTP(double[] parameters) {
-        this(parameters[0], parameters[1], parameters[2],
-                RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs an MTP with array of parameters
-     *
-     *
-     * parameters[0] - mixing probability;
-     * parameters[1] - shift;
-     * parameters[2] - rate;
-     * @param parameters
-     * @param rng
-     */
-    public MTP(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], parameters[2], rng);
+        this(parameters[0], parameters[1], parameters[2], null);
     }
 
     /** Returns a new instance of the random source with the same parameters
@@ -102,25 +91,6 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
      */
     public final MTP newInstance() {
         return (new MTP(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    public final MTP newInstance(RNStreamIfc rng) {
-        return (new MTP(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    public final MTP newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -147,10 +117,12 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
         return z;
     }
 
+    @Override
     public double getVariance() {
         return myMixProb1 * ((SD1.getMean() * SD1.getMean()) + myMean) + myMixProb2 * ((SD2.getMean() * SD2.getMean()) + myMean) - (getMean() * getMean());
     }
 
+    @Override
     public double invCDF(double p) {
         if ((p < 0.0) || (p > 1.0)) {
             throw new IllegalArgumentException("Supplied probability was " + p + " Probability must be [0,1)");
@@ -165,6 +137,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
         return i;
     }
 
+    @Override
     public void setParameters(double[] parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("The parameters array was null");
@@ -172,20 +145,29 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
         setParameters(parameters[2], parameters[1], parameters[0]);
     }
 
+    @Override
     public double complementaryCDF(double x) {
         return myMixProb1 * SD1.complementaryCDF(x) + myMixProb2 * SD2.complementaryCDF(x);
     }
 
+    @Override
     public double firstOrderLossFunction(double x) {
 
         return myMixProb1 * SD1.firstOrderLossFunction(x) + myMixProb2 * SD2.firstOrderLossFunction(x);
     }
 
+    @Override
     public double secondOrderLossFunction(double x) {
 
         return myMixProb1 * SD1.secondOrderLossFunction(x) + myMixProb2 * SD2.secondOrderLossFunction(x);
     }
 
+    /**
+     *
+     * @param rate the rate
+     * @param shift the shift
+     * @param mixProbability the mixing probability
+     */
     public void setParameters(double rate, double shift, double mixProbability) {
         if (rate <= 0.0) {
             throw new IllegalArgumentException("Rate should be > 0.0");

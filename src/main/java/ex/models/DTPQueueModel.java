@@ -32,6 +32,7 @@ import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
 import jsl.modeling.queue.QueueResponse;
 import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 public class DTPQueueModel extends SchedulingElement {
 
@@ -46,7 +47,7 @@ public class DTPQueueModel extends SchedulingElement {
     private ResponseVariable mySysTime;
 
     public DTPQueueModel(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DTPQueueModel(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
@@ -157,8 +158,8 @@ public class DTPQueueModel extends SchedulingElement {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DTPQueueModel driveThroughPharmacy = new DTPQueueModel(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
 
         Optional<QueueResponse> queueResponse = driveThroughPharmacy.getQueueResponse();
         if (queueResponse.isPresent()){

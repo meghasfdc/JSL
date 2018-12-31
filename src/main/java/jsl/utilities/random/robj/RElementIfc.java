@@ -16,10 +16,10 @@
 
 package jsl.utilities.random.robj;
 
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 
 
-public interface RElementIfc<T> extends RandomStreamIfc {
+public interface RElementIfc<T> extends RNStreamControlIfc {
 
 	/** Returns an element randomly selected from the list
 	 * 

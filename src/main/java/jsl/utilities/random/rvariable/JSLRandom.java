@@ -15,18 +15,18 @@
  */
 package jsl.utilities.random.rvariable;
 
-import java.util.List;
-import java.util.stream.DoubleStream;
-
 import jsl.utilities.math.JSLMath;
+import jsl.utilities.random.distributions.*;
+import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.random.rng.RNStreamIfc;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.DoubleStream;
 
 import static jsl.utilities.random.distributions.Gamma.invChiSquareDistribution;
 import static jsl.utilities.random.distributions.Gamma.logGammaFunction;
 import static jsl.utilities.random.distributions.Normal.stdNormalInvCDF;
-
-import jsl.utilities.random.distributions.*;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
  * The purpose of this class is to facilitate random variate generation from
@@ -36,7 +36,7 @@ import jsl.utilities.random.rng.RNStreamIfc;
  * distribution. The user has the option of supplying a RNStreamIfc as the source of
  * the randomness. Methods that do not have a RNStreamIfc parameter use,
  * getRNStream() as the source of randomness.
- *
+ * <p>
  * Also provides a number of methods for sampling with and without replacement
  * from arrays and lists as well as creating permutations of arrays and lists.
  *
@@ -46,22 +46,21 @@ public class JSLRandom {
 
     private static Beta myBeta;
 
-    private JSLRandom(){}
+    private JSLRandom() {
+    }
 
     /**
-     * 
      * @return gets a new stream of pseudo random numbers from the default random
      * number stream factory
      */
-    public static RNStreamIfc getRNStream(){
+    public static RNStreamIfc getRNStream() {
         return RNStreamFactory.getDefaultFactory().getStream();
     }
 
     /**
-     *
      * @return returns a new stream using the Stream API
      */
-    public static DoubleStream getDoubleStream(){
+    public static DoubleStream getDoubleStream() {
         return getRNStream().asDoubleStream();
     }
 
@@ -132,7 +131,7 @@ public class JSLRandom {
 
     /**
      * @param mean the mean of the Poisson
-     * @param rng the RngIfc
+     * @param rng  the RngIfc
      * @return the random value
      */
     public static int rPoisson(double mean, RNStreamIfc rng) {
@@ -370,7 +369,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rJohnsonB(double alpha1, double alpha2,
-                                         double min, double max) {
+                                   double min, double max) {
         return rJohnsonB(alpha1, alpha2, min, max, getRNStream());
     }
 
@@ -383,7 +382,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rJohnsonB(double alpha1, double alpha2,
-                                         double min, double max, RNStreamIfc rng) {
+                                   double min, double max, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -438,7 +437,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rTriangular(double min, double mode,
-                                           double max) {
+                                     double max) {
         return rTriangular(min, mode, max, getRNStream());
     }
 
@@ -450,7 +449,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rTriangular(double min, double mode,
-                                           double max, RNStreamIfc rng) {
+                                     double max, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -619,11 +618,10 @@ public class JSLRandom {
      */
     public static double rBeta(double alpha1, double alpha2, RNStreamIfc rng) {
         if (myBeta == null) {
-            myBeta = new Beta(alpha1, alpha2, rng);
+            myBeta = new Beta(alpha1, alpha2);
         }
-        myBeta.setRandomNumberGenerator(rng);
         myBeta.setParameters(alpha1, alpha2);
-        return myBeta.getValue();
+        return myBeta.getRandomVariable(rng).getValue();
     }
 
     /**
@@ -636,7 +634,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rBetaG(double alpha1, double alpha2,
-                                      double minimum, double maximum) {
+                                double minimum, double maximum) {
         return rBetaG(alpha1, alpha2, minimum, maximum, getRNStream());
     }
 
@@ -651,7 +649,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rBetaG(double alpha1, double alpha2,
-                                      double minimum, double maximum, RNStreamIfc rng) {
+                                double minimum, double maximum, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -672,7 +670,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rPearsonType6(double alpha1, double alpha2,
-                                             double beta) {
+                                       double beta) {
         return rPearsonType6(alpha1, alpha2, beta, getRNStream());
     }
 
@@ -686,7 +684,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rPearsonType6(double alpha1, double alpha2,
-                                             double beta, RNStreamIfc rng) {
+                                       double beta, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -732,7 +730,7 @@ public class JSLRandom {
      * Randomly select an element from the array
      *
      * @param array the array to select from
-     * @return
+     * @return the randomly selected value
      */
     public static int randomlySelect(int[] array) {
         return randomlySelect(array, getRNStream());
@@ -743,7 +741,7 @@ public class JSLRandom {
      *
      * @param array the array to select from
      * @param rng   the source of randomness
-     * @return
+     * @return the randomly selected value
      */
     public static int randomlySelect(int[] array, RNStreamIfc rng) {
         if (rng == null) {
@@ -811,7 +809,7 @@ public class JSLRandom {
      * @param rng   the source of randomness
      * @return the randomly selected value
      */
-    public  static double randomlySelect(double[] array, double[] cdf, RNStreamIfc rng) {
+    public static double randomlySelect(double[] array, double[] cdf, RNStreamIfc rng) {
         if (rng == null) {
             throw new IllegalArgumentException("The supplied RngIfc was null");
         }
@@ -977,6 +975,53 @@ public class JSLRandom {
         return true;
     }
 
+    /** Each element must be in (0,1) and sum of elements must be less than or equal to 1.0
+     *
+     * @param prob the array to check, must not be null, must have at least two elements
+     * @return true if the array represents a probability mass function
+     */
+    public static boolean isValidPMF(double[] prob){
+        Objects.requireNonNull(prob, "The probability array was null");
+        if (prob.length < 2){
+            return false;
+        }
+        double sum = 0.0;
+        for (int i = 0; i < prob.length; i++) {
+            if ((prob[i] <= 0.0) || (prob[i] >= 1.0)) {
+                return false;
+            }
+            sum = sum + prob[i];
+            if (sum > 1.0) {
+                return false;
+            }
+        }
+        if (sum <= 1.0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @param prob the array representing a PMF
+     * @return a valid CDF
+     */
+    public static double[] makeCDF(double[] prob) {
+        Objects.requireNonNull(prob, "The probability array was null");
+        if (!isValidPMF(prob)){
+           throw new IllegalArgumentException("The supplied array was not a valid PMF");
+        }
+        double[] cdf = new double[prob.length];
+        double sum = 0.0;
+        for (int i = 0; i < prob.length-1; i++) {
+            sum = sum + prob[i];
+            cdf[i] = sum;
+        }
+        cdf[prob.length-1] = 1.0;
+        return cdf;
+    }
+
     /**
      * Randomly select from the list using the default stream
      *
@@ -1012,7 +1057,7 @@ public class JSLRandom {
         }
 
         // more than 1, need to randomly pick
-        return list.get(rng.randInt(0, list.size()-1));
+        return list.get(rng.randInt(0, list.size() - 1));
     }
 
     /**
@@ -1026,10 +1071,10 @@ public class JSLRandom {
     }
 
     /**
-     * Randomly permutes the supplied array using the suppled random
+     * Randomly permutes the supplied array using the supplied random
      * number generator, the array is changed
      *
-     * @param x the array
+     * @param x   the array
      * @param rng the source of randomness
      */
     public static void permutation(double[] x, RNStreamIfc rng) {
@@ -1041,7 +1086,7 @@ public class JSLRandom {
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      * using the default random number generator
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the size of the generate
      */
     public static void sampleWithoutReplacement(double[] x, int sampleSize) {
@@ -1052,9 +1097,9 @@ public class JSLRandom {
      * The array x is changed, such that the first sampleSize elements contain the generate.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the generate size
-     * @param rng the source of randomness
+     * @param rng        the source of randomness
      */
     public static void sampleWithoutReplacement(double[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
@@ -1089,7 +1134,7 @@ public class JSLRandom {
      * Randomly permutes the supplied array using the suppled random
      * number generator, the array is changed
      *
-     * @param x the array
+     * @param x   the array
      * @param rng the source of randomness
      */
     public static void permutation(int[] x, RNStreamIfc rng) {
@@ -1101,7 +1146,7 @@ public class JSLRandom {
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      * using the default random number generator
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the generate size
      */
     public static void sampleWithoutReplacement(int[] x, int sampleSize) {
@@ -1112,9 +1157,9 @@ public class JSLRandom {
      * The array x is changed, such that the first sampleSize elements contain the generate.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the generate size
-     * @param rng the source of randomness
+     * @param rng        the source of randomness
      */
     public static void sampleWithoutReplacement(int[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
@@ -1149,7 +1194,7 @@ public class JSLRandom {
      * Randomly permutes the supplied array using the suppled random
      * number generator, the array is changed
      *
-     * @param x the array
+     * @param x   the array
      * @param rng the source of randomness
      */
     public static void permutation(boolean[] x, RNStreamIfc rng) {
@@ -1161,7 +1206,7 @@ public class JSLRandom {
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      * using the default random number generator
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the generate size
      */
     public static void sampleWithoutReplacement(boolean[] x, int sampleSize) {
@@ -1172,9 +1217,9 @@ public class JSLRandom {
      * The array x is changed, such that the first sampleSize elements contain the generate.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the generate size
-     * @param rng the source of randomness
+     * @param rng        the source of randomness
      */
     public static void sampleWithoutReplacement(boolean[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
@@ -1209,7 +1254,7 @@ public class JSLRandom {
      * Randomly permutes the supplied array using the suppled random
      * number generator, the array is changed
      *
-     * @param x the array
+     * @param x   the array
      * @param rng the source of randomness
      */
     public static <T> void permutation(T[] x, RNStreamIfc rng) {
@@ -1221,7 +1266,7 @@ public class JSLRandom {
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      * using the default random number generator
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the source of randomness
      */
     public static <T> void sampleWithoutReplacement(T[] x, int sampleSize) {
@@ -1232,9 +1277,9 @@ public class JSLRandom {
      * The array x is changed, such that the first sampleSize elements contain the generate.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      *
-     * @param x the array
+     * @param x          the array
      * @param sampleSize the generate size
-     * @param rng the source of randomness
+     * @param rng        the source of randomness
      */
     public static <T> void sampleWithoutReplacement(T[] x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {
@@ -1260,7 +1305,7 @@ public class JSLRandom {
      * number generator, the list is changed
      *
      * @param <T> the type of the list
-     * @param x the list
+     * @param x   the list
      */
     public static <T> void permutation(List<T> x) {
         permutation(x, getRNStream());
@@ -1271,7 +1316,7 @@ public class JSLRandom {
      * number generator, the list is changed
      *
      * @param <T> the type of the list
-     * @param x the list
+     * @param x   the list
      * @param rng the source of randomness
      */
     public static <T> void permutation(List<T> x, RNStreamIfc rng) {
@@ -1283,8 +1328,8 @@ public class JSLRandom {
      * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random generate without replacement
      * using the default random number generator
      *
-     * @param <T> the type of the list
-     * @param x the list
+     * @param <T>        the type of the list
+     * @param x          the list
      * @param sampleSize the generate size
      */
     public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize) {
@@ -1295,10 +1340,10 @@ public class JSLRandom {
      * The List x is changed, such that the first sampleSize elements contain the generate.
      * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random generate without replacement
      *
-     * @param <T> the type of the list
-     * @param x the list
+     * @param <T>        the type of the list
+     * @param x          the list
      * @param sampleSize the generate size
-     * @param rng the source of randomness
+     * @param rng        the source of randomness
      */
     public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize, RNStreamIfc rng) {
         if (x == null) {

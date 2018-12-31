@@ -32,8 +32,11 @@ import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
 import jsl.modeling.resource.Request.PreemptionRule;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+//import jsl.utilities.random.distributions.Constant;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.UniformRV;
 
 public class DTPQueueResourceModelWithFailures extends SchedulingElement {
 
@@ -51,7 +54,7 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
     private final RequestInteraction myRequestInteraction = new RequestInteraction();
 
     public DTPQueueResourceModelWithFailures(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DTPQueueResourceModelWithFailures(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
@@ -68,14 +71,14 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
                 .build();
 
         //Constant c1 = new Constant(0.5);
-        Constant c1 = new Constant(3.0);
-        TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(Constant.TWO, c1, c1);
+        ConstantRV c1 = new ConstantRV(3.0);
+        TimeBasedFailure timeBasedFailure = myResource.addTimeBasedFailure(ConstantRV.TWO, c1, c1);
         //SingleFailureEvent fe = new SingleFailureEvent(myResource, new Constant(5), new Constant(6));
         // myResource = new ResourceUnit.Builder(this).name("Server").builder();
 //        RandomIfc duration = new Constant(5);
 //        RandomIfc timeToFailure = new Constant(6);
-        RandomIfc duration = new Uniform(4, 5);
-        RandomIfc timeToFailure = new Uniform(5, 7);
+        RandomIfc duration = new UniformRV(4, 5);
+        RandomIfc timeToFailure = new UniformRV(5, 7);
         ResourceSingleFailureEvent mfe = new ResourceSingleFailureEvent(this, duration, timeToFailure);
         mfe.addResourceUnit(myResource);
         mfe.addFailureEventListener(new FailureEventListener());
@@ -250,8 +253,8 @@ public class DTPQueueResourceModelWithFailures extends SchedulingElement {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DTPQueueResourceModelWithFailures driveThroughPharmacy = new DTPQueueResourceModelWithFailures(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(2);

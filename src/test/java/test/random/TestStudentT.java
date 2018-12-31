@@ -23,6 +23,7 @@ package test.random;
 import java.io.PrintWriter;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.StudentT;
+import jsl.utilities.random.rvariable.StudentTRV;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -130,7 +131,7 @@ public class TestStudentT {
     //@Test
     public void test4() {
         // check the histogram of the generated data
-        StudentT t = new StudentT(10);
+        StudentTRV t = new StudentTRV(10);
         PrintWriter out = JSL.makePrintWriter("Tdata", "txt");
         for (int i = 1; i <= 10000; i++) {
             out.println(t.getValue());

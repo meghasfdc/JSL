@@ -36,8 +36,8 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  * expansion to approximate the quantile and then a search
  * via the inverse transform method.  
  */
-public class Binomial extends Distribution implements DiscreteDistributionIfc,
-        LossFunctionDistributionIfc, GetRVariableIfc {
+public class Binomial extends Distribution implements DiscreteDistributionIfc, LossFunctionDistributionIfc,
+        GetRVariableIfc {
 
     /** The probability of success
      *
@@ -60,7 +60,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** Constructs a Binomial with n=1, p=0.5
      */
     public Binomial() {
-        this(0.5, 1, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.5, 1, null);
     }
 
     /** Constructs a Binomial using the supplied parameters
@@ -69,17 +69,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * the number of trials
      */
     public Binomial(double[] parameters) {
-        this(parameters[0], (int) parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a Binomial using the supplied parameters
-     * @param parameters A array that holds the parameters, parameter[0] should be
-     * the probability (p) and parameter[1] should be
-     * the number of trials
-     * @param rng
-     */
-    public Binomial(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], (int) parameters[1], rng);
+        this(parameters[0], (int) parameters[1], null);
     }
 
     /** Constructs a binomial with p probability of success
@@ -88,17 +78,17 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param numTrials The number of trials
      */
     public Binomial(double prob, int numTrials) {
-        this(prob, numTrials, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, numTrials, null);
     }
 
     /** Constructs a binomial with p probability of success
      * based on n trials
      * @param prob The success probability
      * @param numTrials The number of trials
-     * @param rng
+     * @param name an optional label/name
      */
-    public Binomial(double prob, int numTrials, RNStreamIfc rng) {
-        super(rng);
+    public Binomial(double prob, int numTrials, String name) {
+        super(name);
         setProbabilityOfSuccess(prob);
         setNumberOfTrials(numTrials);
     }
@@ -107,7 +97,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      *  done by recursive (iterative) algorithm based on logarithms
      *  or via beta incomplete function and binomial coefficients.
      *
-     * @return
+     * @return true if the recursive algo is being used
      */
     public final boolean getRecursiveAlgorithmFlag() {
         return myRecursiveAlgoFlag;
@@ -123,35 +113,9 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
         myRecursiveAlgoFlag = flag;
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Binomial newInstance() {
         return (new Binomial(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Binomial newInstance(RNStreamIfc rng) {
-        return (new Binomial(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Binomial newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     /** Gets the success probability
@@ -218,8 +182,8 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** If x is not and integer value, then the probability must be zero
      *  otherwise pmf(int x) is used to determine the probability
      *
-     * @param x
-     * @return
+     * @param x value to evaluate
+     * @return the associated probability
      */
     @Override
     public final double pmf(double x) {
@@ -230,20 +194,30 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
         }
     }
 
+    /**
+     *
+     * @param x value to evaluate
+     * @return the associated probability
+     */
     public final double pmf(int x) {
         return binomialPMF(x, myNumTrials, myProbSuccess, myRecursiveAlgoFlag);
     }
 
-    /** Sets the parameters for the distribution
-     *
-     * @param parameters an array of doubles representing the parameters for
-     * the distribution
+    /**
+     * @param parameters A array that holds the parameters, parameter[0] should be
+     * the probability (p) and parameter[1] should be
+     * the number of trials
      */
     @Override
     public void setParameters(double[] parameters) {
         setParameters(parameters[0], (int) parameters[1]);
     }
 
+    /**
+     *  @return A array that holds the parameters, parameter[0] should be
+     * the probability (p) and parameter[1] should be
+     * the number of trials
+     */
     @Override
     public double[] getParameters() {
         double[] param = new double[2];
@@ -296,8 +270,8 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** Returns the sum of the complementary CDF
      *  from 0 up to but not including x
      *
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the sum of the complementary CDF
      */
     private double sumCCDF(double x) {
         if (x <= 0.0) {
@@ -319,8 +293,8 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      *  1 up to and including x. x is interpreted
      *  as an integer
      *
-     * @param x
-     * @return
+     * @param x the x to evaluate
+     * @return the first order loss functio
      */
     private double sumFirstLoss(double x) {
         int n = (int) x;
@@ -334,7 +308,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** Computes the probability mass function at j using a
      *  recursive (iterative) algorithm using logarithms
      *
-     * @param j
+     * @param j the value to evaluate
      * @param n number of trials
      * @param p success probability
      * @return probability of j
@@ -405,7 +379,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** Computes the probability mass function at j using a
      *  recursive (iterative) algorithm using logarithms
      *
-     * @param j
+     * @param j the value to evaluate
      * @param n number of trials
      * @param p success probability
      * @return cumulative probability of j
@@ -474,7 +448,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param j value for which prob is needed
      * @param n num of trials
      * @param p prob of success
-     * @return
+     * @return the probability at j
      */
     public static double binomialPMF(int j, int n, double p) {
         return binomialPMF(j, n, p, true);
@@ -487,7 +461,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param n num of successes
      * @param p prob of success
      * @param recursive true indicates that the recursive logarithmic algorithm should be used
-     * @return
+     * @return the probability at j
      */
     public static double binomialPMF(int j, int n, double p, boolean recursive) {
         if (n <= 0) {
@@ -557,7 +531,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param j value for which cdf is needed
      * @param n num of trials
      * @param p prob of success
-     * @return
+     * @return the cumulative probability at j
      */
     public static double binomialCDF(int j, int n, double p) {
         return binomialCDF(j, n, p, true);
@@ -570,7 +544,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param n num of trials
      * @param p prob of success
      * @param recursive true indicates that the recursive logarithmic algorithm should be used
-     * @return
+     * @return the cumulative probability at j
      */
     public static double binomialCDF(int j, int n, double p, boolean recursive) {
         if (n <= 0) {
@@ -603,7 +577,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param j value for which ccdf is needed
      * @param n num of trials
      * @param p prob of success
-     * @return
+     * @return the complementary CDF at j
      */
     public static double binomialCCDF(int j, int n, double p) {
         return binomialCCDF(j, n, p, true);
@@ -616,7 +590,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param n num of trials
      * @param p prob of success
      * @param recursive true indicates that the recursive logarithmic algorithm should be used
-     * @return
+     * @return the complementary CDF at j
      */
     public static double binomialCCDF(int j, int n, double p, boolean recursive) {
         if (n <= 0) {
@@ -646,7 +620,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param j value for which 1st order loss function is needed
      * @param n num of trial
      * @param p prob of success
-     * @return
+     * @return the first order loss function at j
      */
     public static double binomialLF1(double j, int n, double p) {
         return binomialLF1(j, n, p, true);
@@ -659,7 +633,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param n num of trials
      * @param p prob of success
      * @param recursive true indicates that the recursive logarithmic algorithm should be used
-     * @return
+     * @return the first order loss function at j
      */
     public static double binomialLF1(double j, int n, double p, boolean recursive) {
         if (n <= 0) {
@@ -684,11 +658,11 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
     /** Returns the sum of the complementary CDF
      *  from 0 up to but not including x
      *
-     * @param x
-     * @param n 
-     * @param recursive 
-     * @param p 
-     * @return
+     * @param x the value to evaluate
+     * @param n the number of trials
+     * @param recursive the flag to use the recursive algorithm
+     * @param p the probability of success
+     * @return the sum of the complementary CDF
      */
     protected static double sumCCDF_(double x, int n, double p, boolean recursive) {
         if (x <= 0.0) {
@@ -713,7 +687,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param j value for which 2nd order loss function is needed
      * @param n num of trials
      * @param p prob of success
-     * @return
+     * @return the 2nd order loss function at j
      */
     public static double binomialLF2(double j, int n, double p) {
         return binomialLF2(j, n, p, true);
@@ -726,7 +700,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param n num of trials
      * @param p prob of success
      * @param recursive true indicates that the recursive logarithmic algorithm should be used
-     * @return
+     * @return the 2nd order loss function at j
      */
     public static double binomialLF2(double j, int n, double p, boolean recursive) {
         if (n <= 0) {
@@ -758,11 +732,11 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      *  1 up to and including x. x is interpreted
      *  as an integer
      *
-     * @param x
-     * @param n 
-     * @param p 
-     * @param recursive 
-     * @return
+     * @param x the value to evaluate
+     * @param n the number of trials
+     * @param p the probability of success
+     * @param recursive true if recursive algorithm is to be used
+     * @return the sum
      */
     protected static double sumFirstLoss_(double x, int n, double p, boolean recursive) {
         int k = (int) x;
@@ -780,7 +754,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param x The probability that the quantile is needed for
      * @param n The number of trials
      * @param p The probability of success, must be in range [0,1)
-     * @return
+     * @return the quantile associated with the supplied probability
      */
     public static int binomialInvCDF(double x, int n, double p) {
         return binomialInvCDF(x, n, p, true);
@@ -793,7 +767,7 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
      * @param n The number of trials
      * @param p The probability of success, must be in range [0,1)
      * @param recursive true indicates that the recursive logarithmic algorithm should be used
-     * @return
+     * @return the quantile associated with the supplied probability
      */
     public static int binomialInvCDF(double x, int n, double p, boolean recursive) {
         if (n <= 0) {
@@ -836,10 +810,10 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc,
 
     /** Approximates the quantile of x using a normal distribution
      *
-     * @param x
-     * @param n
-     * @param p
-     * @return
+     * @param x the value to evaluate
+     * @param n the number of trials
+     * @param p the probability of success
+     * @return the approximate inverse CDF value
      */
     public static int invCDFViaNormalApprox(double x, int n, double p) {
         if (n <= 0) {

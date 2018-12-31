@@ -19,7 +19,6 @@ import jsl.modeling.JSLTooManyIterationsException;
 import jsl.utilities.Interval;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.math.FunctionIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rvariable.BetaRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
@@ -31,16 +30,15 @@ import jsl.utilities.random.rng.RNStreamIfc;
  * The standard beta distribution defined over the range from (0,1)
  *
  */
-public class Beta extends Distribution implements ContinuousDistributionIfc,
-        InverseCDFIfc, GetRVariableIfc {
+public class Beta extends Distribution implements ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
 
-    private static IncompleteBetaFunctionFraction myContinuedFraction = new IncompleteBetaFunctionFraction();
+    private static final IncompleteBetaFunctionFraction myContinuedFraction = new IncompleteBetaFunctionFraction();
 
-    private static Interval myInterval = new Interval(0.0, 1.0);
+    private static final Interval myInterval = new Interval(0.0, 1.0);
 
-    private static RootFinder myRootFinder = new BisectionRootFinder();
+    private static final RootFinder myRootFinder = new BisectionRootFinder();
 
-    private static double delta = 0.01;
+    private static final double delta = 0.01;
 
     private double myAlpha1;
 
@@ -59,84 +57,44 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      *
      */
     public Beta() {
-        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, 1.0, null);
     }
 
     /**
      * Creates a beta with the supplied parameters
      *
-     * @param alpha1
-     * @param alpha2
+     * @param alpha1 the alpha1 parameter
+     * @param alpha2 the alpha2 parameter
      */
     public Beta(double alpha1, double alpha2) {
-        this(alpha1, alpha2, RNStreamFactory.getDefaultFactory().getStream());
+        this(alpha1, alpha2, null);
     }
 
     /**
      * Creates a beta with the supplied parameters
      *
-     * @param parameters
+     * @param parameters alpha1 is parameter[0], alpha2 is parameter[1]
      */
     public Beta(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
+        this(parameters[0], parameters[1], null);
     }
 
     /**
      * Creates a beta with the supplied parameters
      *
-     * @param parameters
-     * @param rng
+     * @param alpha1 the alpha1 parameter
+     * @param alpha2 the alpha2 parameter
+     * @param name a label
      */
-    public Beta(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
-    }
-
-    /**
-     * Creates a beta with the supplied parameters
-     *
-     * @param alpha1
-     * @param alpha2
-     * @param rng
-     */
-    public Beta(double alpha1, double alpha2, RNStreamIfc rng) {
-        super(rng);
+    public Beta(double alpha1, double alpha2, String name) {
+        super(name);
         setParameters(alpha1, alpha2);
         myRootFinder.setMaximumIterations(200);
     }
 
-    /**
-     * Returns a new instance of the random source with the same parameters but
-     * an independent generator
-     *
-     * @return
-     */
     @Override
     public final Beta newInstance() {
         return (new Beta(getParameters()));
-    }
-
-    /**
-     * Returns a new instance of the random source with the same parameters with
-     * the supplied RngIfc
-     *
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Beta newInstance(RNStreamIfc rng) {
-        return (new Beta(getParameters(), rng));
-    }
-
-    /**
-     * Returns a new instance that will supply values based on antithetic U(0,1)
-     * when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Beta newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -163,8 +121,8 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
     /**
      * Changes the parameters to the supplied values
      *
-     * @param alpha1
-     * @param alpha2
+     * @param alpha1 the alpha1 parameter
+     * @param alpha2 the alpha2 parameter
      */
     public final void setParameters(double alpha1, double alpha2) {
         if (alpha1 <= 0) {
@@ -195,17 +153,11 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
         setParameters(parameters[0], parameters[1]);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getMean()
-     */
     @Override
     public final double getMean() {
         return (myAlpha1 / (myAlpha1 + myAlpha2));
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getParameters()
-     */
     @Override
     public final double[] getParameters() {
         double[] param = new double[2];
@@ -214,9 +166,6 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
         return (param);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getVariance()
-     */
     @Override
     public final double getVariance() {
         double n = myAlpha1 * myAlpha2;
@@ -242,11 +191,6 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
         return regularizedIncompleteBetaFunction(x, myAlpha1, myAlpha2, mylnBetaA1A2);
     }
 
-    /**
-     * Inverts the CDF, has accuracy to about 10e-7
-     *
-     * @param p the probability to invert to, must be in [0,1]
-     */
     @Override
     public double invCDF(double p) {
         if ((p < 0.0) || (p > 1.0)) {
@@ -256,9 +200,6 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
         return (inverseBetaCDF(p));
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#pdf(double)
-     */
     @Override
     public final double pdf(double x) {
         if ((0 < x) && (x < 1)) {
@@ -273,11 +214,11 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
     /**
      * Computes Beta(z1,z2)
      *
-     * @param z1
-     * @param z2
-     * @return
+     * @param z1 the first parameter
+     * @param z2 the second parameter
+     * @return the computed value
      */
-    public final static double betaFunction(double z1, double z2) {
+    public static double betaFunction(double z1, double z2) {
         if (z1 <= 0) {
             throw new IllegalArgumentException("The 1st parameter must be > 0");
         }
@@ -295,11 +236,11 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
     /**
      * The natural logarithm of Beta(z1,z2)
      *
-     * @param z1
-     * @param z2
-     * @return
+     * @param z1 the first parameter
+     * @param z2 the second parameter
+     * @return natural logarithm of Beta(z1,z2)
      */
-    public final static double logBetaFunction(double z1, double z2) {
+    public static double logBetaFunction(double z1, double z2) {
         if (z1 <= 0) {
             throw new IllegalArgumentException("The 1st parameter must be > 0");
         }
@@ -321,9 +262,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param x the point to be evaluated
      * @param a alpha 1
      * @param b alpha 2
-     * @return
+     * @return the regularized beta function at the supplied x
      */
-    public final static double incompleteBetaFunction(double x, double a, double b) {
+    public static double incompleteBetaFunction(double x, double a, double b) {
         double beta = Beta.betaFunction(a, b);
         double rBeta = Beta.regularizedIncompleteBetaFunction(x, a, b);
         return (rBeta * beta);
@@ -335,9 +276,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param x the point to be evaluated
      * @param a alpha 1
      * @param b alpha 2
-     * @return
+     * @return the regularized incomplete beta function at the supplied x
      */
-    public final static double regularizedIncompleteBetaFunction(double x, double a, double b) {
+    public static double regularizedIncompleteBetaFunction(double x, double a, double b) {
         double lnbeta = logBetaFunction(a, b);
         return (regularizedIncompleteBetaFunction(x, a, b, lnbeta));
     }
@@ -349,9 +290,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param a alpha 1
      * @param b alpha 2
      * @param lnbeta the natural log of Beta(alpha1,alpha2)
-     * @return
+     * @return the regularized incomplete beta function at the supplied x
      */
-    protected final static double regularizedIncompleteBetaFunction(double x, double a, double b, double lnbeta) {
+    protected static double regularizedIncompleteBetaFunction(double x, double a, double b, double lnbeta) {
 
         if ((x < 0.0) || (x > 1.0)) {
             throw new IllegalArgumentException("Argument x, must be in [0,1]");
@@ -392,12 +333,12 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
     /**
      * Computes the continued fraction for the incomplete beta function.
      *
-     * @param x
-     * @param a
-     * @param b
-     * @return
+     * @param x the point to be evaluated
+     * @param a alpha 1
+     * @param b alpha 2
+     * @return the continued fraction
      */
-    protected final static double betaContinuedFraction(double x, double a, double b) {
+    protected static double betaContinuedFraction(double x, double a, double b) {
         double em;
         double tem;
         double d;
@@ -443,8 +384,8 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * Computes the inverse of the beta CDF at the supplied probability point
      * using an initial approximation and a root finding technique
      *
-     * @param p
-     * @return
+     * @param p the probability to evaluate
+     * @return the inverse value
      */
     protected final double inverseBetaCDF(double p) {
         if (JSLMath.equal(p, 1.0)) {
@@ -495,20 +436,18 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
         StringBuilder sb = new StringBuilder();
         sb.append("Name ");
         sb.append(getName());
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Mean ");
         sb.append(getMean());
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Variance ");
         sb.append(getVariance());
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Alpha1 ");
         sb.append(this.myAlpha1);
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Alpha2 ");
         sb.append(this.myAlpha2);
-        sb.append("\n");
-        sb.append(myRNG);
         return (sb.toString());
     }
 
@@ -520,7 +459,7 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * @param qq Alpha 2 parameter
      * @param a The point to be evaluated
      * @param lnbeta The log of Beta(alpha1,alpha2)
-     * @return
+     * @return the approx cdf value
      */
     public final static double approximateCDF(double pp, double qq, double a, double lnbeta) {
         double r, y, t, s, h, w, x;
@@ -558,9 +497,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * Sets the desired precision in the continued fraction expansion for the
      * computation of the incompleteBetaFunction
      *
-     * @param prec
+     * @param prec the desired precision
      */
-    public final static void setContinuedFractionDesiredPrecision(double prec) {
+    public static void setContinuedFractionDesiredPrecision(double prec) {
         myContinuedFraction.setDesiredPrecision(prec);
     }
 
@@ -568,9 +507,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * Sets the maximum number of iterations in the continued fraction expansion
      * for the computation of the incompleteBetaFunction
      *
-     * @param maxIter
+     * @param maxIter the maximum number of iterations
      */
-    public final static void setContinuedFractionMaximumIterations(int maxIter) {
+    public static void setContinuedFractionMaximumIterations(int maxIter) {
         myContinuedFraction.setMaximumIterations(maxIter);
     }
 
@@ -578,9 +517,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * Sets the desired precision of the root finding algorithm in the CDF
      * inversion computation
      *
-     * @param prec
+     * @param prec the desired precision
      */
-    public final static void setRootFindingDesiredPrecision(double prec) {
+    public static void setRootFindingDesiredPrecision(double prec) {
         myRootFinder.setDesiredPrecision(prec);
     }
 
@@ -588,9 +527,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
      * Sets the maximum number of iterations of the root finding algorithm in
      * the CDF inversion computation
      *
-     * @param maxIter
+     * @param maxIter the max iterations
      */
-    public final static void setRootFindingMaximumIterations(int maxIter) {
+    public static void setRootFindingMaximumIterations(int maxIter) {
         myRootFinder.setMaximumIterations(maxIter);
     }
 
@@ -632,8 +571,9 @@ public class Beta extends Distribution implements ContinuousDistributionIfc,
         System.out.println("------------");
         System.out.println("------------");
 
+        RVariableIfc rv = n2.getRandomVariable();
         for (int i = 1; i <= 10; i++) {
-            System.out.println("nextRandom(" + i + ")= " + n2.getValue());
+            System.out.println("nextRandom(" + i + ")= " + rv.getValue());
         }
         System.out.println("------------");
 

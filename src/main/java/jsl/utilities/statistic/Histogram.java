@@ -17,6 +17,7 @@ package jsl.utilities.statistic;
 
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.math.*;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /** A Histogram tabulates data into bins.  The user must specify the lower limit
  *  of the first bin, the width of the bins, and the number of bins.  Alternatively,
@@ -707,7 +708,7 @@ public class Histogram extends AbstractStatistic {
     }
 
     public static void main(String args[]) {
-        Exponential d = new Exponential(2);
+        ExponentialRV d = new ExponentialRV(2);
         Histogram h = new Histogram(0.0, 20, 0.1);
         for (int i = 1; i <= 100; ++i) {
             h.collect(d.getValue());

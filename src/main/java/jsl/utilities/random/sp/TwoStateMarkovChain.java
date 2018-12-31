@@ -16,29 +16,47 @@
 
 package jsl.utilities.random.sp;
 
-import jsl.utilities.random.AbstractRandom;
-import jsl.utilities.random.distributions.Bernoulli;
+import jsl.utilities.NewInstanceIfc;
+import jsl.utilities.controls.ControllableIfc;
+import jsl.utilities.controls.Controls;
+import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
+import jsl.utilities.random.rvariable.BernoulliRV;
 import jsl.utilities.statistic.Statistic;
 
-/** Represents a two state Markov chain
- *  States = {0,1}
- *  User supplies
- *  P{X(i) = 1| X(i-1) = 1} Probability of success after success
- *  P{X(i) = 1| X(i-1) = 0} Probability of success after failure
+/**
+ * Represents a two state Markov chain
+ * States = {0,1}
+ * User supplies
+ * P{X(i) = 1| X(i-1) = 1} Probability of success after success
+ * P{X(i) = 1| X(i-1) = 0} Probability of success after failure
  *
  * @author rossetti
  */
-public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarkovChainIfc {
+public class TwoStateMarkovChain implements TwoStateMarkovChainIfc, ControllableIfc,
+        ParametersIfc, NewInstanceIfc, RNStreamControlIfc {
+
+    /** A counter to count the number of created to assign "unique" ids
+     */
+    private static int myIdCounter_;
+
+    /** The id of this object
+     */
+    protected int myId;
+
+    /** Holds the name of the name of the object for the IdentityIfc
+     */
+    protected String myName;
 
     private double myP1;
 
     private double myP0;
 
-    private Bernoulli myB11;
+    private BernoulliRV myB11;
 
-    private Bernoulli myB01;
+    private BernoulliRV myB01;
 
     private int myState;
 
@@ -61,9 +79,32 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
     }
 
     public TwoStateMarkovChain(int initialState, double p11, double p01, RNStreamIfc rng) {
+        myIdCounter_ = myIdCounter_ + 1;
+        myId = myIdCounter_;
         setInitialState(initialState);
         setProbabilities(p11, p01, rng);
         reset();
+    }
+
+    @Override
+    public final int getId() {
+        return (myId);
+    }
+
+    @Override
+    public final String getName() {
+        return myName;
+    }
+
+    /** Sets the name
+     * @param str The name as a string.
+     */
+    public final void setName(String str) {
+        if (str == null) {
+            myName = this.getClass().getSimpleName();
+        } else {
+            myName = str;
+        }
     }
 
     public void setInitialState(int initialState) {
@@ -99,25 +140,14 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
         if ((p01 < 0.0) || (p01 > 1.0)) {
             throw new IllegalArgumentException("P11 must be [0,1]");
         }
-
-        if (myB11 == null) {
-            myB11 = new Bernoulli(p11, rng);
-        } else {
-            myB11.setProbabilityOfSuccess(p11);
-        }
-
-        if (myB01 == null) {
-            myB01 = new Bernoulli(p01, rng);
-        } else {
-            myB01.setProbabilityOfSuccess(p01);
-        }
-
+        myB11 = new BernoulliRV(p11, rng);
+        myB01 = new BernoulliRV(p01, rng);
         myP0 = 1 - (p01 / (1 - p11 + p01));
         myP1 = 1 - myP0;
     }
 
-    /** Sets the state back to the initial state
-     *
+    /**
+     * Sets the state back to the initial state
      */
     public void reset() {
         myState = myInitialState;
@@ -148,10 +178,11 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
         return myB11.getProbabilityOfSuccess();
     }
 
-    /** The array consists of:
-     *  p[0] = p11
-     *  p[1] = p01
-     *  p[2] = initial state
+    /**
+     * The array consists of:
+     * p[0] = p11
+     * p[1] = p01
+     * p[2] = initial state
      *
      * @return
      */
@@ -160,11 +191,12 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
         return p;
     }
 
-    /** Supply an array with:
-     *  p[0] = p11
-     *  p[1] = p01
-     *  p[2] = initial state
-     * 
+    /**
+     * Supply an array with:
+     * p[0] = p11
+     * p[1] = p01
+     * p[2] = initial state
+     *
      * @param parameters
      */
     @Override
@@ -204,7 +236,8 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
         return b;
     }
 
-    /** The instance is initialized at getInitialState()
+    /**
+     * The instance is initialized at getInitialState()
      *
      * @return
      */
@@ -213,11 +246,12 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
         return (new TwoStateMarkovChain(getInitialState(), getP11(), getP01()));
     }
 
-    /** The instance is initialized at getInitialState()
+    /**
+     * The instance is initialized at getInitialState()
      *
      * @return
      */
-    @Override
+//    @Override
     public TwoStateMarkovChain newInstance(RNStreamIfc rng) {
         return (new TwoStateMarkovChain(getInitialState(), getP11(), getP01(), rng));
     }
@@ -232,5 +266,25 @@ public class TwoStateMarkovChain extends AbstractRandom implements TwoStateMarko
             //System.out.println(x);
         }
         System.out.println(s);
+    }
+
+    @Override
+    public Controls getControls() {
+        return new RandomControls();
+    }
+
+    @Override
+    public void setControls(Controls controls) {
+        if (controls == null) {
+            throw new IllegalArgumentException("The supplied controls were null!");
+        }
+        setParameters(controls.getDoubleArrayControl("parameters"));
+    }
+
+    protected class RandomControls extends Controls {
+
+        protected void fillControls(){
+            addDoubleArrayControl("parameters", getParameters());
+        }
     }
 }

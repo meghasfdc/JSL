@@ -19,6 +19,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  *
@@ -46,8 +47,8 @@ public class RandomMover extends AbstractMover {
      */
     public RandomMover(ModelElement parent, String name, SpatialModel smodel) {
         super(parent, name, smodel);
-        myTripDestinationX = new RandomVariable(this, new Uniform(2, 10));
-        myTripDestinationY = new RandomVariable(this, new Uniform(3, 10));
+        myTripDestinationX = new RandomVariable(this, new UniformRV(2, 10));
+        myTripDestinationY = new RandomVariable(this, new UniformRV(3, 10));
         myDestination = new Vector3D();
         //MovementControllerIfc c = new EuclideanStepBasedMovementController(this);
         // setMovementController(c);

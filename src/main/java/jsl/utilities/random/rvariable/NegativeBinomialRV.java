@@ -82,7 +82,7 @@ public final class NegativeBinomialRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rNegBinomial(myProbSuccess, myNumSuccesses, myRNG);
+        double v = JSLRandom.rNegBinomial(myProbSuccess, myNumSuccesses, myRNStream);
         return v;
     }
 

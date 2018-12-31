@@ -23,8 +23,8 @@ package jsl.modeling.elements.resource;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Bernoulli;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.BernoulliRV;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 /** This class will probabilistically route to one of two EntityReceiverAbstracts
  *  with probability p to the first EntityReceiverAbstract. If a time
@@ -54,7 +54,7 @@ public class TwoWayByChanceEntitySender extends EntityReceiver {
         setSecondReceiver(r2);
         setTransferTime(time);
         setEntitySender(new Sender());
-        myRV = new RandomVariable(this, new Bernoulli(p));
+        myRV = new RandomVariable(this, new BernoulliRV(p));
     }
 
     /** Sets the transfer time
@@ -62,7 +62,7 @@ public class TwoWayByChanceEntitySender extends EntityReceiver {
      * @param time 
      */
     public final void setTransferTime(double time){
-        setTransferTime(new Constant(time));
+        setTransferTime(new ConstantRV(time));
     }
     
     /** If the supplied value is null, then zero is used for the time
@@ -71,7 +71,7 @@ public class TwoWayByChanceEntitySender extends EntityReceiver {
      */
     public final void setTransferTime(RandomIfc time) {
         if (time == null){
-            time = Constant.ZERO;
+            time = ConstantRV.ZERO;
         }
         if (myTime == null) {
             myTime = new RandomVariable(this, time);

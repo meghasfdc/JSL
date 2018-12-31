@@ -16,12 +16,12 @@
 package jsl.modeling.elements;
 
 import jsl.modeling.StreamOptionIfc;
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 
 /**
  *
  * @author rossetti
  */
-public interface RandomElementIfc extends RandomStreamIfc, StreamOptionIfc {
+public interface RandomElementIfc extends RNStreamControlIfc, StreamOptionIfc {
 
 }

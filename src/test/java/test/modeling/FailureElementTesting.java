@@ -24,7 +24,7 @@ package test.modeling;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.resource.ResourceUnit;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 /**
  *
@@ -47,10 +47,10 @@ public class FailureElementTesting {
         Model model = sim.getModel();
         ResourceUnit resource = new ResourceUnit.Builder(model).
                 allowFailuresToDelay().build();
-        Constant c1 = new Constant(0.5);
-        Constant c2 = new Constant(0.2);
-        resource.addTimeBasedFailure(Constant.TWO, c1);
-        resource.addTimeBasedFailure(Constant.ONE, c2);
+        ConstantRV c1 = new ConstantRV(0.5);
+        ConstantRV c2 = new ConstantRV(0.2);
+        resource.addTimeBasedFailure(ConstantRV.TWO, c1);
+        resource.addTimeBasedFailure(ConstantRV.ONE, c2);
         
         sim.setLengthOfReplication(20.0);
         sim.setNumberOfReplications(2);
@@ -62,10 +62,10 @@ public class FailureElementTesting {
         Simulation sim = new Simulation("Test FailureElement");
         Model model = sim.getModel();
         ResourceUnit resource = new ResourceUnit.Builder(model).build();
-        Constant c1 = new Constant(0.5);
-        Constant c2 = new Constant(0.2);
-        resource.addTimeBasedFailure(Constant.TWO, c1);
-        resource.addTimeBasedFailure(Constant.ONE, c2);
+        ConstantRV c1 = new ConstantRV(0.5);
+        ConstantRV c2 = new ConstantRV(0.2);
+        resource.addTimeBasedFailure(ConstantRV.TWO, c1);
+        resource.addTimeBasedFailure(ConstantRV.ONE, c2);
         sim.setLengthOfReplication(20.0);
         sim.setNumberOfReplications(2);
         sim.run();

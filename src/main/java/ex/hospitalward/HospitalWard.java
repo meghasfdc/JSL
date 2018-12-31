@@ -28,6 +28,8 @@ import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.random.distributions.Lognormal;
 import jsl.modeling.SimulationReporter;
 import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.LognormalRV;
 
 /**
  *
@@ -68,17 +70,17 @@ public class HospitalWard extends ModelElement {
         myOR = new OperatingRoom(this);
 
         myNoOpPatientArrivalListener = new NoOpPatientArrivalListener();
-        Exponential d1 = new Exponential(12.0);
+        ExponentialRV d1 = new ExponentialRV(12.0);
         myNoOpPatientGenerator = new EventGenerator(this, myNoOpPatientArrivalListener, d1, d1);
 
         myOpPatientArrivalListener = new OpPatientArrivalListener();
-        Exponential d2 = new Exponential(6.0);
+        ExponentialRV d2 = new ExponentialRV(6.0);
         myOpPatientGenerator = new EventGenerator(this, myOpPatientArrivalListener, d2, d2);
 
-        myNonOpPatientStayTime = new RandomVariable(this, new Exponential(60.0));
-        myPreOpStayTime = new RandomVariable(this, new Exponential(24.0));
-        myOperationTime = new RandomVariable(this, new Lognormal(0.75, 0.25 * 0.25));
-        myPostOpStayTime = new RandomVariable(this, new Exponential(72.0));
+        myNonOpPatientStayTime = new RandomVariable(this, new ExponentialRV(60.0));
+        myPreOpStayTime = new RandomVariable(this, new ExponentialRV(24.0));
+        myOperationTime = new RandomVariable(this, new LognormalRV(0.75, 0.25 * 0.25));
+        myPostOpStayTime = new RandomVariable(this, new ExponentialRV(72.0));
 
         mySystemTime = new ResponseVariable(this, "System Time");
     }

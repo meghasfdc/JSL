@@ -23,8 +23,6 @@ package jsl.utilities.statistic;
 import java.util.*;
 
 import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.distributions.DEmpiricalPMF;
-import jsl.utilities.random.distributions.DUniform;
 
 /**
  * This class tabulates the frequency associated with
@@ -340,8 +338,10 @@ public class IntegerFrequency {
     }
 
     /**
-     * Returns a n by 2 array of value, proportion pairs
+     * Returns a 2 by n array of value, proportion pairs
      * where n = getNumberOfCells()
+     * row 0 is the values
+     * row 1 is the proportions
      *
      * @return the array or an empty array
      */
@@ -353,16 +353,18 @@ public class IntegerFrequency {
         double[][] v = new double[myCells.size()][2];
         int i = 0;
         for (Cell c : cellSet) {
-            v[i][0] = c.myValue;
-            v[i][1] = c.myProportion;
+            v[0][i] = c.myValue;
+            v[1][i] = c.myProportion;
             i++;
         }
         return v;
     }
 
     /**
-     * Returns a n by 2 array of value, cumulative proportion pairs
+     * Returns a 2 by n array of value, cumulative proportion pairs
      * where n = getNumberOfCells()
+     * row 0 is the values
+     * row 1 is the cumulative proportions
      *
      * @return the array or an empty array
      */
@@ -375,9 +377,9 @@ public class IntegerFrequency {
         int i = 0;
         double sum = 0.0;
         for (Cell c : cellSet) {
-            v[i][0] = c.myValue;
+            v[0][i] = c.myValue;
             sum = sum + c.myProportion;
-            v[i][1] = sum;
+            v[1][i] = sum;
             i++;
         }
         return v;
@@ -468,32 +470,12 @@ public class IntegerFrequency {
     }
 
     /**
-     * @return a DEmpirical
-     */
-    public DEmpiricalPMF createDEmpirical() {
-        DEmpiricalPMF d = new DEmpiricalPMF();
-        double[][] x = getValueProportions();
-        for (int j = 0; j < x.length - 1; j++) {
-            d.addProbabilityPoint(x[j][0], x[j][1]);
-        }
-        d.addLastProbabilityPoint(x[x.length - 1][0]);
-        return d;
-    }
-
-    /**
      * @return a DEmpirical based on the frequencies
      */
     public DEmpiricalCDF createDEmpiricalCDF() {
         // form the array of parameters
-        double[] pm = new double[2 * getNumberOfCells()];
         double[][] x = getValueCumulativeProportions();
-        int k = 0;
-        for (int j = 0; j < x.length; j++) {
-            pm[k] = x[j][0];
-            pm[k + 1] = x[j][1];
-            k = k + 2;
-        }
-        return (new DEmpiricalCDF(pm));
+        return (new DEmpiricalCDF(x[0], x[1]));
     }
 
     /**

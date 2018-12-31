@@ -16,17 +16,17 @@
 package ex.jobshop;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
 import jsl.modeling.Simulation;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Gamma;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.GammaRV;
 
 public class JobShop extends ModelElement {
 
@@ -71,14 +71,18 @@ public class JobShop extends ModelElement {
         return (s);
     }
 
-    public JobGenerator addJobGenerator(RandomIfc timeBtwArrivals) {
-        return (addJobGenerator(timeBtwArrivals, null));
+    public JobGenerator addJobGenerator(List<JobType> jobTypes, double[] typeCDf, RandomIfc timeBtwArrivals) {
+        return (addJobGenerator(jobTypes, typeCDf, timeBtwArrivals, null));
     }
 
-    public JobGenerator addJobGenerator(RandomIfc timeBtwArrivals, String name) {
-        JobGenerator jg = new JobGenerator(this, timeBtwArrivals, timeBtwArrivals, name);
+    public JobGenerator addJobGenerator(List<JobType> jobTypes, double[] typeCDf, RandomIfc timeBtwArrivals, String name) {
+        JobGenerator jg = new JobGenerator(this, jobTypes, typeCDf, timeBtwArrivals, timeBtwArrivals, name);
         myJobGenerators.add(jg);
         return (jg);
+    }
+
+    public JobType createJobType(String name, Sequence sequence){
+        return new JobType(this, name, sequence);
     }
 
     public static void main(String[] args) throws IOException {
@@ -102,27 +106,32 @@ public class JobShop extends ModelElement {
 
         // create the sequences
         Sequence s1 = shop.addSequence();
-        s1.addJobStep(w3, new Gamma(2.0, 0.5 / 2.0));
-        s1.addJobStep(w1, new Gamma(2.0, 0.6 / 2.0));
-        s1.addJobStep(w2, new Gamma(2.0, 0.85 / 2.0));
-        s1.addJobStep(w5, new Gamma(2.0, 0.5 / 2.0));
+        s1.addJobStep(w3, new GammaRV(2.0, 0.5 / 2.0));
+        s1.addJobStep(w1, new GammaRV(2.0, 0.6 / 2.0));
+        s1.addJobStep(w2, new GammaRV(2.0, 0.85 / 2.0));
+        s1.addJobStep(w5, new GammaRV(2.0, 0.5 / 2.0));
 
         Sequence s2 = shop.addSequence();
-        s2.addJobStep(w4, new Gamma(2.0, 1.1 / 2.0));
-        s2.addJobStep(w1, new Gamma(2.0, 0.8 / 2.0));
-        s2.addJobStep(w3, new Gamma(2.0, 0.75 / 2.0));
+        s2.addJobStep(w4, new GammaRV(2.0, 1.1 / 2.0));
+        s2.addJobStep(w1, new GammaRV(2.0, 0.8 / 2.0));
+        s2.addJobStep(w3, new GammaRV(2.0, 0.75 / 2.0));
 
         Sequence s3 = shop.addSequence();
-        s3.addJobStep(w2, new Gamma(2.0, 1.2 / 2.0));
-        s3.addJobStep(w5, new Gamma(2.0, 0.25 / 2.0));
-        s3.addJobStep(w1, new Gamma(2.0, 0.7 / 2.0));
-        s3.addJobStep(w4, new Gamma(2.0, 0.9 / 2.0));
-        s3.addJobStep(w3, new Gamma(2.0, 1.0 / 2.0));
+        s3.addJobStep(w2, new GammaRV(2.0, 1.2 / 2.0));
+        s3.addJobStep(w5, new GammaRV(2.0, 0.25 / 2.0));
+        s3.addJobStep(w1, new GammaRV(2.0, 0.7 / 2.0));
+        s3.addJobStep(w4, new GammaRV(2.0, 0.9 / 2.0));
+        s3.addJobStep(w3, new GammaRV(2.0, 1.0 / 2.0));
 
-        JobGenerator jg = shop.addJobGenerator(new Exponential(0.25));
-        jg.addJobType("A", s1, 0.3);
-        jg.addJobType("B", s2, 0.5);
-        jg.addLastJobType("C", s3);
+        JobType typeA = shop.createJobType("A", s1);
+        JobType typeB = shop.createJobType("B", s2);
+        JobType typeC = shop.createJobType("C", s3);
+
+        double[] cdf = new double[] {0.3, 0.8, 1.0};
+        List<JobType> types = Arrays.asList(typeA, typeB, typeC);
+
+        JobGenerator jg = shop.addJobGenerator(types, cdf, new ExponentialRV(0.25));
+
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

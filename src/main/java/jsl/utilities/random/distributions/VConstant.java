@@ -20,19 +20,14 @@
  */
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.rng.RNStreamIfc;
-
 /** A degenerate distribution on a single value.  The value may
  *  be changed via the setParameters() method or the setValue() method.
  *  This is primarily to avoid having to make many Constants.
  *
  * @author rossetti
  */
+@Deprecated
 public class VConstant extends Constant {
-
-    public VConstant(double value, RNStreamIfc rng) {
-        super(value, rng);
-    }
 
     public VConstant(double value) {
         super(value);
@@ -44,7 +39,7 @@ public class VConstant extends Constant {
 
     @Override
     public VConstant newInstance() {
-        return (new VConstant(getValue()));
+        return (new VConstant(myValue));
     }
 
     @Override
@@ -58,25 +53,4 @@ public class VConstant extends Constant {
      */
     public void setValue(double value) { myValue = value;}
 
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public VConstant newInstance(RNStreamIfc rng) {
-        return (newInstance());
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     * Since the rng is not used for Constant
-     *  this method is defined for sub-class compatibility with Distribution
-     *
-     * @return
-     */
-    @Override
-    public VConstant newAntitheticInstance() {
-        return newInstance();
-    }
 }

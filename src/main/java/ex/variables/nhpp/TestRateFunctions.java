@@ -24,6 +24,7 @@ import jsl.modeling.elements.variable.nhpp.PiecewiseConstantRateFunction;
 import jsl.modeling.elements.variable.nhpp.PiecewiseLinearRateFunction;
 import jsl.modeling.elements.variable.nhpp.PiecewiseRateFunction;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  *
@@ -222,7 +223,7 @@ public class TestRateFunctions {
         double a = 0.0;
         double y = 0.0;
         double tau = f.getCumulativeRateRangeUpperLimit();
-        Exponential e = new Exponential();
+        ExponentialRV e = new ExponentialRV(1.0);
         int n = 0;
         y = y + e.getValue();
         while (y < tau) {
@@ -249,7 +250,7 @@ public class TestRateFunctions {
         double a = 0.0;
         double y = 0.0;
         double tau = f.getCumulativeRateRangeUpperLimit();
-        Exponential e = new Exponential();
+        ExponentialRV e = new ExponentialRV(1.0);
         int n = 0;
         y = y + e.getValue();
         while (y < tau) {

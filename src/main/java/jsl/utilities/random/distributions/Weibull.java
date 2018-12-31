@@ -35,7 +35,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
     /** Creates new weibull with shape 1.0, scale 1.0
      */
     public Weibull() {
-        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, 1.0, null);
     }
 
     /** Constructs a weibull distribution with
@@ -43,16 +43,7 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the shape and scale
      */
     public Weibull(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a weibull distribution with
-     * shape = parameters[0] and scale = parameters[1]
-     * @param parameters An array with the shape and scale
-     * @param rng
-     */
-    public Weibull(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
+        this(parameters[0], parameters[1], null);
     }
 
     /** Constructs a weibull distribution with supplied shape and scale
@@ -61,49 +52,23 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
      * @param scale The scale parameter of the distribution
      */
     public Weibull(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
+        this(shape, scale, null);
     }
 
     /** Constructs a weibull distribution with supplied shape and scale
      *
      * @param shape The shape parameter of the distribution
      * @param scale The scale parameter of the distribution
-     * @param rng A RngIfc
+     * @param name an optional name/label
      */
-    public Weibull(double shape, double scale, RNStreamIfc rng) {
-        super(rng);
+    public Weibull(double shape, double scale, String name) {
+        super(name);
         setParameters(shape, scale);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Weibull newInstance() {
         return (new Weibull(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Weibull newInstance(RNStreamIfc rng) {
-        return (new Weibull(getParameters(), rng));
-    }
-
-        /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Weibull newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -216,15 +181,6 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
         return (f);
     }
 
-    /** Returns the inverse cumulative distribution function of the triangular distribution
-     * throws IllegalArgumentException if the value of the argument passed is beyond the range [0,1]
-     * p = 0.0 returns 0.0
-     * p = 1.0 returns Double.POSITIVE_INFINTITY
-
-     * @param p the cumulative probability that requires the corresponding point
-     * @return double the value in the distribution at which the cumulative distribution funtion equals the value of p
-     *
-     */
     @Override
     public final double invCDF(double p) {
         if ((p < 0.0) || (p > 1.0)) {
@@ -243,10 +199,18 @@ public class Weibull extends Distribution implements ContinuousDistributionIfc,
         return myScale * Math.pow(-Math.log(1.0 - p), 1.0 / myShape);
     }
 
+    /**
+     *
+     * @return the 3rd moment
+     */
     public final double getMoment3() {
         return Math.pow(myShape, 3) * Math.exp(Gamma.logGammaFunction(1 + (3 * (1 / myScale))));
     }
 
+    /**
+     *
+     * @return the 4th moment
+     */
     public final double getMoment4() {
         return Math.pow(myShape, 4) * Math.exp(Gamma.logGammaFunction(1 + (4 * (1 / myScale))));
     }

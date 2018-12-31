@@ -22,14 +22,13 @@ import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.PearsonType6RV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
-/** Represents a Pearson Type VI distribution, 
- *  see Law (2007) Simulation Modeling and Analysis, McGraw-Hill, pg 294
- * 
- *  Code contributed by Nabil Lehlou
- *
+/**
+ * Represents a Pearson Type VI distribution,
+ * see Law (2007) Simulation Modeling and Analysis, McGraw-Hill, pg 294
+ * <p>
+ * Code contributed by Nabil Lehlou
  */
-public class PearsonType6 extends Distribution implements ContinuousDistributionIfc,
-        InverseCDFIfc, GetRVariableIfc {
+public class PearsonType6 extends Distribution implements ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
 
     private double myAlpha1;
 
@@ -41,115 +40,67 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
 
     private double myBetaA1A2;
 
-    /** Creates a PearsonTypeVI distribution with
-     *  alpha1 = 2.0
-     *  alpha2 = 3.0
-     *  beta = 1.0
-     *
+    /**
+     * Creates a PearsonTypeVI distribution with
+     * alpha1 = 2.0
+     * alpha2 = 3.0
+     * beta = 1.0
      */
     public PearsonType6() {
-        this(RNStreamFactory.getDefaultFactory().getStream());
+        this(2.0, 3.0, 1.0, null);
     }
 
-    /** Creates a PearsonTypeVI distribution with
-     *  alpha1 = 2.0
-     *  alpha2 = 3.0
-     *  beta = 1.0
-     *
-     * @param rng
-     */
-    public PearsonType6(RNStreamIfc rng) {
-        this(2.0, 3.0, 1.0, rng);
-    }
-
-    /** Creates a PearsonTypeVI distribution
-     *
-     * @param alpha1
-     * @param alpha2
-     * @param beta
-     */
-    public PearsonType6(double alpha1, double alpha2, double beta) {
-        this(alpha1, alpha2, beta, RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Creates a PearsonTypeVI distribution
-     *
-     * parameters[0] = alpha1
-     * parameters[1] = alpha2
-     * parameters[2] = beta
-     *
-     * @param parameters
-     */
-    public PearsonType6(double[] parameters) {
-        this(parameters[0], parameters[1], parameters[2],
-                RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Creates a PearsonTypeVI distribution
-     *
-     * parameters[0] = alpha1
-     * parameters[1] = alpha2
-     * parameters[2] = beta
-     * @param parameters
-     * @param rng
-     */
-    public PearsonType6(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], parameters[2], rng);
-    }
-
-    /** Creates a PearsonTypeVI distribution
+    /**
+     * Creates a PearsonTypeVI distribution
      *
      * @param alpha1 shape 1
      * @param alpha2 shape 2
-     * @param beta scale
-     * @param rng
+     * @param beta   scale
      */
-    public PearsonType6(double alpha1, double alpha2, double beta, RNStreamIfc rng) {
-        super(rng);
+    public PearsonType6(double alpha1, double alpha2, double beta) {
+        this(alpha1, alpha2, beta, null);
+    }
+
+    /**
+     * Creates a PearsonTypeVI distribution
+     * <p>
+     * parameters[0] = alpha1
+     * parameters[1] = alpha2
+     * parameters[2] = beta
+     *
+     * @param parameters the parameter array
+     */
+    public PearsonType6(double[] parameters) {
+        this(parameters[0], parameters[1], parameters[2], null);
+    }
+
+    /**
+     * Creates a PearsonTypeVI distribution
+     *
+     * @param alpha1 shape 1
+     * @param alpha2 shape 2
+     * @param beta   scale
+     * @param name   an optional name/label
+     */
+    public PearsonType6(double alpha1, double alpha2, double beta, String name) {
+        super(name);
         setParameters(alpha1, alpha2, beta);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final PearsonType6 newInstance() {
         return (new PearsonType6(getParameters()));
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
     @Override
-    public final PearsonType6 newInstance(RNStreamIfc rng) {
-        return (new PearsonType6(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final PearsonType6 newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
-    }
-
-    @Override
-    public final Interval getDomain(){
+    public final Interval getDomain() {
         return new Interval(0, Double.POSITIVE_INFINITY);
     }
 
     /**
-     *
-     * @param alpha1
-     * @param alpha2
-     * @param beta
+     * @param alpha1 shape 1
+     * @param alpha2 shape 2
+     * @param beta   scale
      */
     public final void setParameters(double alpha1, double alpha2, double beta) {
         setScale(beta);
@@ -157,11 +108,10 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
     }
 
     /**
-     *
-     * @param alpha1
-     * @param alpha2
+     * @param alpha1 shape 1
+     * @param alpha2 shape 2
      */
-    public void setShapeParameters(double alpha1, double alpha2) {
+    public final void setShapeParameters(double alpha1, double alpha2) {
         if (alpha1 <= 0.0) {
             throw new IllegalArgumentException("The 1st shape parameter must be > 0.0");
         }
@@ -173,15 +123,14 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
         myAlpha2 = alpha2;
         myBetaA1A2 = Beta.betaFunction(myAlpha1, myAlpha2);
         if (myBetaCDF == null) {
-            myBetaCDF = new Beta(alpha1, alpha2, myRNG);
+            myBetaCDF = new Beta(alpha1, alpha2);
         } else {
             myBetaCDF.setParameters(alpha1, alpha2);
         }
     }
 
     /**
-     *
-     * @param beta
+     * @param beta the scale
      */
     public void setScale(double beta) {
         if (beta <= 0.0) {
@@ -191,21 +140,24 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
         myBeta = beta;
     }
 
-    /** params[0] = alpha1
-     *  params[1] = alpha2
-     *  params[2] = beta
+    /**
+     * params[0] = alpha1
+     * params[1] = alpha2
+     * params[2] = beta
      *
-     * @param params
+     * @param params the parameter array
      */
     @Override
     public void setParameters(double[] params) {
         setParameters(params[0], params[1], params[2]);
     }
 
-    /** params[0] = alpha1
-     *  params[1] = alpha2
-     *  params[2] = beta
+    /**
+     * params[0] = alpha1
+     * params[1] = alpha2
+     * params[2] = beta
      *
+     * @return the parameter array
      */
     @Override
     public double[] getParameters() {
@@ -213,7 +165,6 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -243,8 +194,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
     }
 
     /**
-     *
-     * @return  Returns the mean or Double.NaN if alpha2 &lt;= 1.0
+     * @return Returns the mean or Double.NaN if alpha2 &lt;= 1.0
      */
     @Override
     public double getMean() {
@@ -255,8 +205,7 @@ public class PearsonType6 extends Distribution implements ContinuousDistribution
         return myBeta * myAlpha1 / (myAlpha2 - 1);
     }
 
-    /** 
-     *
+    /**
      * @return Returns the variance or Double.NaN if alpha2 &lt;= 2.0
      */
     @Override

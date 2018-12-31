@@ -73,7 +73,7 @@ public final class DUniformRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rDUniform(min, max, myRNG);
+        double v = JSLRandom.rDUniform(min, max, myRNStream);
         return v;
     }
 

@@ -15,8 +15,8 @@
  */
 package ex.montecarlo;
 
-import jsl.utilities.random.distributions.Distribution;
-import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -27,7 +27,7 @@ public class EstimateRenewals {
 
     private Statistic myStat;
 
-    private Distribution myDist;
+    private RVariableIfc myRV;
 
     private int myMaxIterations = 100000;
 
@@ -38,15 +38,15 @@ public class EstimateRenewals {
     private double myIntervalLength = 1.0;
 
     public EstimateRenewals() {
-        this(new Exponential(), 1.0, 0.001);
+        this(new ExponentialRV(1.0), 1.0, 0.001);
     }
 
-    public EstimateRenewals(Distribution d, double interval){
+    public EstimateRenewals(RVariableIfc d, double interval){
         this(d, interval, 0.001);
     }
     
-    public EstimateRenewals(Distribution d, double interval, double tol) {
-        setDistribution(d);
+    public EstimateRenewals(RVariableIfc d, double interval, double tol) {
+        setRandomVariable(d);
         setInterval(interval);
         setTolerance(tol);
         myStat = new Statistic();
@@ -64,11 +64,11 @@ public class EstimateRenewals {
         return myStat.getAverage();
     }
 
-    public final void setDistribution(Distribution d) {
+    public final void setRandomVariable(RVariableIfc d) {
         if (d == null) {
             throw new IllegalArgumentException("The supplied distribution was null");
         }
-        myDist = d;
+        myRV = d;
     }
 
     public final void setInterval(double interval) {
@@ -134,7 +134,7 @@ public class EstimateRenewals {
         double t = 0.0;
         double n = 0;
         do {
-            t = t + myDist.getValue();
+            t = t + myRV.getValue();
             if (t <= myIntervalLength) {
                 n = n + 1;
             }

@@ -20,6 +20,8 @@ import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.*;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Triangular;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.random.rvariable.TriangularRV;
 
 /**
  *
@@ -68,9 +70,9 @@ public class EuclideanStepBasedMovementController extends AbstractMovementContro
      */
     public EuclideanStepBasedMovementController(ModelElement parent, String name) {
         super(parent, name);
-        DistributionIfc velocityCDF = new Triangular(myVelocityMin, myVelocityMode, myVelocityMax);
+        RandomIfc velocityCDF = new TriangularRV(myVelocityMin, myVelocityMode, myVelocityMax);
         setVelocityInitialRandomSource(velocityCDF);
-        DistributionIfc stepSizeCDF = new Triangular(myStepSizeMin, myStepSizeMode, myStepSizeMax);
+        RandomIfc stepSizeCDF = new TriangularRV(myStepSizeMin, myStepSizeMode, myStepSizeMax);
         myStepSize = new RandomVariable(this, stepSizeCDF);
         myPosition = new Vector3D();
         myDestination = new Vector3D();

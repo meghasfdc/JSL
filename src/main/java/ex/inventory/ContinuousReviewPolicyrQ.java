@@ -16,21 +16,14 @@
 
 package ex.inventory;
 
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.Experiment;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.Model;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.elements.variable.RandomVariable;
-import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.*;
 import jsl.modeling.elements.variable.Counter;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.random.distributions.Exponential;
+import jsl.modeling.elements.variable.RandomVariable;
+import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.JSL;
-import jsl.modeling.SimulationReporter;
 
 public class ContinuousReviewPolicyrQ extends SchedulingElement {
 
@@ -80,8 +73,8 @@ public class ContinuousReviewPolicyrQ extends SchedulingElement {
      */
     public ContinuousReviewPolicyrQ(ModelElement parent, String name) {
         super(parent, name);
-        myDemandTBA = new RandomVariable(this, new Exponential(365.0 / 14.0));
-        myLeadTimeRV = new RandomVariable(this, new Constant(45.0));
+        myDemandTBA = new RandomVariable(this, new ExponentialRV(365.0 / 14.0));
+        myLeadTimeRV = new RandomVariable(this, new ConstantRV(45.0));
         myOnHandInv = new TimeWeighted(this, REORDERPOINT + ORDERQ, "Amount of Inventory On Hand");
         myOnOrderInv = new TimeWeighted(this, 0.0, "Amount of Inventory On Order");
         myBackOrder = new TimeWeighted(this, 0.0, "Amount of Demand BackOrdered");

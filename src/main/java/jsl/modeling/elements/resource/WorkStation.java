@@ -18,11 +18,11 @@ package jsl.modeling.elements.resource;
 import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
-import jsl.modeling.queue.Queue;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.queue.Queue;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 /**
  *
@@ -50,7 +50,7 @@ public class WorkStation extends EntityReceiver {
 
     public WorkStation(ModelElement parent, String name, int numServers) {
         super(parent, name);
-        setServiceTimeInitialRandomSource(Constant.ONE);
+        setServiceTimeInitialRandomSource(ConstantRV.ONE);
         myQueue = new Queue(this, getName() + "_Q");
         myResource = new Resource(this, numServers, getName() + "_R");
         mySystemTime = new ResponseVariable(this, getName() + "_SystemTime");

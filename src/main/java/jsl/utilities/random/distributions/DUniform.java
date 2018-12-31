@@ -27,38 +27,25 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  */
 public class DUniform extends Distribution implements DiscreteDistributionIfc, GetRVariableIfc {
 
-    // private data members
     private int myMinimum;
 
     private int myMaximum;
 
     private int myRange;
 
-    // constructors
     /** Constructs a discrete uniform over the range {0,1}
      */
     public DUniform() {
-        this(0, 1, RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a discrete uniform where parameter[0] is the
-     * lower limit and parameter[1] is the upper limit of the range.
-     *  the lower limit must be &lt; upper limit
-     * @param parameters A array containing the lower limit and upper limit
-     */
-    public DUniform(double[] parameters) {
-        this((int) parameters[0], (int) parameters[1],
-                RNStreamFactory.getDefaultFactory().getStream());
+        this(0, 1, null);
     }
 
     /** Constructs a discrete uniform where parameter[0] is the
      * lower slimit and parameter[1] is the upper limit of the range.
      *  the lower limit must be &lt; upper limit
      * @param parameters A array containing the lower limit and upper limit
-     * @param rng
      */
-    public DUniform(double[] parameters, RNStreamIfc rng) {
-        this((int) parameters[0], (int) parameters[1], rng);
+    public DUniform(double[] parameters) {
+        this((int) parameters[0], (int) parameters[1], null);
     }
 
     /** Constructs a discrete uniform over the supplied range
@@ -67,17 +54,17 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
      * @param maximum The upper limit of the range
      */
     public DUniform(int minimum, int maximum) {
-        this(minimum, maximum, RNStreamFactory.getDefaultFactory().getStream());
+        this(minimum, maximum, null);
     }
 
     /** Constructs a discrete uniform over the supplied range
      *  the lower limit must be &lt; upper limit
      * @param minimum The lower limit of the range
      * @param maximum The upper limit of the range
-     * @param rng
+     * @param name an optional name/label
      */
-    public DUniform(int minimum, int maximum, RNStreamIfc rng) {
-        super(rng);
+    public DUniform(int minimum, int maximum, String name) {
+        super(name);
         setRange(minimum, maximum);
     }
 
@@ -89,27 +76,6 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
     @Override
     public final DUniform newInstance() {
         return (new DUniform(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final DUniform newInstance(RNStreamIfc rng) {
-        return (new DUniform(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final DUniform newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     /** Gets the distribution's lower limit
@@ -169,15 +135,14 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
         if ((prob < 0.0) || (prob > 1.0)) {
             throw new IllegalArgumentException("Probability must be [0,1]");
         }
-
         return (myMinimum + Math.floor(myRange * prob));
     }
 
     /** If x is not and integer value, then the probability must be zero
      *  otherwise pmf(int x) is used to determine the probability
      *
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the associated probability
      */
     @Override
     public final double pmf(double x) {
@@ -199,9 +164,9 @@ public class DUniform extends Distribution implements DiscreteDistributionIfc, G
     }
 
     /** Returns the probability associated with x
-     * 
-     * @param x
-     * @return
+     *
+     * @param x the value to evaluate
+     * @return the associated probability
      */
     public final double pmf(int x) {
         if ((x < myMinimum) || (x > myMaximum)) {

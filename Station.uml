@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>jsl.modeling.elements.station.Station</OriginalElement>
+  <nodes>
+    <node x="711.875" y="0.0">jsl.modeling.elements.station.SendQObjectIfc</node>
+    <node x="244.25000000000006" y="80.0">jsl.modeling.elements.station.ReceiveQObjectIfc</node>
+    <node x="453.87500000000006" y="0.0">jsl.modeling.ModelElement</node>
+    <node x="147.0" y="240.0">jsl.modeling.elements.station.SingleQueueStation</node>
+    <node x="338.0" y="240.0">jsl.modeling.elements.station.TwoWayByChanceStationSender</node>
+    <node x="301.25" y="160.0">jsl.modeling.elements.station.Station</node>
+    <node x="404.37500000000006" y="80.0">jsl.modeling.SchedulingElement</node>
+    <node x="610.0" y="240.0">jsl.modeling.elements.station.NWayByChanceStationSender</node>
+    <node x="591.375" y="80.0">jsl.modeling.elements.station.TwoWayByChanceQObjectSender</node>
+    <node x="472.12500000000006" y="160.0">jsl.modeling.elements.station.SResource</node>
+    <node x="0.0" y="240.0">jsl.modeling.elements.station.DelayStation</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="jsl.modeling.elements.station.NWayByChanceStationSender" target="jsl.modeling.elements.station.Station">
+      <point x="0.0" y="-15.0" />
+      <point x="728.0" y="210.0" />
+      <point x="383.50000000000006" y="210.0" />
+      <point x="35.25000000000006" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.SingleQueueStation" target="jsl.modeling.elements.station.Station">
+      <point x="0.0" y="-15.0" />
+      <point x="232.5" y="220.0" />
+      <point x="336.5" y="220.0" />
+      <point x="-11.75" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.TwoWayByChanceQObjectSender" target="jsl.modeling.ModelElement">
+      <point x="-64.5" y="-15.0" />
+      <point x="655.875" y="55.0" />
+      <point x="555.875" y="55.0" />
+      <point x="34.0" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.DelayStation" target="jsl.modeling.elements.station.Station">
+      <point x="0.0" y="-15.0" />
+      <point x="63.5" y="210.0" />
+      <point x="313.0" y="210.0" />
+      <point x="-35.25" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.SResource" target="jsl.modeling.SchedulingElement">
+      <point x="0.0" y="-15.0" />
+      <point x="41.75" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.Station" target="jsl.modeling.elements.station.ReceiveQObjectIfc">
+      <point x="-23.499999999999943" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.TwoWayByChanceStationSender" target="jsl.modeling.elements.station.Station">
+      <point x="0.0" y="-15.0" />
+      <point x="464.0" y="220.0" />
+      <point x="360.0" y="220.0" />
+      <point x="11.75" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.TwoWayByChanceQObjectSender" target="jsl.modeling.elements.station.SendQObjectIfc">
+      <point x="64.5" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.SchedulingElement" target="jsl.modeling.ModelElement">
+      <point x="0.0" y="-15.0" />
+      <point x="-34.0" y="15.0" />
+    </edge>
+    <edge source="jsl.modeling.elements.station.Station" target="jsl.modeling.SchedulingElement">
+      <point x="23.500000000000057" y="-15.0" />
+      <point x="371.75000000000006" y="135.0" />
+      <point x="446.12500000000006" y="135.0" />
+      <point x="-41.75" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.882295719844358" x="504.0" y="135.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -16,6 +16,7 @@
 package ex.montecarlo;
 
 import jsl.utilities.random.distributions.DUniform;
+import jsl.utilities.random.rvariable.DUniformRV;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -24,8 +25,8 @@ public class CrapsGame {
 
     public static void main(String[] args) {
 
-        DUniform d1 = new DUniform(1, 6);
-        DUniform d2 = new DUniform(1, 6);
+        DUniformRV d1 = new DUniformRV(1, 6);
+        DUniformRV d2 = new DUniformRV(1, 6);
 
         Statistic probOfWinning = new Statistic("Prob of winning");
         Statistic numTosses = new Statistic("Number of Toss Statistics");

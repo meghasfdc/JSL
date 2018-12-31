@@ -37,7 +37,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
     /** Constructs a uniform distribution over the range (0,1)
      */
     public Uniform() {
-        this(0.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 1.0, null);
     }
 
     /** Constructs a uniform distribution with
@@ -45,16 +45,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @param parameters The array of parameters
      */
     public Uniform(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a uniform distribution with
-     * lower limit = parameters[0], upper limit = parameters[1]
-     * @param parameters The array of parameters
-     * @param rng
-     */
-    public Uniform(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
+        this(parameters[0], parameters[1], null);
     }
 
     /** Constructs a uniform distribution over the provided range
@@ -63,49 +54,23 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
      * @param upperLimit limit of the distribution
      */
     public Uniform(double lowerLimit, double upperLimit) {
-        this(lowerLimit, upperLimit, RNStreamFactory.getDefaultFactory().getStream());
+        this(lowerLimit, upperLimit, null);
     }
 
     /** Constructs a uniform distribution over the provided range
      *
      * @param lowerLimit limit of the distribution
      * @param upperLimit limit of the distribution
-     * @param rng A RngIfc
+     * @param name an optional name/label
      */
-    public Uniform(double lowerLimit, double upperLimit, RNStreamIfc rng) {
-        super(rng);
+    public Uniform(double lowerLimit, double upperLimit, String name) {
+        super(name);
         setRange(lowerLimit, upperLimit);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Uniform newInstance() {
         return (new Uniform(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Uniform newInstance(RNStreamIfc rng) {
-        return (new Uniform(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Uniform newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -150,10 +115,15 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
         myRange = myMax - myMin;
     }
 
+    /**
+     *
+     * @return the range (max - min)
+     */
     public final double getRange() {
         return (myRange);
     }
 
+    @Override
     public final double cdf(double x) {
         if (x < myMin) {
             return 0.0;
@@ -165,13 +135,6 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
         }
     }
 
-    /** Returns the inverse cumulative distribution function of the distribution
-     * throws IllegalArgumentException if the value of the argument passed is beyond the range [0,1]
-     *
-     * @param prob the cumulative probability that requires the corresponding point
-     * @return double the value in the triangular distribution at which the cumulative distribution funtion equals the value of p
-     *
-     */
     @Override
     public final double invCDF(double prob) {
         if ((prob < 0.0) || (prob > 1.0)) {
@@ -181,6 +144,7 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
         return (myMin + myRange * prob);
     }
 
+    @Override
     public final double pdf(double x) {
         if ((x < myMin) || (x > myMax)) {
             return (0.0);
@@ -194,10 +158,18 @@ public class Uniform extends Distribution implements ContinuousDistributionIfc,
         return ((myMin + myMax) / 2.0);
     }
 
+    /**
+     *
+     * @return the 3rd moment
+     */
     public final double getMoment3() {
         return (1.0 / 4.0) * ((myMin + myMax) * ((myMin * myMin) + (myMax * myMax)));
     }
 
+    /**
+     *
+     * @return the 4th moment
+     */
     public final double getMoment4() {
         double min2 = myMin * myMin;
         double max2 = myMax * myMax;

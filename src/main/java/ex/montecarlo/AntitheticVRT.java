@@ -24,6 +24,9 @@ import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.distributions.Uniform;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.random.rvariable.UniformRV;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticXY;
 
@@ -46,14 +49,12 @@ public class AntitheticVRT {
 
         example4();
 
-        example5();
-
     }
 
     public static void example1() {
         // estimating the mean of a rv via antithetic variates
 
-        Uniform nf = new Uniform();
+        UniformRV nf = new UniformRV();
 
         //       Normal nf = new Normal(10, 2);
         Statistic s = new Statistic("Crude Estimator");
@@ -121,8 +122,8 @@ public class AntitheticVRT {
         int n = 2 * m;  // number of samples
 
         // use the antithetic streams
-        Normal nf1 = new Normal(10.0, 2.0, s1);
-        Normal nf2 = new Normal(10.0, 2.0, s2);
+        NormalRV nf1 = new NormalRV(10.0, 2.0, s1);
+        NormalRV nf2 = new NormalRV(10.0, 2.0, s2);
         Statistic s = new Statistic("Antithetic");
         StatisticXY sxy = new StatisticXY();
 
@@ -141,7 +142,7 @@ public class AntitheticVRT {
     public static void example3() {
         // recall that you can just do inverse transform yourself
 
-        Uniform uf = new Uniform();
+        UniformRV uf = new UniformRV();
         Normal nf = new Normal(10.0, 2.0);
 
         int m = 1000; // number of antithetic pairs
@@ -164,8 +165,8 @@ public class AntitheticVRT {
     }
 
     public static void example4() {
-        Normal nf = new Normal(10.0, 2.0);
-        Normal nfa = nf.newAntitheticInstance();
+        NormalRV nf = new NormalRV(10.0, 2.0);
+        RVariableIfc nfa = nf.newAntitheticInstance();
 
         int m = 1000; // number of antithetic pairs
         int n = 2 * m;  // number of samples
@@ -184,23 +185,4 @@ public class AntitheticVRT {
         System.out.println(sxy);
     }
 
-    public static void example5() {
-        Normal nf = new Normal(10.0, 2.0);
-
-        int m = 1000; // number of antithetic pairs
-        int n = 2 * m;  // number of samples
-        Statistic s = new Statistic("Antithetic");
-        StatisticXY sxy = new StatisticXY();
-
-        for (int i = 1; i <= m; i++) {
-            double x = nf.getValue();
-            double xa = nf.getAntitheticValue();
-            sxy.collectXY(x, xa);
-            s.collect((x + xa) / 2.0);
-        }
-        System.out.println("--------------------");
-        System.out.println("Example 5");
-        System.out.println(s);
-        System.out.println(sxy);
-    }
 }

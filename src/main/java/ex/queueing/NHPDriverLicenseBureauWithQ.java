@@ -27,6 +27,8 @@ import jsl.modeling.elements.variable.nhpp.PiecewiseConstantRateFunction;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 public class NHPDriverLicenseBureauWithQ extends SchedulingElement {
 
@@ -55,7 +57,7 @@ public class NHPDriverLicenseBureauWithQ extends SchedulingElement {
 
         setNumberOfServers(numServers);
 
-        myServiceRV = new RandomVariable(this, new Exponential(3));
+        myServiceRV = new RandomVariable(this, new ExponentialRV(3));
 
         PiecewiseConstantRateFunction f = new PiecewiseConstantRateFunction(360.0, 0.006);
         f.addRateSegment(180.0, 0.033);
@@ -90,7 +92,7 @@ public class NHPDriverLicenseBureauWithQ extends SchedulingElement {
         myNumServers = n;
     }
 
-    public void setServiceDistributionInitialRandomSource(DistributionIfc d) {
+    public void setServiceDistributionInitialRandomSource(RVariableIfc d) {
         myServiceRV.setInitialRandomSource(d);
     }
 

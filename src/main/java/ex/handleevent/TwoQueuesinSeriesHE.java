@@ -22,6 +22,7 @@ import jsl.modeling.queue.*;
 import jsl.modeling.elements.variable.*;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
 public class TwoQueuesinSeriesHE extends SchedulingElement {
@@ -64,9 +65,9 @@ public class TwoQueuesinSeriesHE extends SchedulingElement {
         super(parent);
         myQueue1 = new Queue(this, getName() + " Queue1");
         myQueue2 = new Queue(this, getName() + " Queue2");
-        myTBA = new RandomVariable(this, new Exponential(1));
-        myServiceTime1 = new RandomVariable(this, new Exponential(0.7));
-        myServiceTime2 = new RandomVariable(this, new Exponential(0.9));
+        myTBA = new RandomVariable(this, new ExponentialRV(1));
+        myServiceTime1 = new RandomVariable(this, new ExponentialRV(0.7));
+        myServiceTime2 = new RandomVariable(this, new ExponentialRV(0.9));
         myServer1State = new TimeWeighted(this, 0.0, " Server1 Utilization");
         myServer2State = new TimeWeighted(this, 0.0, " Server2 Utilization");
         mySystemTime = new ResponseVariable(this, " System Time");

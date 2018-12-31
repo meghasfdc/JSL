@@ -23,9 +23,10 @@
 package ex.randomnumbers;
 
 import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.distributions.DEmpiricalPMF;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  *
@@ -45,12 +46,10 @@ public class DiscreteEmpiricalExamples {
         RNStreamFactory f2 = new RNStreamFactory();
         // thus the first streams returned are identical
         RNStreamIfc f2s1 = f2.getStream();
-        
-        DEmpiricalPMF n1 = new DEmpiricalPMF(f1s1);
-        n1.addProbabilityPoint(1.0, 1.0/6.0);
-        n1.addProbabilityPoint(2.0, 2.0/6.0);
-        n1.addProbabilityPoint(3.0, 2.0/6.0);
-        n1.addLastProbabilityPoint(4.0);
+
+        double[] values = {1.0, 2.0, 3.0, 4.0};
+        double[] cdf = {1.0/6.0, 3.0/6.0, 5.0/6.0, 1.0};
+        DEmpiricalRV n1 = new DEmpiricalRV(values, cdf, f1s1);
 
         System.out.println("pmf");
         System.out.println(n1);
@@ -58,15 +57,14 @@ public class DiscreteEmpiricalExamples {
         for (int i = 1; i <= 5; i++) {
             System.out.println("x(" + i + ")= " + n1.getValue());
         }
-        
-        double[] pm = {1.0, 1.0/6.0, 2.0, 3.0/6.0, 3.0, 5.0/6.0, 4.0, 1.0};
-        DEmpiricalCDF n2 = new DEmpiricalCDF(pm, f2s1);
+
+        DEmpiricalCDF n2 = new DEmpiricalCDF(values, cdf);
 
         System.out.println("pmf");
         System.out.println(n2);
-
+        RVariableIfc n2RV = n2.getRandomVariable();
         for (int i = 1; i <= 5; i++) {
-            System.out.println("x(" + i + ")= " + n2.getValue());
+            System.out.println("x(" + i + ")= " + n2RV.getValue());
         }
     }
     

@@ -19,13 +19,13 @@ import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
-import jsl.modeling.queue.Queue;
-import jsl.modeling.queue.Queue.Discipline;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.modeling.queue.Queue;
+import jsl.modeling.queue.Queue.Discipline;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 public class ResourceProvider extends SchedulingElement {
 
@@ -125,7 +125,7 @@ public class ResourceProvider extends SchedulingElement {
             discipline = Queue.Discipline.FIFO;
         }
 
-        myServiceRV = new RandomVariable(this, Constant.ONE);
+        myServiceRV = new RandomVariable(this, ConstantRV.ONE);
         myEntityQ = new Queue(this, getName() + "_Q", discipline);
         myNS = new TimeWeighted(this, 0.0, getName() + "_NS");
         myWs = new ResponseVariable(this, getName() + "_WS");

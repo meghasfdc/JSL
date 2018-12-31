@@ -27,6 +27,10 @@ public final class UniformRV extends AbstractRVariable {
     private final double min;
     private final double max;
 
+    public UniformRV(){
+        this(0.0, 1.0);
+    }
+
     public UniformRV(double min, double max){
         this(min, max, RNStreamFactory.getDefaultFactory().getStream());
     }
@@ -73,7 +77,7 @@ public final class UniformRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rUniform(min, max, myRNG);
+        double v = JSLRandom.rUniform(min, max, myRNStream);
         return v;
     }
 

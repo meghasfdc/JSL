@@ -21,33 +21,22 @@
  */
 package ex.station;
 
-import java.util.List;
 import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
 import jsl.modeling.Simulation;
 import jsl.modeling.SimulationReporter;
-import jsl.modeling.queue.QObject;
 import jsl.modeling.elements.station.ReceiveQObjectIfc;
 import jsl.modeling.elements.station.SingleQueueStation;
-import jsl.modeling.elements.variable.AcrossReplicationStatisticIfc;
-import jsl.modeling.elements.variable.Counter;
-import jsl.modeling.elements.variable.RandomVariable;
-import jsl.modeling.elements.variable.ResponseVariable;
-import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.modeling.elements.variable.*;
+import jsl.modeling.queue.QObject;
 import jsl.observers.variable.AcrossReplicationHalfWidthChecker;
-import jsl.utilities.random.distributions.Beta;
-import jsl.utilities.random.distributions.Binomial;
-import jsl.utilities.random.distributions.Lognormal;
-import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.distributions.ShiftedDistribution;
-import jsl.utilities.random.distributions.Triangular;
-import jsl.utilities.random.distributions.Uniform;
-import jsl.utilities.random.distributions.Weibull;
+import jsl.utilities.random.rvariable.*;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 
+import java.util.List;
+
 /**
- *
  * @author rossetti
  */
 public class LOTR extends ModelElement {
@@ -55,8 +44,6 @@ public class LOTR extends ModelElement {
     private int myNumDailyCalls = 100;
     private double myRingTol = 0.02;
     private double myOTLimit = 960.0;
-    private final Binomial mySuccessFullCallPMF;
-    private final RandomVariable myNumSuccessFullCallsRV;
     private final RandomVariable mySalesCallProb;
     private final RandomVariable myMakeRingTimeRV;
     private final RandomVariable mySmallRingODRV;
@@ -78,23 +65,15 @@ public class LOTR extends ModelElement {
     private final TimeWeighted myNumInRMandInspection;
     private final ResponseVariable myTimeInRMandInspection;
 
-//    private final SResource myRingMakers;
-//    private final SResource myInspectors;
-//    private final SResource myPackagers;
-//    private final SResource myReworkers;
     public LOTR(ModelElement parent, String name) {
         super(parent, name);
-        mySuccessFullCallPMF = new Binomial(0.5, myNumDailyCalls);
-        myNumSuccessFullCallsRV = new RandomVariable(this, mySuccessFullCallPMF);
-        myNumSuccessFullCallsRV.setResetInitialParametersWarningFlag(false);
-        mySalesCallProb = new RandomVariable(this, new Beta(5.0, 1.5));
-        myMakeRingTimeRV = new RandomVariable(this, new Uniform(5, 15));
-        mySmallRingODRV = new RandomVariable(this, new Normal(1.49, 0.005 * 0.005));
-        myBigRingIDRV = new RandomVariable(this, new Normal(1.5, 0.002 * 0.002));
-        myInspectTimeRV = new RandomVariable(this, new Triangular(2, 4, 7));
-        myPackingTimeRV = new RandomVariable(this, new Lognormal(7, 1));
-        myReworkTimeRV = new RandomVariable(this,
-                new ShiftedDistribution(new Weibull(3, 15), 5));
+        mySalesCallProb = new RandomVariable(this, new BetaRV(5.0, 1.5));
+        myMakeRingTimeRV = new RandomVariable(this, new UniformRV(5, 15));
+        mySmallRingODRV = new RandomVariable(this, new NormalRV(1.49, 0.005 * 0.005));
+        myBigRingIDRV = new RandomVariable(this, new NormalRV(1.5, 0.002 * 0.002));
+        myInspectTimeRV = new RandomVariable(this, new TriangularRV(2, 4, 7));
+        myPackingTimeRV = new RandomVariable(this, new LognormalRV(7, 1));
+        myReworkTimeRV = new RandomVariable(this, new ShiftedRV(5.0, new WeibullRV(3, 15)));
         myRingMakingStation = new SingleQueueStation(this, myMakeRingTimeRV,
                 "RingMakingStation");
         myInspectionStation = new SingleQueueStation(this, myInspectTimeRV,
@@ -122,8 +101,7 @@ public class LOTR extends ModelElement {
     protected void initialize() {
         super.initialize();
         double p = mySalesCallProb.getValue();
-        mySuccessFullCallPMF.setParameters(p, myNumDailyCalls);
-        int n = (int) myNumSuccessFullCallsRV.getValue();
+        int n = JSLRandom.rBinomial(p, myNumDailyCalls);
         for (int i = 0; i < n; i++) {
             myRingMakingStation.receive(new RingOrder());
             myNumInSystem.increment();
@@ -202,7 +180,7 @@ public class LOTR extends ModelElement {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
+
         //test1();
         test2();
 
@@ -231,8 +209,8 @@ public class LOTR extends ModelElement {
         System.out.println("hw = " + stat.getHalfWidth());
         System.out.println(stat.getConfidenceInterval());
     }
-    
-    public static void test2(){
+
+    public static void test2() {
         Simulation sim = new Simulation("LOTR Example");
         // get the model
         Model m = sim.getModel();

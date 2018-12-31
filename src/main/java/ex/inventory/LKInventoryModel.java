@@ -15,19 +15,17 @@
  */
 package ex.inventory;
 
-import java.io.IOException;
 import java.lang.Math;
+
 import jsl.modeling.elements.variable.*;
 import jsl.modeling.elements.*;
 import jsl.modeling.*;
-import jsl.observers.textfile.CSVReplicationReport;
-import jsl.observers.textfile.CSVReport;
 import jsl.utilities.random.*;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.random.distributions.DEmpiricalPMF;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Uniform;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  *
@@ -48,9 +46,9 @@ public class LKInventoryModel extends SchedulingElement {
 
     private double myInitialInventoryLevel = 60;
 
-    private Variable myLeadTime;
+    private RandomVariable myLeadTime;
 
-    private Variable myDemandAmount;
+    private RandomVariable myDemandAmount;
 
     private TimeWeighted myInvLevel;
 
@@ -72,19 +70,19 @@ public class LKInventoryModel extends SchedulingElement {
 
     private OrderArrival myOrderArrivalListener;
 
-    /** Creates a new instance of LKInventoryModel */
+    /**
+     * Creates a new instance of LKInventoryModel
+     */
     public LKInventoryModel(ModelElement parent) {
         super(parent);
         myDemandGenerator =
-                new EventGenerator(this, new DemandArrival(), new Exponential(0.1), new Exponential(0.1), "Demand Generator");
+                new EventGenerator(this, new DemandArrival(),
+                        new ExponentialRV(0.1), new ExponentialRV(0.1), "Demand Generator");
         myInventoryCheckGenerator =
-                new EventGenerator(this, new InventoryCheck(), new Constant(0.0), new Constant(1.0), "Inventory Check");
-        myLeadTime = new RandomVariable(this, new Uniform(0.5, 1.0));
-        DEmpiricalPMF d = new DEmpiricalPMF();
-        d.addProbabilityPoint(1.0, 0.167);
-        d.addProbabilityPoint(2.0, 0.333);
-        d.addProbabilityPoint(3.0, 0.333);
-        d.addLastProbabilityPoint(4.0);
+                new EventGenerator(this, new InventoryCheck(), ConstantRV.ZERO, ConstantRV.ONE, "Inventory Check");
+        myLeadTime = new RandomVariable(this, new UniformRV(0.5, 1.0));
+        RandomIfc d = new DEmpiricalRV(new double[]{1.0, 2.0, 3.0, 4.0},
+                                       new double[]{1.0 / 6.0, 3.0 / 6.0, 5.0 / 6.0, 1.0});
         myDemandAmount = new RandomVariable(this, d);
         myOrderArrivalListener = new OrderArrival();
         myInvLevel = new TimeWeighted(this, 0.0, "Inventory Level");
@@ -190,9 +188,9 @@ public class LKInventoryModel extends SchedulingElement {
         s.setLengthOfReplication(120.0);
         s.setLengthOfWarmUp(20.0);
         s.run();
-        
+
         r.printAcrossReplicationStatistics();
-        
+
         System.out.println("Done!");
     }
 }

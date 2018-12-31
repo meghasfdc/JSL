@@ -21,6 +21,7 @@ import jsl.utilities.random.distributions.Bernoulli;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.BernoulliRV;
 
 /**
  */
@@ -61,10 +62,10 @@ public class UpDownComponentHE extends SchedulingElement {
         super(parent, name);
 
         myHeight = new Variable(this, 1.0, "height");
-        DistributionIfc utd = new Exponential(1.0);
-        DistributionIfc dtd = new Exponential(2.0);
-        myUpTime = new RandomVariable(this, utd, "up time");
-        myDownTime = new RandomVariable(this, dtd, "down time");
+        Exponential utd = new Exponential(1.0);
+        Exponential dtd = new Exponential(2.0);
+        myUpTime = new RandomVariable(this, utd.getRandomVariable(), "up time");
+        myDownTime = new RandomVariable(this, dtd.getRandomVariable(), "down time");
         myState = new TimeWeighted(this, "state");
         myCycleLength = new ResponseVariable(this, "cycle length");
 
@@ -80,7 +81,7 @@ public class UpDownComponentHE extends SchedulingElement {
         // chance of being in up state
         double p = meanUpTime / (meanUpTime + meanDownTime);
         System.out.println("p = " + p);
-        myInitialState = new RandomVariable(this, new Bernoulli(p), "initial state");
+        myInitialState = new RandomVariable(this, new BernoulliRV(p), "initial state");
 
     }
 

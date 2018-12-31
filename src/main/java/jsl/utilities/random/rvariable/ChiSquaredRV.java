@@ -64,7 +64,7 @@ public final class ChiSquaredRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rChiSquared(dof, myRNG);
+        double v = JSLRandom.rChiSquared(dof, myRNStream);
         return v;
     }
 

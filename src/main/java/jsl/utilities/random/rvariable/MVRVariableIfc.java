@@ -21,8 +21,8 @@ import jsl.utilities.random.rng.*;
 /** An interface for defining random variables
  *
  */
-public interface MVRVariableIfc extends RandomStreamIfc,
-        MVSampleIfc, GetRngIfc, SetRngIfc {
+public interface MVRVariableIfc extends RNStreamControlIfc,
+        MVSampleIfc, GetRandomNumberStreamIfc, SetRandomNumberStreamIfc {
 
     /**
      * @param rng the RngIfc to use

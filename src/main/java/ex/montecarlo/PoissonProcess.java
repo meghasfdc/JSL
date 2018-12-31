@@ -16,6 +16,7 @@
 package ex.montecarlo;
 
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -32,7 +33,7 @@ public class PoissonProcess {
     }
 
     public static void PoissonProcess() {
-        Exponential e = new Exponential();
+        ExponentialRV e = new ExponentialRV(1.0);
         double x = 10.0;
 
         int r = 1000;

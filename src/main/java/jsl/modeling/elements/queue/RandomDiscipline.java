@@ -19,7 +19,8 @@ import java.util.List;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
 
-import jsl.utilities.random.distributions.DUniform;
+import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 /** The RandomDiscipline provides a mechanism to the Queue object
  * to provide a random selection of objects from the queue
@@ -51,7 +52,7 @@ public class RandomDiscipline extends QueueDiscipline implements RandomElementIf
      */
     protected boolean myResetNextSubStreamOption;
 
-    private DUniform myDistribution;
+    private RNStreamIfc myStream;
 
     private int myNext;
 
@@ -63,7 +64,7 @@ public class RandomDiscipline extends QueueDiscipline implements RandomElementIf
         super(parent, name);
         setResetStartStreamOption(true);
         setResetNextSubStreamOption(true);
-        myDistribution = new DUniform();
+        myStream = JSLRandom.getRNStream();
     }
 
     @Override
@@ -81,8 +82,7 @@ public class RandomDiscipline extends QueueDiscipline implements RandomElementIf
         if (list.size() == 1) {
             myNext = 0;
         } else {
-            myDistribution.setRange(0, list.size() - 1);
-            myNext = (int) myDistribution.getValue();
+            myNext = myStream.randInt(0, list.size() - 1);
         }
         return ((QObject) list.get(myNext));// randomly pick it from the range available
     }
@@ -105,27 +105,27 @@ public class RandomDiscipline extends QueueDiscipline implements RandomElementIf
 
     @Override
     public void advanceToNextSubstream() {
-        myDistribution.advanceToNextSubstream();
+        myStream.advanceToNextSubstream();
     }
 
     @Override
     public void resetStartStream() {
-        myDistribution.resetStartStream();
+        myStream.resetStartStream();
     }
 
     @Override
     public void resetStartSubstream() {
-        myDistribution.resetStartSubstream();
+        myStream.resetStartSubstream();
     }
 
     @Override
     public void setAntitheticOption(boolean flag) {
-        myDistribution.setAntitheticOption(flag);
+        myStream.setAntitheticOption(flag);
     }
 
     @Override
     public boolean getAntitheticOption() {
-        return myDistribution.getAntitheticOption();
+        return myStream.getAntitheticOption();
     }
 
     @Override
@@ -151,7 +151,7 @@ public class RandomDiscipline extends QueueDiscipline implements RandomElementIf
     @Override
     protected void beforeExperiment() {
         if (getResetStartStreamOption()) {
-            myDistribution.resetStartStream();
+            myStream.resetStartStream();
         }
     }
 
@@ -161,7 +161,7 @@ public class RandomDiscipline extends QueueDiscipline implements RandomElementIf
     @Override
     protected void afterReplication() {
         if (getResetNextSubStreamOption()) {
-            myDistribution.advanceToNextSubstream();
+            myStream.advanceToNextSubstream();
         }
     }
 }

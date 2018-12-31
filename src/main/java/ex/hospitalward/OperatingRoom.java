@@ -19,10 +19,10 @@ import ex.hospitalward.HospitalWard.OpPatient;
 import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.SchedulingElement;
-import jsl.modeling.queue.Queue;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.random.distributions.Constant;
+import jsl.modeling.queue.Queue;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 /**
  *
@@ -64,8 +64,8 @@ public class OperatingRoom extends SchedulingElement {
         super(ward, name);
         myHospitalWard = ward;
         myORQ = new Queue(this, "OR Q");
-        myOpRoomOpenTime = new RandomVariable(this, new Constant(24.0));
-        myOpRoomCloseTime = new RandomVariable(this, new Constant(4.0));
+        myOpRoomOpenTime = new RandomVariable(this, new ConstantRV(24.0));
+        myOpRoomCloseTime = new RandomVariable(this, new ConstantRV(4.0));
         myORRoomOpenStatus = new TimeWeighted(this, OPEN, "OR-Open-Status");
         myORRoomIdleStatus = new TimeWeighted(this, IDLE, "OR-Idle-Status");
         myOpenOperatingRoomAction = new OpenOperatingRoomAction();

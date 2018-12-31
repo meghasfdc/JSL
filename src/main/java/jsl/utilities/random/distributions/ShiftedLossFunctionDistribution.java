@@ -26,33 +26,20 @@ public class ShiftedLossFunctionDistribution extends ShiftedDistribution
         implements LossFunctionDistributionIfc {
 
     /**
-     * @param distribution
-     * @param shift
+     * @param distribution the distribution to shift
+     * @param shift the shift
      */
     public ShiftedLossFunctionDistribution(LossFunctionDistributionIfc distribution, double shift) {
-        this(distribution, shift, RNStreamFactory.getDefaultFactory().getStream());
+        super((DistributionIfc) distribution, shift, null);
     }
 
-    /**
-     * @param distribution
-     * @param shift
-     * @param rng
-     */
-    public ShiftedLossFunctionDistribution(LossFunctionDistributionIfc distribution, double shift, RNStreamIfc rng) {
-        super((DistributionIfc) distribution, shift, rng);
-    }
-
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.LossFunctionDistributionIfc#firstOrderLossFunction(double)
-     */
+    @Override
     public double firstOrderLossFunction(double x) {
         LossFunctionDistributionIfc cdf = (LossFunctionDistributionIfc) myDistribution;
         return cdf.firstOrderLossFunction(x - myShift);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.LossFunctionDistributionIfc#secondOrderLossFunction(double)
-     */
+    @Override
     public double secondOrderLossFunction(double x) {
         LossFunctionDistributionIfc cdf = (LossFunctionDistributionIfc) myDistribution;
         return cdf.secondOrderLossFunction(x - myShift);

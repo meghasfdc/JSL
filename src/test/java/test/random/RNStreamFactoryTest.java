@@ -28,6 +28,7 @@ import java.util.Arrays;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamFactory.RNStream;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -477,12 +478,12 @@ public class RNStreamFactoryTest {
         RNStreamFactory.getDefaultFactory().resetFactorySeed();
         System.out.println(RNStreamFactory.getDefaultFactory());
 
-        List<Exponential> list1 = new ArrayList<Exponential>();
-        Exponential e;
+        List<ExponentialRV> list1 = new ArrayList<ExponentialRV>();
+        ExponentialRV e;
 
         System.out.println("Making some Exponentials using default factory");
         for (int i = 1; i <= 3; i++) {
-            e = new Exponential();
+            e = new ExponentialRV(1.0);
             System.out.println(e);
             list1.add(e);
         }
@@ -506,12 +507,12 @@ public class RNStreamFactoryTest {
         RNStreamFactory.setDefaultFactory(f1);
         System.out.println(RNStreamFactory.getDefaultFactory());
 
-        List<Exponential> list2 = new ArrayList<Exponential>();
+        List<ExponentialRV> list2 = new ArrayList<ExponentialRV>();
         System.out.println("Making some Exponentials using new default factory");
         System.out.println("Exponentials actually have different stream objects,");
         System.out.println("but they start at the same location (seed)");
         for (int i = 1; i <= 3; i++) {
-            e = new Exponential();
+            e = new ExponentialRV(1.0);
             list2.add(e);
             System.out.println(e);
         }

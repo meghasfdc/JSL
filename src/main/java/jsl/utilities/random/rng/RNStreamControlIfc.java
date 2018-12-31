@@ -19,7 +19,7 @@ package jsl.utilities.random.rng;
  * Controls the movement through a pseudo-random number stream
  *
  */
-public interface RandomStreamIfc {
+public interface RNStreamControlIfc {
 
     /**
      * The resetStartStream method will position the RNG at the beginning of its

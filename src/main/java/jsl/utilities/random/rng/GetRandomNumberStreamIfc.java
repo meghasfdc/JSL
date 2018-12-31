@@ -13,27 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package jsl.utilities.random.rng;
 
-/**
- * The new instance has the same state as the underlying stream.  This is a new stream
- * but it has the same state (starting values, etc.)
- * @author rossetti
- */
-public interface NewStreamInstanceIfc {
+public interface GetRandomNumberStreamIfc {
 
-    /** Returns a clone of the stream with
-     *  exactly the same state
-     *
-     * @return
-     */
-    RNStreamIfc newInstance();
-
-    /** Returns a clone of the stream that
-     *  has exactly the same state
-     *
-     * @param name
-     * @return
-     */
-    RNStreamIfc newInstance(String name);
+    RNStreamIfc getRandomNumberStream();
 }

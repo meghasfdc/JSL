@@ -16,10 +16,12 @@
 package ex.models;
 
 import jsl.modeling.*;
-import jsl.modeling.elements.variable.*;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.modeling.SimulationReporter;
+import jsl.modeling.elements.variable.Counter;
+import jsl.modeling.elements.variable.RandomVariable;
+import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  */
@@ -42,8 +44,8 @@ public class UpDownComponent extends SchedulingElement {
 
     public UpDownComponent(ModelElement parent, String name) {
         super(parent, name);
-        DistributionIfc utd = new Exponential(1.0);
-        DistributionIfc dtd = new Exponential(2.0);
+        RVariableIfc utd = new ExponentialRV(1.0);
+        RVariableIfc dtd = new ExponentialRV(2.0);
         myUpTime = new RandomVariable(this, utd, "up time");
         myDownTime = new RandomVariable(this, dtd, "down time");
         myState = new TimeWeighted(this, "state");

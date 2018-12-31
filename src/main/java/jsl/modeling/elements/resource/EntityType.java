@@ -15,14 +15,17 @@
  */
 package jsl.modeling.elements.resource;
 
-import java.util.*;
-import jsl.modeling.*;
+import jsl.modeling.JSLEvent;
+import jsl.modeling.ModelElement;
+import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
+
+import java.util.*;
 
 /** EntityType represents a generic classification of entities. Every
  *  entity must have an entity type.  The entity type holds information that
@@ -90,7 +93,7 @@ public class EntityType extends SchedulingElement {
      *  experienced by the entity
      *
      */
-    protected Map<Delay, RandomIfc> myActivityTimes;
+    protected Map<Delay, RandomVariable> myActivityTimes;
 
     /** Creates an EntityType with a default name
      * 
@@ -467,7 +470,7 @@ public class EntityType extends SchedulingElement {
      * @param random
      */
     public void addDestination(EntityReceiverAbstract origin,
-            EntityReceiverAbstract destination, RandomIfc random) {
+            EntityReceiverAbstract destination, RVariableIfc random) {
         RandomVariable rv = new RandomVariable(this, random);
         addDestination(origin, new Destination(destination, rv));
     }
@@ -694,7 +697,7 @@ public class EntityType extends SchedulingElement {
      * @param time
      */
     public final void addActivityTime(Delay a, double time) {
-        addActivityTime(a, new Constant(time));
+        addActivityTime(a, new ConstantRV(time));
     }
 
     /** Associates a activity (Activity) with the supplied
@@ -703,7 +706,7 @@ public class EntityType extends SchedulingElement {
      * @param a  The activity
      * @param r  The time
      */
-    public final void addActivityTime(Delay a, RandomIfc r) {
+    public final void addActivityTime(Delay a, RVariableIfc r) {
 
         if (a == null) {
             throw new IllegalArgumentException("The supplied activity was null");
@@ -714,7 +717,7 @@ public class EntityType extends SchedulingElement {
         }
 
         if (myActivityTimes == null) {
-            myActivityTimes = new HashMap<Delay, RandomIfc>();
+            myActivityTimes = new HashMap<Delay, RandomVariable>();
         }
 
         a.setDelayOption(Delay.DelayOption.BY_TYPE);

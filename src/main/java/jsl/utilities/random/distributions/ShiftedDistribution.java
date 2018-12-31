@@ -16,6 +16,9 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.GetRVariableIfc;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.random.rvariable.ShiftedRV;
 
 /** Represents a Distribution that has been Shifted (translated to the right)
  *  The shift must be &gt;= 0.0
@@ -30,52 +33,28 @@ public class ShiftedDistribution extends Distribution {
 
     /** Constructs a shifted distribution based on the provided distribution
      *
-     * @param distribution
+     * @param distribution the distribution to shift
      * @param shift The linear shift
      */
     public ShiftedDistribution(DistributionIfc distribution, double shift) {
-        this(distribution, shift, distribution.getRandomNumberGenerator());
+        this(distribution, shift, null);
     }
 
     /** Constructs a shifted distribution based on t he provided distribution
      *
-     * @param distribution
+     * @param distribution the distribution to shift
      * @param shift The linear shift
-     * @param rng
+     * @param name an optional name/label
      */
-    public ShiftedDistribution(DistributionIfc distribution, double shift, RNStreamIfc rng) {
-        super(rng);
+    public ShiftedDistribution(DistributionIfc distribution, double shift, String name) {
+        super(name);
         setDistribution(distribution, shift);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
+    @Override
     public final ShiftedDistribution newInstance() {
         DistributionIfc d = (DistributionIfc) myDistribution.newInstance();
         return (new ShiftedDistribution(d, myShift));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    public final ShiftedDistribution newInstance(RNStreamIfc rng) {
-        DistributionIfc d = (DistributionIfc) myDistribution.newInstance();
-        return (new ShiftedDistribution(d, myShift, rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    public final ShiftedDistribution newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     /** Changes the underlying distribution and the shift
@@ -109,7 +88,7 @@ public class ShiftedDistribution extends Distribution {
      * as a parameter, then the underlying distribution's parameters are not changed
      * (and do not need to be supplied)
      */
-    public void setParameters(double[] parameters) {
+    public final void setParameters(double[] parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("The parameters array was null");
         }
@@ -126,10 +105,8 @@ public class ShiftedDistribution extends Distribution {
         myDistribution.setParameters(y);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#cdf(double)
-     */
-    public double cdf(double x) {
+    @Override
+    public final double cdf(double x) {
         if (x < myShift) {
             return 0.0;
         } else {
@@ -137,10 +114,8 @@ public class ShiftedDistribution extends Distribution {
         }
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getMean()
-     */
-    public double getMean() {
+    @Override
+    public final double getMean() {
         return myShift + myDistribution.getMean();
     }
 
@@ -149,7 +124,7 @@ public class ShiftedDistribution extends Distribution {
      * The other elements of the returned array are
      * the parameters of the underlying distribution
      */
-    public double[] getParameters() {
+    public final double[] getParameters() {
         double[] x = myDistribution.getParameters();
         double[] y = new double[x.length + 1];
 
@@ -160,17 +135,14 @@ public class ShiftedDistribution extends Distribution {
         return y;
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getVariance()
-     */
+    @Override
     public double getVariance() {
         return myDistribution.getVariance();
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#invCDF(double)
-     */
+    @Override
     public double invCDF(double p) {
         return (myDistribution.invCDF(p) + myShift);
     }
+
 }

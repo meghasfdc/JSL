@@ -31,10 +31,10 @@ import jsl.modeling.elements.resource.ResourcedActivity;
 import jsl.modeling.elements.resource.SQSRWorkStation;
 import jsl.modeling.elements.resource.WorkStation;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Uniform;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  *
@@ -68,8 +68,8 @@ public class TestEntityPackage {
 
         Model m = s.getModel();
 
-        EntityGenerator g = new EntityGenerator(m, new Constant(10.0),
-                new Constant(10.0));
+        EntityGenerator g = new EntityGenerator(m, new ConstantRV(10.0),
+                new ConstantRV(10.0));
         g.setDirectEntityReceiver(new NothingReceiver());
         g.useDefaultEntityType();
 
@@ -87,8 +87,8 @@ public class TestEntityPackage {
 
         Model m = s.getModel();
 
-        EntityGenerator g = new EntityGenerator(m, new Constant(10.0),
-                new Constant(10.0));
+        EntityGenerator g = new EntityGenerator(m, new ConstantRV(10.0),
+                new ConstantRV(10.0));
         g.setDirectEntityReceiver(new TestReceiver(m));
         g.useDefaultEntityType();
 
@@ -106,12 +106,12 @@ public class TestEntityPackage {
 
         Model m = s.getModel();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.useDefaultEntityType();
 
         WorkStation w = new WorkStation(m);
-        w.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         g.setDirectEntityReceiver(w);
 
         DisposeEntity x = new DisposeEntity();
@@ -135,16 +135,16 @@ public class TestEntityPackage {
 
         Model m = s.getModel();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.useDefaultEntityType();
 
         WorkStation w1 = new WorkStation(m);
-        w1.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w1.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         g.setDirectEntityReceiver(w1);
 
         WorkStation w2 = new WorkStation(m);
-        w2.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w2.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         w1.setDirectEntityReceiver(w2);
 
         DisposeEntity x = new DisposeEntity();
@@ -172,12 +172,12 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
 
         WorkStation w = new WorkStation(m);
-        w.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         g.setDirectEntityReceiver(w);
 
         DisposeEntity x = new DisposeEntity();
@@ -205,17 +205,17 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
         g.setSendingOption(EntityType.SendOption.SEQ);
 
         WorkStation w1 = new WorkStation(m);
-        w1.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w1.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         w1.setSendingOption(EntityType.SendOption.SEQ);
 
         WorkStation w2 = new WorkStation(m);
-        w2.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w2.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         w2.setSendingOption(EntityType.SendOption.SEQ);
 
         DisposeEntity x = new DisposeEntity();
@@ -246,17 +246,17 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
         g.setSendingOption(EntityType.SendOption.BY_TYPE);
 
         WorkStation w1 = new WorkStation(m);
-        w1.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w1.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         w1.setSendingOption(EntityType.SendOption.BY_TYPE);
 
         WorkStation w2 = new WorkStation(m);
-        w2.setServiceTimeInitialRandomSource(new Exponential(0.5));
+        w2.setServiceTimeInitialRandomSource(new ExponentialRV(0.5));
         w2.setSendingOption(EntityType.SendOption.BY_TYPE);
 
         DisposeEntity x = new DisposeEntity();
@@ -282,9 +282,9 @@ public class TestEntityPackage {
         Simulation s = new Simulation("test8");
 
         Model m = s.getModel();
-        Constant c1 = new Constant(10.0);
+        ConstantRV c1 = new ConstantRV(10.0);
         EntityGenerator g = new EntityGenerator(m, c1, c1);
-        Constant c2 = Constant.TWO;
+        ConstantRV c2 = ConstantRV.TWO;
         Delay a1 = new Delay(m);
         a1.setDelayTime(c2);
         Delay a2 = new Delay(m);
@@ -315,17 +315,17 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
         g.setSendingOption(EntityType.SendOption.SEQ);
 
         WorkStation w1 = new WorkStation(m, "W1");
-        w1.setServiceTimeInitialRandomSource(new Exponential(0.7));
+        w1.setServiceTimeInitialRandomSource(new ExponentialRV(0.7));
         w1.setSendingOption(EntityType.SendOption.SEQ);
 
         WorkStation w2 = new WorkStation(m, "W2");
-        w2.setServiceTimeInitialRandomSource(new Exponential(0.9));
+        w2.setServiceTimeInitialRandomSource(new ExponentialRV(0.9));
         w2.setSendingOption(EntityType.SendOption.SEQ);
 
         DisposeEntity x = new DisposeEntity();
@@ -357,21 +357,21 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
         g.setSendingOption(EntityType.SendOption.SEQ);
 
         WorkStation w1 = new WorkStation(m, "W1");
-        w1.setServiceTimeInitialRandomSource(new Exponential(0.7));
+        w1.setServiceTimeInitialRandomSource(new ExponentialRV(0.7));
         w1.setSendingOption(EntityType.SendOption.SEQ);
 
         Delay a1 = new Delay(m);
-        a1.setDelayTime(new Uniform(0.0, 2.0));
+        a1.setDelayTime(new UniformRV(0.0, 2.0));
         a1.setSendingOption(EntityType.SendOption.SEQ);
 
         WorkStation w2 = new WorkStation(m, "W2");
-        w2.setServiceTimeInitialRandomSource(new Exponential(0.9));
+        w2.setServiceTimeInitialRandomSource(new ExponentialRV(0.9));
         w2.setSendingOption(EntityType.SendOption.SEQ);
 
         DisposeEntity x = new DisposeEntity();
@@ -403,13 +403,13 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
 
         Resource r1 = new Resource(m, "W1_R");
         ResourcedActivity w1 = new ResourcedActivity(m, "W1");
-        w1.setDelayTime(new Exponential(0.5));
+        w1.setDelayTime(new ExponentialRV(0.5));
         w1.addSeizeRequirement(r1, 1, Request.DEFAULT_PRIORITY, false);
         w1.addReleaseRequirement(r1, 1);
         g.setDirectEntityReceiver(w1);
@@ -439,20 +439,20 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
 
         Resource r1 = new Resource(m, "W1_R");
         ResourcedActivity w1 = new ResourcedActivity(m, "W1");
-        w1.setDelayTime(new Exponential(0.7));
+        w1.setDelayTime(new ExponentialRV(0.7));
         w1.addSeizeRequirement(r1, 1);
         w1.addReleaseRequirement(r1, 1);
         g.setDirectEntityReceiver(w1);
 
         Resource r2 = new Resource(m, "W2_R");
         ResourcedActivity w2 = new ResourcedActivity(m, "W2");
-        w2.setDelayTime(new Exponential(0.9));
+        w2.setDelayTime(new ExponentialRV(0.9));
         w2.addSeizeRequirement(r2, 1);
         w2.addReleaseRequirement(r2, 1);
         w1.setDirectEntityReceiver(w2);
@@ -482,12 +482,12 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
 
         SQSRWorkStation w = new SQSRWorkStation(m);
-        w.setDelayTime(new Exponential(0.5));
+        w.setDelayTime(new ExponentialRV(0.5));
         g.setDirectEntityReceiver(w);
 
         DisposeEntity x = new DisposeEntity();
@@ -514,16 +514,16 @@ public class TestEntityPackage {
         et.turnOnNumberInSystemCollection();
         et.turnOnTimeInSystemCollection();
 
-        RandomIfc tba = new Exponential(1.0);
+        RandomIfc tba = new ExponentialRV(1.0);
         EntityGenerator g = new EntityGenerator(m, tba, tba);
         g.setEntityType(et);
 
         SQSRWorkStation w1 = new SQSRWorkStation(m, "W1");
-        w1.setDelayTime(new Exponential(0.7));
+        w1.setDelayTime(new ExponentialRV(0.7));
         g.setDirectEntityReceiver(w1);
 
         SQSRWorkStation w2 = new SQSRWorkStation(m, "W2");
-        w2.setDelayTime(new Exponential(0.9));
+        w2.setDelayTime(new ExponentialRV(0.9));
         w1.setDirectEntityReceiver(w2);
 
         DisposeEntity x = new DisposeEntity();

@@ -17,6 +17,7 @@ package ex.montecarlo;
 
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -27,6 +28,8 @@ public class CrudeMCIntegral {
 
     protected Uniform myUniform;
 
+    private RVariableIfc myRV;
+
     protected Statistic myStatistic;
 
     protected FunctionIfc myFunction;
@@ -34,11 +37,13 @@ public class CrudeMCIntegral {
     public CrudeMCIntegral(double lowerLimit, double upperLimit, FunctionIfc function) {
         setFunction(function);
         myUniform = new Uniform(lowerLimit, upperLimit);
+        myRV = myUniform.getRandomVariable();
         myStatistic = new Statistic("Monte-Carlo Integration");
     }
 
     public void setLimits(double lowerLimit, double upperLimit) {
         myUniform.setRange(lowerLimit, upperLimit);
+        myRV = myUniform.getRandomVariable(myRV.getRandomNumberStream());
     }
 
     public void setFunction(FunctionIfc function) {
@@ -59,12 +64,12 @@ public class CrudeMCIntegral {
 
         myStatistic.reset();
         if (resetStartStream) {
-            myUniform.resetStartStream();
+            myRV.resetStartStream();
         }
 
         double r = myUniform.getRange();
         for (int i = 1; i <= sampleSize; i++) {
-            double x = myUniform.getValue();
+            double x = myRV.getValue();
             double y = r * myFunction.fx(x);
             myStatistic.collect(y);
         }
@@ -85,13 +90,13 @@ public class CrudeMCIntegral {
 
         myStatistic.reset();
         if (resetStartStream) {
-            myUniform.resetStartStream();
+            myRV.resetStartStream();
         }
 
         double r = myUniform.getRange();
         boolean flag = false;
         while (flag != true) {
-            double x = myUniform.getValue();
+            double x = myRV.getValue();
             double y = r * myFunction.fx(x);
             myStatistic.collect(y);
             if (myStatistic.getCount() > 2) {

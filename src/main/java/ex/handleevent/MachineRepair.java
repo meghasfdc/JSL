@@ -27,6 +27,7 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  *
@@ -142,8 +143,8 @@ public class MachineRepair extends SchedulingElement {
 
         int numMachines = 5;
         int numOperators = 1;
-        RandomIfc tbf = new Exponential(10.0);
-        RandomIfc rt = new Exponential(4.0);
+        RandomIfc tbf = new ExponentialRV(10.0);
+        RandomIfc rt = new ExponentialRV(4.0);
         MachineRepair machineRepair = new MachineRepair(m, numOperators, numMachines, tbf, rt);
 
         s.run();

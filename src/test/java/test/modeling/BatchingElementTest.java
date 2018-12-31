@@ -15,20 +15,19 @@
  */
 package test.modeling;
 
-import jsl.modeling.elements.variable.ResponseVariable;
-import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.statistic.StatisticAccessorIfc;
-import jsl.utilities.math.JSLMath;
 import ex.queueing.DriverLicenseBureauWithQ;
-import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.ExperimentGetIfc;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.StatisticalBatchingElement;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.utilities.math.JSLMath;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.statistic.StatisticAccessorIfc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  *
@@ -54,7 +53,7 @@ public class BatchingElementTest {
         myModel = mySim.getModel();
 
         mySim.turnOnStatisticalBatching();
-        StatisticalBatchingElement be = mySim.getStatisticalBatchingElement().get();
+        myBE = mySim.getStatisticalBatchingElement().get();
 
         // create the model element and attach it to the main model
         myDLB = new DriverLicenseBureauWithQ(myModel);
@@ -64,6 +63,8 @@ public class BatchingElementTest {
         mySim.setLengthOfReplication(200000.0 * 30.0);
         mySim.setLengthOfWarmUp(50000.0);
         System.out.println(myModel.getResponseVariableNames());
+
+
     }
 
     @Test
@@ -72,7 +73,7 @@ public class BatchingElementTest {
         int k = 0;
         double p = 0.0;
 
-        Exponential d = new Exponential(0.8);
+        ExponentialRV d = new ExponentialRV(0.8);
         myDLB.setServiceDistributionInitialRandomSource(d);
 
         // run the simulation
@@ -81,6 +82,8 @@ public class BatchingElementTest {
         System.out.println(myBE);
 
         TimeWeighted tw = (TimeWeighted) myModel.getResponseVariable("DriverLicenseQ:NumInQ");
+
+        //assertNull(tw);
         System.out.println("tw = " + tw);
 
         StatisticAccessorIfc sNQ = myBE.getBatchStatistic(tw);

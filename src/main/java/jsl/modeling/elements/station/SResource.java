@@ -21,14 +21,15 @@
  */
 package jsl.modeling.elements.station;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import jsl.modeling.ModelElement;
 import jsl.modeling.ModelElementState;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.reporting.JSL;
 import jsl.utilities.statistic.StatisticAccessorIfc;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A SResource represents a simple resource that can have units become busy. A
@@ -115,14 +116,32 @@ public class SResource extends SchedulingElement {
      */
     private Set<SResourceStateChangeListenerIfc> myStateChangeListeners;
 
+    /**
+     * The capacity is set to 1
+     *
+     * @param parent the parent model element
+     */
     public SResource(ModelElement parent) {
         this(parent, 1, null);
     }
 
+    /**
+     * The capacity is set to 1
+     *
+     * @param parent the parent model element
+     * @param name a unique name for the resource
+     */
     public SResource(ModelElement parent, String name) {
         this(parent, 1, name);
     }
 
+    /**
+     * The capacity represents the maximum number of units available to use when
+     * the resource is idle.
+     *
+     * @param parent the parent model element
+     * @param capacity the initial capacity of the resource
+     */
     public SResource(ModelElement parent, int capacity) {
         this(parent, capacity, null);
     }
@@ -131,9 +150,9 @@ public class SResource extends SchedulingElement {
      * The capacity represents the maximum number of units available to use when
      * the resource is idle.
      *
-     * @param parent
-     * @param capacity
-     * @param name
+     * @param parent the parent model element
+     * @param capacity the initial capacity of the resource
+     * @param name a unique name for the resource
      */
     public SResource(ModelElement parent, int capacity, String name) {
         super(parent, name);
@@ -163,7 +182,7 @@ public class SResource extends SchedulingElement {
     /**
      * Returns how many times the resource has had units used.
      *
-     * @return
+     * @return how many times the resource has had units used.
      */
     public final int getNumberTimesSeized() {
         return myNumTimesSeized;
@@ -172,7 +191,7 @@ public class SResource extends SchedulingElement {
     /**
      * Returns how many times the resource has had units returned from use.
      *
-     * @return
+     * @return how many times the resource has had units returned from use
      */
     public final int getNumberTimesReleased() {
         return myNumTimesReleased;
@@ -181,7 +200,7 @@ public class SResource extends SchedulingElement {
     /**
      * The fraction of the capacity that is currently busy
      *
-     * @return
+     * @return fraction of the capacity that is currently busy
      */
     public final double getFractionBusy() {
         return (myNumBusy.getValue() / getCapacity());
@@ -190,7 +209,7 @@ public class SResource extends SchedulingElement {
     /**
      * The number of units that are currently busy
      *
-     * @return
+     * @return number of units that are currently busy
      */
     public final int getNumBusy() {
         return (int) myNumBusy.getValue();
@@ -211,7 +230,7 @@ public class SResource extends SchedulingElement {
      * the resource has no units available, then an exception occurs. If the amt
      * &gt; getNumberAvailable() then an exception occurs.
      *
-     * @param amt
+     * @param amt the amount to seize
      */
     public void seize(int amt) {
         if (amt == 0) {
@@ -270,7 +289,7 @@ public class SResource extends SchedulingElement {
      * Releases amt units of the resource. If amt is 0 then an exception occurs.
      * If the amt is &gt; getNumBusy() then an exception occurs
      *
-     * @param amt
+     * @param amt the amount to release
      */
     public void release(int amt) {
         if (amt == 0) {
@@ -321,7 +340,7 @@ public class SResource extends SchedulingElement {
      * Checks to see if the resource is busy. The resource is busy if 1 or more
      * of its units are busy.
      *
-     * @return
+     * @return true if busy
      */
     public final boolean isBusy() {
         return (myState == myBusyState);
@@ -330,7 +349,7 @@ public class SResource extends SchedulingElement {
     /**
      * The current capacity of the resource.
      *
-     * @return
+     * @return the capacity
      */
     public final int getCapacity() {
         return myCapacity;
@@ -339,7 +358,7 @@ public class SResource extends SchedulingElement {
     /**
      * Returns the number of units that are currently available for use
      *
-     * @return
+     * @return the number of units that are currently available for use
      */
     public int getNumberAvailable() {
         return getCapacity() - getNumBusy();
@@ -348,7 +367,7 @@ public class SResource extends SchedulingElement {
     /**
      * Returns true if getNumberAvailable() &gt; 0
      *
-     * @return
+     * @return true if getNumberAvailable() &gt; 0
      */
     public final boolean hasAvailableUnits() {
         return (getNumberAvailable() > 0);
@@ -357,7 +376,7 @@ public class SResource extends SchedulingElement {
     /**
      * Gets the initial capacity of the resource
      *
-     * @return
+     * @return the initial capacity of the resource
      */
     public final int getInitialCapacity() {
         return myInitialCapacity;
@@ -367,7 +386,7 @@ public class SResource extends SchedulingElement {
      * Sets the initial capacity of the resource. This only changes it for when
      * the resource is initialized.
      *
-     * @param capacity
+     * @param capacity the initial capacity of the resource
      */
     public final void setInitialCapacity(int capacity) {
         if (capacity <= 0) {

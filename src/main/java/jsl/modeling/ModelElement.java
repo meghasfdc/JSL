@@ -15,29 +15,31 @@
  */
 package jsl.modeling;
 
-import java.lang.IllegalStateException;
-import java.util.*;
-
 import jsl.modeling.elements.EventGenerator;
-
-import jsl.utilities.reporting.JSL;
-import jsl.modeling.elements.spatial.SpatialModel;
-import jsl.modeling.elements.variable.*;
-import jsl.utilities.controls.Controls;
-import jsl.utilities.IdentityIfc;
 import jsl.modeling.elements.RandomElementIfc;
-import jsl.modeling.queue.QObject;
 import jsl.modeling.elements.resource.Entity;
 import jsl.modeling.elements.resource.EntityType;
+import jsl.modeling.elements.spatial.SpatialModel;
+import jsl.modeling.elements.variable.Counter;
+import jsl.modeling.elements.variable.RandomVariable;
+import jsl.modeling.elements.variable.ResponseVariable;
+import jsl.modeling.elements.variable.Variable;
+import jsl.modeling.queue.QObject;
 import jsl.modeling.resource.Request;
 import jsl.modeling.resource.Request.PreemptionRule;
+import jsl.modeling.resource.RequestReactorIfc;
 import jsl.modeling.resource.ResourceUnit;
 import jsl.observers.ObservableComponent;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.random.distributions.Constant;
-import jsl.modeling.resource.RequestReactorIfc;
+import jsl.utilities.IdentityIfc;
+import jsl.utilities.controls.Controls;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.reporting.JSL;
+
+import java.lang.IllegalStateException;
+import java.util.*;
 
 /**
  * The ModelElement represents elements within the simulation model that can
@@ -3068,13 +3070,13 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
 
         @Override
         public Request indefinitely() {
-            this.timeSetter = Constant.POSITIVE_INFINITY;
+            this.timeSetter = ConstantRV.POSITIVE_INFINITY;
             return units();
         }
 
         @Override
         public RequestTimeIfc forDuration(double time) {
-            return forDuration(new Constant(time));
+            return forDuration(new ConstantRV(time));
         }
 
         @Override

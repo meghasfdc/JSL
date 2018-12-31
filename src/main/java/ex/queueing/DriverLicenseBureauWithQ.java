@@ -15,30 +15,24 @@
  */
 package ex.queueing;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Optional;
-
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.queue.QObject;
-import jsl.modeling.queue.Queue;
+import jsl.modeling.*;
 import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.reporting.JSLDatabase;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.reporting.JSL;
-import jsl.modeling.SimulationReporter;
-import jsl.modeling.StatisticalBatchingElement;
+import jsl.modeling.queue.QObject;
+import jsl.modeling.queue.Queue;
 import jsl.modeling.queue.QueueResponse;
+import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.reporting.JSL;
+import jsl.utilities.reporting.JSLDatabase;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.StatisticAccessorIfc;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Optional;
 
 public class DriverLicenseBureauWithQ extends SchedulingElement {
 
@@ -46,9 +40,9 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
     private Queue myWaitingQ;
 
-    private DistributionIfc myServiceDistribution;
+    private RandomIfc myServiceDistribution;
 
-    private DistributionIfc myArrivalDistribution;
+    private RandomIfc myArrivalDistribution;
 
     private RandomVariable myServiceRV;
 
@@ -67,10 +61,10 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
     private EndServiceEventAction myEndServiceEventAction;
 
     public DriverLicenseBureauWithQ(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
-    public DriverLicenseBureauWithQ(ModelElement parent, int numServers, DistributionIfc ad, DistributionIfc sd) {
+    public DriverLicenseBureauWithQ(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
         super(parent);
 
         setNumberOfServers(numServers);
@@ -109,7 +103,7 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         myNumServers = n;
     }
 
-    public final void setServiceDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setServiceDistributionInitialRandomSource(RandomIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Service Time Distribution was null!");
@@ -126,7 +120,7 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
     }
 
-    public final void setArrivalDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setArrivalDistributionInitialRandomSource(RandomIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Arrival Time Distribution was null!");

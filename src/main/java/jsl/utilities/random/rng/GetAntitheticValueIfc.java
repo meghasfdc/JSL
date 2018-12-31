@@ -13,4 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package jsl.utilities.random.ar;
+package jsl.utilities.random.rng;
+
+/**
+ *
+ * @author rossetti
+ */
+public interface GetAntitheticValueIfc {
+
+    /** Returns the antithetic value of the previous GetValueIfc
+     * 
+     * @return
+     */
+    double getAntitheticValue();
+
+}

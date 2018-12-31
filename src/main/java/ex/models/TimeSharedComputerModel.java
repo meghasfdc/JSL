@@ -21,6 +21,8 @@ import jsl.modeling.queue.*;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /** 
  *  Timesharing computer model
@@ -39,9 +41,9 @@ public class TimeSharedComputerModel extends SchedulingElement {
 
     private int myNumJobs;
 
-    private DistributionIfc myThinkTimeDistribution;
+    private RVariableIfc myThinkTimeDistribution;
 
-    private DistributionIfc myServiceDistribution;
+    private RVariableIfc myServiceDistribution;
 
     private RandomVariable myServiceRV;
 
@@ -56,13 +58,12 @@ public class TimeSharedComputerModel extends SchedulingElement {
     private EndServiceListener myEndServiceListener;
     
     public TimeSharedComputerModel(ModelElement parent){
-        this(parent, 1000, 80, new Exponential(25.0),
-                new Exponential(0.8), 0.1, 0.015);
+        this(parent, 1000, 80, new ExponentialRV(25.0),
+                new ExponentialRV(0.8), 0.1, 0.015);
     }
 
     public TimeSharedComputerModel(ModelElement parent, int numJobs,
-            int numTerminals,
-            DistributionIfc thinking, DistributionIfc service,
+            int numTerminals, RVariableIfc thinking, RVariableIfc service,
             double quantum, double swaptime) {
         super(parent);
         setServiceDistributionInitialRandomSource(service);
@@ -117,11 +118,11 @@ public class TimeSharedComputerModel extends SchedulingElement {
         mySwapTime = swapTime;
     }
 
-    public DistributionIfc getArrivalDistribution() {
+    public RVariableIfc getArrivalDistribution() {
         return (myThinkTimeDistribution);
     }
 
-    public DistributionIfc getServiceDistribution() {
+    public RVariableIfc getServiceDistribution() {
         return (myServiceDistribution);
     }
 
@@ -133,7 +134,7 @@ public class TimeSharedComputerModel extends SchedulingElement {
         myNumTerminals = n;
     }
 
-    public final void setServiceDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setServiceDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Service Time Distribution was null!");
@@ -150,7 +151,7 @@ public class TimeSharedComputerModel extends SchedulingElement {
 
     }
 
-    public final void setThinkTimeDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setThinkTimeDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("ThinkTime Distribution was null!");

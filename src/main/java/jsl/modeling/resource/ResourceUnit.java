@@ -15,13 +15,7 @@
  */
 package jsl.modeling.resource;
 
-import java.util.*;
-
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.State;
+import jsl.modeling.*;
 import jsl.modeling.elements.Schedule;
 import jsl.modeling.elements.ScheduleChangeListenerIfc;
 import jsl.modeling.elements.variable.Counter;
@@ -33,7 +27,10 @@ import jsl.modeling.queue.QueueResponse;
 import jsl.modeling.resource.Request.PreemptionRule;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
+
+import java.util.*;
+import java.lang.IllegalStateException;
 
 /**
  * A ResourceUnit is a single unit of a resource. A resource is something that
@@ -656,7 +653,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, double time) {
-        return seize(reactor, new Constant(time), null, null);
+        return seize(reactor, new ConstantRV(time), null, null);
     }
 
     /**
@@ -670,7 +667,7 @@ public class ResourceUnit extends SchedulingElement implements SeizeableIfc {
      * @return the request
      */
     public final Request seize(RequestReactorIfc reactor, double time, Object entity) {
-        return seize(reactor, new Constant(time), null, entity);
+        return seize(reactor, new ConstantRV(time), null, entity);
     }
 
     /**

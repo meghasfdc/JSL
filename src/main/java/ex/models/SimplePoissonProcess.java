@@ -28,6 +28,7 @@ import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  *
@@ -44,7 +45,7 @@ public class SimplePoissonProcess extends SchedulingElement {
 
     public SimplePoissonProcess(ModelElement parent, String name) {
         super(parent, name);
-        myTBE = new RandomVariable(this, new Exponential());
+        myTBE = new RandomVariable(this, new ExponentialRV(1.0));
         myCount = new Counter(this, "Counts events");
     }
 

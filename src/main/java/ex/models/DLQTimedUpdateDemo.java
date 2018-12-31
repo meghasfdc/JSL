@@ -29,6 +29,7 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
 import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
 public class DLQTimedUpdateDemo extends SchedulingElement {
@@ -47,7 +48,7 @@ public class DLQTimedUpdateDemo extends SchedulingElement {
     private ResponseVariable myDemoResponse;
 
     public DLQTimedUpdateDemo(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DLQTimedUpdateDemo(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
@@ -183,8 +184,8 @@ public class DLQTimedUpdateDemo extends SchedulingElement {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DLQTimedUpdateDemo driveThroughPharmacy = new DLQTimedUpdateDemo(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
         //m.turnOnTimeIntervalCollection(100);
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

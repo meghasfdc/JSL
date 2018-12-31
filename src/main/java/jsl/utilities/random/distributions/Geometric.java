@@ -28,8 +28,8 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  * Bernoulli trials needed to get one success.
  * 
  */
-public class Geometric extends Distribution implements DiscreteDistributionIfc,
-        LossFunctionDistributionIfc, GetRVariableIfc {
+public class Geometric extends Distribution implements DiscreteDistributionIfc, LossFunctionDistributionIfc,
+        GetRVariableIfc {
 
     /**
      *  The probability of success on a trial
@@ -46,80 +46,44 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      *
      */
     public Geometric() {
-        this(0.5, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.5, null);
     }
 
     /**
      *   Constructs a Geometric using the supplied parameters array
      *   parameters[0] is probability of success
-     * @param parameters
+     * @param parameters the parameter array
      */
     public Geometric(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /**
-     *   Constructs a Geometric using the supplied parameters array
-     *   parameters[0] is probability of success
-     * @param parameters
-     * @param rng
-     */
-    public Geometric(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], rng);
+        this(parameters[0], null);
     }
 
     /**  Constructs a Geometric using the supplied success probability
      * @param prob, the probability of success
      */
     public Geometric(double prob) {
-        this(prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, null);
     }
 
     /** Constructs a Geometric using the supplied success probability
      *  and lower range
      *
-     * @param prob
-     * @param rng
+     * @param prob the probability of success
+     * @param name an optional label/name
      */
-    public Geometric(double prob, RNStreamIfc rng) {
-        super(rng);
+    public Geometric(double prob, String name) {
+        super(name);
         setProbabilityOfSuccess(prob);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final Geometric newInstance() {
         return (new Geometric(getParameters()));
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Geometric newInstance(RNStreamIfc rng) {
-        return (new Geometric(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final Geometric newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
-    }
-
     /** Sets the probability of success
      *
-     * @param prob
+     * @param prob the probability of success
      */
     public final void setProbabilityOfSuccess(double prob) {
         if ((prob < 0.0) || (prob > 1.0)) {
@@ -131,7 +95,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
 
     /** Gets the probability of success
      *
-     * @return
+     * @return the probability of success
      */
     public final double getProbabilityOfSuccess() {
         return myProbSuccess;
@@ -150,7 +114,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
     /**  Sets the parameters using the supplied array
      * parameters[0] is probability of success
      *  parameters[1] is lower range
-     * @param parameters
+     * @param parameters the parameter array
      */
     @Override
     public final void setParameters(double[] parameters) {
@@ -171,8 +135,8 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
     /** computes the pmf of the distribution
      *   f(x) = p(1-p)^(x) for x&gt;=0, 0 otherwise
      *
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the probability
      */
     public final double pmf(int x) {
         if (x < 0) {
@@ -184,8 +148,8 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
     /** If x is not and integer value, then the probability must be zero
      *  otherwise pmf(int x) is used to determine the probability
      *
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the probability
      */
     @Override
     public final double pmf(double x) {
@@ -200,7 +164,7 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
      *   F(X&lt;=x)
      *
      * @param x, must be &gt;= lower limit
-     * @return
+     * @return the cumulative probability
      */
     @Override
     public final double cdf(double x) {
@@ -232,9 +196,6 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
         return (Math.ceil((Math.log(1.0 - prob) / (Math.log(1.0 - myProbSuccess))) - 1.0));
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.LossFunctionDistributionIfc#firstOrderLossFunction(double)
-     */
     @Override
     public double firstOrderLossFunction(double x) {
         double mu = getMean();
@@ -253,9 +214,6 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc,
         }
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.LossFunctionDistributionIfc#secondOrderLossFunction(double)
-     */
     @Override
     public double secondOrderLossFunction(double x) {
         double mu = getMean();
