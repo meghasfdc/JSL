@@ -27,7 +27,7 @@ import jsl.utilities.random.rng.RNStreamIfc;
  *
  * @author rossetti
  */
-public class RngIfcExample {
+public class RNStreamExample {
 
     /**
      * @param args the command line arguments

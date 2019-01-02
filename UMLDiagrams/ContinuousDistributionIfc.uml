@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>jsl.utilities.random.distributions.ContinuousDistributionIfc</OriginalElement>
+  <nodes>
+    <node x="367.00000000000006" y="120.0">jsl.utilities.random.distributions.StudentT</node>
+    <node x="810.0" y="120.0">jsl.utilities.random.distributions.Normal</node>
+    <node x="1316.0" y="120.0">jsl.utilities.random.distributions.Exponential</node>
+    <node x="924.0" y="120.0">jsl.utilities.random.distributions.Lognormal</node>
+    <node x="652.0" y="120.0">jsl.utilities.random.distributions.PearsonType5</node>
+    <node x="494.00000000000006" y="120.0">jsl.utilities.random.distributions.PearsonType6</node>
+    <node x="1059.0" y="120.0">jsl.utilities.random.distributions.LogLogistic</node>
+    <node x="0.0" y="120.0">jsl.utilities.random.distributions.Weibull</node>
+    <node x="235.0" y="120.0">jsl.utilities.random.distributions.Triangular</node>
+    <node x="1200.0" y="120.0">jsl.utilities.random.distributions.Gamma</node>
+    <node x="115.0" y="120.0">jsl.utilities.random.distributions.Uniform</node>
+    <node x="1458.0" y="120.0">jsl.utilities.random.distributions.Beta</node>
+    <node x="684.5" y="0.0">jsl.utilities.random.distributions.ContinuousDistributionIfc</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="jsl.utilities.random.distributions.Triangular" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="291.0" y="70.0" />
+      <point x="728.0416666666666" y="70.0" />
+      <point x="-60.95833333333337" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Uniform" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="165.0" y="60.0" />
+      <point x="710.625" y="60.0" />
+      <point x="-78.375" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.StudentT" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="420.50000000000006" y="80.0" />
+      <point x="745.4583333333334" y="80.0" />
+      <point x="-43.54166666666663" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.PearsonType5" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="721.0" y="100.0" />
+      <point x="780.2916666666667" y="100.0" />
+      <point x="-8.708333333333258" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Weibull" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="47.5" y="50.0" />
+      <point x="693.2083333333334" y="50.0" />
+      <point x="-95.79166666666663" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.PearsonType6" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="563.0" y="90.0" />
+      <point x="762.875" y="90.0" />
+      <point x="-26.125" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Beta" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="1497.0" y="50.0" />
+      <point x="884.7916666666667" y="50.0" />
+      <point x="95.79166666666674" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Exponential" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="1377.0" y="60.0" />
+      <point x="867.375" y="60.0" />
+      <point x="78.375" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Lognormal" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="981.5" y="90.0" />
+      <point x="815.125" y="90.0" />
+      <point x="26.125" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Normal" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="857.0" y="100.0" />
+      <point x="797.7083333333334" y="100.0" />
+      <point x="8.708333333333371" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Gamma" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="1248.0" y="70.0" />
+      <point x="849.9583333333334" y="70.0" />
+      <point x="60.95833333333337" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.LogLogistic" target="jsl.utilities.random.distributions.ContinuousDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="1119.5" y="80.0" />
+      <point x="832.5416666666667" y="80.0" />
+      <point x="43.54166666666674" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.577120822622108" x="768.0" y="75.0" />
+  <SelectedNodes>
+    <node>jsl.utilities.random.distributions.ContinuousDistributionIfc</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

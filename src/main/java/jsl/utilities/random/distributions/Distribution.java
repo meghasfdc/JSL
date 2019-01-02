@@ -20,8 +20,6 @@ import jsl.utilities.NewInstanceIfc;
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
 import jsl.utilities.math.FunctionIfc;
-import jsl.utilities.random.ParametersIfc;
-import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.rootfinding.BisectionRootFinder;
 
 /**
@@ -31,7 +29,7 @@ import jsl.utilities.rootfinding.BisectionRootFinder;
  *
  *
  */
-public abstract class Distribution implements DistributionIfc, ControllableIfc, ParametersIfc, NewInstanceIfc {
+public abstract class Distribution implements DistributionIfc, ControllableIfc, NewInstanceIfc {
 
     private static BisectionRootFinder myRootFinder;
 
