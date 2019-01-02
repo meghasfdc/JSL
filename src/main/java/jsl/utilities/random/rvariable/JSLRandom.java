@@ -1062,7 +1062,7 @@ public class JSLRandom {
 
     /**
      * Randomly permutes the supplied array using the default random
-     * number generator.  The array is changed
+     * number generator.  The array is changed.
      *
      * @param x the array
      */
@@ -1121,8 +1121,29 @@ public class JSLRandom {
     }
 
     /**
+     * Facilitates sampling without replacement to a new array. Example usage:
+     *
+     * sampleWithoutReplacement(x, 5); // first sample into first 5 slots
+     * double[] sample = copyFirstNValues(x, 5); // now copy from the first 5 slots
+     *
+     * @param x the array to copy from
+     * @param N the number of values to copy
+     * @param <T> the type of the array
+     * @return a new array with the values
+     */
+    public static <T> T[] copyFirstNValues(T[] x, int N) {
+        Objects.requireNonNull(x, "The supplied array was null");
+        if (N > x.length) {
+            throw new IllegalArgumentException("Cannot copy more than the number of elements available");
+        }
+        double[] y = new double[N];
+        System.arraycopy(x, 0, y, 0, y.length);
+        return (x);
+    }
+
+    /**
      * Randomly permutes the supplied array using the default random
-     * number generator.  The array is changed
+     * number generator.  The array is changed.
      *
      * @param x the array
      */
@@ -1131,8 +1152,8 @@ public class JSLRandom {
     }
 
     /**
-     * Randomly permutes the supplied array using the suppled random
-     * number generator, the array is changed
+     * Randomly permutes the supplied array using the supplied random
+     * number generator, the array is changed.
      *
      * @param x   the array
      * @param rng the source of randomness
@@ -1142,7 +1163,7 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      * using the default random number generator
      *
@@ -1154,7 +1175,7 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      *
      * @param x          the array
@@ -1182,7 +1203,7 @@ public class JSLRandom {
 
     /**
      * Randomly permutes the supplied array using the default random
-     * number generator.  The array is changed
+     * number generator.  The array is changed.
      *
      * @param x the array
      */
@@ -1192,7 +1213,7 @@ public class JSLRandom {
 
     /**
      * Randomly permutes the supplied array using the suppled random
-     * number generator, the array is changed
+     * number generator, the array is changed.
      *
      * @param x   the array
      * @param rng the source of randomness
@@ -1202,7 +1223,7 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      * using the default random number generator
      *
@@ -1214,7 +1235,7 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
      * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
      *
      * @param x          the array
@@ -1262,8 +1283,8 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the randomly sampled values without replacement
      * using the default random number generator
      *
      * @param x          the array
@@ -1274,8 +1295,8 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the randomly sampled values without replacement
      *
      * @param x          the array
      * @param sampleSize the generate size

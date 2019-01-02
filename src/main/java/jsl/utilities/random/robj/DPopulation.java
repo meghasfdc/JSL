@@ -128,7 +128,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc, Param
         return (new DPopulation(getParameters(), rng));
     }
 
-    /** Creates a new array that contains a random generate without replacement
+    /** Creates a new array that contains a randomly sampled values without replacement
      *  from the existing population.
      *
      * @param sampleSize

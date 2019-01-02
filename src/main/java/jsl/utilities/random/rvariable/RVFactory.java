@@ -30,7 +30,7 @@ import static jsl.utilities.random.rvariable.RVariableIfc.RVType.*;
  *  controls.  The controls hold the (key, value) pairs that represent distributional
  *  parameters by name.  The user of the control is responsible for setting legal
  *  parameter values on the controls as required by the desired random variable type.
- *  The returned control can be used to make many instance of random variables based
+ *  The returned control can be used to make many instances of random variables based
  *  on its current parameter settings.
  */
 public class RVFactory {
