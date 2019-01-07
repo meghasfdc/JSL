@@ -108,6 +108,9 @@ uploadArchives {
         flatDir {
             dirs 'jarOutputDir'
         }
+//        flatDir {
+//            dirs '/Users/rossetti/Documents/Development/JSL-Documentation/jarOutputDir'
+//        }
     }
 }
 
@@ -116,8 +119,17 @@ uploadShadow {
         flatDir {
             dirs 'jarOutputDir'
         }
+//        flatDir {
+//            dirs '/Users/rossetti/Documents/Development/JSL-Documentation/jarOutputDir'
+//        }
     }
 }
+
+//task copyJavaDoc(type: Copy){
+//    from("build/docs/javadoc")
+//    into("/Users/rossetti/Documents/Development/JSL-Documentation/public")
+//}
+
 // exclude all tests from the builder
 // comment this out if you want to run the tests
 test {
