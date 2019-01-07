@@ -13,7 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package jsl.modeling.elements.entity;
+
 /**
- * A simplified representation of stations with resources that process QObjects
+ *
  */
-package jsl.modeling.elements.station;
+public interface ResourceReleaseListenerIfc {
+
+	/** This method is called whenever units of a resource have
+	 *  been released by a request.
+	 * 
+	 * @param request
+	 */
+	public void resourceReleased(Request request);
+
+}

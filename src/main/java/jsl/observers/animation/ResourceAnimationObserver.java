@@ -16,7 +16,7 @@
 package jsl.observers.animation;
 
 import jsl.modeling.ModelElement;
-import jsl.modeling.elements.resource.Resource;
+import jsl.modeling.elements.entity.Resource;
 
 public class ResourceAnimationObserver extends AnimationObserverAbstract {
 

@@ -13,7 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- * A simplified representation of stations with resources that process QObjects
+
+package jsl.modeling.elements.entity;
+
+import jsl.utilities.GetValueIfc;
+
+/** The DestinationIfc can lookup an EntityReceiverAbstract and also
+ *  return a value, which might be interpreted as a time to travel
+ *  to the receiver
+ *
+ * @author rossetti
  */
-package jsl.modeling.elements.station;
+public interface DestinationIfc extends GetEntityReceiverIfc, GetValueIfc {
+
+}

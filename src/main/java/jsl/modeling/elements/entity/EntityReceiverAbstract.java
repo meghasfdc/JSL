@@ -13,7 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- * A simplified representation of stations with resources that process QObjects
+package jsl.modeling.elements.entity;
+
+
+/** Represents something that can receive entities
+ *
  */
-package jsl.modeling.elements.station;
+public abstract class EntityReceiverAbstract {
+
+    /** Used to receive the entity.
+     *
+     * @param entity Must not be null or IllegalArgument exception should be thrown
+     */
+    abstract protected void receive(Entity entity);
+}

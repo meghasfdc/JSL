@@ -13,7 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package jsl.modeling.elements.entity;
+
+import jsl.modeling.elements.variable.*;
+import jsl.utilities.GetValueIfc;
+
 /**
- * A simplified representation of stations with resources that process QObjects
+ * @author rossetti
+ *
  */
-package jsl.modeling.elements.station;
+public interface AttributeIfc extends GetValueIfc, SetValueIfc {
+
+}

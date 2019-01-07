@@ -19,7 +19,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.elements.processview.description.ProcessCommand;
 
 import jsl.modeling.elements.processview.description.ProcessExecutor;
-import jsl.modeling.elements.resource.*;
+import jsl.modeling.elements.entity.*;
 import jsl.modeling.elements.variable.*;
 import jsl.modeling.queue.Queue;
 

@@ -17,7 +17,7 @@ package jsl.modeling.elements.processview.description.commands;
 
 import jsl.modeling.elements.processview.description.ProcessCommand;
 import jsl.modeling.queue.Queue;
-import jsl.modeling.elements.resource.*;
+import jsl.modeling.elements.entity.*;
 import jsl.modeling.ModelElement;
 
 /**

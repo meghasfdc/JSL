@@ -13,7 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- * A simplified representation of stations with resources that process QObjects
- */
-package jsl.modeling.elements.station;
+package jsl.modeling.elements.entity;
+
+import jsl.modeling.ModelElement;
+import jsl.modeling.queue.Queue;
+
+public interface EntitySelectionRuleIfc {
+
+    public Entity selectNextEntity(Queue queue, ModelElement modelElement);
+}

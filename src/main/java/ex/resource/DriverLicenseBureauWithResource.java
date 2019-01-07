@@ -17,11 +17,9 @@ package ex.resource;
 
 import jsl.modeling.*;
 import jsl.modeling.queue.Queue;
-import jsl.modeling.elements.resource.Entity;
-import jsl.modeling.elements.resource.Resource;
+import jsl.modeling.elements.entity.Entity;
+import jsl.modeling.elements.entity.Resource;
 import jsl.modeling.elements.variable.*;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.random.rvariable.RVariableIfc;

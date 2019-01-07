@@ -18,7 +18,7 @@ package jsl.modeling.elements.spatial;
 import java.util.Observer;
 
 import jsl.modeling.ModelElement;
-import jsl.modeling.elements.resource.Resource;
+import jsl.modeling.elements.entity.Resource;
 import jsl.utilities.reporting.JSL;
 
 /**

@@ -18,7 +18,7 @@ package jsl.modeling.elements.spatial;
 import java.util.Observer;
 
 import jsl.modeling.ModelElement;
-import jsl.modeling.elements.resource.Resource;
+import jsl.modeling.elements.entity.Resource;
 import jsl.modeling.elements.spatial.transporter.EmptyMoveCompletionIfc;
 import jsl.modeling.elements.spatial.transporter.TransportCompletionIfc;
 import jsl.modeling.elements.spatial.transporter.Transporter;

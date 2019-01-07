@@ -13,7 +13,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+package jsl.modeling.elements.entity;
+
 /**
- * A simplified representation of stations with resources that process QObjects
+ *
+ * @author rossetti
  */
-package jsl.modeling.elements.station;
+class DisposeEntityException extends RuntimeException  {
+
+    /**
+     *
+     */
+    public DisposeEntityException() {
+        super(new String("Exception when disposing of the entity"));
+    }
+
+    /**
+     *
+     * @param m
+     */
+    public DisposeEntityException(String m) {
+        super(m);
+    }
+}

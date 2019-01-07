@@ -15,7 +15,7 @@
  */
 package jsl.modeling.elements.spatial.transporter;
 
-import jsl.modeling.elements.resource.Request;
+import jsl.modeling.elements.entity.Request;
 
 public interface TransporterAllocationRuleIfc {
 

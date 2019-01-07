@@ -13,7 +13,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package jsl.modeling.elements.entity;
+
+
 /**
- * A simplified representation of stations with resources that process QObjects
+ *
  */
-package jsl.modeling.elements.station;
+public interface EntityReceiverIteratorIfc {
+
+    /** Returns the next receiver or null if none
+     * @return Returns the next EntityReceiver.
+     */
+    public EntityReceiverAbstract nextEntityReceiver();
+
+    public EntityReceiverAbstract previousEntityReceiver();
+
+    public boolean hasNextEntityReceiver();
+
+    public boolean hasPreviousEntityReceiver();
+
+    public int nextEntityReceiverIndex();
+
+    public int previousEntityReceiverIndex();
+    
+}

@@ -13,7 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- * A simplified representation of stations with resources that process QObjects
+
+package jsl.modeling.elements.entity;
+
+/** Can be used to determine an entity type
+ *
+ * @author rossetti
  */
-package jsl.modeling.elements.station;
+public interface GetEntityTypeIfc {
+
+    public EntityType getEntityType();
+
+}

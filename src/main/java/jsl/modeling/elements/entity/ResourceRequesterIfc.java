@@ -13,7 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- * A simplified representation of stations with resources that process QObjects
- */
-package jsl.modeling.elements.station;
+package jsl.modeling.elements.entity;
+
+
+public interface ResourceRequesterIfc {
+
+	public void idleResourceProvided(Resource resource, Request request);
+		
+}

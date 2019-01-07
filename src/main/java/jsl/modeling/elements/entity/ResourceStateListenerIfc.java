@@ -13,7 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package jsl.modeling.elements.entity;
+
 /**
- * A simplified representation of stations with resources that process QObjects
+ *
  */
-package jsl.modeling.elements.station;
+public interface ResourceStateListenerIfc {
+
+	/** Provides an interface to objects that want to know when the resource
+	 *  becomes busy
+	 * 
+	 * @param resource
+	 * @param request
+	 */
+	public void resourceStateChange(Resource resource, Request request);
+	
+}

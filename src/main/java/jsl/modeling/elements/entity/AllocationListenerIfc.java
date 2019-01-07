@@ -13,7 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package jsl.modeling.elements.entity;
+
 /**
- * A simplified representation of stations with resources that process QObjects
+ *
  */
-package jsl.modeling.elements.station;
+public interface AllocationListenerIfc {
+
+    /** This method is called whenever units of a resource have
+     *  been allocated to a request.
+     *
+     * @param request
+     */
+    public void allocated(Request request);
+}

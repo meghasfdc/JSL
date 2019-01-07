@@ -27,9 +27,9 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.Simulation;
 import jsl.modeling.SimulationReporter;
-import jsl.modeling.elements.resource.Allocation;
-import jsl.modeling.elements.resource.Entity;
-import jsl.modeling.elements.resource.Resource;
+import jsl.modeling.elements.entity.Allocation;
+import jsl.modeling.elements.entity.Entity;
+import jsl.modeling.elements.entity.Resource;
 
 /**
  *

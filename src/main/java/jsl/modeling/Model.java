@@ -24,7 +24,7 @@ import jsl.modeling.elements.variable.*;
 
 //import jsl.spatial.spatial2D.SpatialModel2D;
 import jsl.utilities.reporting.JSL;
-import jsl.modeling.elements.resource.EntityType;
+import jsl.modeling.elements.entity.EntityType;
 import jsl.observers.ObserverIfc;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 

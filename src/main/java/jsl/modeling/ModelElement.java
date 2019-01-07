@@ -17,8 +17,8 @@ package jsl.modeling;
 
 import jsl.modeling.elements.EventGenerator;
 import jsl.modeling.elements.RandomElementIfc;
-import jsl.modeling.elements.resource.Entity;
-import jsl.modeling.elements.resource.EntityType;
+import jsl.modeling.elements.entity.Entity;
+import jsl.modeling.elements.entity.EntityType;
 import jsl.modeling.elements.spatial.SpatialModel;
 import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
