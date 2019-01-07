@@ -18,7 +18,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jsl.modeling.elements.resource;
+package jsl.modeling.elements.entity;
 
 import java.util.SortedSet;
 import java.util.TreeSet;

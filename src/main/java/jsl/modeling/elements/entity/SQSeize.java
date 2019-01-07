@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package jsl.modeling.elements.resource;
+package jsl.modeling.elements.entity;
 
 import jsl.modeling.ModelElement;
 import jsl.modeling.queue.Queue;

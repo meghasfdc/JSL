@@ -18,12 +18,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jsl.modeling.elements.resource;
+package jsl.modeling.elements.entity;
 
 import jsl.modeling.ModelElement;
-import jsl.modeling.elements.resource.Delay.DelayOption;
-import jsl.modeling.elements.resource.ReleaseResourceSetRequirement.ReleaseOption;
-import jsl.modeling.elements.resource.SeizeResources.RequirementOption;
+import jsl.modeling.elements.entity.Delay.DelayOption;
+import jsl.modeling.elements.entity.ReleaseResourceSetRequirement.ReleaseOption;
+import jsl.modeling.elements.entity.SeizeResources.RequirementOption;
 import jsl.utilities.random.RandomIfc;
 
 /**
