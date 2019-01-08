@@ -22,16 +22,16 @@ import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.ShiftedGeometricRV;
 
-/** The ShiftedeGeometric distribution is the probability distribution of
+/**
+ * The ShiftedeGeometric distribution is the probability distribution of
  * the number of Bernoulli trials needed to get one success.
  * supported on the set {1, 2, 3, ... }
- *
  */
 public class ShiftedGeometric extends Distribution implements DiscreteDistributionIfc,
         GetRVariableIfc {
 
     /**
-     *  The probability of success on a trial
+     * The probability of success on a trial
      */
     private double myProbSuccess;
 
@@ -41,88 +41,51 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
     private double myProbFailure;
 
     /**
-     *   Constructs a ShiftedGeometric with success probability = 0.5
-     *   and a starting range of 0
-     *
+     * Constructs a ShiftedGeometric with success probability = 0.5
      */
     public ShiftedGeometric() {
-        this(0.5, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.5, null);
     }
 
     /**
-     *   Constructs a ShiftedGeometric using the supplied parameters array
-     *   parameters[0] is probability of success
-
+     * Constructs a ShiftedGeometric using the supplied parameters array
+     * parameters[0] is probability of success
+     *
      * @param parameters
      */
     public ShiftedGeometric(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
+        this(parameters[0], null);
     }
 
     /**
-     *   Constructs a ShiftedGeometric using the supplied parameters array
-     *   parameters[0] is probability of success
-
-     * @param parameters
-     * @param rng
-     */
-    public ShiftedGeometric(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], rng);
-    }
-
-    /**  Constructs a ShiftedGeometric using the supplied success probability
+     * Constructs a ShiftedGeometric using the supplied success probability
      *
      * @param prob the probability of success
      */
     public ShiftedGeometric(double prob) {
-        this(prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, null);
     }
 
-    /** Constructs a ShiftedGeometric using the supplied success probability
+    /**
+     * Constructs a ShiftedGeometric using the supplied success probability
      *
-     *
-     * @param prob
-     * @param rng
+     * @param prob the probability of success
+     * @param name an optional name/label
      */
-    public ShiftedGeometric(double prob, RNStreamIfc rng) {
-        super(rng);
+    public ShiftedGeometric(double prob, String name) {
+        super(name);
         setProbabilityOfSuccess(prob);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final ShiftedGeometric newInstance() {
         return (new ShiftedGeometric(getParameters()));
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final ShiftedGeometric newInstance(RNStreamIfc rng) {
-        return (new ShiftedGeometric(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
+    /**
+     * Sets the probability of success
      *
-     * @return
-     */
-    @Override
-    public final ShiftedGeometric newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
-    }
-
-    /** Sets the probability of success
-     *
-     * @param prob
+     * @param prob the probability of success
      */
     public final void setProbabilityOfSuccess(double prob) {
         if ((prob < 0.0) || (prob > 1.0)) {
@@ -132,9 +95,10 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
         myProbFailure = 1.0 - myProbSuccess;
     }
 
-    /** Gets the probability of success
+    /**
+     * Gets the probability of success
      *
-     * @return
+     * @return the probability of success
      */
     public final double getProbabilityOfSuccess() {
         return myProbSuccess;
@@ -150,18 +114,22 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
         return (myProbFailure) / (myProbSuccess * myProbSuccess);
     }
 
-    /**  Sets the parameters using the supplied array
+    /**
+     * Sets the parameters using the supplied array
      * parameters[0] is probability of success
-     * @param parameters
+     *
+     * @param parameters the parameter array
      */
     @Override
     public final void setParameters(double[] parameters) {
         setProbabilityOfSuccess(parameters[0]);
     }
 
-    /** Gets the parameters as an array
+    /**
+     * Gets the parameters as an array
      * parameters[0] is probability of success
      *
+     * @return the parameter array
      */
     @Override
     public final double[] getParameters() {
@@ -170,11 +138,12 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
         return (param);
     }
 
-    /** computes the pmf of the distribution
-     *   f(x) = p(1-p)^(x-1.0)
+    /**
+     * computes the pmf of the distribution
+     * f(x) = p(1-p)^(x-1.0)
      *
-     * @param x
-     * @return
+     * @param x the value to evaluate
+     * @return the probability at x
      */
     public final double pmf(int x) {
         if (x < 1) {
@@ -183,12 +152,6 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
         return (myProbSuccess * Math.pow(myProbFailure, x - 1.0));
     }
 
-    /** If x is not and integer value, then the probability must be zero
-     *  otherwise pmf(int x) is used to determine the probability
-     *
-     * @param x
-     * @return
-     */
     @Override
     public final double pmf(double x) {
         if (Math.floor(x) == x) {
@@ -198,12 +161,6 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
         }
     }
 
-    /** computes the cdf of the distribution
-     *   F(X&lt;=x)
-     *
-     * @param x
-     * @return
-     */
     @Override
     public final double cdf(double x) {
         if (x < 1) {
@@ -213,10 +170,6 @@ public class ShiftedGeometric extends Distribution implements DiscreteDistributi
         return (1 - Math.pow(myProbFailure, xx));
     }
 
-    /** Gets the inverse cdf for the distribution
-     *
-     *  @param prob Must be in range [0,1)
-     */
     @Override
     public final double invCDF(double prob) {
         if ((prob < 0.0) || (prob > 1.0)) {

@@ -15,17 +15,13 @@
  */
 package ex.models;
 
-import jsl.modeling.JSLEvent;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.SimulationReporter;
+import jsl.modeling.*;
 import jsl.modeling.elements.EventGenerator;
+import jsl.modeling.elements.EventGeneratorActionIfc;
 import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
-import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  * Arrivals are governed by a compound Poisson process. An EventGenerator is used
@@ -46,9 +42,10 @@ public class EventGeneratorCPP extends SchedulingElement {
 
     public EventGeneratorCPP(ModelElement parent, double tba, String name) {
         super(parent, name);
-        double[] a = {1, 0.2, 2, 0.5, 3, 1.0};
-        myNumArrivals = new RandomVariable(this, new DEmpiricalCDF(a));
-        myTBA = new RandomVariable(this, new Exponential(tba));
+        double[] values = {1, 2, 3};
+        double[] cdf = {0.2, 0.5, 1.0};
+        myNumArrivals = new RandomVariable(this, new DEmpiricalRV(values, cdf));
+        myTBA = new RandomVariable(this, new ExponentialRV(tba));
         myEventCounter = new Counter(this, "Counts Events");
         myArrivalCounter = new Counter(this, "Counts Arrivals");
         myArrivalGenerator = new EventGenerator(this, new Arrivals(), myTBA, myTBA);

@@ -24,6 +24,7 @@ import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamFactory.RNStream;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticXY;
 
@@ -63,8 +64,8 @@ public class UseRNG {
         StatisticXY statXY = new StatisticXY("Stat X Y");
 //        Normal n1 = new Normal(2, 1, f1s1);
 //        Normal n2 = new Normal(2.1, 1, f2s1);
-                Normal n1 = new Normal(2, 1);
-        Normal n2 = new Normal(2.1, 1);
+        NormalRV n1 = new NormalRV(2, 1);
+        NormalRV n2 = new NormalRV(2.1, 1);
         for (int i = 0; i < 10; i++) {
             double x = n1.getValue();
             double y = n2.getValue();
@@ -106,8 +107,8 @@ public class UseRNG {
 
         Statistic d = new Statistic("(X + Y)/2");
         StatisticXY statXY = new StatisticXY("Stat X Y");
-        Normal n1 = new Normal(2, 1, f1s1);
-        Normal n2 = new Normal(2, 1, f2s1);
+        NormalRV n1 = new NormalRV(2, 1, f1s1);
+        NormalRV n2 = new NormalRV(2, 1, f2s1);
         for (int i = 0; i < 10; i++) {
             double x = n1.getValue();
             double y = n2.getValue();

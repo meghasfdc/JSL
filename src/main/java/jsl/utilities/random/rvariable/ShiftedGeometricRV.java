@@ -63,7 +63,7 @@ public final class ShiftedGeometricRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = 1.0 + JSLRandom.rGeometric(myProbSuccess, myRNG);
+        double v = 1.0 + JSLRandom.rGeometric(myProbSuccess, myRNStream);
         return v;
     }
 

@@ -18,8 +18,7 @@ package jsl.modeling.elements.processview.description;
 import jsl.modeling.IllegalStateException;
 import java.util.*;
 
-import jsl.modeling.elements.resource.Entity;
-import jsl.utilities.reporting.JSL;
+import jsl.modeling.elements.entity.Entity;
 
 public class ProcessExecutor {
 

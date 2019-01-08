@@ -18,6 +18,8 @@ package jsl.utilities.random.arta;
 import jsl.utilities.random.rng.AR1CorrelatedRNStreamStream;
 import jsl.utilities.random.distributions.Distribution;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 
@@ -37,7 +39,7 @@ public class ARTACorrelationEvaluator {
 	 *  correlated random variates
 	 * 
 	 */
-	protected Distribution myDistribution;
+	protected RVariableIfc myDistribution;
 		
 	/** The generate size used to estimate the actual
 	 *  correlation within one replication.  The 
@@ -78,7 +80,7 @@ public class ARTACorrelationEvaluator {
 	 *    
 	 * @param distribution
 	 */
-	public ARTACorrelationEvaluator(Distribution distribution) {
+	public ARTACorrelationEvaluator(RVariableIfc distribution) {
 		this(distribution, 0.0, 1000, 1, false);
 	}
 	
@@ -91,7 +93,7 @@ public class ARTACorrelationEvaluator {
 	 * @param distribution
 	 * @param lag1
 	 */
-	public ARTACorrelationEvaluator(Distribution distribution, double lag1) {
+	public ARTACorrelationEvaluator(RVariableIfc distribution, double lag1) {
 		this(distribution, lag1, 1000, 1, false);
 	}
 	
@@ -104,7 +106,7 @@ public class ARTACorrelationEvaluator {
 	 * @param lag1
 	 * @param sampleSize
 	 */
-	public ARTACorrelationEvaluator(Distribution distribution, double lag1,
+	public ARTACorrelationEvaluator(RVariableIfc distribution, double lag1,
 			int sampleSize) {
 		this(distribution, lag1, sampleSize, 1, false);
 	}
@@ -118,25 +120,25 @@ public class ARTACorrelationEvaluator {
 	 * @param sampleSize
 	 * @param numReps
 	 */
-	public ARTACorrelationEvaluator(Distribution distribution, double lag1,
+	public ARTACorrelationEvaluator(RVariableIfc distribution, double lag1,
 			int sampleSize, int numReps) {
 		this(distribution, lag1, sampleSize, numReps, false);
 	}
 	
-	/** Note that the distribution will be set to use a correlated
+	/** Note that the randomVariable will be set to use a correlated
 	 *  random number generator, with the supplied lag 1 correlation
 	 *  
-	 * @param distribution
+	 * @param randomVariable
 	 * @param lag1
 	 * @param sampleSize
 	 * @param numReps
 	 * @param antitheticFlag
 	 */
-	public ARTACorrelationEvaluator(Distribution distribution, double lag1,
+	public ARTACorrelationEvaluator(RVariableIfc randomVariable, double lag1,
 			int sampleSize, int numReps, boolean antitheticFlag) {
 		myCorrelatedRng = new AR1CorrelatedRNStreamStream(lag1);
-		setDistribution(distribution);
-		distribution.setRandomNumberGenerator(myCorrelatedRng);
+		setRandomVariable(randomVariable);
+		randomVariable.setRandomNumberStream(myCorrelatedRng);
 		setSampleSize(sampleSize);
 		setNumberOfReplications(numReps);
 		setAntitheticFlag(antitheticFlag);	
@@ -147,18 +149,18 @@ public class ARTACorrelationEvaluator {
 	/**
 	 * @return the distribution
 	 */
-	public final Distribution getDistribution() {
+	public final RVariableIfc getRandomVariable() {
 		return myDistribution;
 	}
 
 	/**
-	 * @param distribution the distribution to set
+	 * @param randomVariable the randomVariable to set
 	 */
-	public final void setDistribution(Distribution distribution) {
-		if (distribution == null)
-			throw new IllegalArgumentException("The supplied distribution was null");
+	public final void setRandomVariable(RVariableIfc randomVariable) {
+		if (randomVariable == null)
+			throw new IllegalArgumentException("The supplied randomVariable was null");
 		
-		myDistribution = distribution;
+		myDistribution = randomVariable;
 	}
 
 	/** This is the correlation set within the NORTA process
@@ -425,8 +427,8 @@ public class ARTACorrelationEvaluator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		Distribution d = new Exponential();
+
+		ExponentialRV d = new ExponentialRV(1.0);
 		double lag1 = 0.8278;
 		//double lag1 = 0.8;
 		int n = 10000;

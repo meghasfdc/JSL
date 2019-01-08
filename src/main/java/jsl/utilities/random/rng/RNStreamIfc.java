@@ -18,12 +18,12 @@
 package jsl.utilities.random.rng;
 
 /**
- * Represents a random number generator with streams
+ * Represents a random number stream with stream control
  *
  * @author rossetti
  */
-public interface RNStreamIfc extends RandU01Ifc, RandomStreamIfc,
-        NewStreamInstanceIfc, GetAntitheticStreamIfc {
+public interface RNStreamIfc extends RandU01Ifc, RNStreamControlIfc,
+        RNStreamNewInstanceIfc, GetAntitheticStreamIfc {
 
     /**
      * Returns a (pseudo)random number from the discrete uniform distribution

@@ -71,7 +71,7 @@ public final class BetaRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = myBeta.invCDF(myRNG.randU01());
+        double v = myBeta.invCDF(myRNStream.randU01());
         return v;
     }
 

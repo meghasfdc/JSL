@@ -88,7 +88,7 @@ public final class TriangularRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rTriangular(myMin, myMode, myMax, myRNG);
+        double v = JSLRandom.rTriangular(myMin, myMode, myMax, myRNStream);
         return v;
     }
 

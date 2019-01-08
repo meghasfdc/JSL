@@ -16,28 +16,11 @@
 package jsl.utilities.random;
 
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.NewInstanceIfc;
-import jsl.utilities.random.rng.RandomStreamIfc;
-import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 
 /**
  *
  */
-public interface RandomIfc extends ParametersIfc, GetValueIfc, RandomStreamIfc, NewInstanceIfc {
+public interface RandomIfc extends GetValueIfc, RNStreamControlIfc {
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent underlying random number source
-     *
-     * @return a new instance
-     */
-    @Override
-    RandomIfc newInstance();
-
-    /** Returns a new instance of the random source with the same parameters
-     *  but using the supplied random number stream
-     *
-     * @param rng the stream to use
-     * @return the new instance
-     */
-    RandomIfc newInstance(RNStreamIfc rng);
 }

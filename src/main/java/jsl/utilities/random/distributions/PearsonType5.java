@@ -28,8 +28,7 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  *  Code contributed by Seda Gumrukcu
  *
  */
-public class PearsonType5 extends Distribution implements ContinuousDistributionIfc,
-        InverseCDFIfc, GetRVariableIfc {
+public class PearsonType5 extends Distribution implements ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
 
     private double myShape;
 
@@ -45,28 +44,17 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * scale = 1.0
      */
     public PearsonType5() {
-        this(1.0, 1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, 1.0, null);
     }
 
     /** Creates a PearsonType5 distribution
      * parameters[0] = shape
      * parameters[1] = scale
      *
-     * @param parameters
+     * @param parameters the parameter array
      */
     public PearsonType5(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Creates a PearsonType5 distribution
-     * parameters[0] = shape
-     * parameters[1] = scale
-     *
-     * @param parameters
-     * @param rng
-     */
-    public PearsonType5(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
+        this(parameters[0], parameters[1], null);
     }
 
     /** Creates a PearsonType5 distribution
@@ -75,49 +63,23 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * @param scale must be &gt; 0
      */
     public PearsonType5(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
+        this(shape, scale, null);
     }
 
     /** Creates a PearsonType5 distribution
      *
      * @param shape must be &gt;0
      * @param scale must be &gt; 0
-     * @param rng
+     * @param name an optional label/name
      */
-    public PearsonType5(double shape, double scale, RNStreamIfc rng) {
-        super(rng);
+    public PearsonType5(double shape, double scale, String name) {
+        super(name);
         setParameters(shape, scale);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
     @Override
     public final PearsonType5 newInstance() {
         return (new PearsonType5(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final PearsonType5 newInstance(RNStreamIfc rng) {
-        return (new PearsonType5(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final PearsonType5 newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     /** Sets the shape and scale parameters
@@ -139,7 +101,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
         myScale = scale;
 
         if (myGammaCDF == null) {
-            myGammaCDF = new Gamma(myShape, 1.0 / myScale, myRNG);
+            myGammaCDF = new Gamma(myShape, 1.0 / myScale);
         } else {
             myGammaCDF.setShape(shape);
             myGammaCDF.setScale(1.0 / scale);
@@ -153,7 +115,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
 
     /** Gets the shape parameter
      *
-     * @return
+     * @return the shape parameter
      */
     public final double getShape() {
         return myShape;
@@ -161,7 +123,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
 
     /** Gets the scale parameter
      *
-     * @return
+     * @return the scale parameter
      */
     public final double getScale() {
         return myScale;
@@ -236,7 +198,7 @@ public class PearsonType5 extends Distribution implements ContinuousDistribution
      * parameters[0] = shape
      * parameters[1] = scale
      *
-     * @param parameters
+     * @param parameters the parameter array
      */
     @Override
     public void setParameters(double[] parameters) {

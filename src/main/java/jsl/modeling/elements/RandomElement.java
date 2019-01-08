@@ -21,33 +21,35 @@ import java.util.List;
 import jsl.modeling.ModelElement;
 import jsl.utilities.random.robj.DEmpiricalList;
 
-/** RandomElement allows for randomly selecting objects of type T
- *  according to a DEmpiricalList.  This essentially allows DEmpiricalList to
- *  be a ModelElement
- *
+/**
+ * RandomElement allows for randomly selecting objects of type T
+ * according to a DEmpiricalList.  This essentially allows DEmpiricalList to
+ * be a ModelElement
  */
 public class RandomElement<T> extends ModelElement implements RandomElementIfc {
 
-    /** indicates whether or not the random variable's
-     *  distribution has it stream reset to the default
-     *  stream, or not prior to each experiment.  Resetting
-     *  allows each experiment to use the same underlying random numbers
-     *  i.e. common random numbers, this is the default
-     * 
-     *  Setting it to true indicates that it does reset
+    /**
+     * indicates whether or not the random variable's
+     * distribution has it stream reset to the default
+     * stream, or not prior to each experiment.  Resetting
+     * allows each experiment to use the same underlying random numbers
+     * i.e. common random numbers, this is the default
+     * <p>
+     * Setting it to true indicates that it does reset
      */
     protected boolean myResetStartStreamOption;
 
-    /** indicates whether or not the random variable's
-     *  distribution has it stream reset to the next substream
-     *  stream, or not, prior to each replication.  Resetting
-     *  allows each replication to better ensure that each
-     *  replication will be start at the same place in the
-     *  substreams, thereby, improving sychronization when using
-     *  common random numbers.
-     *
-     *  Setting it to true indicates that it does jump to
-     *  the next substream, true is the default
+    /**
+     * indicates whether or not the random variable's
+     * distribution has it stream reset to the next substream
+     * stream, or not, prior to each replication.  Resetting
+     * allows each replication to better ensure that each
+     * replication will be start at the same place in the
+     * substreams, thereby, improving sychronization when using
+     * common random numbers.
+     * <p>
+     * Setting it to true indicates that it does jump to
+     * the next substream, true is the default
      */
     protected boolean myResetNextSubStreamOption;
 
@@ -56,23 +58,25 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
     /**
      * @param parent
      */
-    public RandomElement(ModelElement parent) {
-        this(parent, null);
+    public RandomElement(ModelElement parent, List<T> elements, double[] cdf) {
+        this(parent, elements, cdf, null);
     }
 
     /**
      * @param parent
      * @param name
      */
-    public RandomElement(ModelElement parent, String name) {
+    public RandomElement(ModelElement parent, List<T> elements, double[] cdf, String name) {
         super(parent, name);
-        myRandomList = new DEmpiricalList<T>();
+        myRandomList = new DEmpiricalList<T>(elements, cdf);
         setWarmUpOption(false); // do not need to respond to warm events
         setResetStartStreamOption(true);
         setResetNextSubStreamOption(true);
     }
 
-    /** Gets the current Reset Start Stream Option
+    /**
+     * Gets the current Reset Start Stream Option
+     *
      * @return
      */
     @Override
@@ -80,8 +84,10 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
         return myResetStartStreamOption;
     }
 
-    /** Sets the reset start stream option, true
-     *  means that it will be reset to the starting stream
+    /**
+     * Sets the reset start stream option, true
+     * means that it will be reset to the starting stream
+     *
      * @param b
      */
     @Override
@@ -89,9 +95,11 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
         myResetStartStreamOption = b;
     }
 
-    /** Gets the current reset next substream option
-     *  true means, that it is set to jump to the next substream after
-     *  each replication
+    /**
+     * Gets the current reset next substream option
+     * true means, that it is set to jump to the next substream after
+     * each replication
+     *
      * @return
      */
     @Override
@@ -99,31 +107,16 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
         return myResetNextSubStreamOption;
     }
 
-    /** Sets the current reset next substream option
-     *  true means, that it is set to jump to the next substream after
-     *  each replication
+    /**
+     * Sets the current reset next substream option
+     * true means, that it is set to jump to the next substream after
+     * each replication
+     *
      * @param b
      */
     @Override
     public final void setResetNextSubStreamOption(boolean b) {
         myResetNextSubStreamOption = b;
-    }
-
-    /**
-     * @param obj
-     * @param p
-     * @see jsl.utilities.random.robj.DEmpiricalList#add(java.lang.Object, double)
-     */
-    public final void add(T obj, double p) {
-        myRandomList.add(obj, p);
-    }
-
-    /**
-     * @param obj
-     * @see jsl.utilities.random.robj.DEmpiricalList#addLast(java.lang.Object)
-     */
-    public final void addLast(T obj) {
-        myRandomList.addLast(obj);
     }
 
     /**
@@ -177,7 +170,9 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
         return myRandomList.size();
     }
 
-    /** Returns an unmodifiable view of the list of elements
+    /**
+     * Returns an unmodifiable view of the list of elements
+     *
      * @return
      */
     public final List<T> getList() {
@@ -209,9 +204,9 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
         return myRandomList.getAntitheticOption();
     }
 
-    /** before any replications reset the underlying random number generator to the
-     *  starting stream
-     *
+    /**
+     * before any replications reset the underlying random number generator to the
+     * starting stream
      */
     @Override
     protected void beforeExperiment() {
@@ -222,8 +217,9 @@ public class RandomElement<T> extends ModelElement implements RandomElementIfc {
 
     }
 
-    /** after each replication reset the underlying random number generator to the next
-     *  substream
+    /**
+     * after each replication reset the underlying random number generator to the next
+     * substream
      */
     @Override
     protected void afterReplication() {

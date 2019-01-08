@@ -25,6 +25,7 @@ import java.util.Arrays;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.DEmpiricalCDF;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rng.RNStreamFactory;
 import org.junit.jupiter.api.BeforeAll;
@@ -59,7 +60,7 @@ public class TestDEmpirical {
 
         RNStreamIfc defaultStream = RNStreamFactory.getDefaultStream();
 
-        DEmpiricalCDF d = new DEmpiricalCDF(pp, defaultStream);
+        DEmpiricalRV d = new DEmpiricalRV(x, p, defaultStream);
 
         int n = 100;
         double[] x1 = new double[n];

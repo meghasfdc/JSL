@@ -20,7 +20,7 @@ package jsl.utilities.random.rng;
  *
  * @author rossetti
  */
-public interface RandomStreamManagerIfc extends RandomStreamIfc{
+public interface RandomStreamManagerIfc extends RNStreamControlIfc {
 
     /** Returns the number of streams being managed
      *
@@ -46,7 +46,7 @@ public interface RandomStreamManagerIfc extends RandomStreamIfc{
      * @param index
      * @return
      */
-    RandomStreamIfc get(int index);
+    RNStreamControlIfc get(int index);
 
     /** Checks if the manager contains the supplied stream
      *

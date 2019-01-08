@@ -15,15 +15,15 @@
  */
 package jsl.modeling.resource;
 
-import java.util.Optional;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.State;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.math.JSLMath;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.reporting.JSL;
+import jsl.utilities.random.rvariable.ConstantRV;
+
+import java.util.Optional;
 
 /**
  * A Request represents a notification that the ResourceUnit is needed for
@@ -264,7 +264,7 @@ public class Request extends QObject {
         }
         myReactor = reactor;
         if (duration == null) {
-            duration = Constant.POSITIVE_INFINITY;
+            duration = ConstantRV.POSITIVE_INFINITY;
 //            StringBuilder sb = new StringBuilder();
 //            sb.append("The request's time setter was set to Constant.POSITIVE_INFINITY").append(System.lineSeparator());
 //            JSL.LOGGER.warning(sb.toString());
@@ -384,7 +384,7 @@ public class Request extends QObject {
         
         private ResourceUnit resourceUnit;
         private int priority = JSLEvent.DEFAULT_PRIORITY;
-        private GetValueIfc timeSetter = Constant.POSITIVE_INFINITY;
+        private GetValueIfc timeSetter = ConstantRV.POSITIVE_INFINITY;
         private String name;
         private PreemptionRule rule = PreemptionRule.RESUME;
         private double timeUnits = 1;

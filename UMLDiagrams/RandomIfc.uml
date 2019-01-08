@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>jsl.utilities.random.RandomIfc</OriginalElement>
+  <nodes>
+    <node x="306.0" y="0.0">java.lang.FunctionalInterface</node>
+    <node x="207.5" y="270.0">jsl.utilities.random.RandomIfc</node>
+    <node x="0.0" y="80.0">jsl.utilities.random.rng.RNStreamControlIfc</node>
+    <node x="91.5" y="350.0">jsl.utilities.random.rvariable.AbstractRVariable</node>
+    <node x="300.0" y="124.0">jsl.utilities.GetValueIfc</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="jsl.utilities.GetValueIfc" target="java.lang.FunctionalInterface">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.RandomIfc" target="jsl.utilities.GetValueIfc">
+      <point x="28.75" y="-15.0" />
+      <point x="293.75" y="245.0" />
+      <point x="390.0" y="245.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="jsl.utilities.random.RandomIfc" target="jsl.utilities.random.rng.RNStreamControlIfc">
+      <point x="-28.75" y="-15.0" />
+      <point x="236.25" y="245.0" />
+      <point x="140.0" y="245.0" />
+      <point x="0.0" y="70.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rvariable.AbstractRVariable" target="jsl.utilities.random.RandomIfc">
+      <point x="0.0" y="-180.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="180.5" y="293.5" />
+  <SelectedNodes>
+    <node>jsl.utilities.random.rng.RNStreamControlIfc</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

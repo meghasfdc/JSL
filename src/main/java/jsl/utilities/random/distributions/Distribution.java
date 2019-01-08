@@ -16,90 +16,97 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
+import jsl.utilities.NewInstanceIfc;
+import jsl.utilities.controls.ControllableIfc;
+import jsl.utilities.controls.Controls;
 import jsl.utilities.math.FunctionIfc;
-import jsl.utilities.random.AbstractRandom;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.rootfinding.BisectionRootFinder;
 
 /**
  * An Distribution provides a skeletal implementation for classes that must
  * implement the DistributionIfc. This class is an abstract class. Subclasses
- * must provide concrete implementations. A Distribution generates random
- * variates via its getValue() method.
+ * must provide concrete implementations.
  *
- * Remarks:
- *
- * 1) Each Distribution that is created, instantiates its own reference to an
- * object that implements the RngIfc. By default this is an instance of
- * RngStream. The user can provide their own RngIfc using the
- * setRandomNumberGenerator() method. Subclasses can use this reference to
- * assist with random variate generation
  *
  */
-public abstract class Distribution extends AbstractRandom implements DistributionIfc {
+public abstract class Distribution implements DistributionIfc, ControllableIfc, NewInstanceIfc {
 
     private static BisectionRootFinder myRootFinder;
 
     private static Interval myInterval;
 
-    /**
-     * myRNG provides a reference to the underlying stream of random numbers
+    /** A counter to count the number of created to assign "unique" ids
      */
-    protected RNStreamIfc myRNG;
+    private static int myIdCounter_;
 
+    /** The id of this object
+     */
+    protected int myId;
+
+    /** Holds the name of the name of the object for the IdentityIfc
+     */
+    protected String myName;
+
+    /**
+     * Constructs a probability distribution
+     */
     public Distribution() {
-        this(RNStreamFactory.getDefaultFactory().getStream(), null);
+        this(null);
     }
 
     /**
-     * Constructs a probability distribution using the supplied RngIfc
+     * Constructs a probability distribution
      *
-     * @param rng class that implements the RngIfc @returns a valid Distribution
-     */
-    public Distribution(RNStreamIfc rng) {
-        this(rng, null);
-    }
-
-    /**
-     * Constructs a probability distribution using the supplied RngIfc
-     *
-     * @param rng a class that implements the RngIfc
      * @param name a String name @returns a valid Distribution
      */
-    public Distribution(RNStreamIfc rng, String name) {
-        super(name);
-        setRandomNumberGenerator(rng);
-    }
-
-    @Override
-    public double cdf(double x1, double x2) {
-        if (x1 > x2) {
-            String msg = "x1 = " + x1 + " > x2 = " + x2 + " in cdf(x1,x2)";
-            throw new IllegalArgumentException(msg);
-        }
-
-        return (cdf(x2) - cdf(x1));
-    }
-
-    @Override
-    public double complementaryCDF(double x) {
-        return (1.0 - cdf(x));
+    public Distribution(String name) {
+        setId();
+        setName(name);
     }
 
     /**
-     * Returns the antithetic of the last getValue() If getValue() has never
-     * been called then returns Double.NaN
      *
-     * @return
+     * @return the assigned name
      */
-    public double getAntitheticValue() {
-        return invCDF(myRNG.getAntitheticValue());
+    public final String getName() {
+        return myName;
+    }
+
+    /** Sets the name
+     * @param str The name as a string.
+     */
+    public final void setName(String str) {
+        if (str == null) {
+            myName = this.getClass().getSimpleName();
+        } else {
+            myName = str;
+        }
+    }
+
+    /**
+     *
+     * @return a number identifier
+     */
+    public final int getId() {
+        return (myId);
+    }
+
+    protected final void setId() {
+        myIdCounter_ = myIdCounter_ + 1;
+        myId = myIdCounter_;
     }
 
     @Override
-    public double getValue() {
-        return invCDF(myRNG.randU01());
+    public Controls getControls() {
+        return new RandomControls();
+    }
+
+    @Override
+    public void setControls(Controls controls) {
+        if (controls == null) {
+            throw new IllegalArgumentException("The supplied controls were null!");
+        }
+        setParameters(controls.getDoubleArrayControl("parameters"));
     }
 
     @Override
@@ -108,104 +115,37 @@ public abstract class Distribution extends AbstractRandom implements Distributio
     }
 
     @Override
-    public void advanceToNextSubstream() {
-        myRNG.advanceToNextSubstream();
-    }
-
-    @Override
-    public void resetStartStream() {
-        myRNG.resetStartStream();
-    }
-
-    @Override
-    public void resetStartSubstream() {
-        myRNG.resetStartSubstream();
-    }
-
-    @Override
-    public void setAntitheticOption(boolean flag) {
-        myRNG.setAntitheticOption(flag);
-    }
-
-    @Override
-    public boolean getAntitheticOption() {
-        return myRNG.getAntitheticOption();
-    }
-
-    /**
-     * Returns a new instance of the random source with the same parameters but
-     * an independent generator
-     *
-     * @return
-     */
-    @Override
     abstract public Distribution newInstance();
 
-    /**
-     * Returns a new instance of the random source with the same parameters with
-     * the supplied RngIfc
-     *
-     * @param rng
-     * @return
-     */
-    @Override
-    abstract public Distribution newInstance(RNStreamIfc rng);
-
-    /**
-     * Returns a new instance that will supply values based on antithetic U(0,1)
-     * when compared to this distribution
-     *
-     * @return
-     */
-    abstract public Distribution newAntitheticInstance();
-
-    @Override
-    public RNStreamIfc getRandomNumberGenerator() {
-        return (myRNG);
-    }
-
-    /**
-     * Sets the underlying random number generator for the distribution Throws a
-     * NullPointerException if rng is null
-     *
-     * @param rng the reference to the random number generator
-     */
-    public final void setRandomNumberGenerator(RNStreamIfc rng) {
-        if (rng == null) {
-            throw new NullPointerException("RngIfc rng must be non-null");
-        }
-        myRNG = rng;
-    }
-
-    /**
-     * Returns a string describing the distribution
-     *
-     *
-     * @return a String representation of the distribution
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Name ");
         sb.append(getName());
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Mean ");
         sb.append(getMean());
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Variance ");
         sb.append(getVariance());
-        sb.append("\n");
-        sb.append(myRNG);
+        sb.append(System.lineSeparator());
         return (sb.toString());
+    }
+
+    protected class RandomControls extends Controls {
+
+        protected void fillControls(){
+            addDoubleArrayControl("parameters", getParameters());
+        }
     }
 
     /**
      * Computes the inverse CDF by using the bisection method [ll,ul] must
      * contain the desired value. Initial search point is (ll+ul)/2.0
-     * 
+     *
      * [ll, ul] are defined on the domain of the CDF, i.e. the X values
-     * 
-     * @param cdf
+     *
+     * @param cdf a reference to the cdf
      * @param p must be in [0,1]
      * @param ll lower limit of search range, must be &lt; ul
      * @param ul upper limit of search range, must be &gt; ll
@@ -219,10 +159,10 @@ public abstract class Distribution extends AbstractRandom implements Distributio
     /**
      * Computes the inverse CDF by using the bisection method [ll,ul] must
      * contain the desired value
-     * 
+     *
      * [ll, ul] are defined on the domain of the CDF, i.e. the x values
-     * 
-     * @param cdf
+     *
+     * @param cdf a reference to the cdf
      * @param p must be in [0,1]
      * @param ll lower limit of search range, must be &lt; ul
      * @param ul upper limit of search range, must be &gt; ll
@@ -274,14 +214,14 @@ public abstract class Distribution extends AbstractRandom implements Distributio
     /** Searches starting at the value start until the CDF &gt; p
      *  "start" must be the smallest possible value for the range of the CDF
      *  as an integer.  This requirement is NOT checked
-     *  
+     *
      *  Each value is incremented by 1. Thus, the range of possible
      *  values for the CDF is assumed to be {start, start + 1, start + 2, etc.}
-     * 
-     * @param df
-     * @param p
-     * @param start
-     * @return
+     *
+     * @param df a reference to the discrete distribution
+     * @param p the probability to evaluate, must be (0,1)
+     * @param start the initial starting search position
+     * @return the found inverse of the CDF found for p
      */
     public static double inverseDiscreteCDFViaSearchUp(DiscreteDistributionIfc df, double p, int start) {
         if ((p < 0.0) || (p > 1.0)) {

@@ -29,9 +29,9 @@ public class TestFrequencies {
 
     public static void main(String[] args) {
 
- //       testIntegerFrequency();
+        testIntegerFrequency();
 
-        //testStateFrequencies();
+        testStateFrequencies();
         testStateTransitions();
     }
 

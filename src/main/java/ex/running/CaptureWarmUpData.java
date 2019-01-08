@@ -30,6 +30,7 @@ import jsl.modeling.SimulationReporter;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.JSL;
 import jsl.utilities.statistic.BatchStatistic;
 import jsl.utilities.welch.WelchDataCollectorTW;
@@ -59,8 +60,8 @@ public class CaptureWarmUpData {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(1.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(0.7));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(1.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(0.7));
         ResponseVariable rv = m.getResponseVariable("System Time");
         rv.turnOnTrace(true);
         //rv.turnOnTrace();
@@ -81,8 +82,8 @@ public class CaptureWarmUpData {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(1.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(0.7));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(1.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(0.7));
         ResponseVariable rv = m.getResponseVariable("System Time");
         TimeWeighted tw = m.getTimeWeighted("# in System");
         tw.turnOnTrace(true);
@@ -128,8 +129,8 @@ public class CaptureWarmUpData {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(1.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(0.7));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(1.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(0.7));
         // get access to the response variables
         ResponseVariable stRV = m.getResponseVariable("System Time");
         TimeWeighted nisTW = m.getTimeWeighted("# in System");

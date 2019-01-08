@@ -21,19 +21,19 @@ import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  * Provides a representation for a discrete distribution with
  * arbitrary values and assigned probabilities to each value.
- * Allows the specification of the distribution via an array containing the
- * following pairs
- * (v1, c1, v2, c2, ..., vn, 1.0)
+ * Allows the specification of the distribution via a pair of arrays containing the
+ * values = {v1, v2, ... , vn} and the cumulative probabilities cdf = {c1, c2, ... , 1.0}
+ *
  * where if p1 is the probability associated with v1, p2 with v2, etc
  * then c1 = p1, c2 = p1 + p2, c3 = p1 + p2 + p3, etc,
  * with cn = 1.0 (the sum of all the probabilities). If cn is not 1.0, then
  * an exception is thrown.
- * If the size of the array is not even, then an exception is thrown.
  */
 public class DEmpiricalCDF extends Distribution implements DiscreteDistributionIfc, GetRVariableIfc {
 
@@ -43,32 +43,23 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
     private LinkedList<ProbPoint> myProbabilityPoints;
 
     /**
-     * This constructor takes in an Array of probability points
-     * (value, cumulative probability), Eg. X[] = {v1, cp1, v2, cp2, ...},
-     * as the input parameter.
-     * <p>
-     * An IllegalStateException will be thrown if the user attempts
-     * to use the methods and the total probability does not sum up to 1.0
-     *
-     * @param pairs An array holding the value cumulative probability
+     * @param values an array of values that will be drawn from
+     * @param cdf    a cdf corresponding to the values
      */
-    public DEmpiricalCDF(double[] pairs) {
-        this(pairs, RNStreamFactory.getDefaultFactory().getStream());
+    public DEmpiricalCDF(double[] values, double[] cdf) {
+        this(values, cdf, null);
     }
 
     /**
-     * This constructor takes in an Array of probability points
-     * (value, cumulative probability), Eg. X[] = {v1, cp1, v2, cp2, ...},
-     * as the input parameter.
-     * <p>
-     * An IllegalStateException will be thrown if the user attempts
-     * to use the methods and the total probability does not sum up to 1.0
+     * (v[0], cdf[0], ...) represent the value and the cumulative probability of that value.
      *
-     * @param pairs An array holding the value, cumulative probability pairs.
-     * @param rng
+     * @param values an array of values that will be drawn from
+     * @param cdf    a cdf corresponding to the values
+     * @param name   an optional name/label
      */
-    public DEmpiricalCDF(double[] pairs, RNStreamIfc rng) {
-        super(rng);
+    public DEmpiricalCDF(double[] values, double[] cdf, String name) {
+        super(name);
+        double[] pairs = makePairs(values, cdf);
         myProbabilityPoints = new LinkedList<ProbPoint>();
         setParameters(pairs);
     }
@@ -78,9 +69,9 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * to the integers starting at 0.
      *
      * @param cdf the probability array. must have valid probability elements
-     * and last element equal to 1. Every element must be greater than or equal
-     * to the previous element. That is, monotonically increasing.
-     * @return
+     *            and last element equal to 1. Every element must be greater than or equal
+     *            to the previous element. That is, monotonically increasing.
+     * @return the pairs
      */
     public static double[] makePairs(double[] cdf) {
         return makePairs(0, cdf);
@@ -91,10 +82,10 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * to the integers starting at start.
      *
      * @param start place to start assignment
-     * @param cdf the probability array. must have valid probability elements
-     * and last element equal to 1. Every element must be greater than or equal
-     * to the previous element. That is, monotonically increasing.
-     * @return
+     * @param cdf   the probability array. must have valid probability elements
+     *              and last element equal to 1. Every element must be greater than or equal
+     *              to the previous element. That is, monotonically increasing.
+     * @return the pairs
      */
     public static double[] makePairs(int start, double[] cdf) {
         if (cdf == null) {
@@ -124,38 +115,52 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
     }
 
     /**
-     * Returns a new instance of the random source with the same parameters
-     * but an independent generator
+     * This method takes in an Array of probability points
+     * (value, cumulative probability), Eg. X[] = {v1, cp1, v2, cp2, ...},
+     * as the input parameter and makes a 2D array of the value/prob pairs
      *
-     * @return
+     * @param pairs An array holding the value, cumulative probability pairs.
      */
+    public static double[][] splitPairs(double[] pairs) {
+        Objects.requireNonNull(pairs, "The pairs array was null");
+        int n = pairs.length / 2;
+        double[][] split = new double[2][n];
+        for (int i = 0; i < n; i++) {
+            split[0][i] = pairs[2 * i];
+            split[1][i] = pairs[2 * i + 1];
+        }
+        return split;
+    }
+
+    /**
+     * Makes a pair array that can be used for the parameters of the DEmpiricalCDF distribution
+     *
+     * @param values an array of values that will be drawn from
+     * @param cdf    a cdf corresponding to the values
+     * @return a properly configured array of pairs for the DEmpiricalCDF distribution
+     */
+    public static double[] makePairs(double[] values, double[] cdf) {
+        Objects.requireNonNull(values, "The values array was null");
+        Objects.requireNonNull(cdf, "The values array was null");
+        if (values.length != cdf.length) {
+            throw new IllegalArgumentException("The length of the arrays was not equal.");
+        }
+        if (!JSLRandom.isValidCDF(cdf)) {
+            throw new IllegalArgumentException("The cdf array does not represent a valid cdf");
+        }
+        double[] pairs = new double[cdf.length * 2];
+        for (int i = 0; i < cdf.length; i++) {
+            pairs[2 * i] = values[i];
+            pairs[2 * i + 1] = cdf[i];
+        }
+        return pairs;
+    }
+
     @Override
     public final DEmpiricalCDF newInstance() {
-        return (new DEmpiricalCDF(getParameters()));
-    }
-
-    /**
-     * Returns a new instance of the random source with the same parameters
-     * with the supplied RngIfc
-     *
-     * @param rng
-     * @return
-     */
-    @Override
-    public final DEmpiricalCDF newInstance(RNStreamIfc rng) {
-        return (new DEmpiricalCDF(getParameters(), rng));
-    }
-
-    /**
-     * Returns a new instance that will supply values based
-     * on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final DEmpiricalCDF newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
+        double[] pairs = getParameters();
+        double[][] splitPairs = splitPairs(pairs);
+        return (new DEmpiricalCDF(splitPairs[0], splitPairs[1]));
     }
 
     @Override
@@ -256,8 +261,8 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * distribution
      *
      * @param p The probability to be evaluated for the inverse, p must be [0,1]
-     * or
-     * an IllegalArgumentException is thrown
+     *          or
+     *          an IllegalArgumentException is thrown
      * @return The inverse cdf evaluated at p
      */
     @Override
@@ -286,7 +291,7 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
      * as the input parameters.
      *
      * @param parameters an array of doubles representing the parameters for
-     * the distribution
+     *                   the distribution
      */
     @Override
     public final void setParameters(double[] parameters) {
@@ -331,37 +336,6 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
         return (param);
     }
 
-    /**
-     * Gets the PMF parameters for a DEmpiricalPMF distribution
-     *
-     * @return Returns an array of the parameters for the distribution
-     */
-    public double[] getPMFParameters() {
-        int n = 2 * myProbabilityPoints.size();
-        double[] param = new double[n];
-
-        int i = 0;
-        ProbPoint p;
-        ListIterator<ProbPoint> iter = myProbabilityPoints.listIterator();
-        while (iter.hasNext()) {
-            p = (ProbPoint) iter.next();
-            param[i] = p.value;
-            param[i + 1] = p.probability;
-            i = i + 2;
-        }
-
-        return (param);
-    }
-
-    /**
-     * Creates a DEmpiricalPMF based on the DEmpiricalCDF
-     *
-     * @return
-     */
-    public DEmpiricalPMF createDEmpiricalPMF() {
-        return new DEmpiricalPMF(getPMFParameters());
-    }
-
     private final class ProbPoint {
 
         private double value;
@@ -388,9 +362,9 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
     public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
         double[] values = new double[myProbabilityPoints.size()];
         double[] cdf = new double[myProbabilityPoints.size()];
-        int i= 0;
-        for(ProbPoint probPoint: myProbabilityPoints){
-            values[i]= probPoint.value;
+        int i = 0;
+        for (ProbPoint probPoint : myProbabilityPoints) {
+            values[i] = probPoint.value;
             cdf[i] = probPoint.cumProb;
             i++;
         }
@@ -398,9 +372,11 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
     }
 
     public static void main(String args[]) {
-        double[] pm = {1.0, 1.0 / 6.0, 2.0, 3.0 / 6.0, 3.0, 5.0 / 6.0, 4.0, 1.0};
+        double[] values = {1.0, 2.0, 3.0, 4.0};
+        double[] cdf = {1.0 / 6.0, 3.0 / 6.0, 5.0 / 6.0, 1.0};
 
-        DEmpiricalCDF n2 = new DEmpiricalCDF(pm);
+        DEmpiricalCDF n2 = new DEmpiricalCDF(values, cdf);
+        RVariableIfc rv2 = n2.getRandomVariable();
 
         System.out.println("mean = " + n2.getMean());
         System.out.println("var = " + n2.getVariance());
@@ -408,19 +384,21 @@ public class DEmpiricalCDF extends Distribution implements DiscreteDistributionI
         System.out.println(n2);
 
         for (int i = 1; i <= 10; i++) {
-            System.out.println("x(" + i + ")= " + n2.getValue());
+            System.out.println("x(" + i + ")= " + rv2.getValue());
         }
 
-        double[] pp = {1.0, 0.7, 2.0, 0.8, 4.0, 0.9, 5.0, 1.0};
-        DEmpiricalCDF d = new DEmpiricalCDF(pp);
+        values = new double[]{1.0, 2.0, 4.0, 5.0};
+        cdf = new double[] {0.7, 0.8, 0.9, 1.0};
 
+        DEmpiricalCDF d = new DEmpiricalCDF(values, cdf);
+        RVariableIfc rvd = d.getRandomVariable();
         System.out.println("mean = " + d.getMean());
         System.out.println("var = " + d.getVariance());
         System.out.println("pmf");
         System.out.println(d);
 
         for (int i = 1; i <= 5; i++) {
-            System.out.println("x(" + i + ")= " + d.getValue());
+            System.out.println("x(" + i + ")= " + rvd.getValue());
         }
 
         System.out.println();

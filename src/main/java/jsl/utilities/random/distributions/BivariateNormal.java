@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Allows for the generation of bivariate normal
@@ -25,7 +25,7 @@ import jsl.utilities.random.rng.RNStreamIfc;
  *
  * @author rossetti
  */
-public class BivariateNormal implements RandomStreamIfc, ParametersIfc {
+public class BivariateNormal implements RNStreamControlIfc, ParametersIfc {
 
     protected RNStreamIfc myRNG;
 

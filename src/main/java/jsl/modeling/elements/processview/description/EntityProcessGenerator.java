@@ -17,11 +17,10 @@ package jsl.modeling.elements.processview.description;
 
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
-import jsl.modeling.elements.resource.EntityGenerator;
-import jsl.modeling.elements.EventGenerator;
-import jsl.modeling.elements.resource.Entity;
-import jsl.modeling.elements.resource.EntityType;
-import jsl.modeling.elements.resource.NoEntityTypeSpecifiedException;
+import jsl.modeling.elements.entity.EntityGenerator;
+import jsl.modeling.elements.entity.Entity;
+import jsl.modeling.elements.entity.EntityType;
+import jsl.modeling.elements.entity.NoEntityTypeSpecifiedException;
 import jsl.utilities.random.RandomIfc;
 
 /**

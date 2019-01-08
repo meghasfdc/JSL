@@ -16,18 +16,15 @@
 package ex.models;
 
 import jsl.modeling.*;
-import jsl.modeling.queue.QObject;
-import jsl.modeling.queue.Queue;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.jsldbsrc.tables.records.WithinRepViewRecord;
-import jsl.utilities.reporting.JSLDatabase;
-import jsl.utilities.random.distributions.Exponential;
+import jsl.modeling.queue.QObject;
+import jsl.modeling.queue.Queue;
 import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.reporting.JSLDatabase;
 import jsl.utilities.statistic.MultipleComparisonAnalyzer;
-import org.jooq.Record5;
-import org.jooq.Result;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -47,11 +44,12 @@ public class DriveThroughPharmacy extends SchedulingElement {
     private EndServiceEventAction myEndServiceEventAction;
 
     public DriveThroughPharmacy(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1,
+                new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DriveThroughPharmacy(ModelElement parent, int numServers) {
-        this(parent, numServers, new Exponential(1.0), new Exponential(0.5));
+        this(parent, numServers, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DriveThroughPharmacy(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
@@ -187,8 +185,8 @@ public class DriveThroughPharmacy extends SchedulingElement {
 
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy dtp = new DriveThroughPharmacy(m, numServers);
-        dtp.setArrivalRS(new Exponential(6.0));
-        dtp.setServiceRS(new Exponential(3.0));
+        dtp.setArrivalRS(new ExponentialRV(6.0));
+        dtp.setServiceRS(new ExponentialRV(3.0));
         //m.turnOnTimeIntervalCollection(100);
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

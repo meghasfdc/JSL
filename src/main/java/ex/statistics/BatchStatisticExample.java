@@ -21,6 +21,7 @@
 package ex.statistics;
 
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.statistic.BatchStatistic;
 import jsl.utilities.statistic.Statistic;
 
@@ -35,7 +36,7 @@ public class BatchStatisticExample {
      */
     public static void main(String args[]) {
 
-        Exponential d = new Exponential(2);
+        ExponentialRV d = new ExponentialRV(2);
 
         // number of observations
         int n = 1000; 

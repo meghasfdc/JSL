@@ -15,20 +15,15 @@
  */
 package jsl.modeling.elements.component;
 
+import jsl.modeling.*;
+import jsl.modeling.IllegalStateException;
+import jsl.modeling.elements.variable.RandomVariable;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.reporting.JSL;
+
 import java.util.LinkedList;
 import java.util.List;
-
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.IllegalStateException;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.ModelElement;
-import jsl.modeling.ModelElementState;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.StateAccessorIfc;
-import jsl.modeling.elements.variable.RandomVariable;
-import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.reporting.JSL;
 
 public class Component extends SchedulingElement {
 
@@ -56,7 +51,7 @@ public class Component extends SchedulingElement {
     /** A distribution governing the time associated with operating
      *  the component
      */
-    protected RandomIfc myOperationTimeCDF;
+    protected RVariableIfc myOperationTimeCDF;
 
     /** If the component has been scheduled to operate this
      *  event represents the end of the operation time
@@ -77,7 +72,7 @@ public class Component extends SchedulingElement {
 
     /** A CDF governing the amount of time to failure when a failure event has been scheduled
      */
-    protected RandomIfc myTimeToFailureCDF;
+    protected RVariableIfc myTimeToFailureCDF;
 
     /** If the component has been scheduled to fail this
      *  event represents the end of the time to failure
@@ -99,7 +94,7 @@ public class Component extends SchedulingElement {
 
     /** Governs the RV representing the amount of time to repair the component
      */
-    protected RandomIfc myRepairTimeCDF;
+    protected RVariableIfc myRepairTimeCDF;
 
     /** Represents the amount of time to repair the component
      */
@@ -223,7 +218,7 @@ public class Component extends SchedulingElement {
      * @param timeToFailureCDF The time to failure CDF
      * @param name The name of the component
      */
-    public Component(ModelElement parent, RandomIfc timeToFailureCDF, String name) {
+    public Component(ModelElement parent, RVariableIfc timeToFailureCDF, String name) {
         this(parent, timeToFailureCDF, null, null, name);
     }
 
@@ -236,7 +231,7 @@ public class Component extends SchedulingElement {
      * @param operationTimeCDF The operation time CDF
      * @param name The name of the component
      */
-    public Component(ModelElement parent, RandomIfc timeToFailureCDF, RandomIfc operationTimeCDF, String name) {
+    public Component(ModelElement parent, RVariableIfc timeToFailureCDF, RVariableIfc operationTimeCDF, String name) {
         this(parent, timeToFailureCDF, operationTimeCDF, null, name);
     }
 
@@ -252,7 +247,7 @@ public class Component extends SchedulingElement {
      * @param operationTimeCDF The operation time CDF
      * @param repairTimeCDF The repair time CDF
      */
-    public Component(ModelElement parent, RandomIfc timeToFailureCDF, RandomIfc operationTimeCDF, RandomIfc repairTimeCDF) {
+    public Component(ModelElement parent, RVariableIfc timeToFailureCDF, RVariableIfc operationTimeCDF, RVariableIfc repairTimeCDF) {
         this(parent, timeToFailureCDF, operationTimeCDF, repairTimeCDF, null);
     }
 
@@ -269,24 +264,24 @@ public class Component extends SchedulingElement {
      * @param repairTimeCDF The repair time CDF
      * @param name The name of the component
      */
-    public Component(ModelElement parent, RandomIfc timeToFailureCDF, RandomIfc operationTimeCDF,
-            RandomIfc repairTimeCDF, String name) {
+    public Component(ModelElement parent, RVariableIfc timeToFailureCDF, RVariableIfc operationTimeCDF,
+                     RVariableIfc repairTimeCDF, String name) {
         super(parent, name);
 
         if (timeToFailureCDF == null) {
-            myTimeToFailureCDF = new Constant(Double.POSITIVE_INFINITY);
+            myTimeToFailureCDF = ConstantRV.POSITIVE_INFINITY;
         } else {
             myTimeToFailureCDF = timeToFailureCDF;
         }
 
         if (operationTimeCDF == null) {
-            myOperationTimeCDF = new Constant(0.0);
+            myOperationTimeCDF = ConstantRV.ZERO;
         } else {
             myOperationTimeCDF = operationTimeCDF;
         }
 
         if (repairTimeCDF == null) {
-            myRepairTimeCDF = new Constant(0.0);
+            myRepairTimeCDF = ConstantRV.ZERO;
         } else {
             myRepairTimeCDF = repairTimeCDF;
         }
@@ -502,7 +497,7 @@ public class Component extends SchedulingElement {
      *
      * @param distribution, must not be null
      */
-    public final void setTimeToFailureCDFInitialRandomSource(RandomIfc distribution) {
+    public final void setTimeToFailureCDFInitialRandomSource(RVariableIfc distribution) {
         if (distribution == null) {
             throw new IllegalArgumentException("The time to failure distribution was null!");
         }
@@ -514,7 +509,7 @@ public class Component extends SchedulingElement {
      *
      * @param distribution, must not be null
      */
-    public final void setOperationTimeCDFInitialRandomSource(RandomIfc distribution) {
+    public final void setOperationTimeCDFInitialRandomSource(RVariableIfc distribution) {
         if (distribution == null) {
             throw new IllegalArgumentException("The operation time distribution was null!");
         }
@@ -526,7 +521,7 @@ public class Component extends SchedulingElement {
      *
      * @param distribution, must not be null
      */
-    public final void setRepairTimeCDFInitialRandomSource(RandomIfc distribution) {
+    public final void setRepairTimeCDFInitialRandomSource(RVariableIfc distribution) {
         if (distribution == null) {
             throw new IllegalArgumentException("The repair time distribution was null!");
         }

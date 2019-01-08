@@ -28,6 +28,7 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
 import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 public class DTPFunctionalTest extends SchedulingElement {
 
@@ -42,7 +43,7 @@ public class DTPFunctionalTest extends SchedulingElement {
     private ResponseVariable mySysTime;
 
     public DTPFunctionalTest(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DTPFunctionalTest(ModelElement parent, int numServers, RandomIfc ad, RandomIfc sd) {
@@ -149,8 +150,8 @@ public class DTPFunctionalTest extends SchedulingElement {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DTPFunctionalTest driveThroughPharmacy = new DTPFunctionalTest(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);
         sim.setLengthOfReplication(20000.0);

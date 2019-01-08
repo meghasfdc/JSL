@@ -32,6 +32,7 @@ import jsl.modeling.resource.Request;
 import jsl.modeling.resource.RequestReactorAdapter;
 import jsl.modeling.resource.ResourceUnit;
 import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.JSL;
 import jsl.modeling.resource.RequestReactorIfc;
 import jsl.modeling.resource.ResourcePoolWithQ;
@@ -51,11 +52,11 @@ public class DTPQueueResourcePoolWithQModel extends SchedulingElement {
     private final RequestReactorIfc myRequestReactor = new RequestReactor();
 
     public DTPQueueResourcePoolWithQModel(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DTPQueueResourcePoolWithQModel(ModelElement parent, int numServers) {
-        this(parent, numServers, new Exponential(1.0), new Exponential(0.5));
+        this(parent, numServers, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
     public DTPQueueResourcePoolWithQModel(ModelElement parent, int numServers,
@@ -188,8 +189,8 @@ public class DTPQueueResourcePoolWithQModel extends SchedulingElement {
         // add DriveThroughPharmacy to the main model
         int numServers = 2;
         DTPQueueResourcePoolWithQModel dtp = new DTPQueueResourcePoolWithQModel(m, numServers);
-        dtp.setArrivalRS(new Exponential(6.0));
-        dtp.setServiceRS(new Exponential(3.0));
+        dtp.setArrivalRS(new ExponentialRV(6.0));
+        dtp.setServiceRS(new ExponentialRV(3.0));
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

@@ -24,6 +24,8 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElement;
 import jsl.modeling.queue.QObject;
 
+import java.util.List;
+
 /** This model element randomly selects a instance that implements 
  *  the ReceiveQObjectIfc and sends the QObject to the receiver
  *
@@ -32,12 +34,12 @@ import jsl.modeling.queue.QObject;
 public class NWayByChanceQObjectSender extends RandomElement<ReceiveQObjectIfc> 
         implements SendQObjectIfc {
 
-    public NWayByChanceQObjectSender(ModelElement parent) {
-        this(parent, null);
+    public NWayByChanceQObjectSender(ModelElement parent, List<ReceiveQObjectIfc> elements, double[] cdf) {
+        this(parent, elements, cdf,null);
     }
         
-    public NWayByChanceQObjectSender(ModelElement parent, String name) {
-        super(parent, name);
+    public NWayByChanceQObjectSender(ModelElement parent, List<ReceiveQObjectIfc> elements, double[] cdf, String name) {
+        super(parent, elements, cdf, name);
     }
     
     @Override

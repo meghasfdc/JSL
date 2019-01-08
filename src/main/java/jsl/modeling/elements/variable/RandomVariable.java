@@ -15,60 +15,50 @@
  */
 package jsl.modeling.elements.variable;
 
-import java.util.logging.Level;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
-import jsl.utilities.random.*;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamIfc;
-import jsl.utilities.reporting.*;
+import jsl.utilities.random.RandomIfc;
+import jsl.utilities.reporting.JSL;
 
-/** A random variable (RandomVariable) is a function that
- *  maps a probability space to a real number.    A random variable uses
- *  a RandomIfc to provide the underlying mapping to a real number
- *  via the getValue() method.
+/** A random variable (RandomVariable) is a function that maps a probability space to a real number.
+ *  A random variable uses a RandomIfc to provide the underlying mapping to a real number via the getValue() method.
  *  
- *  To construct a RandomVariable the user must provide an instance of
- *  a class that implements the RandomIfc interface as the initial random source.
- *  This source is used to initialize the source of randomness for each
- *  replication.  
+ *  To construct a RandomVariable the user must provide an instance of a class that implements the RandomIfc interface as the initial random source.
+ *  This source is used to initialize the source of randomness for each replication.
  *  
- *  WARNING:  For efficiency, this class uses the direct
- *  reference to the supplied random source.  Thus, a change to that instance
- *  will be reflected in the use of that instance in this class.  Thus, if
- *  the client changes, for example the parameters associated with the initial source instance,
- *  those parameter changes will be reflected in the use of the source by this class.
- *  This may result in replications not starting in exactly the same state.  Since
- *  the source of randomness during a replication will be the same as the initial source, because
- *  it is reset at the start of each replication, any changes to the initial source 
- *  during a replication will also be reflected in the replication. This may not be
- *  what the client intended; however, since it is unusual for a client to change
- *  the parameters of the initial source during a replication, the direct
- *  reference is utilized in order to save in the creation of extra object references.  
- *  To have this class use a separate instance of the supplied
- *  source with no dependence, call the constructor with initialSource.newInstance(), which will supply
- *  a duplicate of the source as a different object. Any changes to the initial source, will thus
- *  not be reflected in the use of this class.
+ *  WARNING:  For efficiency, this class uses a direct reference to the supplied initial random source.
+ *  It simply wraps the supplied object reference to a random source so that it can be utilized within
+ *  the JSL model.  Because of the direct reference to the random source, a change to the state of the
+ *  random source will be reflected in the use of that instance within this class.  Thus, mutating
+ *  the state of the  random source will also see those mutations reflected in the usage of this
+ *  class.  This may or not be what is expected by the client.  For example, mutating the state of
+ *  the initial random source during a replication may cause each replication to start with different initial
+ *  conditions.
+ *
+ *  Using the setRandomSource() method allows the user to change the source of randomness during a replication.
+ *  The source of randomness during a replication is set to the reference of the initial
+ *  random source at the beginning of each replication.  This ensures that each replication uses
+ *  the same random source during the replication. However, the user may call the setRandomSource() method
+ *  to immediately change the source of randomness during the replication.  This change is in effect only during
+ *  the current replication.  At the beginning of each replication, the source of randomness is set to
+ *  the reference to the initial random source.  This ensures that each replication uses the same random source.
+ *  For this reason, the use of setInitialRandomSource() should be limited to before or after
+ *  running a simulation experiment.
  *  
  *  The initial source is used to set up the source used during the replication.  If the
  *  client changes the reference to the initial source, this change does not become effective
  *  until the beginning of the next replication.  In other words, the random source used
- *  during the replication is unaffected. However, as previously noted, if the client only changes
- *  the parameters of the initial source, these will be reflected immediately.  
- *  
- *  The client may change the parameters of the source being used during a replication.
- *  If this occurs, those changes are immediately reflected within the current replication; however,
- *  those changes are discarded for the next replication since the initial source will be
- *  used to ensure that each replication starts with the same characteristics. However, since during 
- *  a replication the random source is the same as the initial random source (unless changed by
- *  setRandomSource()), changes to the parameters with this method will also
- *  change the *current* parameters of the initial random source. It will not change the parameters
- *  available when the initial random source was set, those original parameters will be
- *  used to reset the sources appropriately so that each replication starts with the same parameter
- *  settings.
+ *  during the replication is unaffected. However, the client might mutate the initial random source
+ *  during a replication.  If this occurs, those changes are immediately reflected within the current replication
+ *  and all subsequent replications.  Again, mutating the initial random source during a replication is
+ *  generally a bad idea unless you really know what you are doing.
+ *
+ *  Changing the initial random source between experiments is very common.  For example, to set up an experiment
+ *  that has different random characteristics the client can and should change the source of randomness
+ *  (either by mutating the random source or by supplying a reference to a different random source.
  *  
  */
-public class RandomVariable extends Variable implements RandomIfc, RandomElementIfc {
+public class RandomVariable extends ModelElement implements RandomIfc, RandomElementIfc {
 
     /** indicates whether or not the random variable's
      *  distribution has it stream reset to the default
@@ -103,33 +93,6 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
      */
     protected RandomIfc myInitialRandomSource;
 
-    /** The values of the parameters of the initial random source
-     *  These are remembered to allow the initial random source
-     *  to be reset to the initial parameters at the beginning of 
-     *  each replication (if they were changed during the replication)
-     * 
-     */
-    protected double[] myInitialParameters;
-
-    /** During a replication, the client may change the parameters of
-     *  the initial source.  This flag indicates whether or not
-     *  the original parameters of the initial source should be used
-     *  to reset the parameters of the initial source to the originals.
-     *  The default option is true (it will reset the parameters).
-     *  This is only applicable if the parameters of the source changes. 
-     *  If the reference to the initial source changes then the changed
-     *  reference will be used. 
-     * 
-     */
-    protected boolean myResetInitialParametersFlag = true;
-
-    /** If the parameters of the initial source were changed during the replication
-     *  and reset initial parameters flag is true, then a warning message will
-     *  occur.  This flag turns off that default warning message.
-     * 
-     */
-    protected boolean myResetInitialParametersWarningFlag = true;
-
     /**
      *  A flag to indicate whether or not a ResponseVariable should be created
      *  and used to capture the randomly generated values. Useful for control variate implementation
@@ -148,7 +111,7 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
      * @param initialSource The reference to the underlying source of randomness
      */
     public RandomVariable(ModelElement parent, RandomIfc initialSource) {
-        this(parent, initialSource, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, null);
+        this(parent, initialSource, null);
     }
 
     /** Constructs a RandomVariable given the supplied reference to the underlying source of randomness
@@ -159,63 +122,7 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
      * @param name A string to label the RandomVariable
      */
     public RandomVariable(ModelElement parent, RandomIfc initialSource, String name) {
-        this(parent, initialSource, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, name);
-    }
-
-    /** Constructs a RandomVariable given the supplied reference to the underlying source of randomness
-     * Throws a NullPointerException if the supplied randomness is null
-     *
-     * @param parent The parent ModelElement
-     * @param initialSource The reference to the underlying source of randomness
-     * @param lowerLimit the lower limit on the range for the variable, must be &lt; upperLimit
-     * @param upperLimit the upper limit on the range for the variable
-     */
-    public RandomVariable(ModelElement parent, RandomIfc initialSource, 
-            double lowerLimit, double upperLimit) {
-        this(parent, initialSource, Double.NaN, lowerLimit, upperLimit, null);
-    }
-
-    /** Constructs a RandomVariable given the supplied reference to the underlying source of randomness
-     * Throws a NullPointerException if the supplied randomness is null
-     *
-     * @param parent The parent ModelElement
-     * @param initialSource The reference to the underlying source of randomness
-     * @param lowerLimit the lower limit on the range for the variable, must be &lt; upperLimit
-     * @param upperLimit the upper limit on the range for the variable
-     * @param name A string to label the RandomVariable
-     */
-    public RandomVariable(ModelElement parent, RandomIfc initialSource, 
-            double lowerLimit, double upperLimit, String name) {
-        this(parent, initialSource, Double.NaN, lowerLimit, upperLimit, name);
-    }
-
-    /** Constructs a RandomVariable given the supplied reference to the underlying source of randomness
-     * Throws a NullPointerException if the supplied randomness is null
-     *
-     * @param parent The parent ModelElement
-     * @param initialSource The reference to the underlying source of randomness
-     * @param initialValue The initial value of the variable.  Must be within the range.
-     * @param lowerLimit the lower limit on the range for the variable, must be &lt; upperLimit
-     * @param upperLimit the upper limit on the range for the variable
-     */
-    public RandomVariable(ModelElement parent, RandomIfc initialSource, 
-            double initialValue, double lowerLimit, double upperLimit) {
-        this(parent, initialSource, Double.NaN, lowerLimit, upperLimit, null);
-    }
-
-    /** Constructs a RandomVariable given the supplied reference to the underlying source of randomness
-     * Throws a NullPointerException if the supplied randomness is null
-     *
-     * @param parent The parent ModelElement
-     * @param initialSource The reference to the underlying source of randomness
-     * @param initialValue The initial value of the variable.  Must be within the range.
-     * @param lowerLimit the lower limit on the range for the variable, must be &lt; upperLimit
-     * @param upperLimit the upper limit on the range for the variable
-     * @param name A string to label the RandomVariable
-     */
-    public RandomVariable(ModelElement parent, RandomIfc initialSource, 
-            double initialValue, double lowerLimit, double upperLimit, String name) {
-        super(parent, initialValue, lowerLimit, upperLimit, name);
+        super(parent, name);
         setInitialRandomSource(initialSource);
         myRandomSource = myInitialRandomSource;
         setWarmUpOption(false); // do not need to respond to warmup events
@@ -268,30 +175,9 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
         myRandomSource.resetStartSubstream();
     }
 
-    @Override
-    public final double[] getParameters() {
-        return myRandomSource.getParameters();
-    }
-
-    /** This changes the parameters of the random source being used during
-     *  the replication.  The initial random source and its original parameters are used
-     *  at the beginning of each replication to ensure that the same random
-     *  source is used to start each replication.  Since during a replication
-     *  the random source is the same as the initial random source (unless changed by
-     *  setRandomSource()), changes to the parameters with this method will also
-     *  change the parameters of the initial random source (with possible side effects to
-     *  any other objects that also use the initial random source).
-     *
-     * @see jsl.utilities.random.ParametersIfc#setParameters(double[])
-     */
-    @Override
-    public final void setParameters(double[] parameters) {
-        myRandomSource.setParameters(parameters);
-    }
-
-    /** Gets the underlying RandomIfc for the RandomVariable. This is the
+    /** Gets the underlying RVariableIfc for the RandomVariable. This is the
      *  source to which each replication will be initialized
-     * @return a RandomIfc
+     * @return a RVariableIfc
      */
     public final RandomIfc getInitialRandomSource() {
         return (myInitialRandomSource);
@@ -304,20 +190,20 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
      *  the reference returned by getRandomSource().  Please also see the 
      *  discussion in the class documentation.
      *  
-     *  WARNING: If this is used during a replication to change the characteristics of
-     *  the random source, then each replication will not necessarily start in the
-     *  same initial state.  It is recommended
-     *  that this be used only prior to executing experiments.
-     *  
-     * Throws NullPointerExceptions if source is null.
-     * @param source the reference to the random source
+     *  WARNING: If this is used during an experiment to change the characteristics of
+     *  the random source, then each replication may not necessarily start in the
+     *  same initial state.  It is recommended that this be used only prior to executing experiments.
+     *
+     * @param source the reference to the random source, must not be null
      */
     public final void setInitialRandomSource(RandomIfc source) {
         if (source == null) {
             throw new NullPointerException("RandomIfc source must be non-null");
         }
+        if (getSimulation().isRunning()){
+            JSL.LOGGER.warn("Changes the initial source of {} during a replication.", getName());
+        }
         myInitialRandomSource = source;
-        myInitialParameters = source.getParameters();
     }
 
     /**
@@ -338,40 +224,6 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
         return myCaptureResponseFlag;
     }
 
-    /** Returns whether the reset initial parameters flag is true/false
-     * 
-     * @return true if on
-     */
-    public final boolean getResetInitialParametersFlag() {
-        return myResetInitialParametersFlag;
-    }
-
-    /** Sets the option to reset initial parameters to original values
-     *  of the initial source
-     * 
-     * @param option true means on
-     */
-    public final void setResetInitialParametersFlag(boolean option) {
-        myResetInitialParametersFlag = option;
-    }
-
-    /** Returns whether the warning message is on 
-     * 
-     * @return true means on
-     */
-    public final boolean getResetInitialParametersWarningFlag() {
-        return myResetInitialParametersWarningFlag;
-    }
-
-    /** Sets the option have a warning message if resetting the initial parameters to original values
-     *  of the initial source
-     * 
-     * @param option true is on
-     */
-    public final void setResetInitialParametersWarningFlag(boolean option) {
-        myResetInitialParametersWarningFlag = option;
-    }
-
     /** Gets the underlying RandomIfc for the RandomVariable currently
      *  being used during the replication
      *  
@@ -390,9 +242,8 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
      *  
      *  To set the random source for the entire experiment (all replications)
      *  use the setInitialRandomSource() method
-     *  
-     * Throws NullPointerExceptions if source is null.
-     * @param source the reference to the random source
+     *
+     * @param source the reference to the random source, must not be null
      */
     public final void setRandomSource(RandomIfc source) {
         if (source == null) {
@@ -406,11 +257,11 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
      */
     @Override
     public double getValue() {
-        setValue(myRandomSource.getValue());
+        double value = myRandomSource.getValue();
         if (getCaptureResponseFlag()){
-            myResponse.setValue(myValue);
+            myResponse.setValue(value);
         }
-        return (myValue);
+        return (value);
     }
 
     /** Returns the sum of n random draws of the random variable
@@ -445,20 +296,6 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
     }
 
     @Override
-    public final RandomVariable newInstance() {
-        return newInstance(RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    @Override
-    public final RandomVariable newInstance(RNStreamIfc rng) {
-        double iv = this.getInitialValue();
-        double ll = this.getLowerLimit();
-        double ul = this.getUpperLimit();
-        RandomIfc r = this.getRandomSource().newInstance(rng);
-        return (new RandomVariable(getParentModelElement(), r, iv, ll, ul));
-    }
-
-    @Override
     public String asString(){
         StringBuilder sb = new StringBuilder();
         sb.append(toString());
@@ -470,7 +307,6 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
         super.removedFromModel();
         myRandomSource = null;
         myInitialRandomSource = null;
-        myInitialParameters = null;
     }
 
     /** before any replications reset the underlying random number generator to the
@@ -480,13 +316,10 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
     @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
-        myInitialParameters = myInitialRandomSource.getParameters();
         myRandomSource = myInitialRandomSource;
-
         if (getResetStartStreamOption()) {
             resetStartStream();
         }
-
     }
 
     /** after each replication reset the underlying random number generator to the next
@@ -502,29 +335,6 @@ public class RandomVariable extends Variable implements RandomIfc, RandomElement
             // make sure that the random source is the same
             // as the initial random source for the next replication
             myRandomSource = myInitialRandomSource;
-        } else {
-            // the random source and the initial random source
-            // object references are the same, however, the client
-            // might have changed the parameters during the replication
-            boolean changed = false;
-            double[] current = myRandomSource.getParameters();
-            for (int i = 0; i < current.length; i++) {
-                if (current[i] != myInitialParameters[i]) {
-                    changed = true;
-                    break;
-                }
-            }
-
-            if (changed) {
-                // reset the parameters, and indicate warning
-                if (myResetInitialParametersFlag) {
-                    myInitialRandomSource.setParameters(myInitialParameters);
-                    if (myResetInitialParametersWarningFlag) {
-                        JSL.LOGGER.warn("The parameters for the random source of {0} were changed during the replication", getName());
-                        JSL.LOGGER.warn("The parameters were reset to the values available from the last call to setInitialRandomSource() for the next replication.");
-                    }
-                }
-            }
         }
 
         if (getResetNextSubStreamOption()) {

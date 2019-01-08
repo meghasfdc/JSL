@@ -15,20 +15,21 @@
  */
 package jsl.modeling.elements.station;
 
-import java.util.Optional;
 import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
+import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
-import jsl.modeling.queue.QueueListenerIfc;
-import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.modeling.queue.Queue.Discipline;
+import jsl.modeling.queue.QueueListenerIfc;
 import jsl.modeling.queue.QueueResponse;
 import jsl.utilities.GetValueIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.WeightedStatisticIfc;
+
+import java.util.Optional;
 
 /**
  * Models a service station with a resource that has a single queue to hold
@@ -57,7 +58,7 @@ public class SingleQueueStation extends Station {
      * @param parent
      */
     public SingleQueueStation(ModelElement parent) {
-        this(parent, null, Constant.ZERO, null, null);
+        this(parent, null, ConstantRV.ZERO, null, null);
     }
 
     /**
@@ -77,7 +78,7 @@ public class SingleQueueStation extends Station {
      * @param name
      */
     public SingleQueueStation(ModelElement parent, String name) {
-        this(parent, null, Constant.ZERO, null, name);
+        this(parent, null, ConstantRV.ZERO, null, name);
     }
 
     /**
@@ -279,7 +280,7 @@ public class SingleQueueStation extends Station {
      */
     public final void setServiceTime(GetValueIfc st) {
         if (st == null) {
-            st = Constant.ZERO;
+            st = ConstantRV.ZERO;
         }
         myServiceTime = st;
     }

@@ -20,6 +20,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  *
@@ -111,8 +112,9 @@ public class NHPPTimeBtwEventRV extends RandomVariable {
      * @param lastRate the last rate
      * @param name the name
      */
-    public NHPPTimeBtwEventRV(ModelElement parent, InvertibleCumulativeRateFunctionIfc rateFunction, double lastRate, String name) {
-        super(parent, new Exponential(), name);
+    public NHPPTimeBtwEventRV(ModelElement parent, InvertibleCumulativeRateFunctionIfc rateFunction,
+                              double lastRate, String name) {
+        super(parent, new ExponentialRV(1.0), name);
 
         setRateFunction(rateFunction);
 
@@ -129,7 +131,7 @@ public class NHPPTimeBtwEventRV extends RandomVariable {
             myRepeatFlag = false;
         }
 
-        this.setResetInitialParametersWarningFlag(false);
+        //TODO ? this.setResetInitialParametersWarningFlag(false);
         if (myRepeatFlag == true) {
             myCycle = new EndOfCycle(this);
             myCycleLength = myRateFunction.getTimeRangeUpperLimit() - myRateFunction.getTimeRangeLowerLimit();

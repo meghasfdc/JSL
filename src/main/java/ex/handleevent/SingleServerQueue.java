@@ -25,6 +25,7 @@ import jsl.modeling.queue.*;
 import jsl.modeling.elements.variable.*;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.welch.WelchDataCollector;
 import jsl.utilities.welch.WelchDataCollectorTW;
 
@@ -47,8 +48,8 @@ public class SingleServerQueue extends SchedulingElement {
     public SingleServerQueue(ModelElement parent) {
         super(parent);
         myQueue1 = new Queue(this, getName() + " Queue1");
-        myTBA = new RandomVariable(this, new Exponential(1));
-        myServiceTime1 = new RandomVariable(this, new Exponential(0.7));
+        myTBA = new RandomVariable(this, new ExponentialRV(1));
+        myServiceTime1 = new RandomVariable(this, new ExponentialRV(0.7));
         myServer1State = new TimeWeighted(this, 0.0, " Server Utilization");
         mySystemTime = new ResponseVariable(this, "System Time");
         // collect welch data on queue

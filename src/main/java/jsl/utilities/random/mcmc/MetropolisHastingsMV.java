@@ -20,7 +20,7 @@ import jsl.observers.ObservableComponent;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.statistic.Statistic;
 
@@ -33,7 +33,7 @@ import java.util.List;
  *  An implementation for a multi-Dimensional Metropolis Hasting process. The
  *  process is observable at each step
  */
-public class MetropolisHastingsMV implements RandomStreamIfc, ObservableIfc {
+public class MetropolisHastingsMV implements RNStreamControlIfc, ObservableIfc {
 
     protected double[] myCurrentX;
 
@@ -64,7 +64,7 @@ public class MetropolisHastingsMV implements RandomStreamIfc, ObservableIfc {
     protected boolean myBurnInFlag;
 
     /**
-     * myRNG provides a reference to the underlying stream of random numbers
+     * myRNStream provides a reference to the underlying stream of random numbers
      */
     protected RNStreamIfc myRNG;
 

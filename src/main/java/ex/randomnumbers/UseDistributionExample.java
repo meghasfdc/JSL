@@ -27,6 +27,8 @@ import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.distributions.Uniform;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  *
@@ -35,6 +37,8 @@ import jsl.utilities.random.rng.RNStreamIfc;
 public class UseDistributionExample {
 
     public static void main(String[] args) {
+
+        //create the distributions
         // make and use a Uniform(a, b) distribution
         Uniform uDF = new Uniform(10.0, 20.0);
         // make and use a DUniform(a, b) distribution
@@ -45,26 +49,33 @@ public class UseDistributionExample {
         Normal nDF = new Normal(20, 5.0);
         System.out.printf("%10s %10s %10s %10s %10s\n", "i", "u",
                 "du", "bn", "n");
+
+        // make random variables based on the distributions
+        RVariableIfc urv = uDF.getRandomVariable();
+        RVariableIfc drv = duDF.getRandomVariable();
+        RVariableIfc brv = bnDF.getRandomVariable();
+        RVariableIfc nrv = nDF.getRandomVariable();
+
         for (int i = 1; i <= 5; i++) {
-            double u = uDF.getValue();
-            double du = duDF.getValue();
-            double bn = bnDF.getValue();
-            double n = nDF.getValue();
+            double u = urv.getValue();
+            double du = drv.getValue();
+            double bn = brv.getValue();
+            double n = nrv.getValue();
             System.out.printf("%10d %10.4f %10.1f %10.1f %10.3f\n", i, u,
                     du, bn, n);
         }
 
         // reset some streams and run again
-        bnDF.resetStartStream();
-        nDF.resetStartStream();
+        brv.resetStartStream();
+        nrv.resetStartStream();
         System.out.println();
         System.out.printf("%10s %10s %10s %10s %10s\n", "i", "u",
                 "du", "bn", "n");
         for (int i = 1; i <= 5; i++) {
-            double u = uDF.getValue();
-            double du = duDF.getValue();
-            double bn = bnDF.getValue();
-            double n = nDF.getValue();
+            double u = urv.getValue();
+            double du = drv.getValue();
+            double bn = brv.getValue();
+            double n = nrv.getValue();
             System.out.printf("%10d %10.4f %10.1f %10.1f %10.3f\n", i, u,
                     du, bn, n);
         }
@@ -78,9 +89,13 @@ public class UseDistributionExample {
         uDF.setParameters(param);
         System.out.println();
         System.out.printf("%10s %10s %10s\n", "i", "u", "n");
+
+        // get new random variables based on the changed distributions
+        urv = uDF.getRandomVariable();
+        nrv = nDF.getRandomVariable();
         for (int i = 1; i <= 5; i++) {
-            double u = uDF.getValue();
-            double n = nDF.getValue();
+            double u = urv.getValue();
+            double n = nrv.getValue();
             System.out.printf("%10d %10.3f %10.3f\n", i, u, n);
         }
 
@@ -107,10 +122,11 @@ public class UseDistributionExample {
             double u2 = f2s1.randU01();
             System.out.printf("%10d %10.3f %10.3f %10.3f\n", i, u1, u2, u1+u2);
         }
-        
+
+        // just directly make random variables based on the streams
         // set up the normals to use the antithetics
-        Normal n1 = new Normal(20, 4, f1s1);
-        Normal n2 = new Normal(20, 4, f2s1);
+        NormalRV n1 = new NormalRV(20, 4, f1s1);
+        NormalRV n2 = new NormalRV(20, 4, f2s1);
         System.out.println();
         System.out.printf("%10s %10s %10s\n", "i", "n1", "n2");
         for (int i = 1; i <= 10; i++) {

@@ -16,14 +16,12 @@
 
 package jsl.utilities.random.arta;
 
-import java.util.TimerTask;
-
 import jsl.utilities.Interval;
 import jsl.utilities.math.FunctionIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.PoissonRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.rootfinding.StochasticApproximationRootFinder;
-import jsl.utilities.random.distributions.Distribution;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Poisson;
 
 /**
  * @author rossetti
@@ -60,7 +58,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	/**
 	 * @param distribution
 	 */
-	public ARTACorrelationFinder(Distribution distribution) {
+	public ARTACorrelationFinder(RVariableIfc distribution) {
 		this(distribution, 0.0, 1000, 1, false);
 	}
 
@@ -68,7 +66,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	 * @param distribution
 	 * @param lag1
 	 */
-	public ARTACorrelationFinder(Distribution distribution, double lag1) {
+	public ARTACorrelationFinder(RVariableIfc distribution, double lag1) {
 		this(distribution, lag1, 1000, 1, false);
 	}
 
@@ -77,7 +75,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	 * @param lag1
 	 * @param sampleSize
 	 */
-	public ARTACorrelationFinder(Distribution distribution, double lag1, int sampleSize) {
+	public ARTACorrelationFinder(RVariableIfc distribution, double lag1, int sampleSize) {
 		this(distribution, lag1, sampleSize, 1, false);
 	}
 
@@ -87,7 +85,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	 * @param sampleSize
 	 * @param numReps
 	 */
-	public ARTACorrelationFinder(Distribution distribution, double lag1, int sampleSize, int numReps) {
+	public ARTACorrelationFinder(RVariableIfc distribution, double lag1, int sampleSize, int numReps) {
 		this(distribution, lag1, sampleSize, numReps, false);
 	}
 
@@ -98,7 +96,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	 * @param numReps
 	 * @param antitheticFlag
 	 */
-	public ARTACorrelationFinder(Distribution distribution, double lag1, int sampleSize, int numReps, boolean antitheticFlag) {
+	public ARTACorrelationFinder(RVariableIfc distribution, double lag1, int sampleSize, int numReps, boolean antitheticFlag) {
 		super(distribution, lag1, sampleSize, numReps, antitheticFlag);
 		
 	}
@@ -250,7 +248,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	}
 	
 	public static void test1(){
-		Distribution d = new Exponential();
+		RVariableIfc d = new ExponentialRV(1.0);
 		double lag1 = 0.8;
 		int n = 10000;
 		int r = 10;
@@ -286,7 +284,7 @@ public class ARTACorrelationFinder extends ARTACorrelationEvaluator {
 	}
 	
 	public static void test2(){
-		Distribution d = new Poisson(6.64);
+		RVariableIfc d = new PoissonRV(6.64);
 		double lag1 = 0.027688858576956063;
 		int n = 1000;
 		int r = 1;

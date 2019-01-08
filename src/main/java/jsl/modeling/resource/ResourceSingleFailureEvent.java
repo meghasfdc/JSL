@@ -24,7 +24,7 @@ import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.VConstant;
+import jsl.utilities.random.rvariable.VConstantRV;
 import jsl.utilities.reporting.JSL;
 
 import java.util.Collection;
@@ -47,7 +47,7 @@ public class ResourceSingleFailureEvent extends SchedulingElement {
     private boolean myStoppedFlag;
     private boolean mySuspendedFlag;
     private double myTimeToEvent;
-    private final VConstant myEventDuration;
+    private final VConstantRV myEventDuration;
     private final Set<FailureEventListenerIfc> myFailureEventListeners;
     private JSLEvent myStartEvent;
     private JSLEvent myEndEvent;
@@ -73,7 +73,7 @@ public class ResourceSingleFailureEvent extends SchedulingElement {
                                       RandomIfc initialStartTimeRV, String name) {
         super(parent, name);
         myEventDurationRV = new RandomVariable(this, eventDuration, getName() + ":EventDuration");
-        myEventDuration = new VConstant(0.0);
+        myEventDuration = new VConstantRV(0.0);
         if (initialStartTimeRV != null) {
             myInitialStartTimeRV = new RandomVariable(this, initialStartTimeRV, getName() + ":InitialStartTime");
         }

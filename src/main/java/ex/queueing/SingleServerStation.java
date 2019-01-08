@@ -15,18 +15,20 @@
  */
 package ex.queueing;
 
-import java.util.Optional;
 import jsl.modeling.EventActionIfc;
 import jsl.modeling.JSLEvent;
 import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
-import jsl.modeling.queue.*;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.observers.ObserverIfc;
-import jsl.utilities.random.*;
-import jsl.utilities.random.distributions.Constant;
+import jsl.modeling.queue.QObject;
+import jsl.modeling.queue.Queue;
+import jsl.modeling.queue.QueueResponse;
+import jsl.utilities.random.RandomIfc;
+import jsl.utilities.random.rvariable.ConstantRV;
+
+import java.util.Optional;
 
 /**
  */
@@ -56,7 +58,7 @@ public class SingleServerStation extends SchedulingElement {
 
     public SingleServerStation(ModelElement parent, FastFoodRestaurant restaurant, String name) {
         super(parent, name);
-        setServiceDistributionInitialRandomSource(Constant.ONE);
+        setServiceDistributionInitialRandomSource(ConstantRV.ONE);
         myFastFoodRestaurant = restaurant;
         myQueue = new Queue(this, getName() + " Queue");
         myServerStatus = new TimeWeighted(this, getName() + " Server");

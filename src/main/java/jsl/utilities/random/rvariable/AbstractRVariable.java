@@ -32,26 +32,26 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
     private double myPrevValue;
 
     /**
-     * myRNG provides a reference to the underlying stream of random numbers
+     * myRNStream provides a reference to the underlying stream of random numbers
      */
-    protected final RNStreamIfc myRNG;
+    protected RNStreamIfc myRNStream;
 
     /**
      *
-     * @param rng the source of the randomness
+     * @param stream the source of the randomness
      * @throws NullPointerException if rng is null
      *
      */
-    public AbstractRVariable(RNStreamIfc rng) {
+    public AbstractRVariable(RNStreamIfc stream) {
+        myRNStream = Objects.requireNonNull(stream,"RNStreamIfc stream must be non-null" );
         myIdentity = new Identity();
-        myRNG = Objects.requireNonNull(rng,"RngIfc rng must be non-null" );
         myPrevValue = Double.NaN;
     }
 
     /** Makes a new instance.  False allows the new instance to keep using
      * the same underlying source of random numbers.
      *
-     * @param newRNG true mean use new stream. This is same as newInstance(). False
+     * @param newRNG true means use new stream. This is same as newInstance(). False
      *               means clone uses same underlying source of randomness
      * @return a new instance configured based on current instance
      */
@@ -59,7 +59,7 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
         if (newRNG){
             return newInstance();
         } else {
-            return newInstance(this.myRNG);
+            return newInstance(this.myRNStream);
         }
     }
 
@@ -113,31 +113,44 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
 
     @Override
     public final RVariableIfc newAntitheticInstance() {
-        return newInstance(myRNG.newAntitheticInstance());
+        return newInstance(myRNStream.newAntitheticInstance());
     }
 
     @Override
     public final void resetStartStream() {
-        myRNG.resetStartStream();
+        myRNStream.resetStartStream();
     }
 
     @Override
     public final void resetStartSubstream() {
-        myRNG.resetStartSubstream();
+        myRNStream.resetStartSubstream();
     }
 
     @Override
     public final void advanceToNextSubstream() {
-        myRNG.advanceToNextSubstream();
+        myRNStream.advanceToNextSubstream();
     }
 
     @Override
     public final void setAntitheticOption(boolean flag) {
-        myRNG.setAntitheticOption(flag);
+        myRNStream.setAntitheticOption(flag);
     }
 
     @Override
     public final boolean getAntitheticOption() {
-        return myRNG.getAntitheticOption();
+        return myRNStream.getAntitheticOption();
+    }
+
+    @Override
+    public final RNStreamIfc getRandomNumberStream() {
+        return (myRNStream);
+    }
+
+    @Override
+    public final void setRandomNumberStream(RNStreamIfc stream) {
+        if (stream == null) {
+            throw new NullPointerException("RngIfc rng must be non-null");
+        }
+        myRNStream = stream;
     }
 }

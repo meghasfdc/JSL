@@ -15,117 +15,70 @@
  */
 package jsl.utilities.random.robj;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import jsl.utilities.random.distributions.DEmpiricalPMF;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 public class DEmpiricalList<T> implements RElementIfc<T> {
 
-    protected List<T> myElements;
+    protected final List<T> myElements;
 
-    protected DEmpiricalPMF myPDF;
+    protected final double[] myCDF;
 
-    public DEmpiricalList() {
-        this(RNStreamFactory.getDefaultFactory().getStream());
+    protected final RNStreamIfc myRNG;
+
+    public DEmpiricalList(List<T> elements, double[] cdf) {
+        this(elements, cdf, RNStreamFactory.getDefaultFactory().getStream());
     }
 
-    public DEmpiricalList(RNStreamIfc rng) {
-        super();
-        myElements = new ArrayList<T>();
-        myPDF = new DEmpiricalPMF(rng);
-    }
-
-    public DEmpiricalList(List<T> elements, double[] prob, RNStreamIfc rng) {
-        this(rng);
+    public DEmpiricalList(List<T> elements, double[] cdf, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The RNStreamIfc was null");
         if (elements == null) {
             throw new IllegalArgumentException("The list of elements was null");
         }
-        if (prob == null) {
+        if (cdf == null) {
             throw new IllegalArgumentException("The list of probabilities was null");
         }
-        if (elements.size() < prob.length) {
+        if (elements.size() < cdf.length) {
             throw new IllegalArgumentException("The number of objects was less than the number of probabilities.");
         }
-
-        // the array has n=length elements
-        // with index from 0 to n-1
-        for (int i = 0; i <= prob.length - 2; i++) {
-            T obj = elements.get(i);
-            add(obj, prob[i]);
-        }
-
-        T obj = elements.get(prob.length - 1);
-        addLast(obj);
-    }
-
-    public void add(T obj, double p) {
-
-        if (myElements.contains(obj)) {
-            throw new IllegalArgumentException("Already in the set");
-        }
-
-        myElements.add(obj);
-        myPDF.addProbabilityPoint(myElements.indexOf(obj), p);
-    }
-
-    public void addLast(T obj) {
-        if (myElements.contains(obj)) {
-            throw new IllegalArgumentException("Already in the set");
-        }
-
-        myElements.add(obj);
-        myPDF.addLastProbabilityPoint(myElements.indexOf(obj));
+        myElements = new ArrayList<T>(elements);
+        myCDF = Arrays.copyOf(cdf, cdf.length);
+        myRNG = rng;
 
     }
 
     @Override
     public T getRandomElement() {
-        int i = (int) myPDF.getValue();
-        return (myElements.get(i));
+        return JSLRandom.randomlySelect(myElements, myCDF, myRNG);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.RandomListIfc#resetNextSubstream()
-     */
     @Override
     public void advanceToNextSubstream() {
-        myPDF.advanceToNextSubstream();
+        myRNG.advanceToNextSubstream();
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.RandomListIfc#resetStartStream()
-     */
     @Override
     public void resetStartStream() {
-        myPDF.resetStartStream();
+        myRNG.resetStartStream();
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.RandomListIfc#resetStartSubstream()
-     */
     @Override
     public void resetStartSubstream() {
-        myPDF.resetStartSubstream();
+        myRNG.resetStartSubstream();
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.RandomListIfc#setAntithetic(boolean)
-     */
     @Override
     public void setAntitheticOption(boolean flag) {
-        myPDF.setAntitheticOption(flag);
+        myRNG.setAntitheticOption(flag);
     }
 
     @Override
     public final boolean getAntitheticOption() {
-        return myPDF.getAntitheticOption();
+        return myRNG.getAntitheticOption();
     }
 
     /* (non-Javadoc)
@@ -172,11 +125,9 @@ public class DEmpiricalList<T> implements RElementIfc<T> {
 
     public static void main(String[] args) {
 
-        DEmpiricalList<String> originSet = new DEmpiricalList<String>();
+        List<String> cities = Arrays.asList("KC", "CH", "NY");
 
-        originSet.add("KC", 0.4);
-        originSet.add("CH", 0.4);
-        originSet.addLast("NY");
+        DEmpiricalList<String> originSet = new DEmpiricalList<String>(cities, new double[] {0.4, 0.8, 1.0});
 
         for (int i = 1; i <= 10; i++) {
             System.out.println(originSet.getRandomElement());
@@ -184,24 +135,21 @@ public class DEmpiricalList<T> implements RElementIfc<T> {
 
         Map<String, DEmpiricalList<String>> od = new HashMap<String, DEmpiricalList<String>>();
 
-        DEmpiricalList<String> kcdset = new DEmpiricalList<String>();
+        DEmpiricalList<String> kcdset = new DEmpiricalList<String>(
+                Arrays.asList("CO", "AT", "NY"),
+                new double[] {0.2, 0.6, 1.0}
+        );
 
-        kcdset.add("CO", 0.2);
-        kcdset.add("AT", 0.4);
-        kcdset.addLast("NY");
+        DEmpiricalList<String> chdset = new DEmpiricalList<String>(
+                Arrays.asList("AT", "NY", "KC"),
+                new double[] {0.2, 0.6, 1.0}
+        );
 
-        DEmpiricalList<String> chdset = new DEmpiricalList<String>();
-
-        chdset.add("AT", 0.2);
-        chdset.add("NY", 0.4);
-        chdset.addLast("KC");
-
-        DEmpiricalList<String> nydset = new DEmpiricalList<String>();
-
-        nydset.add("AT", 0.2);
-        nydset.add("KC", 0.4);
-        nydset.addLast("CH");
-
+        DEmpiricalList<String> nydset = new DEmpiricalList<String>(
+                Arrays.asList("AT", "KC", "CH"),
+                new double[] {0.2, 0.6, 1.0}
+        );
+        
         od.put("KC", kcdset);
         od.put("CH", chdset);
         od.put("NY", nydset);

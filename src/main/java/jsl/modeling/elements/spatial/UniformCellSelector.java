@@ -19,6 +19,7 @@ import java.util.List;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  *
@@ -34,7 +35,7 @@ public class UniformCellSelector extends ModelElement implements RectangularCell
 
     public UniformCellSelector(ModelElement parent, String name) {
         super(parent, name);
-        myRV = new RandomVariable(this, new Uniform());
+        myRV = new RandomVariable(this, new UniformRV(0.0, 1.0));
     }
 
     /** Randomly generates an integer between i and j

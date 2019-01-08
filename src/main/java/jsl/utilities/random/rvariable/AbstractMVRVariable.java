@@ -25,13 +25,13 @@ abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc
     private final Identity myIdentity;
 
     /**
-     * myRNG provides a reference to the underlying stream of random numbers
+     * myRNStream provides a reference to the underlying stream of random numbers
      */
     protected RNStreamIfc myRNG;
 
     public AbstractMVRVariable(RNStreamIfc rng) {
         myIdentity = new Identity();
-        setRandomNumberGenerator(rng);
+        setRandomNumberStream(rng);
     }
 
     @Override
@@ -55,20 +55,20 @@ abstract public class AbstractMVRVariable implements MVRVariableIfc, IdentityIfc
      *
      * @return the underlying random number source
      */
-    public final RNStreamIfc getRandomNumberGenerator() {
+    public final RNStreamIfc getRandomNumberStream() {
         return (myRNG);
     }
 
     /**
      * Sets the underlying random number source
      *
-     * @param rng the reference to the random number generator, must not be null
+     * @param stream the reference to the random number generator, must not be null
      */
-    public final void setRandomNumberGenerator(RNStreamIfc rng) {
-        if (rng == null) {
+    public final void setRandomNumberStream(RNStreamIfc stream) {
+        if (stream == null) {
             throw new NullPointerException("RngIfc rng must be non-null");
         }
-        myRNG = rng;
+        myRNG = stream;
     }
 
     @Override

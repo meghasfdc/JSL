@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import jsl.utilities.random.*;
 import jsl.utilities.random.distributions.Distribution;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.JSL;
 import jsl.utilities.statistic.*;
 
@@ -48,9 +49,9 @@ public class LindleyEquation {
 
     public static void replicationDeletionExample() {
         // inter-arrival time distribution
-        RandomIfc y = new Exponential(1.0);
+        RandomIfc y = new ExponentialRV(1.0);
         // service time distribution
-        RandomIfc x = new Exponential(0.7);
+        RandomIfc x = new ExponentialRV(0.7);
         int r = 30; // number of replications
         int n = 100000; // number of customers
         int d = 10000; // warm up
@@ -85,9 +86,9 @@ public class LindleyEquation {
         File csvFile = JSL.makeFile("controlVariateOut", "csv");
         PrintWriter out = JSL.makePrintWriter(csvFile);
         // inter-arrival time distribution
-        Distribution y = new Exponential(1.0);
+        ExponentialRV y = new ExponentialRV(1.0);
         // service time distribution
-        Distribution x = new Exponential(0.7);
+        ExponentialRV x = new ExponentialRV(0.7);
         int r = 30; // number of replications
         int n = 10000; // number of customers
         int d = 5000; // warm up
@@ -140,9 +141,9 @@ public class LindleyEquation {
 
     public static void oneLongRunExample() {
         // inter-arrival time distribution
-        RandomIfc y = new Exponential(1.0);
+        RandomIfc y = new ExponentialRV(1.0);
         // service time distribution
-        RandomIfc x = new Exponential(0.7);
+        RandomIfc x = new ExponentialRV(0.7);
         int n = 100000; // number of customers
         int d = 10000; // warm up
         AbstractStatistic wbar = new BatchStatistic("Batch waiting time");

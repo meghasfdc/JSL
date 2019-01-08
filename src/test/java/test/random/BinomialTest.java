@@ -15,14 +15,13 @@
  */
 package test.random;
 
-import jsl.utilities.random.rng.RNStreamIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Binomial;
-
-import org.junit.jupiter.api.BeforeAll;
+import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.random.rng.RNStreamIfc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -116,7 +115,7 @@ public class BinomialTest {
         RNStreamIfc rng = RNStreamFactory.getDefaultFactory().getStream();
         //RngStream rng = new RngStream();
 
-        Binomial b = new Binomial(p, n, rng);
+        Binomial b = new Binomial(p, n);
 
         for (int i = 0; i <= 20; i++) {
             //System.out.println(b.pmf(i) + "\t" + pdf1[i]);
@@ -144,7 +143,7 @@ public class BinomialTest {
 
         RNStreamIfc rng = RNStreamFactory.getDefaultFactory().getStream();
 
-        Binomial b = new Binomial(p, n, rng);
+        Binomial b = new Binomial(p, n);
 
         for (int i = 0; i <= 20; i++) {
             assertTrue(JSLMath.equal(b.pmf(i), pdf2[i], precision));
@@ -171,7 +170,7 @@ public class BinomialTest {
 
         RNStreamIfc rng = RNStreamFactory.getDefaultFactory().getStream();
 
-        Binomial b = new Binomial(p, n, rng);
+        Binomial b = new Binomial(p, n);
 
         for (int i = 0; i <= 20; i++) {
             assertTrue(JSLMath.equal(b.pmf(i), pdf3[i], precision));

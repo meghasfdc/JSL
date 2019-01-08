@@ -22,10 +22,11 @@ import jsl.utilities.random.rvariable.BernoulliRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
-/** An Bernouli provides an implementation of the Bernouli
- *  distribution with success probability (p)
- *  P(X=1) = p
- *  P(X=0) = 1-p
+/**
+ * An Bernouli provides an implementation of the Bernouli
+ * distribution with success probability (p)
+ * P(X=1) = p
+ * P(X=0) = 1-p
  */
 public class Bernoulli extends Distribution implements DiscreteDistributionIfc, GetRVariableIfc {
     // private data members
@@ -35,54 +36,47 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
     private double myProbFailure;
 
     /**
-     * Constructs a probability distribution with the default
-     * random number generator, the default is Bernouli(0.5)
-     *
+     * Constructs a probability distribution, the default is Bernouli(0.5)
      */
     public Bernoulli() {
-        this(0.5, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.5, null);
     }
 
-    /** Constructs a probability distribution with the default
+    /**
+     * Constructs a probability distribution with the default
      * random number generator,
      *
      * @param parameters should be an array with parameter[0]=p
      */
     public Bernoulli(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
+        this(parameters[0], null);
     }
 
-    /** Constructs a probability distribution
-     *
-     * @param parameters should be an array with parameter[0]=p
-     * @param rng
-     */
-    public Bernoulli(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], rng);
-    }
-
-    /** Constructs a probability distribution with the default
+    /**
+     * Constructs a probability distribution with the default
      * random number generator,
      *
      * @param prob is the success probability
      */
     public Bernoulli(double prob) {
-        this(prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, null);
     }
 
-    /** Constructs a probability distribution with the default
+    /**
+     * Constructs a probability distribution with the default
      * random number generator,
      *
      * @param prob is the success probability
-     * @param rng a class that implements the RngIfc
+     * @param name a string label
      */
-    public Bernoulli(double prob, RNStreamIfc rng) {
-        super(rng);
+    public Bernoulli(double prob, String name) {
+        super(name);
         setProbabilityOfSuccess(prob);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
+    /**
+     * Returns a new instance of the random source with the same parameters
+     * but an independent generator
      *
      * @return
      */
@@ -91,28 +85,9 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         return (new Bernoulli(getParameters()));
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final Bernoulli newInstance(RNStreamIfc rng) {
-        return (new Bernoulli(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
+    /**
+     * Sets the success probability
      *
-     * @return
-     */
-    @Override
-    public final Bernoulli newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
-    }
-
-    /** Sets the success probability
      * @param prob The success probability
      */
     public final void setProbabilityOfSuccess(double prob) {
@@ -123,57 +98,18 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         myProbFailure = 1.0 - myProbSuccess;
     }
 
-    /** Gets the success probability
+    /**
+     * Gets the success probability
+     *
      * @return The success probability
      */
     public final double getProbabilityOfSuccess() {
         return (myProbSuccess);
     }
 
-    /** Returns the next random number 1 or 0
-     * @return The random number
-     */
-    @Override
-    public final double getValue() {
-        if (myProbSuccess == 1.0) {
-            return (1.0);
-        } else if (myProbSuccess == 0.0) {
-            return (0.0);
-        } else {
-            double prob = myRNG.randU01();
-            return (invCDF(prob));
-        }
-    }
-
-    /** Returns a randomly generated boolean according to the Bernoulli distribution
+    /**
+     * Returns the P(X&lt;=x)
      *
-     * @return
-     */
-    public final boolean nextBoolean() {
-        if (getValue() == 0.0) {
-            return (false);
-        } else {
-            return (true);
-        }
-    }
-    
-    /** Returns a boolean array filled via nextBoolean()
-     * 
-     * @param n the generate size, must be at least 1
-     * @return the array
-     */
-    public final boolean[] getBooleanSample(int n){
-        if (n <= 0){
-            throw new IllegalArgumentException("The generate size must be > 0");
-        }
-        boolean[] b = new boolean[n];
-        for(int i=0;i<n;i++){
-            b[i] = nextBoolean();
-        }
-        return b;
-    }
-
-    /** Returns the P(X&lt;=x)
      * @param xx The value we want the cumulative probability up to
      * @return The cumulative probability
      */
@@ -191,7 +127,8 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         }
     }
 
-    /** Returns the value of x such that p = Pr{X &lt;= x} where F represents the
+    /**
+     * Returns the value of x such that p = Pr{X &lt;= x} where F represents the
      * cumulative distribution function
      *
      * @param prob a double representing the probability
@@ -210,7 +147,9 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         }
     }
 
-    /** Returns the mean of the distribution if defined
+    /**
+     * Returns the mean of the distribution if defined
+     *
      * @return double  the mean or expected value for the distribution
      */
     @Override
@@ -218,7 +157,8 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         return myProbSuccess;
     }
 
-    /** Returns the f(x) where f represents the probability
+    /**
+     * Returns the f(x) where f represents the probability
      * mass function for the distribution.
      * If JSLMath.equal(x,1.0) the probability of success is returned
      * If JSLMath.equal(x,0.0) the probability of failure is returned
@@ -238,8 +178,9 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         }
     }
 
-    /** Returns the f(x) where f represents the probability
-     *  mass function for the distribution.
+    /**
+     * Returns the f(x) where f represents the probability
+     * mass function for the distribution.
      *
      * @param x an int representing the value to be evaluated
      * @return f(x)
@@ -254,7 +195,9 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         }
     }
 
-    /** Returns the variance of the random variate if defined
+    /**
+     * Returns the variance of the random variate if defined
+     *
      * @return double  the variance of the random variable
      */
     @Override
@@ -262,17 +205,19 @@ public class Bernoulli extends Distribution implements DiscreteDistributionIfc, 
         return myProbSuccess * myProbFailure;
     }
 
-    /** Sets the parameters for the distribution
+    /**
+     * Sets the parameters for the distribution
      *
      * @param parameters an array of doubles representing the parameters for
-     * the distribution
+     *                   the distribution
      */
     @Override
     public final void setParameters(double[] parameters) {
         setProbabilityOfSuccess(parameters[0]);
     }
 
-    /** Gets the parameters for the distribution
+    /**
+     * Gets the parameters for the distribution
      *
      * @return Returns an array of the parameters for the distribution
      */

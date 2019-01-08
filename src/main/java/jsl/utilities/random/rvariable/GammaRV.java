@@ -69,7 +69,7 @@ public final class GammaRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = myGamma.invCDF(myRNG.randU01());
+        double v = myGamma.invCDF(myRNStream.randU01());
         return v;
     }
 
@@ -95,4 +95,74 @@ public final class GammaRV extends AbstractRVariable {
             }
         };
     }
+
+    /** Provides a random number via the standard acceptance rejection technique
+     *  see Law and Kelton for the algorithm
+     * @return double a random number distributed according to the receiver.
+     */
+    public final double randomViaAcceptanceRejection() {
+        double r;
+
+        if (getShape() > 1) {
+            r = randomForAlphaGreaterThan1();
+        } else if (getShape() < 1) {
+            r = randomForAlphaLessThan1();
+        } else {
+            r = randomForAlphaEqual1();
+        }
+
+        return r * getShape();
+    }
+
+    /**
+     * @return double
+     */
+    private double randomForAlphaEqual1() {
+        return -Math.log(1 - myRNStream.randU01());
+    }
+
+    /**
+     * @return double
+     */
+    private double randomForAlphaGreaterThan1() {
+        double u1, u2, v, y, z, w;
+        double a = Math.sqrt(2 * getShape() - 1);
+        double b = getShape() - Math.log(4.0);
+        double q = getShape() + 1 / a;
+        double d = 1 + Math.log(4.5);
+        while (true) {
+            u1 = myRNStream.randU01();
+            u2 = myRNStream.randU01();
+            v = a * Math.log(u1 / (1 - u1));
+            y = getShape() * Math.exp(v);
+            z = u1 * u1 * u2;
+            w = b + q * v - y;
+            if (w + d - 4.5 * z >= 0 || w >= Math.log(z)) {
+                return y;
+            }
+        }
+    }
+
+    /**
+     * @return double
+     */
+    private double randomForAlphaLessThan1() {
+        double p, y;
+        double b = (Math.E + getShape()) / Math.E;
+
+        while (true) {
+            p = myRNStream.randU01() * b;
+            if (p > 1) {
+                y = -Math.log((b - p) / getShape());
+                if (myRNStream.randU01() <= Math.pow(y, getShape() - 1)) {
+                    return y;
+                }
+            }
+            y = Math.pow(p, 1 / getShape());
+            if (myRNStream.randU01() <= Math.exp(-y)) {
+                return y;
+            }
+        }
+    }
+
 }

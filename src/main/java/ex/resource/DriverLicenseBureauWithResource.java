@@ -17,12 +17,12 @@ package ex.resource;
 
 import jsl.modeling.*;
 import jsl.modeling.queue.Queue;
-import jsl.modeling.elements.resource.Entity;
-import jsl.modeling.elements.resource.Resource;
+import jsl.modeling.elements.entity.Entity;
+import jsl.modeling.elements.entity.Resource;
 import jsl.modeling.elements.variable.*;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 public class DriverLicenseBureauWithResource extends SchedulingElement {
 
@@ -30,9 +30,9 @@ public class DriverLicenseBureauWithResource extends SchedulingElement {
 
     private Queue myWaitingQ;
 
-    private DistributionIfc myServiceDistribution;
+    private RVariableIfc myServiceDistribution;
 
-    private DistributionIfc myArrivalDistribution;
+    private RVariableIfc myArrivalDistribution;
 
     private RandomVariable myServiceRV;
 
@@ -45,10 +45,10 @@ public class DriverLicenseBureauWithResource extends SchedulingElement {
     private EndServiceEventAction myEndServiceEventAction;
 
     public DriverLicenseBureauWithResource(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.5));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.5));
     }
 
-    public DriverLicenseBureauWithResource(ModelElement parent, int numServers, DistributionIfc ad, DistributionIfc sd) {
+    public DriverLicenseBureauWithResource(ModelElement parent, int numServers, RVariableIfc ad, RVariableIfc sd) {
         super(parent);
 
         setServiceDistributionInitialRandomSource(sd);
@@ -70,7 +70,7 @@ public class DriverLicenseBureauWithResource extends SchedulingElement {
         myClerks.setInitialCapacity(n);
     }
 
-    public void setServiceDistributionInitialRandomSource(DistributionIfc d) {
+    public void setServiceDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Service Time Distribution was null!");
@@ -87,7 +87,7 @@ public class DriverLicenseBureauWithResource extends SchedulingElement {
 
     }
 
-    public void setArrivalDistributionInitialRandomSource(DistributionIfc d) {
+    public void setArrivalDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Arrival Time Distribution was null!");

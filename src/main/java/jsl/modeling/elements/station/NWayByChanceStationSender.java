@@ -23,6 +23,8 @@ package jsl.modeling.elements.station;
 import jsl.modeling.ModelElement;
 import jsl.modeling.queue.QObject;
 
+import java.util.List;
+
 /** This station will receive a QObject and immediately
  *  send it out to a randomly selected receiver
  *
@@ -32,13 +34,13 @@ public class NWayByChanceStationSender extends Station {
 
     protected NWayByChanceQObjectSender myNWaySender;
     
-    public NWayByChanceStationSender(ModelElement parent) {
-        this(parent, null);
+    public NWayByChanceStationSender(ModelElement parent, List<ReceiveQObjectIfc> elements, double[] cdf) {
+        this(parent, elements, cdf, null);
     }
 
-    public NWayByChanceStationSender(ModelElement parent, String name) {
+    public NWayByChanceStationSender(ModelElement parent, List<ReceiveQObjectIfc> elements, double[] cdf, String name) {
         super(parent, name);
-        myNWaySender = new NWayByChanceQObjectSender(this);
+        myNWaySender = new NWayByChanceQObjectSender(this, elements, cdf);
         setSender(myNWaySender);
     }
 
@@ -63,12 +65,5 @@ public class NWayByChanceStationSender extends Station {
         return myNWaySender.contains(arg0);
     }
 
-    public final void addLast(ReceiveQObjectIfc obj) {
-        myNWaySender.addLast(obj);
-    }
-
-    public final void add(ReceiveQObjectIfc obj, double p) {
-        myNWaySender.add(obj, p);
-    }
     
 }

@@ -16,9 +16,8 @@
 package jsl.modeling;
 
 import java.text.DecimalFormat;
-import jsl.modeling.elements.resource.Entity;
+import jsl.modeling.elements.entity.Entity;
 import jsl.utilities.GetNameIfc;
-import jsl.utilities.IdentityIfc;
 
 /**
  * This class represents a simulated event. This file contains the JSLEvent

@@ -15,8 +15,8 @@
  */
 package ex.montecarlo;
 
-import jsl.utilities.random.distributions.DEmpiricalPMF;
-import jsl.utilities.random.distributions.DistributionIfc;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.*;
 
 /**
@@ -24,15 +24,15 @@ import jsl.utilities.statistic.*;
  */
 public class NewsSellerProblem {
 
-    private DEmpiricalPMF typeofday;
+    private DEmpiricalRV typeofday;
 
-    private DEmpiricalPMF gd;
+    private DEmpiricalRV gd;
 
-    private DEmpiricalPMF fd;
+    private DEmpiricalRV fd;
 
-    private DEmpiricalPMF pd;
+    private DEmpiricalRV pd;
 
-    private DistributionIfc[] demand = new DistributionIfc[4];
+    private RVariableIfc[] demand = new RVariableIfc[4];
 
     private double price = 0.50;
 
@@ -56,36 +56,18 @@ public class NewsSellerProblem {
     public NewsSellerProblem() {
         //super();
         System.out.println("Constructing NSP");
-        typeofday = new DEmpiricalPMF();
-        typeofday.addProbabilityPoint(1.0, 0.35);
-        typeofday.addProbabilityPoint(2.0, 0.45);
-        typeofday.addLastProbabilityPoint(3.0);
+        typeofday = new DEmpiricalRV(new double[] {1.0, 2.0, 3.0}, new double[] {0.35, 0.80, 1.0});
 
-        gd = new DEmpiricalPMF();
-        gd.addProbabilityPoint(40.0, 0.03);
-        gd.addProbabilityPoint(50.0, 0.05);
-        gd.addProbabilityPoint(60.0, 0.15);
-        gd.addProbabilityPoint(70.0, 0.2);
-        gd.addProbabilityPoint(80.0, 0.35);
-        gd.addProbabilityPoint(90.0, 0.15);
-        gd.addLastProbabilityPoint(100.0);
+        gd = new DEmpiricalRV(new double[]{40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0},
+         new double[] {0.03, 0.08, 0.23, 0.43, 0.78, 0.93, 1.0});
 
-        fd = new DEmpiricalPMF();
-        fd.addProbabilityPoint(40.0, 0.1);
-        fd.addProbabilityPoint(50.0, 0.18);
-        fd.addProbabilityPoint(60.0, 0.4);
-        fd.addProbabilityPoint(70.0, 0.2);
-        fd.addProbabilityPoint(80.0, 0.08);
-        fd.addLastProbabilityPoint(90.0);
+        fd = new DEmpiricalRV(new double[]{40.0, 50.0, 60.0, 70.0, 80.0, 90.0},
+                new double[] {0.1, 0.28, 0.68, 0.88, 0.96, 1.0});
 
-        pd = new DEmpiricalPMF();
-        pd.addProbabilityPoint(40.0, 0.44);
-        pd.addProbabilityPoint(50.0, 0.22);
-        pd.addProbabilityPoint(60.0, 0.16);
-        pd.addProbabilityPoint(70.0, 0.12);
-        pd.addLastProbabilityPoint(80.0);
+        pd = new DEmpiricalRV(new double[]{40.0, 50.0, 60.0, 70.0, 80.0},
+                new double[] {0.44, 0.66, 0.82, 0.94, 1.0});
 
-        demand = new DistributionIfc[4];
+        demand = new RVariableIfc[4];
 
         demand[1] = gd;
         demand[2] = fd;

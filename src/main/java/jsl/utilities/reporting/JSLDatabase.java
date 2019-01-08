@@ -27,13 +27,14 @@ import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.observers.ModelElementObserver;
-import jsl.utilities.dbutil.DatabaseFactory;
 import jsl.utilities.dbutil.Database;
+import jsl.utilities.dbutil.DatabaseFactory;
 import jsl.utilities.dbutil.DatabaseIfc;
-import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
 import jsl.utilities.jsldbsrc.tables.records.*;
 import jsl.utilities.statistic.*;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.exception.DataAccessException;
 import tech.tablesaw.api.Table;
@@ -1307,7 +1308,7 @@ public class JSLDatabase {
      * simulation runs does not contain the provided experiment name, then an IllegalArgumentException
      * occurs.  If there are multiple simulation runs with the same experiment name, then
      * an IllegalArgumentException occurs. In other words, when running the experiments, the user
-     * must make the experiment names unique in order to this map to be built.
+     * must make the experiment names unique in order for this map to be built.
      *
      * @param expNames     The set of experiment names for with the responses need extraction, must not
      *                     be null
@@ -1327,7 +1328,7 @@ public class JSLDatabase {
      * simulation runs does not contain the provided experiment name, then an IllegalArgumentException
      * occurs.  If there are multiple simulation runs with the same experiment name, then
      * an IllegalArgumentException occurs. In other words, when running the experiments, the user
-     * must make the experiment names unique in order to this map to be built.
+     * must make the experiment names unique in order for this map to be built.
      *
      * @param expNames     The set of experiment names for with the responses need extraction, must not
      *                     be null

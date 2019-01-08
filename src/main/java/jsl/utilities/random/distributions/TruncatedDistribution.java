@@ -17,10 +17,13 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.GetRVariableIfc;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.random.rvariable.TruncatedRV;
 
 /**
  */
-public class TruncatedDistribution extends Distribution {
+public class TruncatedDistribution extends Distribution implements GetRVariableIfc {
 
     protected DistributionIfc myDistribution;
 
@@ -38,36 +41,39 @@ public class TruncatedDistribution extends Distribution {
 
     protected double myDeltaFUFL;
 
-    /** Constructs a truncated distribution based on the provided distribution
+    /**
+     * Constructs a truncated distribution based on the provided distribution
      *
      * @param distribution
-     * @param cdfLL The lower limit of the range of support of the distribution
-     * @param cdfUL  The upper limit of the range of support of the distribution
-     * @param truncLL The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
-     * @param truncUL The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
      */
     public TruncatedDistribution(DistributionIfc distribution, double cdfLL, double cdfUL,
-            double truncLL, double truncUL) {
-        this(distribution, cdfLL, cdfUL, truncLL, truncUL, distribution.getRandomNumberGenerator());
+                                 double truncLL, double truncUL) {
+        this(distribution, cdfLL, cdfUL, truncLL, truncUL, null);
     }
 
-    /** Constructs a truncated distribution based on the provided distribution
+    /**
+     * Constructs a truncated distribution based on the provided distribution
      *
      * @param distribution
-     * @param cdfLL The lower limit of the range of support of the distribution
-     * @param cdfUL  The upper limit of the range of support of the distribution
-     * @param truncLL The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
-     * @param truncUL The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
-     * @param rng
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     * @param name         an optional name/label
      */
     public TruncatedDistribution(DistributionIfc distribution, double cdfLL, double cdfUL,
-            double truncLL, double truncUL, RNStreamIfc rng) {
-        super(rng);
+                                 double truncLL, double truncUL, String name) {
+        super(name);
         setDistribution(distribution, cdfLL, cdfUL, truncLL, truncUL);
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
+    /**
+     * Returns a new instance of the random source with the same parameters
+     * but an independent generator
      *
      * @return
      */
@@ -76,28 +82,8 @@ public class TruncatedDistribution extends Distribution {
         return (new TruncatedDistribution(d, myCDFLL, myCDFUL, myLowerLimit, myUpperLimit));
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return
-     */
-    public final TruncatedDistribution newInstance(RNStreamIfc rng) {
-        DistributionIfc d = (DistributionIfc) myDistribution.newInstance();
-        return (new TruncatedDistribution(d, myCDFLL, myCDFUL, myLowerLimit, myUpperLimit, rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    public final TruncatedDistribution newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
-    }
-
     public final void setDistribution(DistributionIfc distribution, double cdfLL, double cdfUL,
-            double truncLL, double truncUL) {
+                                      double truncLL, double truncUL) {
         if (distribution == null) {
             throw new IllegalArgumentException("The distribution must not be null");
         }
@@ -147,15 +133,15 @@ public class TruncatedDistribution extends Distribution {
         }
     }
 
-    /** Sets the parameters of the truncated distribution
-     *  cdfLL = parameter[0]
-     *  cdfUL = parameters[1]
-     *  truncLL = parameters[2]
-     *  truncUL = parameters[3]
-     *
-     *  any other values in the array should be interpreted as the parameters
-     *  for the underlying distribution
-     *
+    /**
+     * Sets the parameters of the truncated distribution
+     * cdfLL = parameter[0]
+     * cdfUL = parameters[1]
+     * truncLL = parameters[2]
+     * truncUL = parameters[3]
+     * <p>
+     * any other values in the array should be interpreted as the parameters
+     * for the underlying distribution
      */
     public final void setParameters(double[] parameters) {
         if (parameters == null) {
@@ -170,16 +156,16 @@ public class TruncatedDistribution extends Distribution {
         myDistribution.setParameters(y);
     }
 
-    /** Get the parameters for the truncated distribution
-     *
-     *  cdfLL = parameter[0]
-     *  cdfUL = parameters[1]
-     *  truncLL = parameters[2]
-     *  truncUL = parameters[3]
-     *
-     *  any other values in the array should be interpreted as the parameters
-     *  for the underlying distribution
-     *
+    /**
+     * Get the parameters for the truncated distribution
+     * <p>
+     * cdfLL = parameter[0]
+     * cdfUL = parameters[1]
+     * truncLL = parameters[2]
+     * truncUL = parameters[3]
+     * <p>
+     * any other values in the array should be interpreted as the parameters
+     * for the underlying distribution
      */
     public final double[] getParameters() {
         double[] x = myDistribution.getParameters();
@@ -195,33 +181,37 @@ public class TruncatedDistribution extends Distribution {
         return y;
     }
 
-    /** The CDF's original lower limit
+    /**
+     * The CDF's original lower limit
      *
-     * @return
+     * @return CDF's original lower limit
      */
     public final double getCDFLowerLimit() {
         return (myCDFLL);
     }
 
-    /** The CDF's original upper limit
+    /**
+     * The CDF's original upper limit
      *
-     * @return
+     * @return CDF's original upper limit
      */
     public final double getCDFUpperLimit() {
         return (myCDFUL);
     }
 
-    /** The lower limit for the truncated distribution
+    /**
+     * The lower limit for the truncated distribution
      *
-     * @return
+     * @return lower limit for the truncated distribution
      */
     public final double getTruncatedLowerLimit() {
         return (myLowerLimit);
     }
 
-    /** The upper limit for the trunctated distribution
+    /**
+     * The upper limit for the trunctated distribution
      *
-     * @return
+     * @return upper limit for the trunctated distribution
      */
     public final double getTruncatedUpperLimit() {
         return (myUpperLimit);
@@ -242,17 +232,13 @@ public class TruncatedDistribution extends Distribution {
         }
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getMean()
-     */
+    @Override
     public final double getMean() {
         double mu = myDistribution.getMean();
         return (mu / myDeltaFUFL);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#getVariance()
-     */
+    @Override
     public final double getVariance() {
         // Var[X] = E[X^2] - E[X]*E[X]
         // first get 2nd moment of truncated distribution
@@ -268,11 +254,15 @@ public class TruncatedDistribution extends Distribution {
         return (m2 - mu * mu);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#invCDF(double)
-     */
+    @Override
     public double invCDF(double p) {
         double v = myFofLL + myDeltaFUFL * p;
         return myDistribution.invCDF(v);
     }
+
+    @Override
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
+        return new TruncatedRV(myDistribution, myCDFLL, myCDFUL, myLowerLimit, myUpperLimit, rng);
+    }
+
 }

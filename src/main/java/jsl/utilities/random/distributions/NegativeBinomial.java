@@ -53,7 +53,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * Constructs a NegativeBinomial with n=1, p=0.5
      */
     public NegativeBinomial() {
-        this(0.5, 1, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.5, 1, null);
     }
 
     /**
@@ -63,18 +63,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * should be the desired number of successes
      */
     public NegativeBinomial(double[] parameter) {
-        this(parameter[0], (int) parameter[1], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /**
-     * Constructs a NegativeBinomial using the supplied parameters
-     *
-     * @param parameter parameter[0] should be the probability (p) and parameter[1]
-     * should be the desired number of successes
-     * @param rng
-     */
-    public NegativeBinomial(double[] parameter, RNStreamIfc rng) {
-        this(parameter[0], (int) parameter[1], rng);
+        this(parameter[0], (int) parameter[1], null);
     }
 
     /**
@@ -85,7 +74,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * @param numSuccess The desired number of successes
      */
     public NegativeBinomial(double prob, double numSuccess) {
-        this(prob, numSuccess, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, numSuccess, null);
     }
 
     /**
@@ -94,10 +83,10 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      *
      * @param prob The success probability
      * @param numSuccess The desired number of successes
-     * @param rng A RngIfc
+     * @param name an optional name/label
      */
-    public NegativeBinomial(double prob, double numSuccess, RNStreamIfc rng) {
-        super(rng);
+    public NegativeBinomial(double prob, double numSuccess, String name) {
+        super(name);
         setParameters(prob, numSuccess);
     }
 
@@ -121,35 +110,9 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
         myRecursiveAlgoFlag = flag;
     }
 
-    /** Returns a new instance of the random source with the same parameters
-     *  but an independent generator
-     *
-     * @return the NegativeBinomial
-     */
     @Override
     public final NegativeBinomial newInstance() {
         return (new NegativeBinomial(getParameters()));
-    }
-
-       /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng the RNG
-     * @return the NegativeBinomial
-     */
-    @Override
-    public final NegativeBinomial newInstance(RNStreamIfc rng) {
-        return (new NegativeBinomial(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return the NegativeBinomial
-     */
-    @Override
-    public final NegativeBinomial newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     /**
@@ -165,7 +128,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
 
     /** Gets the mode of the distribution
      *
-     * @return
+     * @return the mode of the distribution
      */
     public final int getMode() {
         if (myDesiredNumSuccesses > 1.0) {
@@ -232,8 +195,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * Sets the probability throws IllegalArgumentException when probability is
      * outside the range (0,1)
      *
-     * @param prob
-     *            the probability of success
+     * @param prob the probability of success
      */
     private void setProbabilityOfSuccess(double prob) {
         if ((prob <= 0.0) || (prob >= 1.0)) {
@@ -243,32 +205,16 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
         myProbFailure = 1.0 - myProbSuccess;
     }
 
-    /**
-     * Gets the expected value
-     *
-     * @return the expected value
-     */
     @Override
     public final double getMean() {
         return (myDesiredNumSuccesses * myProbFailure) / myProbSuccess;
     }
 
-    /**
-     * Gets the variance
-     *
-     * @return the variance
-     */
     @Override
     public final double getVariance() {
         return (myDesiredNumSuccesses * myProbFailure) / (myProbSuccess * myProbSuccess);
     }
 
-    /** If x is not and integer value, then the probability must be zero
-     *  otherwise pmf(int x) is used to determine the probability
-     *
-     * @param x
-     * @return
-     */
     @Override
     public final double pmf(double x) {
         if (Math.floor(x) == x) {
@@ -282,21 +228,13 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * Returns the prob of getting x failures before the rth success where r is
      * the desired number of successes parameter
      *
-     * @param j
+     * @param j the value to evaluate
      * @return the probability
      */
     public final double pmf(int j) {
         return negBinomialPMF(j, myDesiredNumSuccesses, myProbSuccess, myRecursiveAlgoFlag);
     }
 
-    /**
-     * Computes the cumulative probability distribution function for given value
-     * of failures
-     *
-     * @param x
-     *            The value to be evaluated
-     * @return The probability, P{X &lt;=x}
-     */
     @Override
     public final double cdf(double x) {
         return cdf((int) x);
@@ -313,17 +251,6 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
         return negBinomialCDF(j, myDesiredNumSuccesses, myProbSuccess, myRecursiveAlgoFlag);
     }
 
-    /**
-     * Computes the inverse of the cumulative probability distribution function
-     * for the supplied probability throws IllegalArgumentException when
-     * probability is outside the range [0,1]
-     *
-     * p = 0.0 returns 0.0
-     * p = 1.0 returns Double.POSITIVE_INFINITY
-     *
-     * @param prob The probability to be evaluated for the inverse
-     * @return The value associated with the inverse CDF at the probability
-     */
     @Override
     public final double invCDF(double prob) {
         if ((prob < 0.0) || (prob > 1.0)) {
@@ -462,7 +389,7 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
      * @param j value for which prob is needed
      * @param r num of successes
      * @param p prob of success
-     * @return
+     * @return the probability mass function evaluated at j
      */
     public static double negBinomialPMF(int j, double r, double p) {
         return negBinomialPMF(j, r, p, true);
@@ -758,13 +685,13 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
 
     /**
      *
-     * @param x
-     * @param r
-     * @param p
-     * @param start
-     * @param cdfAtStart
-     * @param recursive
-     * @return
+     * @param x the value to evaluate
+     * @param r the trial number
+     * @param p the probability of success
+     * @param start the starting place for search
+     * @param cdfAtStart the CDF at the starting place
+     * @param recursive true for using recursive algorithm
+     * @return the found value
      */
     protected static int searchUpCDF(double x, double r, double p,
             int start, double cdfAtStart, boolean recursive) {
@@ -779,13 +706,13 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
 
     /**
      *
-     * @param x
-     * @param r
-     * @param p
-     * @param start
-     * @param cdfAtStart
-     * @param recursive
-     * @return
+     * @param x the value to evaluate
+     * @param r the trial number
+     * @param p the probability of success
+     * @param start the starting place for search
+     * @param cdfAtStart the CDF at the starting place
+     * @param recursive true for using recursive algorithm
+     * @return the found value
      */
     protected static int searchDownCDF(double x, double r, double p,
             int start, double cdfAtStart, boolean recursive) {
@@ -808,11 +735,11 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
     }
 
     /**
-     * 
-     * @param x
-     * @param r
-     * @param p
-     * @return
+     *
+     * @param x the value to evaluate
+     * @param r the trial number
+     * @param p the probability of success
+     * @return the inverse value at the point x
      */
     protected static int invCDFViaNormalApprox(double x, double r, double p) {
         if (r <= 0) {

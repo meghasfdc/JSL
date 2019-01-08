@@ -76,7 +76,7 @@ public final class LaplaceRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rLaplace(myMean, myScale, myRNG);
+        double v = JSLRandom.rLaplace(myMean, myScale, myRNStream);
         return v;
     }
 

@@ -520,7 +520,7 @@ public class RNStreamFactory extends Identity {
      * A concrete implementation of a random number stream (RngIfc)
      */
     public class RNStream implements RNStreamIfc, IdentityIfc,
-            NewStreamInstanceIfc, GetAntitheticStreamIfc {
+            RNStreamNewInstanceIfc, GetAntitheticStreamIfc {
 
         /**
          * Describes the stream (for writing the state, error messages, etc.).

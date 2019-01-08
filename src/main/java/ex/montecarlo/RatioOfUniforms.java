@@ -22,6 +22,7 @@ package ex.montecarlo;
 
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.UniformRV;
 
 /**
  *
@@ -29,15 +30,15 @@ import jsl.utilities.random.distributions.Uniform;
  */
 public class RatioOfUniforms {
 
-    protected Uniform uCDF;
+    protected UniformRV uCDF;
 
-    protected Uniform vCDF;
+    protected UniformRV vCDF;
 
     protected FunctionIfc r;
 
     public RatioOfUniforms(double umax, double vmin, double vmax, FunctionIfc f) {
-        uCDF = new Uniform(0.0, umax);
-        vCDF = new Uniform(vmin, vmax);
+        uCDF = new UniformRV(0.0, umax);
+        vCDF = new UniformRV(vmin, vmax);
         r = f;
     }
 

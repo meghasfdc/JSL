@@ -16,7 +16,6 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.Interval;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
@@ -31,61 +30,41 @@ public class Exponential extends Distribution implements
 
     private double myMean;
 
-    /** Constructs a exponential random variable with mean 1.0
+    /** Constructs a exponential distribution with mean 1.0
      */
     public Exponential() {
-        this(1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, null);
     }
 
-    /** Constructs a exponential random variable where parameter[0] is the
+    /** Constructs a exponential distributionwhere parameter[0] is the
      * mean of the distribution
      * @param parameters A array containing the mean of the distribution, must be &gt; 0.0
      */
     public Exponential(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
+        this(parameters[0], null);
     }
 
-    /** Constructs a exponential random variable where parameter[0] is the
-     * mean of the distribution
-     * @param parameters A array containing the mean of the distribution, must be &gt; 0.0
-     * @param rng
-     */
-    public Exponential(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], rng);
-    }
-
-    /** Constructs a exponential random variable where mean is the
+    /** Constructs a exponential distribution where mean is the
      * mean of the distribution
      * @param mean The mean of the distribution, , must be &gt; 0.0
      */
     public Exponential(double mean) {
-        this(mean, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, null);
     }
 
-    /** Constructs a exponential random variable where mean is the
+    /** Constructs a exponential distribution where mean is the
      * mean of the distribution
      * @param mean The mean of the distribution, , must be &gt; 0.0
-     * @param rng 
+     * @param name an optional label/name
      */
-    public Exponential(double mean, RNStreamIfc rng) {
-        super(rng);
+    public Exponential(double mean, String name) {
+        super(name);
         setMean(mean);
     }
 
     @Override
     public final Exponential newInstance() {
         return (new Exponential(getParameters()));
-    }
-
-    @Override
-    public final Exponential newInstance(RNStreamIfc rng) {
-        return (new Exponential(getParameters(), rng));
-    }
-
-    @Override
-    public final Exponential newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override

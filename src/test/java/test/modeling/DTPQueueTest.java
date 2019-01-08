@@ -29,6 +29,7 @@ import ex.models.DTPFunctionalTest;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,8 +54,8 @@ public class DTPQueueTest {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DTPFunctionalTest dtp = new DTPFunctionalTest(m);
-        dtp.setArrivalRS(new Exponential(6.0));
-        dtp.setServiceRS(new Exponential(3.0));
+        dtp.setArrivalRS(new ExponentialRV(6.0));
+        dtp.setServiceRS(new ExponentialRV(3.0));
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);
         sim.setLengthOfReplication(20000.0);
@@ -82,8 +83,8 @@ public class DTPQueueTest {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DTPQueueModel driveThroughPharmacy = new DTPQueueModel(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

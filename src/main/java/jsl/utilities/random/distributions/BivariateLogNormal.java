@@ -17,7 +17,7 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**  Allows for the generation of bivariate lognormal random variables.
@@ -27,7 +27,7 @@ import jsl.utilities.random.rng.RNStreamIfc;
  *
  * @author rossetti
  */
-public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
+public class BivariateLogNormal implements RNStreamControlIfc, ParametersIfc {
 
     protected BivariateNormal myBVN;
 
@@ -50,7 +50,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Constructs a bivariate lognormal with mean's = 1.0, variance = 1.0. correlation = 0.0
      *
-     * @param rng
+     * @param rng a random number generator
      */
     public BivariateLogNormal(RNStreamIfc rng) {
         this(1.0, 1.0, 1.0, 1.0, 0.0, rng);
@@ -58,11 +58,11 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /**
      *
-     * @param mean1
-     * @param var1
-     * @param mean2
-     * @param var2
-     * @param rho
+     * @param mean1 the first mean
+     * @param var1 the first variance
+     * @param mean2 the second mean
+     * @param var2 the second variance
+     * @param rho the corrlation
      */
     public BivariateLogNormal(double mean1, double var1, double mean2, double var2, double rho) {
         this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
@@ -75,7 +75,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  param[3] = variance 2;
      *  param[4] = correlation;
      *
-     * @param param
+     * @param param the parameter array
      */
     public BivariateLogNormal(double[] param) {
         this(param[0], param[1], param[2], param[3], param[4],
@@ -89,8 +89,8 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  param[3] = variance 2;
      *  param[4] = correlation;
      *
-     * @param param
-     * @param rng
+     * @param param the parameter array
+     * @param rng a random number generator
      */
     public BivariateLogNormal(double[] param, RNStreamIfc rng) {
         this(param[0], param[1], param[2], param[3], param[4], rng);
@@ -103,7 +103,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      * @param mean2 lognormal 2nd mean
      * @param var2 lognormal 2nd variance
      * @param rho correlation of lognormals
-     * @param rng
+     * @param rng a random number generator
      */
     public BivariateLogNormal(double mean1, double var1, double mean2, double var2, double rho, RNStreamIfc rng) {
         myBVN = new BivariateNormal(rng);
@@ -113,11 +113,11 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
     /** Takes in the parameters of the bivariate lognormal and sets
      *  the parameters of the underlying bivariate normal
      * 
-     * @param m1
-     * @param v1
-     * @param m2
-     * @param v2
-     * @param r
+     * @param m1 the first mean
+     * @param v1 the first variance
+     * @param m2 the second mean
+     * @param v2 the second variance
+     * @param r the correlation
      */
     public void setParameters(double m1, double v1, double m2, double v2, double r) {
         if (m1 <= 0) {
@@ -163,7 +163,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  param[3] = variance 2;
      *  param[4] = correlation;
      *
-     * @param param
+     * @param param the parameter array
      */
     public final void setParameters(double[] param) {
         setParameters(param[0], param[1], param[2], param[3], param[4]);
@@ -177,7 +177,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  param[3] = variance 2;
      *  param[4] = correlation;
      *
-     * @return
+     * @return the parameters
      */
     public final double[] getParameters() {
         double[] param = new double[5];
@@ -196,7 +196,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  param[3] = variance 2;
      *  param[4] = correlation;
      * 
-     * @return
+     * @return the computed parameters
      */
     public final double[] getBiVariateNormalParameters() {
         return myBVN.getParameters();
@@ -216,9 +216,9 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      * @param m2 mean 1 of bivariate normal
      * @param v2 variance 2 of bivariate normal
      * @param r correlation of bivariate normal
-     * @return
+     * @return the computed parameters
      */
-    public static final double[] getBVLNParametersFromBVNParameters(double m1, double v1, double m2, double v2, double r) {
+    public static double[] getBVLNParametersFromBVNParameters(double m1, double v1, double m2, double v2, double r) {
         if (v1 <= 0) {
             throw new IllegalArgumentException("Variance 1 must be positive");
         }
@@ -252,9 +252,9 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  x[4] = correlation of bivariate lognormal
      *
      * @param param array of parameters representing the bivariate normal
-     * @return
+     * @return the computed parameters
      */
-    public static final double[] getBVLNParametersFromBVNParameters(double[] param) {
+    public static double[] getBVLNParametersFromBVNParameters(double[] param) {
         return getBVLNParametersFromBVNParameters(param[0], param[1], param[2], param[3], param[4]);
     }
 
@@ -268,7 +268,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Gets the first mean
      *
-     * @return
+     * @return the first mean
      */
     public final double getMean1() {
         return myMu1;
@@ -284,7 +284,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Gets the first variance
      *
-     * @return
+     * @return the first variance
      */
     public final double getVariance1() {
         return myVar1;
@@ -292,7 +292,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Sets the second mean
      *
-     * @param mean
+     * @param mean the second mean
      */
     public final void setMean2(double mean) {
         setParameters(myMu1, myVar1, mean, myVar2, myRho);
@@ -300,7 +300,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Gets the second mean
      *
-     * @return
+     * @return the second mean
      */
     public final double getMean2() {
         return myMu2;
@@ -316,7 +316,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Gets the 2nd variance
      *
-     * @return
+     * @return the 2nd variance
      */
     public final double getVariance2() {
         return myVar2;
@@ -324,7 +324,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Sets the correlation
      *
-     * @param rho
+     * @param rho the correlation
      */
     public final void setCorrelation(double rho) {
         setParameters(myMu1, myVar1, myMu2, myVar2, rho);
@@ -332,7 +332,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
 
     /** Gets the correlation
      *
-     * @return
+     * @return the correlation
      */
     public final double getCorrelation() {
         return myRho;
@@ -362,7 +362,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  As a convenience also returns the array
      *
      * @param x Must be of size 2 or larger
-     * @return
+     * @return bivariate values
      */
     public double[] getValues(double[] x) {
         // generate the bivariate normals
@@ -377,7 +377,7 @@ public class BivariateLogNormal implements RandomStreamIfc, ParametersIfc {
      *  x[0] = 1st marginal
      *  x[1] = 2nd marginal
      *
-     * @return
+     * @return the values
      */
     public double[] getValues() {
         return (getValues(new double[2]));

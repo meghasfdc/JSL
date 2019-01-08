@@ -17,6 +17,8 @@ package test.random;
 
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.StatisticXY;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,9 +37,9 @@ public class TestAntithetic {
 
     @Test
     public void test1() {
-        Normal e = new Normal();
+        NormalRV e = new NormalRV();
 
-        Normal ea = e.newAntitheticInstance();
+        RVariableIfc ea = e.newAntitheticInstance();
         StatisticXY sxy = new StatisticXY();
 
         for (int i = 1; i <= 10; i++) {
@@ -51,23 +53,4 @@ public class TestAntithetic {
         assertTrue(JSLMath.equal(sxy.getCorrelationXY(), -1.0));
     }
 
-    @Test
-    public void test2() {
-        Normal e = new Normal();
-
-        Normal ea = e.newAntitheticInstance();
-        boolean b = true;
-        for (int i = 1; i <= 10; i++) {
-            double x = e.getValue();
-            double x1 = e.getAntitheticValue();
-            double xa = ea.getValue();
-            if (!JSLMath.equal(xa, x1)) {
-                b = false;
-            }
-        }
-        System.out.println("Test 2");
-        System.out.println("Test passes if all are equal");
-        System.out.println("b = " + b);
-        assertTrue(b);
-    }
 }

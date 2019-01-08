@@ -15,7 +15,7 @@
  */
 package jsl.modeling.elements.processview.description;
 
-import jsl.modeling.elements.resource.Entity;
+import jsl.modeling.elements.entity.Entity;
 
 /**
  */

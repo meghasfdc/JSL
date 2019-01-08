@@ -28,15 +28,17 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.DistributionIfc;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 
 public class DriverLicenseBureau extends SchedulingElement {
 
     private int myNumServers;
 
-    private DistributionIfc myServiceDistribution;
+    private RVariableIfc myServiceDistribution;
 
-    private DistributionIfc myArrivalDistribution;
+    private RVariableIfc myArrivalDistribution;
 
     private RandomVariable myServiceRV;
 
@@ -55,11 +57,11 @@ public class DriverLicenseBureau extends SchedulingElement {
     private EndServiceEventAction myEndServiceEventAction;
 
     public DriverLicenseBureau(ModelElement parent) {
-        this(parent, 1, new Exponential(1.0), new Exponential(0.8));
+        this(parent, 1, new ExponentialRV(1.0), new ExponentialRV(0.8));
     }
 
     public DriverLicenseBureau(ModelElement parent, int numServers,
-                               DistributionIfc ad, DistributionIfc sd) {
+                               RVariableIfc ad, RVariableIfc sd) {
         super(parent);
 
         setNumberOfServers(numServers);
@@ -91,7 +93,7 @@ public class DriverLicenseBureau extends SchedulingElement {
         myNumServers = n;
     }
 
-    public final void setServiceDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setServiceDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Service Time Distribution was null!");
@@ -108,7 +110,7 @@ public class DriverLicenseBureau extends SchedulingElement {
 
     }
 
-    public final void setArrivalDistributionInitialRandomSource(DistributionIfc d) {
+    public final void setArrivalDistributionInitialRandomSource(RVariableIfc d) {
 
         if (d == null) {
             throw new IllegalArgumentException("Arrival Time Distribution was null!");

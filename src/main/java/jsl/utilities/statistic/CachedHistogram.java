@@ -17,6 +17,7 @@ package jsl.utilities.statistic;
 
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
  * A CachedHistogram allow collection and forming of a histogram without
@@ -468,7 +469,7 @@ public class CachedHistogram extends AbstractStatistic {
      * @param args
      */
     public static void main(String[] args) {
-        Exponential d = new Exponential(2);
+        ExponentialRV d = new ExponentialRV(2);
         CachedHistogram h = new CachedHistogram(50);
         for (int i = 1; i <= 100; ++i) {
             h.collect(d.getValue());

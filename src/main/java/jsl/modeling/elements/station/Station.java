@@ -52,19 +52,28 @@ public abstract class Station extends SchedulingElement implements ReceiveQObjec
      */
     private ReceiveQObjectIfc myNextReceiver;
 
+    /**
+     *
+     * @param parent the parent model element
+     */
     public Station(ModelElement parent) {
         this(parent, null, null);
     }
 
+    /**
+     *
+     * @param parent the parent model element
+     * @param name a unique name
+     */
     public Station(ModelElement parent, String name) {
         this(parent, null, name);
     }
 
     /**
      * 
-     * @param parent
-     * @param sender can be null
-     * @param name 
+     * @param parent the parent model element
+     * @param sender can be null, represents something that can send QObjects
+     * @param name a unique name
      */
     public Station(ModelElement parent, SendQObjectIfc sender, String name) {
         super(parent, name);
@@ -76,7 +85,7 @@ public abstract class Station extends SchedulingElement implements ReceiveQObjec
      *  SendQObjectIfc interface.  If this helper object is supplied it will
      *  be used to send the processed QObject to its next location for
      *  processing.
-     * @return 
+     * @return the thing that will be used to send the completed QObject
      */
     public final SendQObjectIfc getSender() {
         return mySender;
@@ -87,7 +96,7 @@ public abstract class Station extends SchedulingElement implements ReceiveQObjec
      *  SendQObjectIfc interface.  If this helper object is supplied it will
      *  be used to send the processed QObject to its next location for
      *  processing.
-     * @param sender 
+     * @param sender the thing that will be used to send the completed QObject
      */
     public final void setSender(SendQObjectIfc sender) {
         mySender = sender;
@@ -99,7 +108,7 @@ public abstract class Station extends SchedulingElement implements ReceiveQObjec
      *  the SendQObjectIfc helper is not supplied, then the object that implements
      *  the ReceiveQObjectIfc will be the next receiver for the QObject when using 
      *  default send() method.
-     * @return 
+     * @return the thing that should receive the completed QObject, may be null
      */
     public final ReceiveQObjectIfc getNextReceiver() {
         return myNextReceiver;
@@ -111,7 +120,7 @@ public abstract class Station extends SchedulingElement implements ReceiveQObjec
      *  the SendQObjectIfc helper is not supplied, then the object that implements
      *  the ReceiveQObjectIfc will be the next receiver for the QObject when using 
      *  default send() method.
-     * @param receiver 
+     * @param receiver the thing that should receive the completed QObject, may be null
      */
     public final void setNextReceiver(ReceiveQObjectIfc receiver) {
         myNextReceiver = receiver;
@@ -130,7 +139,7 @@ public abstract class Station extends SchedulingElement implements ReceiveQObjec
      * 
      *  If neither helper object is supplied then a runtime exception will
      *  occur when trying to use the send() method     
-     * @param qObj 
+     * @param qObj the completed QObject
      */
     protected void send(QObject qObj) {
         if (getSender() != null) {

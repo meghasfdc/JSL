@@ -21,23 +21,17 @@
  */
 package ex.models;
 
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.Model;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.SimulationReporter;
+import jsl.modeling.*;
 import jsl.modeling.elements.EventGenerator;
-import jsl.modeling.queue.QObject;
-import jsl.modeling.queue.Queue;
+import jsl.modeling.elements.EventGeneratorActionIfc;
 import jsl.modeling.elements.station.SResource;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.modeling.queue.QObject;
+import jsl.modeling.queue.Queue;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  *
@@ -56,8 +50,8 @@ public class SharedResource extends SchedulingElement {
     private final RandomVariable myServiceRVTypeA;
     private final RandomVariable myServiceRVTypeB;
 
-    public SharedResource(ModelElement parent, int numServers, RandomIfc tbaA,
-            RandomIfc tbaB, RandomIfc stA, RandomIfc stB, String name) {
+    public SharedResource(ModelElement parent, int numServers, RVariableIfc tbaA,
+                          RVariableIfc tbaB, RVariableIfc stA, RVariableIfc stB, String name) {
         super(parent, name);
         myTypeAGenerator = new EventGenerator(this, new TypeAArrivals(), tbaA, tbaA);
         myTypeBGenerator = new EventGenerator(this, new TypeBArrivals(), tbaB, tbaB);
@@ -143,10 +137,10 @@ public class SharedResource extends SchedulingElement {
         // get the model
         Model m = sim.getModel();
         // add to the main model
-        RandomIfc tbaA = new Exponential(4.0);
-        RandomIfc tbaB = new Exponential(6.0);
-        RandomIfc stA = new Exponential(3.0);
-        RandomIfc stB = new Exponential(5.0);
+        RVariableIfc tbaA = new ExponentialRV(4.0);
+        RVariableIfc tbaB = new ExponentialRV(6.0);
+        RVariableIfc stA = new ExponentialRV(3.0);
+        RVariableIfc stB = new ExponentialRV(5.0);
         SharedResource sr = new SharedResource(m, 2, tbaA, tbaB, stA, stB, "SR");
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);

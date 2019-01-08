@@ -15,6 +15,7 @@
  */
 package test.modeling;
 
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.math.JSLMath;
 import ex.queueing.DriverLicenseBureauWithQ;
@@ -65,7 +66,7 @@ public class DriverLicenseBureauWithQTest {
         int k = 0;
         double p = 0.0;
 
-        Exponential d = new Exponential(0.5);
+        ExponentialRV d = new ExponentialRV(0.5);
         myDLB.setServiceDistributionInitialRandomSource(d);
 
         // run the simulation
@@ -111,7 +112,7 @@ public class DriverLicenseBureauWithQTest {
         int k = 0;
         double p = 0.0;
 
-        Exponential d = new Exponential(0.8);
+        ExponentialRV d = new ExponentialRV(0.8);
         myDLB.setServiceDistributionInitialRandomSource(d);
 
         // run the simulation

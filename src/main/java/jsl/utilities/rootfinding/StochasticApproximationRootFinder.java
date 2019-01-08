@@ -19,6 +19,7 @@ import jsl.utilities.Interval;
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.distributions.Uniform;
 import jsl.utilities.math.JSLMath;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 /** This class implements a basic 1-D stochastic approximation algorithm
  * 
@@ -92,7 +93,7 @@ public class StochasticApproximationRootFinder extends IPRootFinder {
 	 *  when a step attempts to go out of the interval
 	 * 
 	 */
-	protected Uniform myBounce = new Uniform();
+//	protected Uniform myBounce = new Uniform();
 			    
 	/** Constructs a stochastic approximation root finder for the function, using
 	 *  default scale addFactor and mid-point of interval as initial point
@@ -316,8 +317,8 @@ public class StochasticApproximationRootFinder extends IPRootFinder {
 		if (x < getLowerLimit()) {
 			//TODO what should be done if lower limit equals the previous root value
 			// thus no valid bounce interval can be formed
-			myBounce.setParameters(getLowerLimit(), getRoot());
-			x = myBounce.getValue();				
+
+			x = JSLRandom.rUniform(getLowerLimit(), getRoot());
 /*
 			double ll = getLowerLimit();
 			double r = getRoot();
@@ -331,8 +332,7 @@ public class StochasticApproximationRootFinder extends IPRootFinder {
 		} else if (x > getUpperLimit()) {
 			//TODO what should be done if upper limit equals the previous root value
 			// thus no valid bounce interval can be formed
-			myBounce.setParameters(getRoot(), getUpperLimit());			
-			x = myBounce.getValue();
+			x = JSLRandom.rUniform(getRoot(), getUpperLimit());
 		}
 
 		// remember the last evaluation

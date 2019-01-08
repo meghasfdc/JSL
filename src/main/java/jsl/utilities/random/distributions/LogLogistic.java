@@ -27,8 +27,7 @@ import jsl.utilities.statistic.Statistic;
  * @author rossetti
  *
  */
-public class LogLogistic extends Distribution implements ContinuousDistributionIfc,
-        InverseCDFIfc, GetRVariableIfc {
+public class LogLogistic extends Distribution implements ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
 
     private double myShape; // alpha
 
@@ -36,38 +35,29 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
 
     /**
      *
-     * @param shape
-     * @param scale
+     * @param shape the shape parameter
+     * @param scale the scale parameter
      */
     public LogLogistic(double shape, double scale) {
-        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
+        this(shape, scale, null);
     }
 
     /**
      *
-     * @param parameters
+     * @param parameters the parameter array parameter[0] = shape, parameter[1] = scale
      */
     public LogLogistic(double[] parameters) {
-        this(parameters[0], parameters[1], RNStreamFactory.getDefaultFactory().getStream());
+        this(parameters[0], parameters[1], null);
     }
 
     /**
      *
-     * @param parameters
-     * @param rng
+     * @param shape the shape parameter
+     * @param scale the scale parameter
+     * @param name an optional label/name
      */
-    public LogLogistic(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], parameters[1], rng);
-    }
-
-    /**
-     *
-     * @param shape
-     * @param scale
-     * @param rng
-     */
-    public LogLogistic(double shape, double scale, RNStreamIfc rng) {
-        super(rng);
+    public LogLogistic(double shape, double scale, String name) {
+        super(name);
         setShape(shape);
         setScale(scale);
     }
@@ -80,27 +70,6 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
     @Override
     public final LogLogistic newInstance() {
         return (new LogLogistic(getParameters()));
-    }
-
-    /** Returns a new instance of the random source with the same parameters
-     *  with the supplied RngIfc
-     * @param rng
-     * @return
-     */
-    @Override
-    public final LogLogistic newInstance(RNStreamIfc rng) {
-        return (new LogLogistic(getParameters(), rng));
-    }
-
-    /** Returns a new instance that will supply values based
-     *  on antithetic U(0,1) when compared to this distribution
-     *
-     * @return
-     */
-    @Override
-    public final LogLogistic newAntitheticInstance() {
-        RNStreamIfc a = myRNG.newAntitheticInstance();
-        return newInstance(a);
     }
 
     @Override
@@ -186,13 +155,6 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
         return (myScale * myScale * theta * (2.0 * csc2theta - theta * csctheta * csctheta));
     }
 
-    /** Provides the inverse cumulative distribution function for the distribution
-     * @param p The probability to be evaluated for the inverse, p must be [0,1] or
-     * an IllegalArgumentException is thrown
-     * p = 0.0 returns 0.0
-     * p = 1.0 returns Double.POSITIVE_INFINITY
-     * @see jsl.utilities.random.distributions.Distribution#invCDF(double)
-     */
     @Override
     public final double invCDF(double p) {// alpha = shape, beta = scale
         if ((p < 0.0) || (p > 1.0)) {
@@ -252,9 +214,10 @@ public class LogLogistic extends Distribution implements ContinuousDistributionI
         Statistic varhat = new Statistic("Estimated variance");
         int m = 1000;
         int n = 1000;
+        RVariableIfc rv = x.getRandomVariable();
         for (int j = 1; j <= m; j++) {
             for (int i = 1; i <= n; i++) {
-                s.collect(x.getValue());
+                s.collect(rv.getValue());
             }
             muhat.collect(s.getAverage());
             varhat.collect(s.getVariance());

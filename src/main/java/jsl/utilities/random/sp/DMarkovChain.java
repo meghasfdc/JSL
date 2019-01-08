@@ -20,10 +20,12 @@
  */
 package jsl.utilities.random.sp;
 
-import jsl.utilities.random.distributions.DEmpiricalPMF;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.statistic.IntegerFrequency;
+
+import java.util.Objects;
 
 /**
  *
@@ -35,12 +37,12 @@ public class DMarkovChain {
 
     private int myInitialState;
 
-    private DEmpiricalPMF[] myStateProb;
-    
-    private int myMaxState;
+    private int[] myStates;
+
+    private double[][] myCDFs;
 
     /**
-     * myRNG provides a reference to the underlying stream of random numbers
+     * myRNStream provides a reference to the underlying stream of random numbers
      */
     protected RNStreamIfc myRNG;
 
@@ -60,30 +62,20 @@ public class DMarkovChain {
      * @param rng
      */
     public DMarkovChain(int initialState, double[][] prob, RNStreamIfc rng) {
-        setProbabilities(prob, rng);
-        setInitialState(initialState);
-        reset();
-    }
-
-    /**
-     *
-     * @param prob
-     * @param rng
-     */
-    protected final void setProbabilities(double[][] prob, RNStreamIfc rng) {
-        setRandomNumberGenerator(rng);
-        myMaxState = prob.length;
-        myStateProb = new DEmpiricalPMF[prob.length];
+        Objects.requireNonNull(prob, "The array was null");
+        Objects.requireNonNull(rng, "The RNStreamIfc was null");
+        myRNG = rng;
+        myCDFs = new double[prob.length][];
+        myStates = new int[prob.length];
         for (int r = 0; r < prob.length; r++) {
             if (prob[r].length != prob.length) {
                 throw new IllegalArgumentException("The #rows != #cols for probability array");
             }
-            myStateProb[r] = new DEmpiricalPMF(rng);
-            for (int c = 0; c < prob[r].length - 1; c++) {
-                myStateProb[r].addProbabilityPoint(c, prob[r][c]);
-            }
-            myStateProb[r].addLastProbabilityPoint(prob[r].length - 1);
+            myCDFs[r] = JSLRandom.makeCDF(prob[r]);
+            myStates[r] = r + 1;
         }
+        setInitialState(initialState);
+        reset();
     }
 
     /**
@@ -95,8 +87,8 @@ public class DMarkovChain {
     }
 
     public final void setInitialState(int initialState) {
-        if ((initialState < 1) || (initialState > myMaxState)) {
-            throw new IllegalArgumentException("The initial state must be >= 1 and <= " + myMaxState);
+        if ((initialState < 1) || (initialState > myCDFs.length)) {
+            throw new IllegalArgumentException("The initial state must be >= 1 and <= " + myCDFs.length);
         }
         myInitialState = initialState;
     }
@@ -106,8 +98,8 @@ public class DMarkovChain {
     }
 
     public final void setState(int state) {
-        if ((state < 1) || (state > myMaxState)) {
-            throw new IllegalArgumentException("The initial state must be >= 1 and <= " + myMaxState);
+        if ((state < 1) || (state > myCDFs.length)) {
+            throw new IllegalArgumentException("The initial state must be >= 1 and <= " + myCDFs.length);
         }
         myState = state;
     }
@@ -117,8 +109,7 @@ public class DMarkovChain {
     }
 
     public final int next() {
-        int x = (int) myStateProb[myState - 1].getValue();
-        myState = x + 1;
+        myState = JSLRandom.randomlySelect(myStates, myCDFs[myState - 1], myRNG);
         return myState;
     }
 

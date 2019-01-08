@@ -63,7 +63,7 @@ public final class GeometricRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rGeometric(myProbSuccess, myRNG);
+        double v = JSLRandom.rGeometric(myProbSuccess, myRNStream);
         return v;
     }
 

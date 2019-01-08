@@ -19,12 +19,12 @@ package jsl.utilities;
  *
  * @author rossetti
  */
-public interface NewInstanceIfc {
+public interface NewInstanceIfc<T> {
 
     /**
      * Returns a new instance
      *
      * @return the new instance
      */
-    public Object newInstance();
+    public T newInstance();
 }

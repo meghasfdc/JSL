@@ -15,8 +15,6 @@
  */
 package jsl.utilities.random.rng;
 
-import jsl.utilities.random.GetAntitheticValueIfc;
-
 import java.util.function.DoubleSupplier;
 import java.util.stream.DoubleStream;
 

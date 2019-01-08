@@ -21,6 +21,7 @@ import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.mcmc.MetropolisHastings1D;
 import jsl.utilities.random.mcmc.ProposalFunction1DIfc;
+import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.reporting.JSL;
 
 import java.io.PrintWriter;
@@ -51,7 +52,7 @@ public class TestMetropolisHastings {
 
     public static class PropFunction implements ProposalFunction1DIfc {
 
-        Normal n = new Normal(0, 0.01);
+        NormalRV n = new NormalRV(0, 0.01);
 
         @Override
         public double getProposalRatio(double x, double y) {

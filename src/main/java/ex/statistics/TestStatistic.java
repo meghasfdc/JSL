@@ -134,7 +134,7 @@ public class TestStatistic {
         WeightedStatistic ws = new WeightedStatistic("ws test 3");
         System.out.println(stat);
         System.out.println(ws);
-        Normal n = new Normal();
+        NormalRV n = new NormalRV();
         double x;
         for (int i = 1; i <= 10; i++) {
             if (i == 2) {
@@ -150,7 +150,7 @@ public class TestStatistic {
 
     public static void test4() {
         // test half-width checking
-        Normal n = new Normal(10, 2);
+        NormalRV n = new NormalRV(10, 2);
         Statistic s = new Statistic("test hw");
         s.setCollectionRule(Statistic.CollectionRule.HALF_WIDTH);
         s.setDesiredHalfWidth(0.1);
@@ -166,7 +166,7 @@ public class TestStatistic {
 
     public static void test5() {
         // test relative precision
-        Normal n = new Normal(10, 2);
+        NormalRV n = new NormalRV(10, 2);
         Statistic s = new Statistic("test rp");
         s.setCollectionRule(Statistic.CollectionRule.REL_PRECISION);
         s.setRelativePrecision(0.01);
@@ -178,7 +178,7 @@ public class TestStatistic {
 
     public static void test6() {
         // test relative precision
-        Normal n = new Normal(10, 2);
+        NormalRV n = new NormalRV(10, 2);
         BatchStatistic s = new BatchStatistic("test rp");
         s.setCollectionRule(Statistic.CollectionRule.HALF_WIDTH);
         s.setDesiredHalfWidth(0.1);
@@ -188,7 +188,7 @@ public class TestStatistic {
 
     public static void test7() {
         // test relative precision
-        Normal n = new Normal(10, 2);
+        NormalRV n = new NormalRV(10, 2);
         BatchStatistic s = new BatchStatistic("test rp");
         s.setCollectionRule(Statistic.CollectionRule.REL_PRECISION);
         s.setRelativePrecision(0.01);
@@ -199,7 +199,7 @@ public class TestStatistic {
     }
     
     public static void test8(){
-          Normal n = new Normal(10, 2);     
+        NormalRV n = new NormalRV(10, 2);
           WeightedStatistic ws = new WeightedStatistic("ws test 8");
           for(int i=1; i<=100;i++){
               ws.collect(n.getValue(), 1.0);

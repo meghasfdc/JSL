@@ -76,7 +76,7 @@ public final class LogLogisticRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rLogLogistic(myShape, myScale, myRNG);
+        double v = JSLRandom.rLogLogistic(myShape, myScale, myRNStream);
         return v;
     }
 

@@ -15,23 +15,16 @@
  */
 package ex.queueing;
 
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.Experiment;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.Model;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
+import jsl.modeling.*;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.modeling.elements.variable.Variable;
 import jsl.observers.ObserverIfc;
 import jsl.observers.scheduler.ExecutiveTraceReport;
-import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Lognormal;
-import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.LognormalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  * @author rossetti
@@ -106,14 +99,14 @@ public class HospitalWard extends SchedulingElement {
      */
     public HospitalWard(ModelElement parent, String name) {
         super(parent, name);
-        myNonOpPatientStayTime = new RandomVariable(this, new Exponential(60.0));
-        myPreOpStayTime = new RandomVariable(this, new Exponential(24.0));
-        myOperationTime = new RandomVariable(this, new Lognormal(0.75, 0.25 * 0.25));
-        myPostOpStayTime = new RandomVariable(this, new Exponential(72.0));
-        myOpRoomOpenTime = new RandomVariable(this, new Constant(24.0));
-        myOpRoomCloseTime = new RandomVariable(this, new Constant(4.0));
-        myNonOpPatientTBA = new RandomVariable(this, new Exponential(12.0));
-        myOpPatientTBA = new RandomVariable(this, new Exponential(6.0));
+        myNonOpPatientStayTime = new RandomVariable(this, new ExponentialRV(60.0));
+        myPreOpStayTime = new RandomVariable(this, new ExponentialRV(24.0));
+        myOperationTime = new RandomVariable(this, new LognormalRV(0.75, 0.25 * 0.25));
+        myPostOpStayTime = new RandomVariable(this, new ExponentialRV(72.0));
+        myOpRoomOpenTime = new RandomVariable(this, new ConstantRV(24.0));
+        myOpRoomCloseTime = new RandomVariable(this, new ConstantRV(4.0));
+        myNonOpPatientTBA = new RandomVariable(this, new ExponentialRV(12.0));
+        myOpPatientTBA = new RandomVariable(this, new ExponentialRV(6.0));
 
         myNonOpPatientQ = new TimeWeighted(this, 0.0, "NonOpPatientQ");
         myOpPatientQ = new TimeWeighted(this, 0.0, "OpPatientQ");
@@ -147,35 +140,35 @@ public class HospitalWard extends SchedulingElement {
         myORRoomOpenStatus.setInitialValue(CLOSED);
     }
 
-    public void setNonOpPatientStayTimeInitialRandomSource(RandomIfc source) {
+    public void setNonOpPatientStayTimeInitialRandomSource(RVariableIfc source) {
         myNonOpPatientStayTime.setInitialRandomSource(source);
     }
 
-    public void setPreOperationTimeInitialRandomSource(RandomIfc source) {
+    public void setPreOperationTimeInitialRandomSource(RVariableIfc source) {
         myPreOpStayTime.setInitialRandomSource(source);
     }
 
-    public void setPostOperationTimeInitialRandomSource(RandomIfc source) {
+    public void setPostOperationTimeInitialRandomSource(RVariableIfc source) {
         myPostOpStayTime.setInitialRandomSource(source);
     }
 
-    public void setOperationTimeInitialRandomSource(RandomIfc source) {
+    public void setOperationTimeInitialRandomSource(RVariableIfc source) {
         myOperationTime.setInitialRandomSource(source);
     }
 
-    public void setOperatingRoomOpenTimeInitialRandomSource(RandomIfc source) {
+    public void setOperatingRoomOpenTimeInitialRandomSource(RVariableIfc source) {
         myOpRoomOpenTime.setInitialRandomSource(source);
     }
 
-    public void setOperatingRoomCloseTimeInitialRandomSource(RandomIfc source) {
+    public void setOperatingRoomCloseTimeInitialRandomSource(RVariableIfc source) {
         myOpRoomCloseTime.setInitialRandomSource(source);
     }
 
-    public void setNonOpPatientTBAInitialRandomSource(RandomIfc source) {
+    public void setNonOpPatientTBAInitialRandomSource(RVariableIfc source) {
         myNonOpPatientTBA.setInitialRandomSource(source);
     }
 
-    public void setOpPatientTBAInitialRandomSource(RandomIfc source) {
+    public void setOpPatientTBAInitialRandomSource(RVariableIfc source) {
         myOpPatientTBA.setInitialRandomSource(source);
     }
 

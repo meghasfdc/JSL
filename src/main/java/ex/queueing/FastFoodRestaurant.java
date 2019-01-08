@@ -33,6 +33,8 @@ import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.SimulationReporter;
 import jsl.modeling.elements.EventGeneratorActionIfc;
 import jsl.modeling.queue.QueueResponse;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 public class FastFoodRestaurant extends SchedulingElement {
 
@@ -45,14 +47,14 @@ public class FastFoodRestaurant extends SchedulingElement {
     protected CustomerArrival myArrivalListener = new CustomerArrival();
 
     public FastFoodRestaurant(ModelElement parent) {
-        this(parent, 5, new Exponential(1.0), new Exponential(4.5), null);
+        this(parent, 5, new ExponentialRV(1.0), new ExponentialRV(4.5), null);
     }
 
     public FastFoodRestaurant(ModelElement parent, int numStations) {
-        this(parent, numStations, new Exponential(1.0), new Exponential(4.5), null);
+        this(parent, numStations, new ExponentialRV(1.0), new ExponentialRV(4.5), null);
     }
 
-    public FastFoodRestaurant(ModelElement parent, int numStations, DistributionIfc timeBtwArrivals, DistributionIfc serviceTime, String name) {
+    public FastFoodRestaurant(ModelElement parent, int numStations, RVariableIfc timeBtwArrivals, RVariableIfc serviceTime, String name) {
         super(parent, name);
 
         if (numStations < 1) {

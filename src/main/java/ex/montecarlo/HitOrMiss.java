@@ -17,6 +17,7 @@ package ex.montecarlo;
 
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.UniformRV;
 import jsl.utilities.statistic.*;
 
 /**
@@ -33,7 +34,7 @@ public class HitOrMiss {
 
     public static void main(String[] args) {
 
-        Uniform u1RN = new Uniform();
+        UniformRV u1RN = new UniformRV();
 //		Uniform u2RN = new Uniform();
         Statistic s = new Statistic();
         u1RN.advanceToNextSubstream();

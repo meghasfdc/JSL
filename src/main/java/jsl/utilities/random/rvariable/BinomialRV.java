@@ -77,7 +77,7 @@ public final class BinomialRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rBinomial(myProbSuccess, myNumTrials, myRNG);
+        double v = JSLRandom.rBinomial(myProbSuccess, myNumTrials, myRNStream);
         return v;
     }
 

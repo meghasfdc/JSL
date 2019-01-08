@@ -22,7 +22,7 @@
 
 package ex.montecarlo;
 
-import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rvariable.UniformRV;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -37,7 +37,7 @@ public class MCAreaEstimation {
     public static void main(String[] args) {
         double a = 1.0;
         double b = 4.0;
-        Uniform ucdf = new Uniform(a, b);
+        UniformRV ucdf = new UniformRV(a, b);
         Statistic stat = new Statistic("Area Estimator");
         int n = 100; // sample size
         for(int i=1;i<=n;i++){

@@ -23,7 +23,7 @@ import jsl.utilities.random.rng.RNStreamIfc;
 /**
  *  Allows a constant to pretend to be a random variable
  */
-public final class ConstantRV implements RVariableIfc, IdentityIfc {
+public class ConstantRV implements RVariableIfc, IdentityIfc {
 
     /**
      * A constant to represent zero for sharing
@@ -44,12 +44,12 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
      */
     public final static ConstantRV POSITIVE_INFINITY = new ConstantRV(Double.POSITIVE_INFINITY);
 
-    private final double value;
+    protected double myValue;
     private final Identity myIdentity;
 
     public ConstantRV(double value){
         myIdentity = new Identity();
-        this.value = value;
+        myValue = value;
     }
 
     /**
@@ -58,7 +58,7 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
      * @return a new instance with same parameter value
      */
     public final ConstantRV newInstance(RNStreamIfc rng){
-        return new ConstantRV(this.value);
+        return new ConstantRV(myValue);
     }
 
     /**
@@ -66,13 +66,13 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
      * @return a new instance with same parameter value
      */
     public final ConstantRV newInstance(){
-        return new ConstantRV(this.value);
+        return new ConstantRV(myValue);
     }
 
     @Override
     public String toString() {
         return "ConstantRV{" +
-                "value=" + value +
+                "value=" + myValue +
                 '}';
     }
 
@@ -96,7 +96,7 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
 
     @Override
     public final double sample() {
-        return value;
+        return myValue;
     }
 
     @Override
@@ -125,13 +125,13 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
     }
 
     @Override
-    public final double getPreviousValue() {
-        return value;
+    public double getPreviousValue() {
+        return myValue;
     }
 
     @Override
     public final RVariableIfc newAntitheticInstance() {
-        return new ConstantRV(this.value);
+        return new ConstantRV(myValue);
     }
 
     /**
@@ -152,5 +152,15 @@ public final class ConstantRV implements RVariableIfc, IdentityIfc {
                 return new ConstantRV(value);
             }
         };
+    }
+
+    @Override
+    public RNStreamIfc getRandomNumberStream() {
+        return JSLRandom.getRNStream();
+    }
+
+    @Override
+    public void setRandomNumberStream(RNStreamIfc stream) {
+
     }
 }

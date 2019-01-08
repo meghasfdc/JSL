@@ -23,6 +23,10 @@ package jsl.utilities.random.distributions;
 import jsl.utilities.Interval;
 import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.GetRVariableIfc;
+import jsl.utilities.random.rvariable.NormalRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.random.rvariable.StudentTRV;
 
 /** The Student T distribution
  *  
@@ -37,7 +41,7 @@ import jsl.utilities.random.rng.RNStreamIfc;
  * 
  * @author rossetti
  */
-public class StudentT extends Distribution implements ContinuousDistributionIfc, InverseCDFIfc {
+public class StudentT extends Distribution implements ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
 
     /** A default instance for easily computing Student-T values
      * 
@@ -48,12 +52,10 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
 
     private double myIntervalFactor = 6.0;
 
-    private boolean myInvCDFSamplingOption = false;
-
     /** Constructs a StudentT distribution with 1.0 degree of freedom
      */
     public StudentT() {
-        this(1.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, null);
     }
 
     /** Constructs a StudentT distribution with
@@ -61,16 +63,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      * @param parameters An array with the degrees of freedom
      */
     public StudentT(double[] parameters) {
-        this(parameters[0], RNStreamFactory.getDefaultFactory().getStream());
-    }
-
-    /** Constructs a StudentT distribution with
-     * parameters[0] = degrees of freedom
-     * @param parameters An array with the v
-     * @param rng
-     */
-    public StudentT(double[] parameters, RNStreamIfc rng) {
-        this(parameters[0], rng);
+        this(parameters[0], null);
     }
 
     /** Constructs a StudentT distribution dof degrees of freedom
@@ -78,33 +71,22 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      * @param dof  degrees of freedom
      */
     public StudentT(double dof) {
-        this(dof, RNStreamFactory.getDefaultFactory().getStream());
+        this(dof, null);
     }
 
     /** Constructs a StudentT distribution dof degrees of freedom
      *
      * @param dof  degrees of freedom
-     * @param rng A RngIfc
+     * @param name an optional name/label
      */
-    public StudentT(double dof, RNStreamIfc rng) {
-        super(rng);
+    public StudentT(double dof, String name) {
+        super(name);
         setDegreesOfFreedom(dof);
     }
 
     @Override
     public final StudentT newInstance() {
         return (new StudentT(getParameters()));
-    }
-
-    @Override
-    public final StudentT newInstance(RNStreamIfc rng) {
-        return (new StudentT(getParameters(), rng));
-    }
-
-    @Override
-    public final StudentT newAntitheticInstance() {
-        RNStreamIfc ac = myRNG.newAntitheticInstance();
-        return newInstance(ac);
     }
 
     @Override
@@ -123,6 +105,14 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
         myDoF = dof;
     }
 
+    /**
+     *
+     * @return the degrees of freedom
+     */
+    public final double getDegreesOfFreedom(){
+        return myDoF;
+    }
+
     /** Used in the binary search to set the search interval for the inverse
      *  CDF. The default addFactor is 6.0
      * 
@@ -131,7 +121,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      *  ll = start - getIntervalFactor()*getStandardDeviation();
      *  ul = start + getIntervalFactor()*getStandardDeviation();
      *
-     * @return
+     * @return the factor
      */
     public final double getIntervalFactor() {
         return myIntervalFactor;
@@ -145,7 +135,7 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      *  ll = start - getIntervalFactor()*getStandardDeviation();
      *  ul = start + getIntervalFactor()*getStandardDeviation();
      *
-     * @param factor
+     * @param factor the factor
      */
     public final void setIntervalFactor(double factor) {
         if (factor < 1.0) {
@@ -153,24 +143,6 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
 
         }
         myIntervalFactor = factor;
-    }
-
-    /** False means use Bailey's Box-Mueller acceptance rejection
-     *  algorithm
-     * 
-     * @return true means use inverse CDF method for sampling
-     */
-    public boolean getInvCDFSamplingOption() {
-        return myInvCDFSamplingOption;
-    }
-
-    /** False means use Bailey's Box-Mueller acceptance rejection
-     *  algorithm
-     * 
-     * @param  option true means use inverse CDF method for sampling
-     */
-    public void setInvCDFSamplingOption(boolean option) {
-        myInvCDFSamplingOption = option;
     }
 
     @Override
@@ -224,9 +196,9 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
      *  This method has the side effect of changing
      *  the degrees of freedom defaultT
      * 
-     * @param dof
-     * @param x
-     * @return 
+     * @param dof the degrees of freedom
+     * @param x the value to evaluate
+     * @return the CDF value
      */
     public static double getCDF(double dof, double x) {
         defaultT.setDegreesOfFreedom(dof);
@@ -236,11 +208,11 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
     /** A convenience method that uses defaultT to 
      *  return the value of the inverse CDF at the supplied p
      *  This method has the side effect of changing
-     *  the degrees of freedom defaultT
+     *  the degrees of freedom for defaultT
      * 
-     * @param dof
-     * @param p
-     * @return 
+     * @param dof the degrees of freedom
+     * @param p the value to evaluate
+     * @return the inverse
      */
     public static double getInvCDF(double dof, double p) {
         defaultT.setDegreesOfFreedom(dof);
@@ -295,32 +267,8 @@ public class StudentT extends Distribution implements ContinuousDistributionIfc,
     }
 
     @Override
-    public double getValue() {
-        if (getInvCDFSamplingOption()) {
-            return invCDF(myRNG.randU01());
-        } else {
-            return baileysAcceptanceRejection();
-        }
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
+        return new StudentTRV(myDoF, rng);
     }
 
-    /** Directly generate a random variate using Bailey's
-     *  acceptance-rejection algorithm
-     * 
-     * @return
-     */
-    public final double baileysAcceptanceRejection() {
-        double W;
-        double U;
-        do {
-            double u = myRNG.randU01();
-            double v = myRNG.randU01();
-            U = 2.0 * u - 1.0;
-            double V = 2.0 * v - 1.0;
-            W = U * U + V * V;
-        } while (W > 1.0);
-
-        double tmp = myDoF * (Math.pow(W, (-2.0 / myDoF)) - 1.0) / W;
-        double T = U * Math.sqrt(tmp);
-        return T;
-    }
 }

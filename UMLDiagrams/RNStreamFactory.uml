@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>jsl.utilities.random.rng.RNStreamFactory</OriginalElement>
+  <nodes>
+    <node x="209.75" y="240.0">jsl.utilities.random.RandomIfc</node>
+    <node x="344.75" y="240.0">jsl.utilities.random.rng.RandomStreamManagerIfc</node>
+    <node x="766.25" y="160.0">jsl.utilities.random.rng.RandU01Ifc</node>
+    <node x="735.75" y="80.0">jsl.utilities.random.rng.GetAntitheticValueIfc</node>
+    <node x="178.0" y="160.0">jsl.utilities.GetValueIfc</node>
+    <node x="30.5" y="160.0">jsl.utilities.Identity</node>
+    <node x="747.5" y="240.0">jsl.utilities.random.rng.RNStreamIfc</node>
+    <node x="548.25" y="320.0">jsl.utilities.random.rng.RNStreamFactory.RNStream</node>
+    <node x="556.25" y="160.0">jsl.utilities.random.rng.GetAntitheticStreamIfc</node>
+    <node x="364.25" y="160.0">jsl.utilities.random.rng.RNStreamControlIfc</node>
+    <node x="0.0" y="240.0">jsl.utilities.random.rng.RNStreamFactory</node>
+    <node x="69.41666666666674" y="80.0">jsl.utilities.IdentityIfc</node>
+    <node x="906.25" y="160.0">jsl.utilities.random.rng.RNStreamNewInstanceIfc</node>
+    <node x="63.91666666666674" y="0.0">jsl.utilities.GetNameIfc</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="jsl.utilities.random.rng.RNStreamIfc" target="jsl.utilities.random.rng.RandU01Ifc">
+      <point x="15.75" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamIfc" target="jsl.utilities.random.rng.RNStreamNewInstanceIfc">
+      <point x="47.25" y="-15.0" />
+      <point x="857.75" y="220.0" />
+      <point x="957.5" y="220.0" />
+      <point x="-51.25" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamFactory.RNStream" target="jsl.utilities.random.rng.RNStreamNewInstanceIfc">
+      <point x="44.39999999999998" y="-15.0" />
+      <point x="648.15" y="300.0" />
+      <point x="1060.0" y="300.0" />
+      <point x="51.25" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.IdentityIfc" target="jsl.utilities.GetNameIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamFactory.RNStream" target="jsl.utilities.random.rng.RNStreamIfc">
+      <point x="22.200000000000045" y="-15.0" />
+      <point x="625.95" y="290.0" />
+      <point x="810.5" y="290.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RandU01Ifc" target="jsl.utilities.random.rng.GetAntitheticValueIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamFactory.RNStream" target="jsl.utilities.random.rng.RNStreamFactory">
+      <point x="-44.400000000000034" y="-15.0" />
+      <point x="559.35" y="300.0" />
+      <point x="78.5" y="300.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamIfc" target="jsl.utilities.random.rng.RNStreamControlIfc">
+      <point x="-47.25" y="-15.0" />
+      <point x="763.25" y="220.0" />
+      <point x="507.58333333333337" y="220.0" />
+      <point x="57.33333333333337" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RandomStreamManagerIfc" target="jsl.utilities.random.rng.RNStreamControlIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamFactory.RNStream" target="jsl.utilities.random.rng.GetAntitheticStreamIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="-47.5" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.Identity" target="jsl.utilities.IdentityIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="78.5" y="135.0" />
+      <point x="97.16666666666674" y="135.0" />
+      <point x="-27.75" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.RandomIfc" target="jsl.utilities.GetValueIfc">
+      <point x="-28.75" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamIfc" target="jsl.utilities.random.rng.GetAntitheticStreamIfc">
+      <point x="-15.75" y="-15.0" />
+      <point x="794.75" y="210.0" />
+      <point x="698.75" y="210.0" />
+      <point x="47.5" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.RandomIfc" target="jsl.utilities.random.rng.RNStreamControlIfc">
+      <point x="28.75" y="-15.0" />
+      <point x="296.0" y="220.0" />
+      <point x="392.91666666666663" y="220.0" />
+      <point x="-57.33333333333337" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamFactory" target="jsl.utilities.Identity">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.rng.RNStreamFactory.RNStream" target="jsl.utilities.IdentityIfc">
+      <point x="-22.200000000000045" y="-15.0" />
+      <point x="581.55" y="290.0" />
+      <point x="167.5" y="290.0" />
+      <point x="167.5" y="135.0" />
+      <point x="152.66666666666674" y="135.0" />
+      <point x="27.75" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.8657243816254417" x="556.0" y="175.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

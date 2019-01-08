@@ -15,8 +15,10 @@
  */
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.ConstantRV;
+import jsl.utilities.random.rvariable.GetRVariableIfc;
+import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  * Constructs a degenerate distribution with all probability at the provided
@@ -27,7 +29,8 @@ import jsl.utilities.random.rng.RNStreamIfc;
  * instances of Constant.
  *
  */
-public class Constant extends Distribution implements DiscreteDistributionIfc {
+@Deprecated
+public class Constant extends Distribution implements DiscreteDistributionIfc, GetRVariableIfc {
 
     /**
      * A constant to represent zero for sharing
@@ -56,12 +59,12 @@ public class Constant extends Distribution implements DiscreteDistributionIfc {
      * @param value the value for the constant
      */
     public Constant(double value) {
-        this(value, RNStreamFactory.getDefaultStream());
+        this(value, null);
     }
 
     /**
      *
-     * @param parameters
+     * @param parameters the parameter[0] is the value
      */
     public Constant(double[] parameters) {
         this(parameters[0]);
@@ -71,47 +74,16 @@ public class Constant extends Distribution implements DiscreteDistributionIfc {
      * Construct a constant using the supplied value
      *
      * @param value the value for the constant
-     * @param rng a RngIfc (pointless in this case since it is never used)
+     * @param name a string name/label
      */
-    public Constant(double value, RNStreamIfc rng) {
-        super(rng);
+    public Constant(double value, String name) {
+        super(name);
         myValue = value;
     }
 
-    /**
-     * Returns a new instance of the random source with the same parameters but
-     * an independent generator
-     *
-     * @return
-     */
     @Override
     public Constant newInstance() {
-        return (new Constant(getValue()));
-    }
-
-    /**
-     * Returns a new instance of the random source with the same parameters with
-     * the supplied RngIfc. Since the rng is not used for Constant this method
-     * is defined for sub-class compatibility with Distribution
-     *
-     * @param rng
-     * @return
-     */
-    @Override
-    public Constant newInstance(RNStreamIfc rng) {
-        return (newInstance());
-    }
-
-    /**
-     * Returns a new instance that will supply values based on antithetic U(0,1)
-     * when compared to this distribution Since the rng is not used for Constant
-     * this method is defined for sub-class compatibility with Distribution
-     *
-     * @return
-     */
-    @Override
-    public Constant newAntitheticInstance() {
-        return newInstance();
+        return (new Constant(myValue));
     }
 
     @Override
@@ -154,12 +126,13 @@ public class Constant extends Distribution implements DiscreteDistributionIfc {
     }
 
     @Override
-    public final double getValue() {
+    public final double invCDF(double p) {
         return myValue;
     }
 
     @Override
-    public final double invCDF(double p) {
-        return myValue;
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
+        return new ConstantRV(myValue);
     }
+
 }

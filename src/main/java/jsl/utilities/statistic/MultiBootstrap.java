@@ -17,7 +17,7 @@
 package jsl.utilities.statistic;
 
 import jsl.utilities.random.SampleIfc;
-import jsl.utilities.random.rng.RandomStreamIfc;
+import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
@@ -33,7 +33,7 @@ import java.util.*;
  * The name provided for each dataset (or sampler) should be unique and will be used
  * to identify the associated bootstrap results. We call this name a addFactor.
  */
-public class MultiBootstrap implements RandomStreamIfc {
+public class MultiBootstrap implements RNStreamControlIfc {
 
     /**
      * A counter to count the number of created to assign "unique" ids

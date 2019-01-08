@@ -44,14 +44,22 @@ public interface CDFIfc extends ParametersIfc {
      * @return cdf(x2)-cdf(x1)
      * @throws IllegalArgumentException if x1 &gt; x2
      */
-    double cdf(double x1, double x2);
+    default double cdf(double x1, double x2) {
+        if (x1 > x2) {
+            String msg = "x1 = " + x1 + " > x2 = " + x2 + " in cdf(x1,x2)";
+            throw new IllegalArgumentException(msg);
+        }
+        return (cdf(x2) - cdf(x1));
+    }
 
     /** Computes the complementary cumulative probability
      * distribution function for given value of x
      * @param x The value to be evaluated
      * @return The probability, 1-P{X&lt;=x}
      */
-    double complementaryCDF(double x);
+    default double complementaryCDF(double x) {
+        return (1.0 - cdf(x));
+    }
 
     /** Provides the inverse cumulative distribution function for the distribution
      *
@@ -63,4 +71,5 @@ public interface CDFIfc extends ParametersIfc {
      * @return The inverse cdf evaluated at the supplied probability
      */
     double invCDF(double p);
+
 }

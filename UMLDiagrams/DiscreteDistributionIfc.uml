@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>jsl.utilities.random.distributions.DiscreteDistributionIfc</OriginalElement>
+  <nodes>
+    <node x="962.0" y="100.0">jsl.utilities.random.distributions.ShiftedGeometric</node>
+    <node x="253.0" y="100.0">jsl.utilities.random.distributions.Binomial</node>
+    <node x="375.0" y="100.0">jsl.utilities.random.distributions.DEmpiricalCDF</node>
+    <node x="534.0" y="100.0">jsl.utilities.random.distributions.Geometric</node>
+    <node x="843.0" y="100.0">jsl.utilities.random.distributions.Poisson</node>
+    <node x="129.0" y="100.0">jsl.utilities.random.distributions.Bernoulli</node>
+    <node x="424.0" y="0.0">jsl.utilities.random.distributions.DiscreteDistributionIfc</node>
+    <node x="667.0" y="100.0">jsl.utilities.random.distributions.NegativeBinomial</node>
+    <node x="0.0" y="100.0">jsl.utilities.random.distributions.DUniform</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="jsl.utilities.random.distributions.Binomial" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="304.0" y="70.0" />
+      <point x="482.4375" y="70.0" />
+      <point x="-35.0625" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.ShiftedGeometric" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="1040.5" y="50.0" />
+      <point x="599.3125" y="50.0" />
+      <point x="81.8125" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Poisson" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="892.5" y="60.0" />
+      <point x="575.9375" y="60.0" />
+      <point x="58.4375" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Bernoulli" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="181.0" y="60.0" />
+      <point x="459.0625" y="60.0" />
+      <point x="-58.4375" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.NegativeBinomial" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="745.0" y="70.0" />
+      <point x="552.5625" y="70.0" />
+      <point x="35.0625" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.DUniform" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="54.5" y="50.0" />
+      <point x="435.6875" y="50.0" />
+      <point x="-81.8125" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.DEmpiricalCDF" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="444.5" y="80.0" />
+      <point x="505.8125" y="80.0" />
+      <point x="-11.6875" y="15.0" />
+    </edge>
+    <edge source="jsl.utilities.random.distributions.Geometric" target="jsl.utilities.random.distributions.DiscreteDistributionIfc">
+      <point x="0.0" y="-15.0" />
+      <point x="590.5" y="80.0" />
+      <point x="529.1875" y="80.0" />
+      <point x="11.6875" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7884108867427568" x="559.5" y="65.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

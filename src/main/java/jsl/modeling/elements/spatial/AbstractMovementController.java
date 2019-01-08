@@ -19,7 +19,7 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.RandomIfc;
-import jsl.utilities.random.distributions.Constant;
+import jsl.utilities.random.rvariable.ConstantRV;
 
 /**
  * An AbstractMovementController can be used to control the movements of an
@@ -51,7 +51,7 @@ public abstract class AbstractMovementController extends SchedulingElement imple
     public AbstractMovementController(ModelElement parent, String name) {
         super(parent, name);
         myVelFactor = 1.0;
-        myVelocity = new RandomVariable(this, Constant.ONE);
+        myVelocity = new RandomVariable(this, ConstantRV.ONE);
     }
 
     @Override

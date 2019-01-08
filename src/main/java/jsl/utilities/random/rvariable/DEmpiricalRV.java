@@ -113,7 +113,7 @@ public final class DEmpiricalRV extends AbstractRVariable {
         }
         int i = 0;
         double value = myValues[i];
-        double u = myRNG.randU01();
+        double u = myRNStream.randU01();
         while (myCDF[i] <= u) {
             i = i + 1;
             value = myValues[i];

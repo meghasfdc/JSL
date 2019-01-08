@@ -80,7 +80,7 @@ public final class LognormalRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rLogNormal(myMean, myVar, myRNG);
+        double v = JSLRandom.rLogNormal(myMean, myVar, myRNStream);
         return v;
     }
 

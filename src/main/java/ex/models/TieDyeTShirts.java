@@ -21,28 +21,27 @@
  */
 package ex.models;
 
-import java.util.ArrayList;
-import java.util.List;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.Model;
-import jsl.modeling.ModelElement;
-import jsl.modeling.Simulation;
-import jsl.modeling.SimulationReporter;
+import jsl.modeling.*;
 import jsl.modeling.elements.EventGenerator;
-import jsl.modeling.queue.QObject;
+import jsl.modeling.elements.EventGeneratorActionIfc;
 import jsl.modeling.elements.station.ReceiveQObjectIfc;
 import jsl.modeling.elements.station.SResource;
 import jsl.modeling.elements.station.SingleQueueStation;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.utilities.random.distributions.Triangular;
-import jsl.utilities.random.distributions.Uniform;
-import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.modeling.queue.QObject;
+import jsl.utilities.random.rvariable.DEmpiricalRV;
+import jsl.utilities.random.rvariable.ExponentialRV;
+import jsl.utilities.random.rvariable.TriangularRV;
+import jsl.utilities.random.rvariable.UniformRV;
 
-/**
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.lang.IllegalStateException;
+
+/**  This implementation models the Tie Dye T-Shirt example without shared resources.
  *
  * @author rossetti
  */
@@ -70,18 +69,16 @@ public class TieDyeTShirts extends ModelElement {
 
     public TieDyeTShirts(ModelElement parent, String name) {
         super(parent, name);
-        myTBOrders = new RandomVariable(this, new Exponential(15));
+        myTBOrders = new RandomVariable(this, new ExponentialRV(15));
         myOrderGenerator = new EventGenerator(this, new OrderArrivals(),
                 myTBOrders, myTBOrders);
-        double[] a = {1, 0.7, 2, 1.0};
-        double[] b = {3, 0.75, 5, 1.0};
-        DEmpiricalCDF type = new DEmpiricalCDF(a);
-        DEmpiricalCDF size = new DEmpiricalCDF(b);
+        DEmpiricalRV type = new DEmpiricalRV(new double[]{1.0, 2.0}, new double[] {0.7, 1.0});
+        DEmpiricalRV size = new DEmpiricalRV(new double[]{3.0, 5.0}, new double[] {0.75, 1.0});
         myOrderSize = new RandomVariable(this, size);
         myOrderType = new RandomVariable(this, type);
-        myShirtMakingTime = new RandomVariable(this, new Uniform(3, 5));
-        myPaperWorkTime = new RandomVariable(this, new Uniform(8, 10));
-        myPackagingTime = new RandomVariable(this, new Triangular(5, 10, 15));
+        myShirtMakingTime = new RandomVariable(this, new UniformRV(3, 5));
+        myPaperWorkTime = new RandomVariable(this, new UniformRV(8, 10));
+        myPackagingTime = new RandomVariable(this, new TriangularRV(5, 10, 15));
         myShirtMakers = new SResource(this, 1, "ShirtMakers_R");
         myPackager = new SResource(this, 1, "Packager_R");
         myShirtMakingStation = new SingleQueueStation(this, myShirtMakers,
@@ -314,5 +311,6 @@ public class TieDyeTShirts extends ModelElement {
         sim.run();
         System.out.println("Simulation completed.");
         r.printAcrossReplicationSummaryStatistics();
+        r.writeAcrossReplicationSummaryStatisticsAsLaTeX(new PrintWriter(System.out));
     }
 }

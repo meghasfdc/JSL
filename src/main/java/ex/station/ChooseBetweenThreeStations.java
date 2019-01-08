@@ -28,6 +28,10 @@ import jsl.modeling.elements.station.SingleQueueStation;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.modeling.elements.EventGeneratorActionIfc;
+import jsl.utilities.random.rvariable.ExponentialRV;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Arriving customers choose randomly between three stations. The arrivals are
@@ -67,13 +71,13 @@ public class ChooseBetweenThreeStations extends SchedulingElement {
     public ChooseBetweenThreeStations(ModelElement parent, String name) {
         super(parent, name);
 
-        myTBA = new RandomVariable(this, new Exponential(1.0 / 1.1));
+        myTBA = new RandomVariable(this, new ExponentialRV(1.0 / 1.1));
 
-        myST1 = new RandomVariable(this, new Exponential(0.8));
+        myST1 = new RandomVariable(this, new ExponentialRV(0.8));
 
-        myST2 = new RandomVariable(this, new Exponential(0.7));
+        myST2 = new RandomVariable(this, new ExponentialRV(0.7));
 
-        myST3 = new RandomVariable(this, new Exponential(0.6));
+        myST3 = new RandomVariable(this, new ExponentialRV(0.6));
 
         myArrivalGenerator = new EventGenerator(this, new Arrivals(), myTBA, myTBA);
 
@@ -86,10 +90,10 @@ public class ChooseBetweenThreeStations extends SchedulingElement {
         myStation2.setNextReceiver(d);
         myStation3 = new SingleQueueStation(this, myST3, "Station3");
         myStation3.setNextReceiver(d);
-        myTwoWay = new NWayByChanceStationSender(this);
-        myTwoWay.add(myStation1, 0.4);
-        myTwoWay.add(myStation2, 0.3);
-        myTwoWay.addLast(myStation3);
+
+        List<ReceiveQObjectIfc> list = Arrays.asList(myStation1, myStation2, myStation3);
+        double[] cdf = {0.4, 0.7, 1.0};
+        myTwoWay = new NWayByChanceStationSender(this, list, cdf);
 
     }
 

@@ -26,6 +26,13 @@ public final class ExponentialRV extends AbstractRVariable {
 
     private final double mean;
 
+    /**
+     * Defaults to mean = 1.0
+     */
+    public ExponentialRV(){
+        this(1.0);
+    }
+
     public ExponentialRV(double mean){
         this(mean, RNStreamFactory.getDefaultFactory().getStream());
     }
@@ -64,7 +71,7 @@ public final class ExponentialRV extends AbstractRVariable {
 
     @Override
     protected final double generate() {
-        double v = JSLRandom.rExponential(mean, myRNG);
+        double v = JSLRandom.rExponential(mean, myRNStream);
         return v;
     }
 

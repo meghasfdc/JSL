@@ -30,6 +30,7 @@ import jsl.modeling.StatisticalBatchingElement;
 import jsl.modeling.elements.variable.TWBatchingElement;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.Statistic;
 
@@ -56,8 +57,8 @@ public class SimulationDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
         sim.turnOnStatisticalBatching();
         StatisticalBatchingElement be = sim.getStatisticalBatchingElement().get();
         TWBatchingElement twbe = new TWBatchingElement(driveThroughPharmacy);
@@ -85,8 +86,8 @@ public class SimulationDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
         StatisticalBatchingElement be = new StatisticalBatchingElement(m);
         // set the parameters of the experiment
         sim.setNumberOfReplications(1);
@@ -108,8 +109,8 @@ public class SimulationDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(1.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(0.7));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(1.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(0.7));
         // set the parameters of the experiment
         sim.setNumberOfReplications(10);
         sim.setLengthOfReplication(30000.0);
@@ -131,8 +132,8 @@ public class SimulationDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
         sim.turnOnStatisticalBatching();
         StatisticalBatchingElement be = sim.getStatisticalBatchingElement().get();
         TWBatchingElement twbe = new TWBatchingElement(driveThroughPharmacy);
@@ -169,8 +170,8 @@ public class SimulationDemos {
         Model m = sim.getModel();
         // add DriveThroughPharmacy to the main model
         DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
-        driveThroughPharmacy.setArrivalRS(new Exponential(6.0));
-        driveThroughPharmacy.setServiceRS(new Exponential(3.0));
+        driveThroughPharmacy.setArrivalRS(new ExponentialRV(6.0));
+        driveThroughPharmacy.setServiceRS(new ExponentialRV(3.0));
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);
         sim.setLengthOfReplication(20000.0);

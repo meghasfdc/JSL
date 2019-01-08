@@ -28,18 +28,20 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import jsl.utilities.Interval;
-import jsl.utilities.random.distributions.DEmpiricalPMF;
+import jsl.utilities.random.distributions.DEmpiricalCDF;
 import jsl.utilities.random.distributions.DUniform;
+import jsl.utilities.random.rvariable.DUniformRV;
 
-/** This class tabulates the weights associated with
- *  the integers presented to it via the collect() method
- *  Every value presented is interpreted as an integer
- *  For every value presented a sum of the weights is maintained.
- *  There could be space/time performance issues if
- *  the number of different values presented is large.
- *
- *  This class can be useful for tabulating the weighted proportions
- *  over the values (integers) presented.
+/**
+ * This class tabulates the weights associated with
+ * the integers presented to it via the collect() method
+ * Every value presented is interpreted as an integer
+ * For every value presented a sum of the weights is maintained.
+ * There could be space/time performance issues if
+ * the number of different values presented is large.
+ * <p>
+ * This class can be useful for tabulating the weighted proportions
+ * over the values (integers) presented.
  *
  * @author rossetti
  */
@@ -50,7 +52,8 @@ public class WeightedProportion extends AbstractStatistic {
      */
     protected Map<Cell, Cell> myCells;
 
-    /** Collects statistical information
+    /**
+     * Collects statistical information
      */
     protected Statistic myStatistic;
 
@@ -59,25 +62,27 @@ public class WeightedProportion extends AbstractStatistic {
      */
     protected Cell myTemp;
 
-    /** The smallest value allowed.  Any
-     *  values &lt; to this value will be counted
-     *  in the underflow count
-     *
+    /**
+     * The smallest value allowed.  Any
+     * values &lt; to this value will be counted
+     * in the underflow count
      */
     protected int myLowerLimit;
 
-    /** The largest value allowed.  Any
-     *  values &gt; to this value will be counted
-     *  in the overflow count
-     *
+    /**
+     * The largest value allowed.  Any
+     * values &gt; to this value will be counted
+     * in the overflow count
      */
     protected int myUpperLimit;
 
-    /** Counts of values located below first bin.
+    /**
+     * Counts of values located below first bin.
      */
     protected int myUnderFlowCount;
 
-    /** Counts of values located above last bin.
+    /**
+     * Counts of values located above last bin.
      */
     protected int myOverFlowCount;
 
@@ -108,7 +113,7 @@ public class WeightedProportion extends AbstractStatistic {
 
     @Override
     public boolean collect(double x, double weight) {
-        if (isTurnedOff()){
+        if (isTurnedOff()) {
             return false;
         }
         if (Double.isNaN(x)) {
@@ -157,7 +162,8 @@ public class WeightedProportion extends AbstractStatistic {
         clearSavedData();
     }
 
-    /** The number of observations that fell below the first bin's lower limit
+    /**
+     * The number of observations that fell below the first bin's lower limit
      *
      * @return
      */
@@ -165,7 +171,8 @@ public class WeightedProportion extends AbstractStatistic {
         return (myUnderFlowCount);
     }
 
-    /** The number of observations that fell past the last bin's upper limit
+    /**
+     * The number of observations that fell past the last bin's upper limit
      *
      * @return
      */
@@ -173,8 +180,9 @@ public class WeightedProportion extends AbstractStatistic {
         return (myOverFlowCount);
     }
 
-    /** Returns an array of size getNumberOfCells() containing
-     *  the values increasing by value, null if no values
+    /**
+     * Returns an array of size getNumberOfCells() containing
+     * the values increasing by value, null if no values
      *
      * @return
      */
@@ -192,10 +200,12 @@ public class WeightedProportion extends AbstractStatistic {
         return v;
     }
 
-    /** Returns an array of size getNumberOfCells() containing
-     *  the frequencies by value, null if no values
+    /**
+     * Returns an array of size getNumberOfCells() containing
+     * the frequencies by value, null if no values
      *
-     * @return
+     * @return an array of size getNumberOfCells() containing
+     *       the frequencies by value, null if no values
      */
     public final double[] getWeights() {
         if (myCells.isEmpty()) {
@@ -211,10 +221,11 @@ public class WeightedProportion extends AbstractStatistic {
         return v;
     }
 
-        /** Returns an array of size getNumberOfCells() containing
-     *  the frequencies by value, null if no values
+    /**
+     * Returns an array of size getNumberOfCells() containing
+     * the proportions by value, null if no values
      *
-     * @return
+     * @return Returns an array of size getNumberOfCells() containins the proportions by value, null if no values
      */
     public final double[] getProportions() {
         if (myCells.isEmpty()) {
@@ -230,10 +241,11 @@ public class WeightedProportion extends AbstractStatistic {
         return v;
     }
 
-    /** Returns the cumulative frequency up to an including i
+    /**
+     * Returns the cumulative frequency up to an including i
      *
-     * @param i
-     * @return
+     * @param i the value to evaluate
+     * @return the cumulative frequency up to an including i
      */
     public final double getCumulativeWeight(int i) {
         if (myCells.isEmpty()) {
@@ -251,10 +263,11 @@ public class WeightedProportion extends AbstractStatistic {
         return sum;
     }
 
-    /** Returns the cumulative proportion up to an including i
+    /**
+     * Returns the cumulative proportion up to an including i
      *
-     * @param i
-     * @return
+     * @param i the value to evaluate
+     * @return the cumulative proportion up to an including i
      */
     public final double getCumulativeProportion(int i) {
         if (myCells.isEmpty()) {
@@ -264,10 +277,11 @@ public class WeightedProportion extends AbstractStatistic {
         return (getCumulativeWeight(i) / n);
     }
 
-    /** Returns a n by 2 array of value, frequency
-     *  pairs where n = getNummberOfCells()
+    /**
+     * The 0th column is the values and the 1st column is the frequency
      *
-     * @return
+     * @return Returns a n by 2 array of value, frequency
+     * pairs where n = getNumberOfCells()
      */
     public final double[][] getValueWeights() {
         if (myCells.isEmpty()) {
@@ -284,7 +298,13 @@ public class WeightedProportion extends AbstractStatistic {
         return v;
     }
 
-    public final double[][] getValueProportions(){
+    /**
+     * The 0th column is the values and the 1st column is the proportions
+     *
+     * @return returns a n by 2 array of value, proportion pairs, where
+     * n = n = getNumberOfCells()
+     */
+    public final double[][] getValueProportions() {
         if (myCells.isEmpty()) {
             return null;
         }
@@ -299,7 +319,8 @@ public class WeightedProportion extends AbstractStatistic {
         return v;
     }
 
-    /** Returns the number of cells tabulated
+    /**
+     * Returns the number of cells tabulated
      *
      * @return
      */
@@ -307,7 +328,8 @@ public class WeightedProportion extends AbstractStatistic {
         return myCells.size();
     }
 
-    /** The total count associated with the values
+    /**
+     * The total count associated with the values
      *
      * @return
      */
@@ -315,8 +337,9 @@ public class WeightedProportion extends AbstractStatistic {
         return ((int) myStatistic.getSumOfWeights());
     }
 
-    /** Returns the current frequency for the provided integer
-     * 
+    /**
+     * Returns the current frequency for the provided integer
+     *
      * @param x
      * @return
      */
@@ -330,8 +353,9 @@ public class WeightedProportion extends AbstractStatistic {
         }
     }
 
-    /** Gets the proportion of the observations that
-     *  are equal to the supplied integer
+    /**
+     * Gets the proportion of the observations that
+     * are equal to the supplied integer
      *
      * @param x
      * @return
@@ -347,9 +371,10 @@ public class WeightedProportion extends AbstractStatistic {
         }
     }
 
-    /** Interprets the elements of x[] as values
-     *  and returns an array representing the frequency
-     *  for each value
+    /**
+     * Interprets the elements of x[] as values
+     * and returns an array representing the frequency
+     * for each value
      *
      * @param x
      * @return
@@ -362,9 +387,10 @@ public class WeightedProportion extends AbstractStatistic {
         return f;
     }
 
-    /** Returns a copy of the cells in a list
-     *  ordered by the value of each cell, 0th element
-     *  is cell with smallest value, etc
+    /**
+     * Returns a copy of the cells in a list
+     * ordered by the value of each cell, 0th element
+     * is cell with smallest value, etc
      *
      * @return
      */
@@ -377,17 +403,14 @@ public class WeightedProportion extends AbstractStatistic {
         return list;
     }
 
-    public DEmpiricalPMF createDEmpirical(){
-        DEmpiricalPMF d = new DEmpiricalPMF();
-        double[][] x = getValueProportions();
-        for(int j = 0; j<x.length-1;j++){
-            d.addProbabilityPoint(x[j][0], x[j][1]);
-        }
-        d.addLastProbabilityPoint(x[x.length-1][0]);
+    public DEmpiricalCDF createDEmpirical() {
+        double[][] valueProportions = this.getValueProportions();
+        DEmpiricalCDF d = new DEmpiricalCDF(valueProportions[0],valueProportions[1]);
         return d;
     }
 
-    /** Returns a sorted set containing the cells
+    /**
+     * Returns a sorted set containing the cells
      *
      * @return
      */
@@ -573,8 +596,8 @@ public class WeightedProportion extends AbstractStatistic {
         return myStatistic.getConfidenceInterval();
     }
 
-    /** Holds the values and their counts
-     *
+    /**
+     * Holds the values and their counts
      */
     public class Cell implements Comparable<Cell> {
 
@@ -655,7 +678,7 @@ public class WeightedProportion extends AbstractStatistic {
      */
     public static void main(String[] args) {
 
-        DUniform du = new DUniform(1, 10);
+        DUniformRV du = new DUniformRV(1, 10);
 
         WeightedProportion f = new WeightedProportion();
         // IntegerFrequency f = new IntegerFrequency(1,6);

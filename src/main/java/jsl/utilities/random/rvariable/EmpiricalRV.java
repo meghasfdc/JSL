@@ -47,7 +47,7 @@ public final class EmpiricalRV extends AbstractRVariable {
 
     @Override
     public RVariableIfc newInstance(RNStreamIfc rng) {
-        return new EmpiricalRV(myPop.getParameters(), myRNG);
+        return new EmpiricalRV(myPop.getParameters(), myRNStream);
     }
 
     @Override

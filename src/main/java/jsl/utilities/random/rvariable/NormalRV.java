@@ -28,6 +28,10 @@ public final class NormalRV extends AbstractRVariable {
 
     private final double myVar;
 
+    private double nextNormal = 0.0;
+
+    private boolean nextNormalFlag = false;
+
     /**
      *  N(0,1)
      */
@@ -81,9 +85,17 @@ public final class NormalRV extends AbstractRVariable {
         return myVar;
     }
 
+    /**
+     *
+     * @return the standard deviation of the random variable
+     */
+    public final double getStandardDeviation(){
+        return Math.sqrt(getVariance());
+    }
+
     @Override
     protected final double generate() {
-        double v = JSLRandom.rNormal(myMean, myVar, myRNG);
+        double v = JSLRandom.rNormal(myMean, myVar, myRNStream);
         return v;
     }
 
@@ -109,4 +121,33 @@ public final class NormalRV extends AbstractRVariable {
             }
         };
     }
+
+    /** Gets a random variate from this normal distribution
+     *  via the polar method.
+     *
+     * @return a normally distributed random variate
+     */
+    public final double polarMethodRandomVariate() {
+        if (nextNormalFlag == true) {
+            nextNormalFlag = false;
+            return (myMean + getStandardDeviation() * nextNormal);
+        } else {
+            double u1, u2;
+            double v1, v2;
+            double w, y;
+            do {
+                u1 = myRNStream.randU01();
+                u2 = myRNStream.randU01();
+                v1 = 2.0 * u1 - 1.0;
+                v2 = 2.0 * u2 - 1.0;
+                w = v1 * v1 + v2 * v2;
+            } while (w > 1.0);
+            y = Math.sqrt((-2.0 * Math.log(w) / w));
+
+            nextNormal = v2 * y;
+            nextNormalFlag = true;
+            return (myMean + getStandardDeviation() * (v1 * y));
+        }
+    }
+
 }
