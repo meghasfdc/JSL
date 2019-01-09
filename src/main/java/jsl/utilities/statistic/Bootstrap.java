@@ -385,7 +385,7 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
     /**
      *
      * @param b the bootstrap generate number, b = 1, 2, ... to getNumBootstrapSamples()
-     * @return the generate generated for the bth bootstrap, if no samples are saved then
+     * @return the generated values for the bth bootstrap, if no samples are saved then
      * the array returned is of zero length
      */
     public final double[] getDataForBootstrapSample(int b){
@@ -399,7 +399,7 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
     }
 
     /** If the bootstrap samples were saved, this returns the
-     * generate averages for each of the samples
+     * generated averages for each of the samples
      *
      * @return an array of the bootstrap generate averages, will be zero length if
      * no bootstrap samples were saved
@@ -415,9 +415,9 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
     }
 
     /** If the bootstrap samples were saved, this returns the
-     * generate variance for each of the samples
+     * generated variance for each of the samples
      *
-     * @return an array of the bootstrap generate variances, will be zero length if
+     * @return an array of the bootstrap generated variances, will be zero length if
      * no bootstrap samples were saved
      */
     public final double[] getBootstrapSampleVariances(){
@@ -438,7 +438,7 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
     }
 
     /**
-     * @return the generate average of the estimates from the bootstrap samples
+     * @return the generated average of the estimates from the bootstrap samples
      */
     public final double getAcrossBootstrapAverage() {
         return myAcrossBSStat.getAverage();
@@ -458,7 +458,7 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
     }
 
     /**
-     * Each element is the bootstrap estimate for generate i minus getOriginalDataEstimate()
+     * Each element is the bootstrap estimate for sample i minus getOriginalDataEstimate()
      *
      * @return the array of bootstrap differences
      */
@@ -467,7 +467,7 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
     }
 
     /**
-     * Each element is the bootstrap estimate for generate i minus getOriginalDataEstimate()
+     * Each element is the bootstrap estimate for sample i minus getOriginalDataEstimate()
      * divided by getBootstrapStdErrEstimate()
      *
      * @return the array of bootstrap differences

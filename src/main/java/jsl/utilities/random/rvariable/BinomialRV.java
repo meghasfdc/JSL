@@ -83,7 +83,8 @@ public final class BinomialRV extends AbstractRVariable {
 
     /**
      * The keys are "ProbOfSuccess", the default value is 0.5 and
-     * "NumTrials" with default value 2.
+     * "NumTrials" with default value 2.  NumTrials is an Integer control and
+     * ProbOfSuccess is a Double control.
      *
      * @return a control for Binomial random variables
      */
