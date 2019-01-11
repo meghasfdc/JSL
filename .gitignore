@@ -18,6 +18,7 @@
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/copyright/
+.idea/encodings.xml
 
 # Gradle:
 .idea/**/gradle.xml
@@ -199,3 +200,7 @@ JSL\.iml
 \.idea/modules\.xml
 
 \.idea/kotlinc\.xml
+
+bin/.gitignore
+UMLDiagrams/
+
