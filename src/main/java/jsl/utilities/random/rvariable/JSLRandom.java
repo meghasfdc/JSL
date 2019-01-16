@@ -500,9 +500,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rGamma(double shape, double scale, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng,"The supplied RNStreamIfc was null" );
         if (shape <= 0) {
             throw new IllegalArgumentException("Shape parameter must be positive");
         }
@@ -521,7 +519,7 @@ public class JSLRandom {
         double x;
         /* ...special case: exponential distribution */
         if (shape == 1.0) {
-            x = -shape * Math.log(1.0 - p);
+            x = -scale * Math.log(1.0 - p);
             return (x);
         }
         /* ...compute the gamma(alpha, beta) inverse.                   *
