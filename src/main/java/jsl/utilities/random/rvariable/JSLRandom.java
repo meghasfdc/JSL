@@ -44,6 +44,8 @@ import static jsl.utilities.random.distributions.Normal.stdNormalInvCDF;
  */
 public class JSLRandom {
 
+    public static enum AlgoType {Inverse, AcceptanceRejection};
+
     private static Beta myBeta;
 
     private JSLRandom() {
@@ -65,7 +67,7 @@ public class JSLRandom {
     }
 
     /**
-     * @param pSuccess the probability of success
+     * @param pSuccess the probability of success, must be in (0,1)
      * @return the random value
      */
     public static double rBernoulli(double pSuccess) {
@@ -73,16 +75,14 @@ public class JSLRandom {
     }
 
     /**
-     * @param pSuccess the probability of success
+     * @param pSuccess the probability of success, must be in (0,1)
      * @param rng      the RngIfc
      * @return the random value
      */
     public static double rBernoulli(double pSuccess, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
-        if ((pSuccess < 0.0) || (pSuccess > 1.0)) {
-            throw new IllegalArgumentException("Success Probability must be [0,1]");
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        if ((pSuccess <= 0.0) || (pSuccess >= 1.0)) {
+            throw new IllegalArgumentException("Success Probability must be (0,1)");
         }
 
         if (rng.randU01() <= pSuccess) {
@@ -93,8 +93,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param pSuccess the probability of success
-     * @param nTrials  the number of trials
+     * @param pSuccess the probability of success, must be in (0,1)
+     * @param nTrials  the number of trials, must be greater than 0
      * @return the random value
      */
     public static int rBinomial(double pSuccess, int nTrials) {
@@ -102,27 +102,24 @@ public class JSLRandom {
     }
 
     /**
-     * @param pSuccess the probability of success
-     * @param nTrials  the number of trials
-     * @param rng      the RngIfc
+     * @param pSuccess the probability of success, must be in (0,1)
+     * @param nTrials  the number of trials, must be greater than 0
+     * @param rng      the RngIfc, must not be null
      * @return the random value
      */
     public static int rBinomial(double pSuccess, int nTrials, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (nTrials <= 0) {
             throw new IllegalArgumentException("Number of trials must be >= 1");
         }
-        if ((pSuccess < 0.0) || (pSuccess > 1.0)) {
-            throw new IllegalArgumentException("Success Probability must be [0,1]");
+        if ((pSuccess <= 0.0) || (pSuccess >= 1.0)) {
+            throw new IllegalArgumentException("Success Probability must be (0,1)");
         }
-
         return Binomial.binomialInvCDF(rng.randU01(), nTrials, pSuccess);
     }
 
     /**
-     * @param mean the mean of the Poisson
+     * @param mean the mean of the Poisson, must be greater than 0
      * @return the random value
      */
     public static int rPoisson(double mean) {
@@ -130,14 +127,12 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean the mean of the Poisson
-     * @param rng  the RngIfc
+     * @param mean the mean of the Poisson, must be greater than 0
+     * @param rng  the RngIfc, must not be null
      * @return the random value
      */
     public static int rPoisson(double mean, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         return Poisson.poissonInvCDF(rng.randU01(), mean);
     }
 
@@ -157,18 +152,16 @@ public class JSLRandom {
      *
      * @param minimum the minimum of the range
      * @param maximum the maximum of the range
-     * @param rng     the RngIfc
+     * @param rng     the RngIfc, must not be null
      * @return the random value
      */
     public static int rDUniform(int minimum, int maximum, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         return rng.randInt(minimum, maximum);
     }
 
     /**
-     * @param pSuccess the probability of success
+     * @param pSuccess the probability of success, must be in (0,1)
      * @return the random value
      */
     public static int rGeometric(double pSuccess) {
@@ -177,14 +170,12 @@ public class JSLRandom {
     }
 
     /**
-     * @param pSuccess the probability of success
-     * @param rng      the RngIfc
+     * @param pSuccess the probability of success, must be in (0,1)
+     * @param rng      the RngIfc, must not be null
      * @return the random value
      */
     public static int rGeometric(double pSuccess, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if ((pSuccess < 0.0) || (pSuccess > 1.0)) {
             throw new IllegalArgumentException("Success Probability must be [0,1]");
         }
@@ -193,8 +184,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param pSuccess   the probability of success
-     * @param rSuccesses number of trials until rth success
+     * @param pSuccess   the probability of success, must be in (0,1)
+     * @param rSuccesses number of trials until rth success, must be greater than 0
      * @return the random value
      */
     public static int rNegBinomial(double pSuccess, double rSuccesses) {
@@ -204,20 +195,18 @@ public class JSLRandom {
     /**
      * @param pSuccess   the probability of success
      * @param rSuccesses number of trials until rth success
-     * @param rng        the RngIfc
+     * @param rng        the RngIfc, must not be null
      * @return the random value
      */
     public static int rNegBinomial(double pSuccess, double rSuccesses, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         return NegativeBinomial.negBinomialInvCDF(rng.randU01(), pSuccess, rSuccesses);
     }
 
     /**
      * Generates a continuous uniform over the range
      *
-     * @param minimum the minimum of the range
+     * @param minimum the minimum of the range, must be less than maximum
      * @param maximum the maximum of the range
      * @return the random value
      */
@@ -228,15 +217,13 @@ public class JSLRandom {
     /**
      * Generates a continuous uniform over the range
      *
-     * @param minimum the minimum of the range
+     * @param minimum the minimum of the range, must be less than maximum
      * @param maximum the maximum of the range
-     * @param rng     the RngIfc
+     * @param rng     the RngIfc, must not be null
      * @return the random value
      */
     public static double rUniform(double minimum, double maximum, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (minimum >= maximum) {
             throw new IllegalArgumentException("Lower limit must be < upper "
                     + "limit. lower limit = " + minimum + " upper limit = " + maximum);
@@ -247,7 +234,7 @@ public class JSLRandom {
 
     /**
      * @param mean     the mean of the normal
-     * @param variance the variance of the normal
+     * @param variance the variance of the normal, must be greater than 0
      * @return the random value
      */
     public static double rNormal(double mean, double variance) {
@@ -256,14 +243,12 @@ public class JSLRandom {
 
     /**
      * @param mean     the mean of the normal
-     * @param variance the variance of the normal
-     * @param rng      the RngIfc
+     * @param variance the variance of the normal, must be greater than 0
+     * @param rng      the RngIfc, must not null
      * @return the random value
      */
     public static double rNormal(double mean, double variance, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (variance <= 0) {
             throw new IllegalArgumentException("Variance must be positive");
         }
@@ -274,8 +259,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean     the mean of the lognormal
-     * @param variance the variance of the lognormal
+     * @param mean     the mean of the lognormal, must be greater than 0
+     * @param variance the variance of the lognormal, must be greater than 0
      * @return the random value
      */
     public static double rLogNormal(double mean, double variance) {
@@ -283,15 +268,13 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean     the mean of the lognormal
-     * @param variance the variance of the lognormal
-     * @param rng      the RngIfc
+     * @param mean     the mean of the lognormal, must be greater than 0
+     * @param variance the variance of the lognormal, must be greater than 0
+     * @param rng      the RngIfc, must not be null
      * @return the random value
      */
     public static double rLogNormal(double mean, double variance, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (mean <= 0) {
             throw new IllegalArgumentException("Mean must be positive");
         }
@@ -309,8 +292,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
      * @return the random value
      */
     public static double rWeibull(double shape, double scale) {
@@ -318,27 +301,35 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
-     * @param rng   the RngIfc
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
+     * @param rng   the RngIfc, must not null
      * @return the random value
      */
     public static double rWeibull(double shape, double scale, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        checkShapeAndScale(shape, scale);
+        double u = rng.randU01();
+        return scale * Math.pow(-Math.log(1.0 - u), 1.0 / shape);
+    }
+
+    /**
+     * Throws an exception if shape or scale are invalid
+     *
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
+     */
+    private static void checkShapeAndScale(double shape, double scale) {
         if (shape <= 0) {
             throw new IllegalArgumentException("Shape parameter must be positive");
         }
         if (scale <= 0) {
             throw new IllegalArgumentException("Scale parameter must be positive");
         }
-        double u = rng.randU01();
-        return scale * Math.pow(-Math.log(1.0 - u), 1.0 / shape);
     }
 
     /**
-     * @param mean the mean
+     * @param mean the mean, must be greater than 0
      * @return the random value
      */
     public static double rExponential(double mean) {
@@ -346,14 +337,12 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean the mean
-     * @param rng  the RngIfc
+     * @param mean the mean, must be greater than 0
+     * @param rng  the RngIfc, must not null
      * @return the random value
      */
     public static double rExponential(double mean, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (mean <= 0.0) {
             throw new IllegalArgumentException("Exponential mean must be > 0.0");
         }
@@ -375,21 +364,18 @@ public class JSLRandom {
 
     /**
      * @param alpha1 alpha1 parameter
-     * @param alpha2 alpha2 parameter
-     * @param min    the min
+     * @param alpha2 alpha2 parameter, must be greater than zero
+     * @param min    the min, must be less than max
      * @param max    the max
-     * @param rng    the RngIfc
+     * @param rng    the RngIfc, must not be null
      * @return the generated value
      */
     public static double rJohnsonB(double alpha1, double alpha2,
                                    double min, double max, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (alpha2 <= 0) {
             throw new IllegalArgumentException("alpha2 must be > 0");
         }
-
         if (max <= min) {
             throw new IllegalArgumentException("the min must be < than the max");
         }
@@ -410,29 +396,22 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
-     * @param rng   the RngIfc
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
+     * @param rng   the RngIfc, must not be null
      * @return the generated value
      */
     public static double rLogLogistic(double shape, double scale, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
-        if (shape <= 0) {
-            throw new IllegalArgumentException("Shape parameter must be positive");
-        }
-        if (scale <= 0) {
-            throw new IllegalArgumentException("Scale parameter must be positive");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        checkShapeAndScale(shape, scale);
         double u = rng.randU01();
         double c = u / (1.0 - u);
         return (scale * Math.pow(c, 1.0 / shape));
     }
 
     /**
-     * @param min  the min
-     * @param mode the mode
+     * @param min  the min, must be less than or equal to mode
+     * @param mode the mode, must be less than or equal to max
      * @param max  the max
      * @return the random value
      */
@@ -442,32 +421,26 @@ public class JSLRandom {
     }
 
     /**
-     * @param min  the min
-     * @param mode the mode
+     * @param min  the min, must be less than or equal to mode
+     * @param mode the mode, must be less than or equal to max
      * @param max  the max
-     * @param rng  the RngIfc
+     * @param rng  the RngIfc, must not be null
      * @return the random value
      */
     public static double rTriangular(double min, double mode,
                                      double max, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (min > mode) {
             throw new IllegalArgumentException("min must be <= mode");
         }
-
         if (min >= max) {
             throw new IllegalArgumentException("min must be < max");
         }
-
         if (mode > max) {
             throw new IllegalArgumentException("mode must be <= max");
         }
         double range = max - min;
-
         double c = (mode - min) / range;
-
         // get the invCDF for a triang(0,c,1)
         double x;
         double p = rng.randU01();
@@ -485,8 +458,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
      * @return the generated value
      */
     public static double rGamma(double shape, double scale) {
@@ -494,28 +467,42 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
-     * @param rng   the RngIfc
+     * @param shape the shape, must be greater than 0.0
+     * @param scale the scale, must be greater than 0.0
+     * @param rng   the RngIfc, must not null
      * @return the generated value
      */
     public static double rGamma(double shape, double scale, RNStreamIfc rng) {
-        Objects.requireNonNull(rng,"The supplied RNStreamIfc was null" );
-        if (shape <= 0) {
-            throw new IllegalArgumentException("Shape parameter must be positive");
+        return rGamma(shape, scale, rng, AlgoType.Inverse);
+    }
+
+    /**
+     * @param shape the shape, must be greater than 0.0
+     * @param scale the scale, must be greater than 0.0
+     * @param rng   the RngIfc, must not null
+     * @param type, must be appropriate algorithm type, if null then inverse transform is the default
+     * @return the generated value
+     */
+    public static double rGamma(double shape, double scale, RNStreamIfc rng, AlgoType type){
+        if (type == AlgoType.AcceptanceRejection){
+            return rARGamma(shape, scale, rng);
+        } else {
+            return rInvGamma(shape, scale, rng);
         }
-        if (scale <= 0) {
-            throw new IllegalArgumentException("Scale parameter must be positive");
-        }
+    }
+
+    /**
+     * Uses the inverse transform technique for generating from the gamma
+     *
+     * @param shape the shape, must be greater than 0.0
+     * @param scale the scale, must be greater than 0.0
+     * @param rng   the RngIfc, must not null
+     * @return the generated value
+     */
+    private static double rInvGamma(double shape, double scale, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        checkShapeAndScale(shape, scale);
         double p = rng.randU01();
-        if (p <= 0.0) {
-            return 0.0;
-        }
-
-        if (p >= 1.0) {
-            return Double.POSITIVE_INFINITY;
-        }
-
         double x;
         /* ...special case: exponential distribution */
         if (shape == 1.0) {
@@ -525,21 +512,110 @@ public class JSLRandom {
         /* ...compute the gamma(alpha, beta) inverse.                   *
          *    ...compute the chi-square inverse with 2*alpha degrees of *
          *       freedom, which is equivalent to gamma(alpha, 2).       */
-
         double v = 2.0 * shape;
         double g = logGammaFunction(shape);
-
         double chi2 = invChiSquareDistribution(p, v, g,
                 Gamma.DEFAULT_MAX_ITERATIONS, JSLMath.getDefaultNumericalPrecision());
-
         /* ...transfer chi-square to gamma. */
         x = scale * chi2 / 2.0;
-
         return (x);
     }
 
     /**
-     * @param dof degrees of freedom
+     * Uses the acceptance-rejection technique for generating from the gamma
+     *
+     * @param shape the shape, must be greater than 0.0
+     * @param scale the scale, must be greater than 0.0
+     * @param rng   the RngIfc, must not null
+     * @return the generated value
+     */
+    private static double rARGamma(double shape, double scale, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        checkShapeAndScale(shape, scale);
+        // first get gamma(shape, 1)
+        double x = rARGammaScaleEQ1(shape, rng);
+        // now scale to proper scale
+        return (x * scale);
+    }
+
+    /**
+     * Generates a gamma(shape, scale=1) random variable via acceptance rejection. Uses
+     * Ahrens and Dieter (1974) for shape between 0 and 1 and uses Marsaglia and Tsang (2000) for
+     * shape greater than 1
+     *
+     * @param shape the shape, must be positive
+     * @param rng   the random number stream, must not be null
+     * @return the randomly generated value
+     */
+    private static double rARGammaScaleEQ1(double shape, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        if (shape <= 0) {
+            throw new IllegalArgumentException("Shape parameter must be positive");
+        }
+        if ((0.0 < shape) && (shape < 1.0)) {
+            return rARGammaScaleEQ1ShapeBTW01(shape, rng);
+        } else {
+            return rARGammaScaleEQ1ShapeGT1(shape, rng);
+        }
+    }
+
+    /**
+     * Generates a gamma(shape, scale=1) random variable via acceptance rejection. Uses
+     * Ahrens and Dieter (1974)
+     *
+     * @param shape the shape, must be in (0,1)
+     * @param rng   the random number stream, must not be null
+     * @return the randomly generated value
+     */
+    private static double rARGammaScaleEQ1ShapeBTW01(double shape, RNStreamIfc rng) {
+        double e = Math.E;
+        double b = (e + shape) / e;
+        while (true) {
+            double u1 = rng.randU01();
+            double p = b * u1;
+            if (p > 1) {
+                double y = -Math.log((b - p) / shape);
+                double u2 = rng.randU01();
+                if (u2 <= Math.pow(y, shape - 1.0)) {
+                    return y;
+                }
+            } else {
+                double y = Math.pow(p, 1.0 / shape);
+                double u2 = rng.randU01();
+                if (u2 <= Math.exp(-y)) {
+                    return y;
+                }
+            }
+        }
+    }
+
+    /**
+     * Generates a gamma(shape, scale=1) random variable via acceptance rejection. Uses
+     * uses Marsaglia and Tsang (2000) for shape greater than 1
+     *
+     * @param shape the shape, must be greater than 1
+     * @param rng   the random number stream, must not be null
+     * @return the randomly generated value
+     */
+    private static double rARGammaScaleEQ1ShapeGT1(double shape, RNStreamIfc rng) {
+        double d = shape - 1. / 3.;
+        double c = 1. / Math.sqrt(9. * d);
+        for (; ; ) {
+            double x, v, u;
+            do {
+                x = rNormal(0, 1, rng);
+                v = 1. + (c * x);
+            } while (v <= 0.);
+            v = v * v * v;
+            u = rng.randU01();
+            if (u < 1. - .0331 * (x * x) * (x * x)) return (d * v);
+            if (Math.log(u) < 0.5 * x * x + d * (1. - v + Math.log(v))) return (d * v);
+        }
+    }
+
+
+    /**
+     * @param dof degrees of freedom, must be greater than 0
      * @return the random value
      */
     public static double rChiSquared(double dof) {
@@ -547,14 +623,12 @@ public class JSLRandom {
     }
 
     /**
-     * @param dof degrees of freedom
-     * @param rng the RngIfc
+     * @param dof degrees of freedom, must be greater than 0
+     * @param rng the RngIfc, must not be null
      * @return the random value
      */
     public static double rChiSquared(double dof, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (dof <= 0) {
             throw new IllegalArgumentException("The degrees of freedom should be > 0");
         }
@@ -562,8 +636,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
      * @return the generated value
      */
     public static double rPearsonType5(double shape, double scale) {
@@ -571,28 +645,18 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape
-     * @param scale the scale
-     * @param rng   the RngIfc
+     * @param shape the shape, must be greater than 0
+     * @param scale the scale, must be greater than 0
+     * @param rng   the RngIfc, must not be null
      * @return the generated value
      */
     public static double rPearsonType5(double shape, double scale, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
-        if (shape <= 0) {
-            throw new IllegalArgumentException("Alpha (shape parameter) should be > 0");
-        }
-
-        if (scale <= 0) {
-            throw new IllegalArgumentException("Beta (scale parameter) should > 0");
-        }
-
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
+        checkShapeAndScale(shape, scale);
         double GShape = shape;
         double GScale = 1.0 / scale;
         double y = rGamma(GShape, GScale, rng);
         return 1.0 / y;
-
     }
 
     /**
@@ -641,16 +705,14 @@ public class JSLRandom {
      *
      * @param alpha1  alpha1 parameter
      * @param alpha2  alpha2 parameter
-     * @param minimum the minimum of the range
+     * @param minimum the minimum of the range, must be less than maximum
      * @param maximum the maximum of the range
      * @param rng     the RngIfc
      * @return the random value
      */
     public static double rBetaG(double alpha1, double alpha2,
                                 double minimum, double maximum, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (minimum >= maximum) {
             throw new IllegalArgumentException("Lower limit must be < upper "
                     + "limit. lower limit = " + minimum + " upper limit = " + maximum);
@@ -677,15 +739,13 @@ public class JSLRandom {
      *
      * @param alpha1 alpha1 parameter
      * @param alpha2 alpha2 parameter
-     * @param beta   the beta parameter
-     * @param rng    the RngIfc
+     * @param beta   the beta parameter, must be greater than 0
+     * @param rng    the RngIfc, must not be null
      * @return the random value
      */
     public static double rPearsonType6(double alpha1, double alpha2,
                                        double beta, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (beta <= 0.0) {
             throw new IllegalArgumentException("The scale parameter must be > 0.0");
         }
@@ -697,7 +757,7 @@ public class JSLRandom {
      * Generates according to a Laplace(mean, scale)
      *
      * @param mean  mean or location parameter
-     * @param scale scale parameter
+     * @param scale scale parameter, must be greater than 0
      * @return the random value
      */
     public static double rLaplace(double mean, double scale) {
@@ -708,14 +768,12 @@ public class JSLRandom {
      * Generates according to a Laplace(mean, scale)
      *
      * @param mean  mean or location parameter
-     * @param scale scale parameter
-     * @param rng   the RngIfc
+     * @param scale scale parameter, must be greater than 0
+     * @param rng   the RngIfc, must not be null
      * @return the random value
      */
     public static double rLaplace(double mean, double scale, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (scale <= 0.0) {
             throw new IllegalArgumentException("The scale parameter must be > 0.0");
         }
@@ -742,9 +800,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static int randomlySelect(int[] array, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (array == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -773,9 +829,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static double randomlySelect(double[] array, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (array == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -808,9 +862,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static double randomlySelect(double[] array, double[] cdf, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (array == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -861,9 +913,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static int randomlySelect(int[] array, double[] cdf, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (array == null) {
             throw new IllegalArgumentException("The supplied array was null");
         }
@@ -916,9 +966,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static <T> T randomlySelect(List<T> list, double[] cdf, RNStreamIfc rng) {
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
-        }
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (list == null) {
             throw new IllegalArgumentException("The supplied list was null");
         }
@@ -973,14 +1021,15 @@ public class JSLRandom {
         return true;
     }
 
-    /** Each element must be in (0,1) and sum of elements must be less than or equal to 1.0
+    /**
+     * Each element must be in (0,1) and sum of elements must be less than or equal to 1.0
      *
      * @param prob the array to check, must not be null, must have at least two elements
      * @return true if the array represents a probability mass function
      */
-    public static boolean isValidPMF(double[] prob){
+    public static boolean isValidPMF(double[] prob) {
         Objects.requireNonNull(prob, "The probability array was null");
-        if (prob.length < 2){
+        if (prob.length < 2) {
             return false;
         }
         double sum = 0.0;
@@ -1001,22 +1050,21 @@ public class JSLRandom {
     }
 
     /**
-     *
      * @param prob the array representing a PMF
      * @return a valid CDF
      */
     public static double[] makeCDF(double[] prob) {
         Objects.requireNonNull(prob, "The probability array was null");
-        if (!isValidPMF(prob)){
-           throw new IllegalArgumentException("The supplied array was not a valid PMF");
+        if (!isValidPMF(prob)) {
+            throw new IllegalArgumentException("The supplied array was not a valid PMF");
         }
         double[] cdf = new double[prob.length];
         double sum = 0.0;
-        for (int i = 0; i < prob.length-1; i++) {
+        for (int i = 0; i < prob.length - 1; i++) {
             sum = sum + prob[i];
             cdf[i] = sum;
         }
-        cdf[prob.length-1] = 1.0;
+        cdf[prob.length - 1] = 1.0;
         return cdf;
     }
 
@@ -1040,11 +1088,9 @@ public class JSLRandom {
      * @return the randomly selected element
      */
     public static <T> T randomlySelect(List<T> list, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (list == null) {
             throw new IllegalArgumentException("The supplied list was null");
-        }
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied RngIfc was null");
         }
         if (list.isEmpty()) {
             return null;
@@ -1100,16 +1146,13 @@ public class JSLRandom {
      * @param rng        the source of randomness
      */
     public static void sampleWithoutReplacement(double[] x, int sampleSize, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
-        }
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied random number generator was null");
         }
         if (sampleSize > x.length) {
             throw new IllegalArgumentException("Can't draw without replacement more than the number of elements");
         }
-
         for (int j = 0; j < sampleSize; j++) {
             int i = rng.randInt(j, x.length - 1);
             double temp = x[j];
@@ -1120,12 +1163,12 @@ public class JSLRandom {
 
     /**
      * Facilitates sampling without replacement to a new array. Example usage:
-     *
+     * <p>
      * sampleWithoutReplacement(x, 5); // first sample into first 5 slots
      * double[] sample = copyFirstNValues(x, 5); // now copy from the first 5 slots
      *
-     * @param x the array to copy from
-     * @param N the number of values to copy
+     * @param x   the array to copy from
+     * @param N   the number of values to copy
      * @param <T> the type of the array
      * @return a new array with the values
      */
@@ -1181,11 +1224,9 @@ public class JSLRandom {
      * @param rng        the source of randomness
      */
     public static void sampleWithoutReplacement(int[] x, int sampleSize, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
-        }
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied random number generator was null");
         }
         if (sampleSize > x.length) {
             throw new IllegalArgumentException("Can't draw without replacement more than the number of elements");
@@ -1241,11 +1282,9 @@ public class JSLRandom {
      * @param rng        the source of randomness
      */
     public static void sampleWithoutReplacement(boolean[] x, int sampleSize, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
-        }
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied random number generator was null");
         }
         if (sampleSize > x.length) {
             throw new IllegalArgumentException("Can't draw without replacement more than the number of elements");
@@ -1301,16 +1340,13 @@ public class JSLRandom {
      * @param rng        the source of randomness
      */
     public static <T> void sampleWithoutReplacement(T[] x, int sampleSize, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
-        }
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied random number generator was null");
         }
         if (sampleSize > x.length) {
             throw new IllegalArgumentException("Can't draw without replacement more than the number of elements");
         }
-
         for (int j = 0; j < sampleSize; j++) {
             int i = rng.randInt(j, x.length - 1);
             T temp = x[j];
@@ -1365,17 +1401,14 @@ public class JSLRandom {
      * @param rng        the source of randomness
      */
     public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize, RNStreamIfc rng) {
+        Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         if (x == null) {
             throw new IllegalArgumentException("The supplied array was null");
-        }
-        if (rng == null) {
-            throw new IllegalArgumentException("The supplied random number generator was null");
         }
         int n = x.size();
         if (sampleSize > n) {
             throw new IllegalArgumentException("Can't draw without replacement more than the number of elements");
         }
-
         for (int j = 0; j < sampleSize; j++) {
             int i = rng.randInt(j, n - 1);
             T temp = x.get(j);
