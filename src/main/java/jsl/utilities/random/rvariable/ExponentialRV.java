@@ -33,10 +33,19 @@ public final class ExponentialRV extends AbstractRVariable {
         this(1.0);
     }
 
+    /** Uses a new stream from the default stream factory
+     *
+     * @param mean must be greater than 0.0
+     */
     public ExponentialRV(double mean){
         this(mean, RNStreamFactory.getDefaultFactory().getStream());
     }
 
+    /**
+     *
+     * @param mean must be greater than 0.0
+     * @param rng must be null
+     */
     public ExponentialRV(double mean, RNStreamIfc rng){
         super(rng);
         if (mean <= 0.0) {

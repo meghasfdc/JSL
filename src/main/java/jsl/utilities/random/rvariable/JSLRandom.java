@@ -35,7 +35,8 @@ import static jsl.utilities.random.distributions.Normal.stdNormalInvCDF;
  * Each method marked rXXXX will generate random variates from the named
  * distribution. The user has the option of supplying a RNStreamIfc as the source of
  * the randomness. Methods that do not have a RNStreamIfc parameter use,
- * getRNStream() as the source of randomness.
+ * getDefaultRNStream() as the source of randomness. That is, they all <b>share</b> the same
+ * stream, which is the default stream from the default random number stream factory.
  * <p>
  * Also provides a number of methods for sampling with and without replacement
  * from arrays and lists as well as creating permutations of arrays and lists.
@@ -55,15 +56,23 @@ public class JSLRandom {
      * @return gets a new stream of pseudo random numbers from the default random
      * number stream factory
      */
-    public static RNStreamIfc getRNStream() {
+    public static RNStreamIfc createRNStream() {
         return RNStreamFactory.getDefaultFactory().getStream();
+    }
+
+    /**
+     *
+     * @return the default stream from the default random number stream factory
+     */
+    public static RNStreamIfc getDefaultRNStream(){
+        return RNStreamFactory.getDefaultStream();
     }
 
     /**
      * @return returns a new stream using the Stream API
      */
     public static DoubleStream getDoubleStream() {
-        return getRNStream().asDoubleStream();
+        return createRNStream().asDoubleStream();
     }
 
     /**
@@ -71,7 +80,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rBernoulli(double pSuccess) {
-        return rBernoulli(pSuccess, getRNStream());
+        return rBernoulli(pSuccess, getDefaultRNStream());
     }
 
     /**
@@ -98,7 +107,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rBinomial(double pSuccess, int nTrials) {
-        return rBinomial(pSuccess, nTrials, getRNStream());
+        return rBinomial(pSuccess, nTrials, getDefaultRNStream());
     }
 
     /**
@@ -123,7 +132,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rPoisson(double mean) {
-        return rPoisson(mean, getRNStream());
+        return rPoisson(mean, getDefaultRNStream());
     }
 
     /**
@@ -144,7 +153,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rDUniform(int minimum, int maximum) {
-        return rDUniform(minimum, maximum, getRNStream());
+        return rDUniform(minimum, maximum, getDefaultRNStream());
     }
 
     /**
@@ -165,7 +174,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rGeometric(double pSuccess) {
-        return rGeometric(pSuccess, getRNStream());
+        return rGeometric(pSuccess, getDefaultRNStream());
 
     }
 
@@ -189,7 +198,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static int rNegBinomial(double pSuccess, double rSuccesses) {
-        return rNegBinomial(pSuccess, rSuccesses, getRNStream());
+        return rNegBinomial(pSuccess, rSuccesses, getDefaultRNStream());
     }
 
     /**
@@ -211,7 +220,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rUniform(double minimum, double maximum) {
-        return rUniform(minimum, maximum, getRNStream());
+        return rUniform(minimum, maximum, getDefaultRNStream());
     }
 
     /**
@@ -238,7 +247,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rNormal(double mean, double variance) {
-        return rNormal(mean, variance, getRNStream());
+        return rNormal(mean, variance, getDefaultRNStream());
     }
 
     /**
@@ -264,7 +273,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rLogNormal(double mean, double variance) {
-        return rLogNormal(mean, variance, getRNStream());
+        return rLogNormal(mean, variance, getDefaultRNStream());
     }
 
     /**
@@ -297,7 +306,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rWeibull(double shape, double scale) {
-        return rWeibull(shape, scale, getRNStream());
+        return rWeibull(shape, scale, getDefaultRNStream());
     }
 
     /**
@@ -333,7 +342,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rExponential(double mean) {
-        return rExponential(mean, getRNStream());
+        return rExponential(mean, getDefaultRNStream());
     }
 
     /**
@@ -359,7 +368,7 @@ public class JSLRandom {
      */
     public static double rJohnsonB(double alpha1, double alpha2,
                                    double min, double max) {
-        return rJohnsonB(alpha1, alpha2, min, max, getRNStream());
+        return rJohnsonB(alpha1, alpha2, min, max, getDefaultRNStream());
     }
 
     /**
@@ -392,7 +401,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rLogLogistic(double shape, double scale) {
-        return rLogLogistic(shape, scale, getRNStream());
+        return rLogLogistic(shape, scale, getDefaultRNStream());
     }
 
     /**
@@ -417,7 +426,7 @@ public class JSLRandom {
      */
     public static double rTriangular(double min, double mode,
                                      double max) {
-        return rTriangular(min, mode, max, getRNStream());
+        return rTriangular(min, mode, max, getDefaultRNStream());
     }
 
     /**
@@ -463,7 +472,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rGamma(double shape, double scale) {
-        return rGamma(shape, scale, getRNStream());
+        return rGamma(shape, scale, getDefaultRNStream());
     }
 
     /**
@@ -619,7 +628,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rChiSquared(double dof) {
-        return rChiSquared(dof, getRNStream());
+        return rChiSquared(dof, getDefaultRNStream());
     }
 
     /**
@@ -641,7 +650,7 @@ public class JSLRandom {
      * @return the generated value
      */
     public static double rPearsonType5(double shape, double scale) {
-        return rPearsonType5(shape, scale, getRNStream());
+        return rPearsonType5(shape, scale, getDefaultRNStream());
     }
 
     /**
@@ -667,7 +676,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rBeta(double alpha1, double alpha2) {
-        return rBeta(alpha1, alpha2, getRNStream());
+        return rBeta(alpha1, alpha2, getDefaultRNStream());
     }
 
     /**
@@ -697,7 +706,7 @@ public class JSLRandom {
      */
     public static double rBetaG(double alpha1, double alpha2,
                                 double minimum, double maximum) {
-        return rBetaG(alpha1, alpha2, minimum, maximum, getRNStream());
+        return rBetaG(alpha1, alpha2, minimum, maximum, getDefaultRNStream());
     }
 
     /**
@@ -731,7 +740,7 @@ public class JSLRandom {
      */
     public static double rPearsonType6(double alpha1, double alpha2,
                                        double beta) {
-        return rPearsonType6(alpha1, alpha2, beta, getRNStream());
+        return rPearsonType6(alpha1, alpha2, beta, getDefaultRNStream());
     }
 
     /**
@@ -761,7 +770,7 @@ public class JSLRandom {
      * @return the random value
      */
     public static double rLaplace(double mean, double scale) {
-        return rLaplace(mean, scale, getRNStream());
+        return rLaplace(mean, scale, getDefaultRNStream());
     }
 
     /**
@@ -789,7 +798,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static int randomlySelect(int[] array) {
-        return randomlySelect(array, getRNStream());
+        return randomlySelect(array, getDefaultRNStream());
     }
 
     /**
@@ -818,7 +827,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static double randomlySelect(double[] array) {
-        return randomlySelect(array, getRNStream());
+        return randomlySelect(array, getDefaultRNStream());
     }
 
     /**
@@ -849,7 +858,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static double randomlySelect(double[] array, double[] cdf) {
-        return randomlySelect(array, cdf, getRNStream());
+        return randomlySelect(array, cdf, getDefaultRNStream());
     }
 
     /**
@@ -900,7 +909,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static int randomlySelect(int[] array, double[] cdf) {
-        return randomlySelect(array, cdf, getRNStream());
+        return randomlySelect(array, cdf, getDefaultRNStream());
     }
 
     /**
@@ -952,7 +961,7 @@ public class JSLRandom {
      * @return the randomly selected value
      */
     public static <T> T randomlySelect(List<T> list, double[] cdf) {
-        return randomlySelect(list, cdf, getRNStream());
+        return randomlySelect(list, cdf, getDefaultRNStream());
     }
 
     /**
@@ -1076,7 +1085,7 @@ public class JSLRandom {
      * @return the randomly selected element
      */
     public static <T> T randomlySelect(List<T> list) {
-        return randomlySelect(list, getRNStream());
+        return randomlySelect(list, getDefaultRNStream());
     }
 
     /**
@@ -1111,7 +1120,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static void permutation(double[] x) {
-        permutation(x, getRNStream());
+        permutation(x, getDefaultRNStream());
     }
 
     /**
@@ -1134,7 +1143,7 @@ public class JSLRandom {
      * @param sampleSize the size of the generate
      */
     public static void sampleWithoutReplacement(double[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, getRNStream());
+        sampleWithoutReplacement(x, sampleSize, getDefaultRNStream());
     }
 
     /**
@@ -1189,7 +1198,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static void permutation(int[] x) {
-        permutation(x, getRNStream());
+        permutation(x, getDefaultRNStream());
     }
 
     /**
@@ -1212,7 +1221,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      */
     public static void sampleWithoutReplacement(int[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, getRNStream());
+        sampleWithoutReplacement(x, sampleSize, getDefaultRNStream());
     }
 
     /**
@@ -1247,7 +1256,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static void permutation(boolean[] x) {
-        permutation(x, getRNStream());
+        permutation(x, getDefaultRNStream());
     }
 
     /**
@@ -1270,7 +1279,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      */
     public static void sampleWithoutReplacement(boolean[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, getRNStream());
+        sampleWithoutReplacement(x, sampleSize, getDefaultRNStream());
     }
 
     /**
@@ -1305,7 +1314,7 @@ public class JSLRandom {
      * @param x the array
      */
     public static <T> void permutation(T[] x) {
-        permutation(x, getRNStream());
+        permutation(x, getDefaultRNStream());
     }
 
     /**
@@ -1328,7 +1337,7 @@ public class JSLRandom {
      * @param sampleSize the source of randomness
      */
     public static <T> void sampleWithoutReplacement(T[] x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, getRNStream());
+        sampleWithoutReplacement(x, sampleSize, getDefaultRNStream());
     }
 
     /**
@@ -1363,7 +1372,7 @@ public class JSLRandom {
      * @param x   the list
      */
     public static <T> void permutation(List<T> x) {
-        permutation(x, getRNStream());
+        permutation(x, getDefaultRNStream());
     }
 
     /**
@@ -1388,7 +1397,7 @@ public class JSLRandom {
      * @param sampleSize the generate size
      */
     public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize) {
-        sampleWithoutReplacement(x, sampleSize, getRNStream());
+        sampleWithoutReplacement(x, sampleSize, getDefaultRNStream());
     }
 
     /**
