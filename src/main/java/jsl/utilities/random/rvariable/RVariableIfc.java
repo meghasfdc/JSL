@@ -66,7 +66,7 @@ public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanc
      * @return a new instance with same parameter values, with a different stream
      */
     default RVariableIfc newInstance() {
-        return newInstance(JSLRandom.getRNStream());
+        return newInstance(JSLRandom.createRNStream());
     }
 
     /** This method facilitates turning instances of RVariableIfc into Java DoubleStream

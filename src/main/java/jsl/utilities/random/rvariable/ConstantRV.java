@@ -156,7 +156,7 @@ public class ConstantRV implements RVariableIfc, IdentityIfc {
 
     @Override
     public RNStreamIfc getRandomNumberStream() {
-        return JSLRandom.getRNStream();
+        return JSLRandom.getDefaultRNStream();
     }
 
     @Override
