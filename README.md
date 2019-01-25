@@ -24,7 +24,7 @@ Within IntelliJ
 
 1) Check out from Version Control
 
-2) Use this:  git@git.uark.edu:rossetti/JSL.git
+2) Use this:  https://git.uark.edu/rossetti/JSL.git
 
 3) Select directory where you want the clone
 
@@ -55,7 +55,7 @@ NetBean's normal plugin install procedures
 
 2) If you want to clone under Git, then Team > Git> Clone
 
-    a) use git@git.uark.edu:rossetti/JSL.git
+    a) use https://git.uark.edu/rossetti/JSL.git
     
 3) If you just want to download, then download the zip file from the repository and unzip it.
 
