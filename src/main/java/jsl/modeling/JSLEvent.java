@@ -209,12 +209,16 @@ public class JSLEvent<T> implements Comparable<JSLEvent>, GetNameIfc {
      * handle the cancellation. If the event is canceled, it's execute method
      * will not be called when it becomes the current event. Thus, an event can
      * be canceled or uncanceled at any simulated time prior to when the event
-     * is scheduled to occur.
+     * is scheduled to occur. It is an error to attempt to cancel and event that is
+     * not scheduled.
      *
      * @param b A boolean (true is canceled, false is not canceled)
      *
      */
     public final void setCanceledFlag(boolean b) {
+        if (!isScheduled()){
+            throw new IllegalStateException("Attempted to cancel an event that is not scheduled: " + this);
+        }
         myCancelledFlag = b;
     }
 
@@ -370,7 +374,7 @@ public class JSLEvent<T> implements Comparable<JSLEvent>, GetNameIfc {
      *
      * @param flag Provided by the Scheduler class (true is scheduled)
      */
-    protected final void setScheduledFlag(boolean flag) {
+    final void setScheduledFlag(boolean flag) {
         myScheduledFlag = flag;
     }
 
