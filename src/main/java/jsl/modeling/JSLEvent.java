@@ -216,9 +216,6 @@ public class JSLEvent<T> implements Comparable<JSLEvent>, GetNameIfc {
      *
      */
     public final void setCanceledFlag(boolean b) {
-        if (!isScheduled()){
-            throw new IllegalStateException("Attempted to cancel an event that is not scheduled: " + this);
-        }
         myCancelledFlag = b;
     }
 
