@@ -216,6 +216,7 @@ public class JSLEvent<T> implements Comparable<JSLEvent>, GetNameIfc {
      *
      */
     public final void setCanceledFlag(boolean b) {
+        
         myCancelledFlag = b;
     }
 
