@@ -15,10 +15,16 @@
  */
 package ex.montecarlo;
 
+import jsl.utilities.Interval;
 import jsl.utilities.math.FunctionIfc;
 import jsl.utilities.random.distributions.Uniform;
+import jsl.utilities.random.rng.RNStreamFactory;
+import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.Statistic;
+
+import java.util.Objects;
 
 /**
  * @author rossetti
@@ -26,30 +32,38 @@ import jsl.utilities.statistic.Statistic;
  */
 public class CrudeMCIntegral {
 
-    protected Uniform myUniform;
-
-    private RVariableIfc myRV;
-
-    protected Statistic myStatistic;
-
     protected FunctionIfc myFunction;
+    private final Statistic myStatistic;
+    private final Interval myInterval;
+    private RNStreamIfc myStream;
 
     public CrudeMCIntegral(double lowerLimit, double upperLimit, FunctionIfc function) {
+        this(new Interval(lowerLimit, upperLimit), function, RNStreamFactory.getDefaultFactory().getStream());
+    }
+
+    public CrudeMCIntegral(double lowerLimit, double upperLimit, FunctionIfc function, RNStreamIfc stream) {
+        this(new Interval(lowerLimit, upperLimit), function, stream);
+    }
+
+    public CrudeMCIntegral(Interval interval, FunctionIfc function) {
+        this(interval, function, RNStreamFactory.getDefaultFactory().getStream());
+    }
+
+    public CrudeMCIntegral(Interval interval, FunctionIfc function, RNStreamIfc stream) {
+        Objects.requireNonNull(interval, "The interval was null");
+        Objects.requireNonNull(stream, "The RNStreamIfc was null");
+        myInterval = interval;
+        myStream = stream;
         setFunction(function);
-        myUniform = new Uniform(lowerLimit, upperLimit);
-        myRV = myUniform.getRandomVariable();
         myStatistic = new Statistic("Monte-Carlo Integration");
     }
 
     public void setLimits(double lowerLimit, double upperLimit) {
-        myUniform.setRange(lowerLimit, upperLimit);
-        myRV = myUniform.getRandomVariable(myRV.getRandomNumberStream());
+        myInterval.setInterval(lowerLimit, upperLimit);
     }
 
     public void setFunction(FunctionIfc function) {
-        if (function == null) {
-            throw new IllegalArgumentException("The function was null");
-        }
+        Objects.requireNonNull(function, "The FunctionIfc was null");
         myFunction = function;
     }
 
@@ -64,12 +78,14 @@ public class CrudeMCIntegral {
 
         myStatistic.reset();
         if (resetStartStream) {
-            myRV.resetStartStream();
+            myStream.resetStartStream();
         }
 
-        double r = myUniform.getRange();
+        double r = myInterval.getWidth();
+        double a = myInterval.getLowerLimit();
+        double b = myInterval.getUpperLimit();
         for (int i = 1; i <= sampleSize; i++) {
-            double x = myRV.getValue();
+            double x = JSLRandom.rUniform(a, b, myStream);
             double y = r * myFunction.fx(x);
             myStatistic.collect(y);
         }
@@ -90,13 +106,15 @@ public class CrudeMCIntegral {
 
         myStatistic.reset();
         if (resetStartStream) {
-            myRV.resetStartStream();
+            myStream.resetStartStream();
         }
 
-        double r = myUniform.getRange();
+        double r = myInterval.getWidth();
+        double a = myInterval.getLowerLimit();
+        double b = myInterval.getUpperLimit();
         boolean flag = false;
         while (flag != true) {
-            double x = myRV.getValue();
+            double x = JSLRandom.rUniform(a, b, myStream);
             double y = r * myFunction.fx(x);
             myStatistic.collect(y);
             if (myStatistic.getCount() > 2) {
