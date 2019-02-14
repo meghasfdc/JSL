@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Manuel D. Rossetti, rossetti@uark.edu
+ * Copyright (c) 2019. Manuel D. Rossetti, rossetti@uark.edu
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import jsl.utilities.random.rvariable.RVariableIfc;
 
 /**
  */
-public class UpDownComponent extends SchedulingElement {
+public class UpDownComponentV2 extends SchedulingElement {
 
     public static final int UP = 1;
     public static final int DOWN = 0;
@@ -34,15 +34,15 @@ public class UpDownComponent extends SchedulingElement {
     private TimeWeighted myState;
     private ResponseVariable myCycleLength;
     private Counter myCountFailures;
-    private final UpChangeAction myUpChangeAction = new UpChangeAction();
-    private final DownChangeAction myDownChangeAction = new DownChangeAction();
+//    private final UpChangeAction myUpChangeAction = new UpChangeAction();
+//    private final DownChangeAction myDownChangeAction = new DownChangeAction();
     private double myTimeLastUp;
 
-    public UpDownComponent(ModelElement parent) {
+    public UpDownComponentV2(ModelElement parent) {
         this(parent, null);
     }
 
-    public UpDownComponent(ModelElement parent, String name) {
+    public UpDownComponentV2(ModelElement parent, String name) {
         super(parent, name);
         RVariableIfc utd = new ExponentialRV(1.0);
         RVariableIfc dtd = new ExponentialRV(2.0);
@@ -59,36 +59,27 @@ public class UpDownComponent extends SchedulingElement {
         myTimeLastUp = 0.0;
         myState.setValue(UP);
         // schedule the time that it goes down
-        scheduleEvent(myDownChangeAction, myUpTime.getValue(), "Down");
-        //schedule(myDownChangeAction).name("Down").in(myUpTime).units();
+        schedule(this::downChangeAction).name("Down").in(myUpTime).units();
     }
 
-    private class UpChangeAction implements EventActionIfc {
-
-        @Override
-        public void action(JSLEvent event) {
-            // this event action represents what happens when the component goes up
-            // record the cycle length, the time btw up states
-            myCycleLength.setValue(getTime() - myTimeLastUp);
-            // component has just gone up, change its state value
-            myState.setValue(UP);
-            // record the time it went up
-            myTimeLastUp = getTime();
-            // schedule the down state change after the uptime
-            scheduleEvent(myDownChangeAction, myUpTime.getValue(), "Down");
-        }
+    private void upChangeAction(JSLEvent event){
+        // this event action represents what happens when the component goes up
+        // record the cycle length, the time btw up states
+        myCycleLength.setValue(getTime() - myTimeLastUp);
+        // component has just gone up, change its state value
+        myState.setValue(UP);
+        // record the time it went up
+        myTimeLastUp = getTime();
+        // schedule the down state change after the uptime
+        schedule(this::downChangeAction).name("Down").in(myUpTime).units();
     }
 
-    class DownChangeAction implements EventActionIfc {
-
-        @Override
-        public void action(JSLEvent event) {
-            // component has just gone down, change its state value
-            myCountFailures.increment();
-            myState.setValue(DOWN);
-            // schedule when it goes up afer the down time
-            scheduleEvent(myUpChangeAction, myDownTime.getValue(), "Up");
-        }
+    private void downChangeAction(JSLEvent event){
+        // component has just gone down, change its state value
+        myCountFailures.increment();
+        myState.setValue(DOWN);
+        // schedule when it goes up afer the down time
+        schedule(this::upChangeAction).name("Up").in(myDownTime).units();
     }
 
     public static void main(String[] args) {
@@ -99,7 +90,7 @@ public class UpDownComponent extends SchedulingElement {
         // get the model associated with the simulation
         Model m = s.getModel();
         // create the model element and attach it to the model
-        UpDownComponent tv = new UpDownComponent(m);
+        UpDownComponentV2 tv = new UpDownComponentV2(m);
         // make the simulation reporter
         SimulationReporter r = s.makeSimulationReporter();
         // set the running parameters of the simulation
