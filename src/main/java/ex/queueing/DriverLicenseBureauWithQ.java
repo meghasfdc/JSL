@@ -23,6 +23,8 @@ import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
 import jsl.modeling.queue.QueueResponse;
+import jsl.utilities.dbutil.DatabaseFactory;
+import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.JSL;
@@ -323,6 +325,28 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
 
     }
 
+    public static void showDbReuse(){
+        // assumes that a database called JSLDb_DriveThroughPharmacy is in the jslOutput/db directory
+        // create a reference to the previously created database
+        DatabaseIfc database = DatabaseFactory.getEmbeddedDerbyDatabase("JSLDb_DriveThroughPharmacy");
+        //create the simulation without a default JSLDatabase
+        Simulation sim = new Simulation("Some Sim Name");
+        // use the database as the backing database for the new JSLDatabase instance
+        JSLDatabase jslDatabase = new JSLDatabase(database, sim);
+        // create the model element and attach it to the main model
+        new DriverLicenseBureauWithQ(sim.getModel());
+        // set the parameters of the experiment
+        sim.setNumberOfReplications(30);
+        sim.setLengthOfReplication(20000.0);
+        sim.setLengthOfWarmUp(5000.0);
+        SimulationReporter r = sim.makeSimulationReporter();
+        // tell the simulation to run
+        System.out.println("Simulation started.");
+        sim.run();
+        System.out.println("Simulation completed.");
+        r.printAcrossReplicationSummaryStatistics();
+    }
+
     public static void main(String[] args) {
 
         System.out.println("Driver License Bureau Test");
@@ -331,7 +355,9 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         //runBatchReplication();
         //runExperiment();
 
-        testDatabases();
+        //testDatabases();
+
+        showDbReuse();
 
         System.out.println("Done!");
 
