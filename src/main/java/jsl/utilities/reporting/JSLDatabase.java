@@ -1227,7 +1227,7 @@ public class JSLDatabase {
      *
      * @return a jooq Result holding (simid, exp_name, element_name, stat_name, rep_num, value)
      */
-    public final Result<WithinRepViewRecord> getWithRepViewRecords() {
+    public final Result<WithinRepViewRecord> getWithinRepViewRecords() {
         Result<WithinRepViewRecord> fetch = myDb.getDSLContext()
                 .selectFrom(WITHIN_REP_VIEW)
                 .orderBy(WITHIN_REP_VIEW.SIM_RUN_ID_FK,
@@ -1242,14 +1242,14 @@ public class JSLDatabase {
      * @return the within replication view records as a JDBC ResultSet
      */
     public final ResultSet getWithinRepViewRecordsAsResultSet() {
-        return getWithRepViewRecords().intoResultSet();
+        return getWithinRepViewRecords().intoResultSet();
     }
 
     /**
      * @return a map with key sim run id holding the within replication view records by simulation run id
      */
     public final Map<Integer, WithinRepViewRecord> getWithinRepViewRecordsBySimulationRunId() {
-        Map<Integer, WithinRepViewRecord> map = getWithRepViewRecords()
+        Map<Integer, WithinRepViewRecord> map = getWithinRepViewRecords()
                 .intoMap(WITHIN_REP_VIEW.SIM_RUN_ID_FK);
         return map;
     }
@@ -1315,7 +1315,7 @@ public class JSLDatabase {
      * @param responseName the name of the response variable, time weighted variable or counter
      * @return a configured MultipleComparisonAnalyzer
      */
-    public final MultipleComparisonAnalyzer getMultipleComparisonAnalyserFor(Set<String> expNames,
+    public final MultipleComparisonAnalyzer getMultipleComparisonAnalyzerFor(Set<String> expNames,
                                                                              String responseName) {
         Map<String, double[]> map = getWithinRepViewValuesAsMapForExperiments(expNames, responseName);
         MultipleComparisonAnalyzer mca = new MultipleComparisonAnalyzer(map);
