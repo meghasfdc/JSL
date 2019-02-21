@@ -204,3 +204,5 @@ JSL\.iml
 bin/.gitignore
 UMLDiagrams/
 
+
+testoutput/
