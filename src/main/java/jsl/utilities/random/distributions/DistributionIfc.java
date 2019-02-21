@@ -18,13 +18,14 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.NewInstanceIfc;
+import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 
 /**
  * Represents the basic interface that all probability distributions must implement.
  *
  */
-public interface DistributionIfc extends DistributionFunctionIfc, NewInstanceIfc {
+public interface DistributionIfc extends DistributionFunctionIfc, NewInstanceIfc, ParametersIfc {
 
 }
 

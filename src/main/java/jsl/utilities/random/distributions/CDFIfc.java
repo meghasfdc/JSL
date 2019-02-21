@@ -27,7 +27,7 @@ import jsl.utilities.random.ParametersIfc;
  *
  * @author rossetti
  */
-public interface CDFIfc extends ParametersIfc {
+public interface CDFIfc {
 
     /** Returns the F(x) = Pr{X &lt;= x} where F represents the
      * cumulative distribution function
