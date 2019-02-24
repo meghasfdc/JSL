@@ -15,30 +15,24 @@
  */
 package ex.queueing;
 
-import jsl.modeling.EventActionIfc;
-import jsl.modeling.Experiment;
-import jsl.modeling.JSLEvent;
-import jsl.modeling.Model;
-import jsl.modeling.ModelElement;
-import jsl.modeling.SchedulingElement;
-import jsl.modeling.Simulation;
+import jsl.modeling.*;
 import jsl.modeling.elements.variable.LevelResponse;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Exponential;
-import jsl.modeling.SimulationReporter;
+import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.StatisticAccessorIfc;
+
+import java.util.Objects;
 
 public class DriverLicenseBureau extends SchedulingElement {
 
     private int myNumServers;
 
-    private RVariableIfc myServiceDistribution;
+    private RandomIfc myServiceDistribution;
 
-    private RVariableIfc myArrivalDistribution;
+    private RandomIfc myArrivalDistribution;
 
     private RandomVariable myServiceRV;
 
@@ -89,35 +83,23 @@ public class DriverLicenseBureau extends SchedulingElement {
         if (n < 0) {
             throw new IllegalArgumentException();
         }
-
         myNumServers = n;
     }
 
-    public final void setServiceDistributionInitialRandomSource(RVariableIfc d) {
-
-        if (d == null) {
-            throw new IllegalArgumentException("Service Time Distribution was null!");
-        }
-
+    public final void setServiceDistributionInitialRandomSource(RandomIfc d) {
+        Objects.requireNonNull(d, "Service Time Distribution was null!");
         myServiceDistribution = d;
-
         if (myServiceRV == null) { // not made yet
             myServiceRV = new RandomVariable(this, myServiceDistribution, "Service RV");
         } else { // already had been made, and added to model
             // just change the distribution
             myServiceRV.setInitialRandomSource(myServiceDistribution);
         }
-
     }
 
-    public final void setArrivalDistributionInitialRandomSource(RVariableIfc d) {
-
-        if (d == null) {
-            throw new IllegalArgumentException("Arrival Time Distribution was null!");
-        }
-
+    public final void setArrivalDistributionInitialRandomSource(RandomIfc d) {
+        Objects.requireNonNull(d, "Arrival Time Distribution was null!");
         myArrivalDistribution = d;
-
         if (myArrivalRV == null) { // not made yet
             myArrivalRV = new RandomVariable(this, myArrivalDistribution, "Arrival RV");
         } else { // already had been made, and added to model
