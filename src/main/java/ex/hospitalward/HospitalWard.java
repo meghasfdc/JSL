@@ -85,6 +85,10 @@ public class HospitalWard extends ModelElement {
         mySystemTime = new ResponseVariable(this, "System Time");
     }
 
+    public void setInitialNumberOfBeds(int numberOfBeds){
+        myBedWard.setInitialNumberOfBeds(numberOfBeds);
+    }
+
     void departingPatient(QObject p) {
         mySystemTime.setValue(getTime() - p.getCreateTime());
     }
@@ -164,9 +168,7 @@ public class HospitalWard extends ModelElement {
         // set the parameters of the experiment
         s.setNumberOfReplications(30);
         s.setLengthOfWarmUp(5000.0);
-        s.setLengthOfReplication(25000.0);
-        //s.setMaximumExecutionTime(4);
-        //s.setMaximumExecutionTimePerReplication(1);
+        s.setLengthOfReplication(15000.0);
 
         // tell the experiment to run
         s.run();

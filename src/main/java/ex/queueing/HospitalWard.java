@@ -26,6 +26,8 @@ import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.random.rvariable.LognormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
+import java.util.Optional;
+
 /**
  * @author rossetti
  *
@@ -65,6 +67,7 @@ public class HospitalWard extends SchedulingElement {
     protected TimeWeighted myAvailableBeds;
 
     protected TimeWeighted myNumBusyBeds;
+    protected TimeWeighted myNBB;
 
     protected TimeWeighted myORRoomOpenStatus;
 
@@ -99,14 +102,18 @@ public class HospitalWard extends SchedulingElement {
      */
     public HospitalWard(ModelElement parent, String name) {
         super(parent, name);
+
+        myNonOpPatientTBA = new RandomVariable(this, new ExponentialRV(12.0));
+        myOpPatientTBA = new RandomVariable(this, new ExponentialRV(6.0));
+
         myNonOpPatientStayTime = new RandomVariable(this, new ExponentialRV(60.0));
         myPreOpStayTime = new RandomVariable(this, new ExponentialRV(24.0));
         myOperationTime = new RandomVariable(this, new LognormalRV(0.75, 0.25 * 0.25));
         myPostOpStayTime = new RandomVariable(this, new ExponentialRV(72.0));
+
         myOpRoomOpenTime = new RandomVariable(this, new ConstantRV(24.0));
         myOpRoomCloseTime = new RandomVariable(this, new ConstantRV(4.0));
-        myNonOpPatientTBA = new RandomVariable(this, new ExponentialRV(12.0));
-        myOpPatientTBA = new RandomVariable(this, new ExponentialRV(6.0));
+
 
         myNonOpPatientQ = new TimeWeighted(this, 0.0, "NonOpPatientQ");
         myOpPatientQ = new TimeWeighted(this, 0.0, "OpPatientQ");
@@ -114,6 +121,7 @@ public class HospitalWard extends SchedulingElement {
         myAvailableBeds = new TimeWeighted(this, 20.0, "Beds Available");
         myNumBusyBeds = new TimeWeighted(this, 0.0, "Beds Busy");
         myAvailableBeds.addObserver(new BedObserver());
+        myNBB = new TimeWeighted(this, 0.0, "Beds Busy Direct");
         myORRoomOpenStatus = new TimeWeighted(this, OPEN, "OR-Open-Status");
         myORRoomIdleStatus = new TimeWeighted(this, IDLE, "OR-Idle-Status");
 
@@ -128,7 +136,7 @@ public class HospitalWard extends SchedulingElement {
 
     }
 
-    public void setInitialNumberofBeds(double value) {
+    public void setInitialNumberOfBeds(double value) {
         myAvailableBeds.setInitialValue(value);
     }
 
@@ -183,6 +191,7 @@ public class HospitalWard extends SchedulingElement {
         public void action(JSLEvent evt) {
             if (myAvailableBeds.getValue() > 0.0) {
                 myAvailableBeds.decrement();
+                myNBB.increment();
                 scheduleEvent(myNonOperationPatientEndOfStayAction, myNonOpPatientStayTime.getValue());
             } else {
                 myNonOpPatientQ.increment();
@@ -202,6 +211,7 @@ public class HospitalWard extends SchedulingElement {
                 scheduleEvent(myEndOfPreOperationStayAction, myPreOpStayTime.getValue());
             } else {
                 myAvailableBeds.increment();
+                myNBB.decrement();
             }
         }
     }
@@ -211,6 +221,7 @@ public class HospitalWard extends SchedulingElement {
         public void action(JSLEvent evt) {
             if (myAvailableBeds.getValue() > 0.0) {
                 myAvailableBeds.decrement();
+                myNBB.increment();
                 scheduleEvent(myEndOfPreOperationStayAction, myPreOpStayTime.getValue());
             } else {
                 myOpPatientQ.increment();
@@ -255,6 +266,7 @@ public class HospitalWard extends SchedulingElement {
                 scheduleEvent(myEndOfPreOperationStayAction, myPreOpStayTime.getValue());
             } else {
                 myAvailableBeds.increment();
+                myNBB.decrement();
             }
         }
     }
@@ -276,7 +288,7 @@ public class HospitalWard extends SchedulingElement {
 
         public void action(JSLEvent evt) {
             myORRoomOpenStatus.setValue(CLOSED);
-            scheduleEvent(myOpenOperatingRoomAction, myOpRoomCloseTime.getValue());
+            scheduleEvent(myOpenOperatingRoomAction, myOpRoomCloseTime.getValue(), "Open OR");
         }
     }
 
@@ -305,12 +317,14 @@ public class HospitalWard extends SchedulingElement {
 
         // set the parameters of the experiment
         sim.setNumberOfReplications(30);
-        sim.setLengthOfWarmUp(1000.0);
-        sim.setLengthOfReplication(11000.0);
+        sim.setLengthOfWarmUp(5000.0);
+        sim.setLengthOfReplication(15000.0);
 
 //        sim.turnOnDefaultEventTraceReport();
-        ExecutiveTraceReport etr = sim.getDefaultExecutiveTraceReport();
-        etr.setOffTime(100.0);
+//        Optional<ExecutiveTraceReport> etr = sim.getDefaultExecutiveTraceReport();
+//        if (etr.isPresent()){
+//            etr.get().setOffTime(100.0);
+//        }
         
         // tell the experiment to run
         sim.run();

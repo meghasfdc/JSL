@@ -25,6 +25,8 @@ import jsl.observers.textfile.IPLogReport;
 import jsl.utilities.IdentityIfc;
 import jsl.utilities.reporting.JSL;
 
+import java.util.Optional;
+
 /**
  * The Executive controls the execution of events, permits the scheduling of
  * events, updates the current time, and manages conditional actions.
@@ -701,8 +703,8 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
      *
      * @return the ExecutiveTraceReport
      */
-    public final ExecutiveTraceReport getDefaultExecutiveTraceReport() {
-        return myTraceReport;
+    public final Optional<ExecutiveTraceReport> getDefaultExecutiveTraceReport() {
+        return Optional.ofNullable(myTraceReport);
     }
 
     public final void unregisterAllActions() {

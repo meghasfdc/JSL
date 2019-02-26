@@ -879,7 +879,7 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
      *
      * @return the ExecutiveTraceReport
      */
-    public final ExecutiveTraceReport getDefaultExecutiveTraceReport() {
+    public final Optional<ExecutiveTraceReport> getDefaultExecutiveTraceReport() {
         return myExecutive.getDefaultExecutiveTraceReport();
     }
 

@@ -66,6 +66,10 @@ public class BedWard extends SchedulingElement {
 
     }
 
+    protected void setInitialNumberOfBeds(int numberOfBeds){
+        myAvailableBeds.setInitialValue(numberOfBeds);
+    }
+
     protected void receiveNewPatient(NoOpPatient p) {
         myNoOpPatientQ.enqueue(p);
         if (myAvailableBeds.getValue() > 0.0) {
