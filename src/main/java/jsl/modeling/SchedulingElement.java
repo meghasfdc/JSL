@@ -374,7 +374,9 @@ public class SchedulingElement extends ModelElement {
         return (scheduleEvent(action, time, name, JSLEvent.DEFAULT_PRIORITY, message));
     }
 
-    /** Creates an event and schedules it onto the event calendar
+    /** Creates an event and schedules it onto the event calendar.  This is the main scheduling method that
+     * all other scheduling methods call.  The other methods are just convenience methods for this method.
+     *
      * @param action represents an ActionListener that will handle the change of state logic
      * @param time represents the inter-event time, i.e. the interval from the current time to when the
      *        event will need to occur

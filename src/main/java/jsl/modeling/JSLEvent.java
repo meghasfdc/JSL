@@ -346,11 +346,11 @@ public class JSLEvent<T> implements Comparable<JSLEvent>, GetNameIfc {
     /**
      * Sets the ModelElement that scheduled the event.
      *
-     * @param mElement the model element that scheduled the event
+     * @param mElement the model element that scheduled the event, cannot be null
      */
     protected final void setModelElement(ModelElement mElement) {
         if (mElement == null) {
-            throw new IllegalArgumentException("The scheduleing model element was null");
+            throw new IllegalArgumentException("The model element doing the scheduling was null");
         }
         myModelElement = mElement;
     }

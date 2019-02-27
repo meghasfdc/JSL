@@ -25,6 +25,7 @@ import jsl.observers.textfile.IPLogReport;
 import jsl.utilities.IdentityIfc;
 import jsl.utilities.reporting.JSL;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -339,11 +340,12 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
      * to reschedule a canceled event prior to the originally scheduled event
      * time, then just use scheduleEvent() to make a new event.
      *
-     * @param event The event that needs rescheduling
+     * @param event The event that needs rescheduling, cannot be null and cannot already be scheduled
      * @param time represents the inter-event time, i.e. the interval from the
-     * current time to when the event will need to occur
+     * current time to when the event will need to occur. Cannot be negative
      */
     public final void reschedule(JSLEvent event, double time) {
+        Objects.requireNonNull(event, "The supplied event was null");
         if (event.isScheduled()) {
             throw new IllegalArgumentException("Attempted to reschedule an already scheduled event.");
         }
@@ -357,14 +359,14 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
      *
      * @param <T> the type of the message
      * @param listener represents an ActionListener that will handle the change
-     * of state logic
+     * of state logic, cannot be null
      * @param time represents the inter-event time, i.e. the interval from the
-     * current time to when the event will need to occur
-     * @param name the name of the event
+     * current time to when the event will need to occur, Cannot be negative
+     * @param name the name of the event, can be null
      * @param priority is used to influence the ordering of events
      * @param message is a generic Object that may represent data to be
-     * transmitted with the event
-     * @param theElementScheduling the element doing the scheduling
+     * transmitted with the event, may be null
+     * @param theElementScheduling the element doing the scheduling, cannot be null
      * @return a valid JSLEvent
      */
     public final <T> JSLEvent<T> scheduleEvent(EventActionIfc listener,
