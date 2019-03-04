@@ -172,8 +172,12 @@ public class SingleQueueStation extends Station {
     protected double getServiceTime(QObject customer) {
         double t;
         if (getUseQObjectServiceTimeOption()) {
-            GetValueIfc v = customer.getValueObject();
-            t = v.getValue();
+            Optional<GetValueIfc> valueObject = customer.getValueObject();
+            if (valueObject.isPresent()){
+                t = valueObject.get().getValue();
+            } else {
+                throw new IllegalStateException("Attempted to use QObject.getValueObject() when no object was set");
+            }
         } else {
             t = getServiceTime().getValue();
         }

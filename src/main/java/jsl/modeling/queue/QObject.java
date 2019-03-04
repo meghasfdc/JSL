@@ -21,6 +21,8 @@ import jsl.modeling.State;
 import jsl.modeling.StateAccessorIfc;
 import jsl.utilities.GetValueIfc;
 
+import java.util.Optional;
+
 /**
  * QObject can be used as a base class for objects that need to be placed in
  * queues on a regular basis.  A QObject can be in one and only one Queue at a time. 
@@ -109,8 +111,8 @@ public class QObject implements GetNameIfc, Comparable<QObject> {
      *
      * @return an implementation of GetValueIfc or null
      */
-    public GetValueIfc getValueObject() {
-        return myValue;
+    public Optional<GetValueIfc> getValueObject() {
+        return Optional.ofNullable(myValue);
     }
 
     /**

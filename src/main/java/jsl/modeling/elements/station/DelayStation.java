@@ -25,6 +25,8 @@ import jsl.utilities.random.rvariable.ConstantRV;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 import jsl.utilities.statistic.WeightedStatisticIfc;
 
+import java.util.Optional;
+
 public class DelayStation extends Station {
 
     private boolean myUseQObjectSTFlag;
@@ -92,8 +94,12 @@ public class DelayStation extends Station {
     protected double getDelayTime(QObject customer) {
         double t;
         if (getUseQObjectDelayTimeOption()) {
-            GetValueIfc v = customer.getValueObject();
-            t = v.getValue();
+            Optional<GetValueIfc> valueObject = customer.getValueObject();
+            if (valueObject.isPresent()){
+                t = valueObject.get().getValue();
+            } else {
+                throw new IllegalStateException("Attempted to use QObject.getValueObject() when no object was set");
+            }
         } else {
             t = getDelayTime().getValue();
         }
