@@ -25,5 +25,5 @@ public interface FunctionMVIfc {
     /**
      * Returns the value of the function for the specified variable value.
      */
-    public double fx(double[] x);
+    double fx(double[] x);
 }

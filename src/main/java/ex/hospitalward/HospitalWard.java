@@ -30,6 +30,17 @@ import jsl.modeling.SimulationReporter;
 import jsl.modeling.elements.EventGeneratorActionIfc;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.random.rvariable.LognormalRV;
+import org.jooq.*;
+import org.jooq.exception.DataTypeException;
+import org.jooq.exception.IOException;
+import org.jooq.exception.MappingException;
+
+import java.io.OutputStream;
+import java.io.Writer;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  *
@@ -156,7 +167,7 @@ public class HospitalWard extends ModelElement {
     }
 
     public static void main(String[] args) {
-        
+
         Simulation s = new Simulation("Hospital Ward Simulation");
         
         // create the containing model

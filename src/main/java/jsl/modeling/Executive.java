@@ -823,12 +823,18 @@ public class Executive implements IdentityIfc, ObservableIfc, IterativeProcessIf
     protected void schedule(JSLEvent e) {
         if (isCreated() || isEnded()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("An event was scheduled when the Executive is in the created or ended state.\n");
-            sb.append("Since the Executive has not yet been initialized this event will not execute.\n");
-            sb.append(e);
-            sb.append("\n");
-            sb.append("It is likely that the user scheduled the event in a ScheduleElement's constructor. \n");
-            sb.append("Do not schedule events in a constructor.  Use the initialize() method instead.\n");
+            sb.append("An event was scheduled when the Executive is in the created or ended state.");
+            sb.append(System.lineSeparator());
+            sb.append("Since the Executive has not yet been initialized this event will not execute.");
+            sb.append(System.lineSeparator());
+            sb.append("The offending event is : ").append(e);
+            sb.append(System.lineSeparator());
+            sb.append("It is likely that the user scheduled the event in a ScheduleElement's constructor or outside the context of run().");
+            sb.append(System.lineSeparator());
+            sb.append("Do not schedule initial events in a constructor.  Use the initialize() method instead.");
+            sb.append(System.lineSeparator());
+            sb.append("Do not schedule initial events prior to executing the simulation.  Use the initialize() method instead.");
+            sb.append(System.lineSeparator());
             JSL.LOGGER.warn(sb.toString());
             System.out.flush();
         }

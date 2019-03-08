@@ -355,9 +355,9 @@ public class DriverLicenseBureauWithQ extends SchedulingElement {
         //runBatchReplication();
         //runExperiment();
 
-        //testDatabases();
+        testDatabases();
 
-        showDbReuse();
+        //showDbReuse();
 
         System.out.println("Done!");
 
