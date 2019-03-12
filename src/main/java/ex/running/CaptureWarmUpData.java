@@ -177,7 +177,7 @@ public class CaptureWarmUpData {
             JSL.out.println(ps);
         }
         // display the chart
-        //stWDFA.displayWelchChart();
+        stWDFA.displayWelchChart();
         // display the other chart
         //nisWDFA.displayWelchChart();
     }

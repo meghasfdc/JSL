@@ -33,6 +33,7 @@ import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.observers.textfile.CSVExperimentReport;
 import jsl.observers.textfile.CSVReplicationReport;
 import jsl.utilities.reporting.JSL;
+import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.StatisticAccessorIfc;
 
 /**
@@ -721,7 +722,7 @@ public class SimulationReporter {
      * @return the tables as StringBuilders
      */
     public final List<StringBuilder> getAcrossReplicatonStatisticsAsLaTeXTables(int maxRows) {
-        List<StringBuilder> list = getAcrossReplicatonStatisticsAsLaTeXTabular(maxRows);
+        List<StringBuilder> list = getAcrossReplicationStatisticsAsLaTeXTabular(maxRows);
         String hline = "\\hline";
         String caption = "\\caption{Across Replication Statistics for " + mySim.getName() + "} \n";
         String captionc = "\\caption{Across Replication Statistics for " + mySim.getName() + " (Continued)} \n";
@@ -789,8 +790,8 @@ public class SimulationReporter {
      *
      * @return a List of StringBuilders
      */
-    public final List<StringBuilder> getAcrossReplicatonStatisticsAsLaTeXTabular() {
-        return getAcrossReplicatonStatisticsAsLaTeXTabular(60);
+    public final List<StringBuilder> getAcrossReplicationStatisticsAsLaTeXTabular() {
+        return getAcrossReplicationStatisticsAsLaTeXTabular(60);
     }
 
     /**
@@ -803,7 +804,7 @@ public class SimulationReporter {
      * @param maxRows maximum number of rows in each tabular
      * @return a List of StringBuilders
      */
-    public final List<StringBuilder> getAcrossReplicatonStatisticsAsLaTeXTabular(int maxRows) {
+    public final List<StringBuilder> getAcrossReplicationStatisticsAsLaTeXTabular(int maxRows) {
 
         List<StringBuilder> builders = new ArrayList<StringBuilder>();
         List<StatisticAccessorIfc> stats = getModel().getListOfAcrossReplicationStatistics();
@@ -895,5 +896,34 @@ public class SimulationReporter {
         if (myCSVExpReport != null) {
             getModel().deleteObserver(myCSVExpReport);
         }
+    }
+
+    /**
+     *  Prints a half-width summary report for the across replication statistics to
+     *  System.out
+     */
+    public final void printAcrossReplicationHalfWidthSummaryReport(){
+        writeAcrossReplicationHalfWidthSummaryReport(new PrintWriter(System.out));
+    }
+
+    /** Writes a half-width summary report for the across replication statistics
+     *
+     * @param out the writer to write to
+     */
+    public final void writeAcrossReplicationHalfWidthSummaryReport(PrintWriter out){
+        List<StatisticAccessorIfc> list = getAcrossReplicationStatisticsList();
+        StatisticReporter statisticReporter = new StatisticReporter(list);
+        StringBuilder report = statisticReporter.getHalfWidthSummaryReport();
+        out.println(report.toString());
+    }
+
+    /**
+     *
+     * @return a StatisticReporter holding the across replication statistics for reporting
+     */
+    public final StatisticReporter getAcrossReplicationStatisticReporter(){
+        List<StatisticAccessorIfc> list = getAcrossReplicationStatisticsList();
+        StatisticReporter statisticReporter = new StatisticReporter(list);
+        return statisticReporter;
     }
 }

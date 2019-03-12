@@ -44,6 +44,9 @@ public class LevelResponse extends SchedulingElement {
     private State myCurrentState;
     private final ResponseVariable myDistanceAbove;
     private final ResponseVariable myDistanceBelow;
+    private final TimeWeighted myAboveLevel;
+    private final TimeWeighted myBelowLevel;
+    private final TimeWeighted myDeviationFromLevel;
     // all these are collected within replicationEnded()
     private ResponseVariable myAvgTimeAbove;
     private ResponseVariable myAvgTimeBelow;
@@ -63,8 +66,9 @@ public class LevelResponse extends SchedulingElement {
     private final ResponseVariable myTotalTimeBelow;
     private final ResponseVariable myMaxDistanceAbove;
     private final ResponseVariable myMaxDistanceBelow;
-//    private final TimeWeighted myAboveIndicator;
-//    private final TimeWeighted myBelowIndicator;
+    private final ResponseVariable myTotalAbsDeviationFromLevel;
+    private final ResponseVariable myProportionDevFromAboveLevel;
+    private final ResponseVariable myProportionDevFromBelowLevel;
     // end of collected in replicationEnded()
     private final boolean myStatsOption;
     protected double myInitTime;
@@ -130,6 +134,12 @@ public class LevelResponse extends SchedulingElement {
                 myVariable.getName() + ":" + getName() + ":DistAboveLimit:" + D2FORMAT.format(level));
         myDistanceBelow = new ResponseVariable(this,
                 myVariable.getName() + ":" + getName() + ":DistBelowLimit:" + D2FORMAT.format(level));
+        myAboveLevel = new TimeWeighted(this,
+                myVariable.getName() + ":" + getName() + ":AboveLevel:" + D2FORMAT.format(level));
+        myBelowLevel = new TimeWeighted(this,
+                myVariable.getName() + ":" + getName() + ":BelowLevel:" + D2FORMAT.format(level));
+        myDeviationFromLevel = new TimeWeighted(this,
+                myVariable.getName() + ":" + getName() + ":Deviation:" + D2FORMAT.format(level));
         // collected after the replication ends
         myMaxDistanceAbove = new ResponseVariable(this,
                 myVariable.getName() + ":" + getName() + ":MaxDistAboveLimit:" + D2FORMAT.format(level));
@@ -143,8 +153,12 @@ public class LevelResponse extends SchedulingElement {
                 myVariable.getName() + ":" + getName() + ":TotalTimeAbove:" + D2FORMAT.format(level));
         myTotalTimeBelow = new ResponseVariable(this,
                 myVariable.getName() + ":" + getName() + ":TotalTimeBelow:" + D2FORMAT.format(level));
-//        myAboveIndicator = new TimeWeighted(this, getName() + ":P(Above):" + D2FORMAT.format(level));
-//        myBelowIndicator = new TimeWeighted(this, getName() + ":P(Below):" + D2FORMAT.format(level));
+        myTotalAbsDeviationFromLevel = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":TotalAbsDev:" + D2FORMAT.format(level));
+        myProportionDevFromAboveLevel = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":PropDevFromAbove:" + D2FORMAT.format(level));
+        myProportionDevFromBelowLevel = new ResponseVariable(this,
+                myVariable.getName() + ":" + getName() + ":PropDevFromBelow:" + D2FORMAT.format(level));
         myStatsOption = stats;
         if (stats) {
             myAvgTimeAbove = new ResponseVariable(this,
@@ -288,15 +302,20 @@ public class LevelResponse extends SchedulingElement {
 
     protected void stateUpdate() {
         State nextState;
+        myDeviationFromLevel.setValue(myVariable.getValue() - myLevel);
         if (myVariable.getValue() >= myLevel) {
 //            myAboveIndicator.setValue(1.0);
 //            myBelowIndicator.setValue(0.0);
+            myAboveLevel.setValue(myVariable.getValue() - myLevel);
+            myBelowLevel.setValue(0.0);
             myDistanceAbove.setValue(myVariable.getValue() - myLevel);
             nextState = myAbove;
         } else {
             // below level
 //            myAboveIndicator.setValue(0.0);
 //            myBelowIndicator.setValue(1.0);
+            myAboveLevel.setValue(0.0);
+            myBelowLevel.setValue(myLevel - myVariable.getValue());
             myDistanceBelow.setValue(myLevel - myVariable.getValue());
             nextState = myBelow;
         }
@@ -367,6 +386,14 @@ public class LevelResponse extends SchedulingElement {
         // need to get statistics to the end of the simulation, act like exiting current state
         myMaxDistanceAbove.setValue(myDistanceAbove.getWithinReplicationStatistic().getMax());
         myMaxDistanceBelow.setValue(myDistanceBelow.getWithinReplicationStatistic().getMax());
+        double avgDevAbove = myAboveLevel.getWithinReplicationStatistic().getAverage();
+        double avgDevBelow = myBelowLevel.getWithinReplicationStatistic().getAverage();
+        double avgTotalDev = avgDevAbove + avgDevBelow;
+        myTotalAbsDeviationFromLevel.setValue(avgTotalDev);
+        if (avgTotalDev > 0.0){
+            myProportionDevFromAboveLevel.setValue(avgDevAbove/avgTotalDev);
+            myProportionDevFromBelowLevel.setValue(avgDevBelow/avgTotalDev);
+        }
         if (myAbove.getSojournTimeStatistic().isPresent()) {
             double totalTimeInState = myAbove.getTotalTimeInState();
             myPctTimeAbove.setValue(totalTimeInState / (getTime() - myInitTime));
