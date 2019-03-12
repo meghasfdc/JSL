@@ -131,20 +131,20 @@ public class LevelResponse extends SchedulingElement {
         myBelow.turnOnSojournTimeCollection();
         myVariable.addObserver(myObserver);
         myDistanceAbove = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":DistAboveLimit:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":DistAboveLevel:" + D2FORMAT.format(level));
         myDistanceBelow = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":DistBelowLimit:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":DistBelowLevel:" + D2FORMAT.format(level));
         myAboveLevel = new TimeWeighted(this,
                 myVariable.getName() + ":" + getName() + ":AboveLevel:" + D2FORMAT.format(level));
         myBelowLevel = new TimeWeighted(this,
                 myVariable.getName() + ":" + getName() + ":BelowLevel:" + D2FORMAT.format(level));
         myDeviationFromLevel = new TimeWeighted(this,
-                myVariable.getName() + ":" + getName() + ":Deviation:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":DevFromLevel:" + D2FORMAT.format(level));
         // collected after the replication ends
         myMaxDistanceAbove = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":MaxDistAboveLimit:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":MaxDistAboveLevel:" + D2FORMAT.format(level));
         myMaxDistanceBelow = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":MaxDistBelowLimit:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":MaxDistBelowLevel:" + D2FORMAT.format(level));
         myPctTimeAbove = new ResponseVariable(this,
                 myVariable.getName() + ":" + getName() + ":PctTimeAbove:" + D2FORMAT.format(level));
         myPctTimeBelow = new ResponseVariable(this,
@@ -154,21 +154,21 @@ public class LevelResponse extends SchedulingElement {
         myTotalTimeBelow = new ResponseVariable(this,
                 myVariable.getName() + ":" + getName() + ":TotalTimeBelow:" + D2FORMAT.format(level));
         myTotalAbsDeviationFromLevel = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":TotalAbsDev:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":AbsDevFromLevel:" + D2FORMAT.format(level));
         myProportionDevFromAboveLevel = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":PropDevFromAbove:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":PctDevAboveLevel:" + D2FORMAT.format(level));
         myProportionDevFromBelowLevel = new ResponseVariable(this,
-                myVariable.getName() + ":" + getName() + ":PropDevFromBelow:" + D2FORMAT.format(level));
+                myVariable.getName() + ":" + getName() + ":PctDevBelowLevel:" + D2FORMAT.format(level));
         myStatsOption = stats;
         if (stats) {
             myAvgTimeAbove = new ResponseVariable(this,
-                    myVariable.getName() + ":" + getName() + ":AvgTimeAboveLimit:" + D2FORMAT.format(level));
+                    myVariable.getName() + ":" + getName() + ":AvgTimeAboveLevel:" + D2FORMAT.format(level));
             myAvgTimeBelow = new ResponseVariable(this,
-                    myVariable.getName() + ":" + getName() + ":AvgTimeBelowLimit:" + D2FORMAT.format(level));
+                    myVariable.getName() + ":" + getName() + ":AvgTimeBelowLevel:" + D2FORMAT.format(level));
             myMaxTimeAbove = new ResponseVariable(this,
-                    myVariable.getName() + ":" + getName() + ":MaxTimeAboveLimit:" + D2FORMAT.format(level));
+                    myVariable.getName() + ":" + getName() + ":MaxTimeAboveLevel:" + D2FORMAT.format(level));
             myMaxTimeBelow = new ResponseVariable(this,
-                    myVariable.getName() + ":" + getName() + ":MaxTimeBelowLimit:" + D2FORMAT.format(level));
+                    myVariable.getName() + ":" + getName() + ":MaxTimeBelowLevel:" + D2FORMAT.format(level));
             myPAA = new ResponseVariable(this,
                     myVariable.getName() + ":" + getName() + ":P(AboveToAbove)");
             myPAB = new ResponseVariable(this,

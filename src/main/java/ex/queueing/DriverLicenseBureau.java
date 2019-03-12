@@ -174,7 +174,7 @@ public class DriverLicenseBureau extends SchedulingElement {
         new DriverLicenseBureau(m);
 
         // set the parameters of the experiment
-        sim.setNumberOfReplications(1);
+        sim.setNumberOfReplications(10);
         sim.setLengthOfReplication(200000.0);
         sim.setLengthOfWarmUp(50000.0);
 
@@ -183,7 +183,7 @@ public class DriverLicenseBureau extends SchedulingElement {
 
         sim.printHalfWidthSummaryReport();
 
-        sim.setClearDatabaseOptionForDefaultDatabase(false);
+        //sim.setClearDatabaseOptionForDefaultDatabase(false);
 
         sim.run();
 
