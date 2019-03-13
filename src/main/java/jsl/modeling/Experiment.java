@@ -25,19 +25,26 @@ package jsl.modeling;
  * experiment is a specification for the number of replications, the warm up
  * length, replication length, etc. for controlling the running of a simulation.
  *
- * The defaults include: - length of replication = Double.POSITIVE_INFINITY -
- * length of warm up = 0.0 // no warm up - replication initialization TRUE - The
- * system state is re-initialized prior to each replication - reset start stream
- * option FALSE - Do not reset the streams of the random variables to their
+ * The defaults include:
+ * - length of replication = Double.POSITIVE_INFINITY
+ *
+ * - length of warm up = 0.0
+ *
+ * - replication initialization TRUE - The system state is re-initialized prior to each replication
+ *
+ * - reset start stream option FALSE - Do not reset the streams of the random variables to their
  * starting points prior to running the replications within the experiment. This
  * implies that if the experiment is re-run on the same model in the same code
- * invocation that an independent set of replications will be made. - advance
- * next substream option TRUE - The random variables in a within an experiment
- * will start at the next sub-stream for each new replication - number of times
- * to advance streams = 1 This indicates how many times that the streams should
+ * invocation that an independent set of replications will be made.
+ *
+ * - advance next substream option TRUE - The random variables in a within an experiment
+ * will start at the next sub-stream for each new replication
+ *
+ * - number of times to advance streams = 1 This indicates how many times that the streams should
  * be advanced prior to running the experiment. This can be used to ensure
- * simulations start with different streams - antithetic replication option is
- * off by default
+ * simulations start with different streams
+ *
+ * - antithetic replication option is off by default
  *
  */
 public class Experiment implements ExperimentGetIfc {
