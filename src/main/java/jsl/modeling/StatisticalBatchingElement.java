@@ -22,7 +22,6 @@
 package jsl.modeling;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -161,7 +160,7 @@ public class StatisticalBatchingElement extends ModelElement {
      *
      * @return the filled up list
      */
-    public final List<BatchStatistic> getAllBatchStatisitcs() {
+    public final List<BatchStatistic> getAllBatchStatistcs() {
         List<BatchStatistic> list = myTWBatcher.getAllBatchStatisitcs();
         list.addAll(myRVBatcher.getAllBatchStatisitcs());
         return list;
@@ -175,7 +174,7 @@ public class StatisticalBatchingElement extends ModelElement {
      */
     public final List<StatisticAccessorIfc> getAllStatistics() {
         List<StatisticAccessorIfc> list = new ArrayList();
-        List<BatchStatistic> allBatchStatisitcs = getAllBatchStatisitcs();
+        List<BatchStatistic> allBatchStatisitcs = getAllBatchStatistcs();
         list.addAll(allBatchStatisitcs);
         return list;
     }

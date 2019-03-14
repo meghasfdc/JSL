@@ -25,12 +25,17 @@ import ex.models.DriveThroughPharmacy;
 import jsl.modeling.Model;
 import jsl.modeling.Simulation;
 import jsl.modeling.StatisticalBatchingElement;
+import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TWBatchingElement;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.StatisticReporter;
+import jsl.utilities.statistic.BatchStatistic;
 import jsl.utilities.statistic.Statistic;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Illustrates performing a batch means analysis
@@ -43,8 +48,8 @@ public class JSLBatchingDemos {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //runBatchingExample();
-        sequentialBatchingExample();
+        runBatchingExample();
+        //sequentialBatchingExample();
     }
 
     public static void runBatchingExample() {
@@ -75,7 +80,15 @@ public class JSLBatchingDemos {
 
         System.out.println(be);
 
-        System.out.println(statisticReporter.getHalfWidthSummaryReportAsLaTeXTabular());
+        ResponseVariable systemTime = m.getResponseVariable("System Time");
+
+        BatchStatistic batchStatistic = be.getBatchStatistic(systemTime);
+
+        double[] batchMeanArrayCopy = batchStatistic.getBatchMeanArrayCopy();
+
+        System.out.println(Arrays.toString(batchMeanArrayCopy));
+
+        //System.out.println(statisticReporter.getHalfWidthSummaryReportAsLaTeXTabular());
     }
 
     public static void sequentialBatchingExample() {
