@@ -104,6 +104,12 @@ public class RandomVariable extends ModelElement implements RandomIfc, RandomEle
      */
     protected ResponseVariable myResponse;
 
+    /**
+     *  Controls whether warning of changing the initial random source during a replication
+     *  is logged, default is true.
+     */
+    protected boolean myInitialRandomSourceChangeWarning;
+
     /** Constructs a RandomVariable given the supplied reference to the underlying source of randomness
      * Throws a NullPointerException if the supplied randomness is null
      *
@@ -128,6 +134,24 @@ public class RandomVariable extends ModelElement implements RandomIfc, RandomEle
         setWarmUpOption(false); // do not need to respond to warmup events
         setResetStartStreamOption(true);
         setResetNextSubStreamOption(true);
+        myInitialRandomSourceChangeWarning = true;
+    }
+
+    /**
+     *
+     * @return true means the option will be logged
+     */
+    public final boolean getInitialRandomSourceChangeWarningOption() {
+        return myInitialRandomSourceChangeWarning;
+    }
+
+    /** Controls whether or not the change of the initial random source will be
+     * logged if made during the replication
+     *
+     * @param flag true means warning will be logged
+     */
+    public final void setInitialRandomSourceChangeWarningOption(boolean flag) {
+        myInitialRandomSourceChangeWarning = flag;
     }
 
     @Override
@@ -201,7 +225,9 @@ public class RandomVariable extends ModelElement implements RandomIfc, RandomEle
             throw new NullPointerException("RandomIfc source must be non-null");
         }
         if (getSimulation().isRunning()){
-            JSL.LOGGER.warn("Changes the initial source of {} during a replication.", getName());
+            if (getInitialRandomSourceChangeWarningOption()){
+                JSL.LOGGER.warn("Changed the initial source of {} during a replication.", getName());
+            }
         }
         myInitialRandomSource = source;
     }

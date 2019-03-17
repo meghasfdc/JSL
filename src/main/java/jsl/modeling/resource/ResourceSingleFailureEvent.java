@@ -109,6 +109,7 @@ public class ResourceSingleFailureEvent extends SchedulingElement {
         Set<SingleFailureEvent> singleFailureEventSet = myFailures.values();
         // tell all SingleFailureEvent to use the same event duration value, for the replication
         for (SingleFailureEvent sfe: singleFailureEventSet){
+            //sfe.getFailureDurationRV().setInitialRandomSourceChangeWarningOption(false);
             sfe.setFailureDurationTimeInitialRandomSource(myEventDuration);
         }
     }
@@ -327,6 +328,7 @@ public class ResourceSingleFailureEvent extends SchedulingElement {
             String name = getName() + ":" + resourceUnit.getName() + ":FailureEvent";
             // no initial start time because controlled from within this class
             SingleFailureEvent fe = new SingleFailureEvent(resourceUnit, myEventDurationRV, name);
+            fe.getFailureDurationRV().setInitialRandomSourceChangeWarningOption(false);
             myFailures.put(resourceUnit, fe);
         }
     }
