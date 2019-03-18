@@ -50,6 +50,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
 
     private int myDataSize;
 
+    //TODO use guava table
     private LinkedHashMap<String, LinkedHashMap<String, double[]>> myPairDiffs;
 
     private LinkedHashMap<String, LinkedHashMap<String, Statistic>> myPairDiffStats;
@@ -76,7 +77,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The names of items being compared as an array of strings
      *
-     * @return
+     * @return names of items being compared as an array of strings
      */
     public String[] getDataNames() {
         String[] names = new String[myDataMap.keySet().size()];
@@ -92,7 +93,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The number of data sets stored in the analyzer. There is a data set
      * stored for each name.
      *
-     * @return
+     * @return number of data sets stored in the analyzer.
      */
     public int getNumberDatasets() {
         return myDataMap.keySet().size();
@@ -101,8 +102,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * Returns true if the analyzer has data for the name
      *
-     * @param dataName
-     * @return
+     * @param dataName the name to check
+     * @return true if the analyzer has data for the name
      */
     public boolean contains(String dataName) {
         return myDataMap.containsKey(dataName);
@@ -113,7 +114,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * replaced. The supplied dataMap must not be null. There needs to be at
      * least 2 data arrays The length of each data array must be the same.
      *
-     * @param dataMap
+     * @param dataMap the map to read from
      */
     public final void setDataMap(Map<String, double[]> dataMap) {
         if (dataMap == null) {
@@ -145,10 +146,11 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The key to each LinkedHashMap is the name of the data The Statistic is
      * based on the paired differences
      *
-     * @return
+     * @return a map of the paired difference statistics
      */
     public LinkedHashMap<String, LinkedHashMap<String, Statistic>> computePairedDifferenceStatistics() {
         LinkedHashMap<String, LinkedHashMap<String, Statistic>> pd = new LinkedHashMap<>();
+        //TODO use guava table
         int i = 1;
         for (String fn : myDataMap.keySet()) {
             int j = 1;
@@ -174,9 +176,10 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The key to each LinkedHashMap is the name of the data The array contains
      * the paired differences
      *
-     * @return
+     * @return a map holding the paired differences as an array for each data name
      */
     public LinkedHashMap<String, LinkedHashMap<String, double[]>> computePairedDifferences() {
+        //TODO use guava's Table
         LinkedHashMap<String, LinkedHashMap<String, double[]>> pd = new LinkedHashMap<>();
         int i = 1;
         for (String fn : myDataMap.keySet()) {
@@ -204,9 +207,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * strings. If the data names don't exist a null pointer exception will
      * occur
      *
-     * @param s1
-     * @param s2
-     * @return
+     * @param s1 the name of data set number 1
+     * @param s2 the name of data set number 2
+     * @return an array of paired differences
      */
     public double[] getPairedDifference(String s1, String s2) {
         LinkedHashMap<String, double[]> g = myPairDiffs.get(s1);
@@ -220,7 +223,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * A list holding the statistics for all of the pairwise differences is
      * returned
      *
-     * @return
+     * @return A list holding the statistics for all of the pairwise differences
      */
     public List<StatisticAccessorIfc> getPairedDifferenceStatistics() {
         List<StatisticAccessorIfc> list = new ArrayList<>();
@@ -237,9 +240,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The statistics for the pair of data names given by the strings. If the
      * data names don't exist a null pointer exception will occur
      *
-     * @param s1
-     * @param s2
-     * @return
+     * @param s1 the name of data set number 1
+     * @param s2 the name of data set number 2
+     * @return a Statistic collected over the paired differences
      */
     public Statistic getPairedDifferenceStatistic(String s1, String s2) {
         LinkedHashMap<String, Statistic> g = myPairDiffStats.get(s1);
@@ -251,7 +254,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Each paired difference is labeled with data name i - data name j for all
      * i, j The returns the names as an array of strings
      *
-     * @return
+     * @return  the names as an array of strings
      */
     public String[] getNamesOfPairedDifferences() {
         List<StatisticAccessorIfc> list = getPairedDifferenceStatistics();
@@ -267,7 +270,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The name of the maximum average difference
      *
-     * @return
+     * @return name of the maximum average difference
      */
     public String getNameOfMaximumAverageOfDifferences() {
         return getNamesOfPairedDifferences()[getIndexOfMaximumOfAveragesOfDifferences()];
@@ -276,7 +279,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The name of the minimum average difference
      *
-     * @return
+     * @return name of the minimum average difference
      */
     public String getNameOfMinumumAverageOfDifferences() {
         return getNamesOfPairedDifferences()[getIndexOfMinimumOfAveragesOfDifferences()];
@@ -285,7 +288,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The actual maximum average of the differences
      *
-     * @return
+     * @return actual maximum average of the differences
      */
     public double getMaximumOfAveragesOfDifferences() {
         return Statistic.getMax(getAveragesOfDifferences());
@@ -296,7 +299,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * differences. This method returns the index of the maximum of the array
      * given by getAveragesOfDifferences()
      *
-     * @return
+     * @return the index of the maximum of the array given by getAveragesOfDifferences()
      */
     public int getIndexOfMaximumOfAveragesOfDifferences() {
         return Statistic.getIndexOfMax(getAveragesOfDifferences());
@@ -305,7 +308,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * Returns the minimum value of the average of the differences
      *
-     * @return
+     * @return the minimum value of the average of the differences
      */
     public double getMinimumOfAveragesOfDifferences() {
         return Statistic.getMin(getAveragesOfDifferences());
@@ -314,7 +317,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The actual minimum average of the differences
      *
-     * @return
+     * @return actual minimum average of the differences
      */
     public int getIndexOfMinimumOfAveragesOfDifferences() {
         return Statistic.getIndexOfMin(getAveragesOfDifferences());
@@ -326,7 +329,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The elements of the array have correspondence to the array of strings
      * returned by getNamesOfPairedDifferences()
      *
-     * @return
+     * @return averages of the differences in an array.
      */
     public double[] getAveragesOfDifferences() {
         List<Double> list = new ArrayList<>();
@@ -351,7 +354,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * array. The elements of the array have correspondence to the array of
      * strings returned by getNamesOfPairedDifferences()
      *
-     * @return
+     * @return variances of the differences in an array
      */
     public double[] getVariancesOfDifferences() {
         List<Double> list = new ArrayList<>();
@@ -377,7 +380,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * the array of strings returned by getNamesOfPairedDifferences()
      *
      * @param level the confidence level
-     * @return
+     * @return list of confidence intervals of the differences in an array
      */
     public List<Interval> getConfidenceIntervalsOfDifferenceData(double level) {
         List<StatisticAccessorIfc> list = getPairedDifferenceStatistics();
@@ -391,7 +394,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The maximum variance of the differences
      *
-     * @return
+     * @return maximum variance of the differences
      */
     public double getMaxVarianceOfDifferences() {
         double[] v = getVariancesOfDifferences();
@@ -404,9 +407,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The average for the pair of data names given by the strings. If the data
      * names don't exist a null pointer exception will occur
      *
-     * @param s1
-     * @param s2
-     * @return
+     * @param s1 the name of data set number 1
+     * @param s2 the name of data set number 2
+     * @return average for the pair of data names given by the strings
      */
     public double getAverageDifference(String s1, String s2) {
         LinkedHashMap<String, Statistic> g = myPairDiffStats.get(s1);
@@ -418,9 +421,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The variance for the pair of data names given by the strings. If the data
      * names don't exist a null pointer exception will occur
      *
-     * @param s1
-     * @param s2
-     * @return
+     * @param s1 the name of data set number 1
+     * @param s2 the name of data set number 2
+     * @return variance for the pair of data names given by the strings
      */
     public double getVarianceOfDifference(String s1, String s2) {
         LinkedHashMap<String, Statistic> g = myPairDiffStats.get(s1);
@@ -431,9 +434,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * A helper method to compute the difference between the two arrays
      *
-     * @param f
-     * @param s
-     * @return
+     * @param f first array
+     * @param s second array
+     * @return the difference
      */
     public static double[] computeDifference(double[] f, double[] s) {
         if (f.length != s.length) {
@@ -449,8 +452,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * Checks if each double[] in the map has the same length
      *
-     * @param dataMap
-     * @return
+     * @param dataMap the data map to check
+     * @return true if same length
      */
     public final boolean checkLengths(Map<String, double[]> dataMap) {
         if (dataMap.keySet().size() <= 1) {
@@ -476,8 +479,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Get statistics on the data associated with the name. If the name is not
      * in the analyzer, null is returned
      *
-     * @param name
-     * @return
+     * @param name the name of the data set
+     * @return the statistic over the data set
      */
     public Statistic getStatistic(String name) {
         double[] data = myDataMap.get(name);
@@ -492,7 +495,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * must be contained in the analyzer. Use contains() to check.
      *
      * @param name must be associated with a data set
-     * @return
+     * @return the index associated with the data set name
      */
     public final int getIndexOfName(String name) {
         if (!contains(name)) {
@@ -512,7 +515,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * A list of statistics for all the data
      *
-     * @return
+     * @return list of statistics for all the data
      */
     public List<StatisticAccessorIfc> getStatistics() {
         List<StatisticAccessorIfc> list = new ArrayList<StatisticAccessorIfc>();
@@ -526,8 +529,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The average for the named data or Double.NaN if the name is not in the
      * collector
      *
-     * @param name
-     * @return
+     * @param name the name of the data set
+     * @return average for the named data or Double.NaN
      */
     public double getAverage(String name) {
         Statistic s = getStatistic(name);
@@ -541,8 +544,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * The variance for the named data or Double.NaN if the name is not in the
      * collector
      *
-     * @param name
-     * @return
+     * @param name the name of the data set
+     * @return variance for the named data or Double.NaN
      */
     public double getVariance(String name) {
         Statistic s = getStatistic(name);
@@ -555,7 +558,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The maximum of the average of all the data
      *
-     * @return
+     * @return maximum of the average of all the data
      */
     public double getMaximumAverageOfData() {
         double[] avgs = getAveragesOfData();
@@ -565,7 +568,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The index of the maximum average
      *
-     * @return
+     * @return index of the maximum average
      */
     public int getIndexOfMaximumAverageOfData() {
         double[] avgs = getAveragesOfData();
@@ -575,7 +578,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The name of the maximum average
      *
-     * @return
+     * @return name of the maximum average
      */
     public String getNameOfMaximumAverageOfData() {
         String[] names = getDataNames();
@@ -585,7 +588,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The minimum of the average of all the data
      *
-     * @return
+     * @return minimum of the average of all the data
      */
     public double getMinimumAverageOfData() {
         double[] avgs = getAveragesOfData();
@@ -595,7 +598,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The index of the minimum of the average of all the data
      *
-     * @return
+     * @return index of the minimum of the average of all the data
      */
     public int getIndexOfMinimumAverageOfData() {
         double[] avgs = getAveragesOfData();
@@ -605,7 +608,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * The name of the minimum of the average of all the data
      *
-     * @return
+     * @return name of the minimum of the average of all the data
      */
     public String getNameOfMinimumAverageOfData() {
         String[] names = getDataNames();
@@ -616,7 +619,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * An array of all the averages of the data Each element is the average for
      * each of the n data names
      *
-     * @return
+     * @return An array of all the averages of the data
      */
     public double[] getAveragesOfData() {
         List<StatisticAccessorIfc> list = getStatistics();
@@ -632,7 +635,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
     /**
      * An array of all the variances of the data
      *
-     * @return
+     * @return An array of all the variances of the data
      */
     public double[] getVariancesOfData() {
         List<StatisticAccessorIfc> list = getStatistics();
@@ -649,8 +652,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Gets the difference between the system average associated with the name
      * and maximum of the rest of the averages
      *
-     * @param name
-     * @return
+     * @param name  the name of the data set
+     * @return the difference between the system average associated with the name
+     *       and maximum of the rest of the averages
      */
     public double getDiffBtwItemAndMaxOfRest(String name) {
         return getDiffBtwItemAndMaxOfRest(getIndexOfName(name));
@@ -660,8 +664,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Gets the difference between the system average associated with the index
      * and maximum of the rest of the averages
      *
-     * @param index
-     * @return
+     * @param index the index
+     * @return difference between the system average associated with the index
+     *       and maximum of the rest of the averages
      */
     public double getDiffBtwItemAndMaxOfRest(int index) {
         double[] avgs = getAveragesOfData();
@@ -676,7 +681,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * differences then d[0] is the difference between the first dataset average
      * and the maximum over the averages of the other datasets and so on.
      *
-     * @return
+     * @return the difference between each dataset average and the maximum of
+     *       the rest of the averages for each dataset.
      */
     public double[] getAllDiffBtwItemsAndMaxOfRest() {
         double[] avgs = getAveragesOfData();
@@ -692,8 +698,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Gets the difference between the system average associated with the name
      * and minimum of the rest of the averages
      *
-     * @param name
-     * @return
+     * @param name  the name of the data set
+     * @return difference between the system average associated with the name
+     *      and minimum of the rest of the averages
      */
     public double getDiffBtwItemAndMinOfRest(String name) {
         return getDiffBtwItemAndMinOfRest(getIndexOfName(name));
@@ -703,8 +710,9 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Gets the difference between the system average associated with the index
      * and minimum of the rest of the averages
      *
-     * @param index
-     * @return
+     * @param index the index
+     * @return the difference between the system average associated with the index
+     *      and minimum of the rest of the averages
      */
     public double getDiffBtwItemAndMinOfRest(int index) {
         double[] avgs = getAveragesOfData();
@@ -719,7 +727,8 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * differences then d[0] is the difference between the first dataset average
      * and the minimum over the averages of the other datasets and so on
      *
-     * @return
+     * @return the difference between each dataset average and the minimum of
+     *       the rest of the averages for each dataset.
      */
     public double[] getAllDiffBtwItemsAndMinOfRest() {
         double[] avgs = getAveragesOfData();
@@ -735,7 +744,7 @@ public class MultipleComparisonAnalyzer implements GetNameIfc {
      * Form the maximum comparison with the best (MCB) interval for the dataset
      * at the supplied index using an indifference delta of zero.
      *
-     * @param index
+     * @param index the index
      * @return
      */
     public Interval getMCBMaxInterval(int index) {

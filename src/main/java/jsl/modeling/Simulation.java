@@ -617,7 +617,7 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
     }
 
     /**
-     * If set to true then the streams will be reset to the start of there
+     * If set to true then the streams will be reset to the start of the
      * stream prior to running the experiments. True facilitates the use of
      * common random numbers.
      *

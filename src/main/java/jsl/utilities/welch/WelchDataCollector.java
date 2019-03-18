@@ -125,7 +125,7 @@ public class WelchDataCollector extends ModelElementObserver {
         return cs;
     }
 
-    /**
+    /** Columns are the replications, rows are the data
      *
      * @return a copy of the data
      */
@@ -133,6 +133,22 @@ public class WelchDataCollector extends ModelElementObserver {
         double[][] data = new double[myMaxNumObs][myMaxNumReps];
         for (int r = 0; r < myData.length; r++) {
             System.arraycopy(myData[r], 0, data[r], 0, myData[r].length);
+        }
+        return data;
+    }
+
+    /**
+     *
+     * @param repNum the replication number 1, 2, etc
+     * @return the within replication data for the indicated replication
+     */
+    public final double[] getReplicationData(int repNum){
+        if (repNum > myMaxNumReps){
+            return new double[0];
+        }
+        double[] data = new double[myData.length];
+        for(int r= 0; r< myData.length; r++){
+            data[r] = myData[r][repNum-1];
         }
         return data;
     }

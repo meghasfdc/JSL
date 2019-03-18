@@ -179,7 +179,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Returns the last data point read or Double.NaN if none read. Can be used
      * by Observers when data is read.
      *
-     * @return
+     * @return the last data point
      */
     public double getLastDataPoint() {
         return myLastDataPoint;
@@ -189,7 +189,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Makes a file and writes out the welch data to the DataOutputStream This
      * produces a file with the "wpdf" extension. All observations are written
      *
-     * @return
+     * @return the file reference
      */
     public File makeWelchPlotDataFile() {
         return makeWelchPlotDataFile(myMinObsCount);
@@ -200,7 +200,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * produces a file with the "wpdf" extension.
      *
      * @param numObs number of observations to write out
-     * @return
+     * @return the file reference
      */
     public File makeWelchPlotDataFile(long numObs) {
         File wpdf = JSL.makeFile(myDir, myBaseName, "wpdf");
@@ -220,7 +220,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Writes out the welch plot data, xbar, cumxbar to the supplied
      * DataOutputStream. The file is flushed and closed.
      *
-     * @param out
+     * @param out the stream to write to
      * @param numObs number of observations to write out
      * @throws IOException
      */
@@ -243,7 +243,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
     /**
      * Makes and writes out the welch plot data
      *
-     * @return
+     * @return the File reference
      */
     public File makeCSVWelchPlotDataFile() {
         return makeCSVWelchPlotDataFile(myMinObsCount);
@@ -253,7 +253,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Makes and writes out the welch plot data
      *
      * @param numObs number of observations to write
-     * @return
+     * @return the File reference
      */
     public File makeCSVWelchPlotDataFile(long numObs) {
         File wpdf = JSL.makeFile(myDir, myBaseName, "csv");
@@ -271,8 +271,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * results in a comma separated value file that has x_bar and cum_x_bar
      * where x_bar is the average across the replications
      *
-     * @param out
-     * @throws IOException
+     * @param out the PrintWriter
+     * @throws IOException if problem writing
      */
     public void writeCSVWelchPlotData(PrintWriter out) throws IOException {
         writeCSVWelchPlotData(out, myMinObsCount);
@@ -284,9 +284,9 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * where x_bar is the average across the replications. The file is flushed
      * and closed.
      *
-     * @param out
-     * @param numObs
-     * @throws IOException
+     * @param out the PrintWriter
+     * @param numObs how many to write
+     * @throws IOException if problem writing
      */
     public void writeCSVWelchPlotData(PrintWriter out, long numObs) throws IOException {
         if (out == null) {
@@ -309,9 +309,9 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Returns an array of the Welch averages. Since the number of observations
      * in the file may be very large, this may have memory implications.
      *
-     * @param numObs
-     * @return
-     * @throws IOException
+     * @param numObs the number of observations to get
+     * @return the array of data
+     * @throws IOException if there was a problem accessing the file
      */
     public double[] getWelchAverages(int numObs) throws IOException {
         int n;
@@ -333,8 +333,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * getMinNumObservationsInReplications() to determine the number of batches
      * based on MIN_BATCH_SIZE. No data is deleted.
      *
-     * @return
-     * @throws IOException
+     * @return A BatchStatistic
+     * @throws IOException if there was a problem accessing the file
      */
     public BatchStatistic batchWelchAverages() throws IOException {
         return batchWelchAverages(0, MIN_BATCH_SIZE);
@@ -348,8 +348,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      *
      * @param deletePt the number of observations to delete at beginning of
      * series
-     * @return
-     * @throws IOException
+     * @return A BatchStatistic
+     * @throws IOException if there was a problem accessing the file
      */
     public BatchStatistic batchWelchAverages(int deletePt) throws IOException {
         return batchWelchAverages(deletePt, MIN_BATCH_SIZE);
@@ -364,8 +364,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * @param deletePt the number of observations to delete at beginning of
      * series
      * @param minBatchSize the size of the batches, must be GT 1
-     * @return
-     * @throws IOException
+     * @return A BatchStatistic
+     * @throws IOException if there was a problem accessing the file
      */
     public BatchStatistic batchWelchAverages(int deletePt, int minBatchSize) throws IOException {
         if (minBatchSize <= 1) {
@@ -385,10 +385,10 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      *
      * @param deletePt the number of observations to delete at beginning of
      * series
-     * @param minNumBatches
-     * @param minBatchSize
-     * @return
-     * @throws IOException
+     * @param minNumBatches the minimum number of batches to make
+     * @param minBatchSize the minimum batch size
+     * @return a BatchStatistic
+     * @throws IOException if there was a problem accessing the file
      */
     public BatchStatistic batchWelchAverages(int deletePt, int minNumBatches, int minBatchSize) throws IOException {
         return batchWelchAverages(deletePt, minNumBatches, minBatchSize, 2);
@@ -401,11 +401,11 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      *
      * @param deletePt the number of observations to delete at beginning of
      * series
-     * @param minNumBatches
-     * @param minBatchSize
-     * @param maxNBMultiple
-     * @return
-     * @throws IOException
+     * @param minNumBatches the minimum number of batches to make
+     * @param minBatchSize the minimum batch size
+     * @param maxNBMultiple the batch means multiple
+     * @return the BatchStatistic
+     * @throws IOException if there was a problem accessing the file
      */
     public BatchStatistic batchWelchAverages(int deletePt, int minNumBatches,
             int minBatchSize, int maxNBMultiple) throws IOException {
@@ -427,7 +427,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * batch means array is used as the data
      *
      * @param bm The BatchStatistic
-     * @return
+     * @return n array of the partial sums
      */
     public static double[] getPartialSums(BatchStatistic bm) {
         if (bm == null) {
@@ -444,8 +444,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Quantitative Methods in Simulation for producing a partial sum plot
      *
      * @param avg the average of the supplied data array
-     * @param data
-     * @return
+     * @param data the data
+     * @return the array of partial sums
      */
     public static double[] getPartialSums(double avg, double[] data) {
         if (data == null) {
@@ -474,8 +474,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Uses the batch means array from the BatchStatistic to compute the
      * positive bias test statistic
      *
-     * @param bm
-     * @return
+     * @param bm the BatchStatistic
+     * @return the positive bias test statistic
      */
     public static double getPositiveBiasTestStatistic(BatchStatistic bm) {
         if (bm == null) {
@@ -490,7 +490,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * on page 2580 Chapter 102 Nelson Handbook of Industrial Engineering,
      * Quantitative Methods in Simulation
      *
-     * @param data
+     * @param data the data
      * @return test statistic to be compared with F distribution
      */
     public static double getPositiveBiasTestStatistic(double[] data) {
@@ -526,8 +526,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Uses the batch means array from the BatchStatistic to compute the
      * positive bias test statistic
      *
-     * @param bm
-     * @return
+     * @param bm the BatchStatistic
+     * @return the computed test statistic
      */
     public static double getNegativeBiasTestStatistic(BatchStatistic bm) {
         if (bm == null) {
@@ -542,7 +542,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * on page 2580 Chapter 102 Nelson Handbook of Industrial Engineering,
      * Quantitative Methods in Simulation
      *
-     * @param data
+     * @param data the data to test
      * @return test statistic to be compared with F distribution
      */
     public static double getNegativeBiasTestStatistic(double[] data) {
@@ -577,7 +577,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
     /**
      * The number of observations in each replication
      *
-     * @return
+     * @return number of observations in each replication
      */
     public long[] getObservationCounts() {
         return Arrays.copyOf(myObsCounts, myObsCounts.length);
@@ -587,7 +587,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Returns the average amount of time taken per observation in each of the
      * replications
      *
-     * @return
+     * @return the average amount of time taken per observation in each of the
+     *       replications
      */
     public double[] getTimePerObservation() {
         return Arrays.copyOf(myTimePerObs, myTimePerObs.length);
@@ -597,7 +598,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Returns the average within each replication. That is, the average of the
      * observations within each replication. zero is the first replication
      *
-     * @return
+     * @return the average within each replication
      */
     public double[] getReplicationAverages() {
         return Arrays.copyOf(myRepAvgs, myRepAvgs.length);
@@ -608,7 +609,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * replications. This can be used to determine a warmup period in terms of
      * time.
      *
-     * @return
+     * @return average time between observations
      */
     public double getAverageTimePerObservation() {
         return Statistic.collectStatistics(myTimePerObs).getAverage();
@@ -617,7 +618,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
     /**
      * The number of observations across the replications
      *
-     * @return
+     * @return number of observations across the replications
      */
     public long getMinNumObservationsInReplications() {
         return myMinObsCount;
@@ -627,9 +628,9 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Computes and returns the across replication average for ith row of
      * observations
      *
-     * @param i
-     * @return
-     * @throws IOException
+     * @param i row number
+     * @return  the across replication average for ith row
+     * @throws IOException if there was trouble with the file
      */
     public double getAcrossReplicationAverage(long i) throws IOException {
         myAcrossRepStat.reset();
@@ -641,10 +642,10 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Fills the supplied array with a row of observations across the
      * replications
      *
-     * @param i
-     * @param x
-     * @return
-     * @throws IOException
+     * @param i row number
+     * @param x array to hold across replication observations
+     * @return the array of filled observations
+     * @throws IOException if there was trouble with the file
      */
     public double[] getAcrossReplicationData(long i, double[] x) throws IOException {
         if (x == null) {// make it if it is not supplied
@@ -665,7 +666,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
     /**
      * The number of replications
      *
-     * @return
+     * @return The number of replications
      */
     public int getNumberOfReplications() {
         return myObsCounts.length;
@@ -674,10 +675,10 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
     /**
      * Returns the ith observation in the jth replication
      *
-     * @param i
-     * @param j
-     * @return
-     * @throws IOException
+     * @param i ith observation
+     * @param j jth replication
+     * @return the ith observation in the jth replication
+     * @throws IOException if there was trouble with the file
      */
     public double get(long i, int j) throws IOException {
         setPosition(i, j);
@@ -687,8 +688,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
     /**
      * Returns the value at the current position
      *
-     * @return
-     * @throws IOException
+     * @return the value at the current position
+     * @throws IOException if there was trouble with the file
      */
     public double get() throws IOException {
         myLastDataPoint = myData.readDouble();
@@ -700,9 +701,9 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      * Moves the file pointer to the position associated with the ith
      * observation at in the jth replication
      *
-     * @param i
-     * @param j
-     * @throws IOException
+     * @param i ith observation
+     * @param j jth replication
+     * @throws IOException if there was trouble with the file
      */
     public void setPosition(long i, int j) throws IOException {
         myData.seek(getPosition(i, j));
@@ -715,7 +716,8 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
      *
      * @param i the index to the ith observation
      * @param j the index to the jth replication
-     * @return
+     * @return the position in the file relative to the beginning of the file of
+     *      the ith observation in the jth replication
      */
     public long getPosition(long i, int j) {
         if ((i < 1) || (j < 1) || (j > myObsCounts.length) || (i > myObsCounts[j - 1])) {
@@ -733,7 +735,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
 
     /** Returns the last observation index asked for.  Can be used by observers
      *  Returns Integer.MIN_VALUE if no observations have been read
-     * @return 
+     * @return  the last observation index asked for.
      */
     public final long getLastObservationIndex() {
         return myLastObsIndex;
@@ -741,7 +743,7 @@ public class WelchDataFileAnalyzer implements ObservableIfc {
 
     /** Returns the last replication index asked for.  Can be used by observers
      *  Returns Integer.MIN_VALUE if no observations have been read
-     * @return 
+     * @return  last replication index asked for
      */
     public final long getLastReplicationIndex() {
         return myLastRepIndex;
