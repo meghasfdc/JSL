@@ -61,7 +61,7 @@ import jsl.modeling.SchedulingElement;
  */
 public class Schedule extends SchedulingElement {
 
-    private static long idCounter = 0;
+    private long idCounter = 0;
 
     /**
      * Indicates whether or not the schedule should be started
@@ -638,6 +638,7 @@ public class Schedule extends SchedulingElement {
      */
     public class ScheduleItem<T> implements Comparable<ScheduleItem> {
 
+        private String myName;
         private final double myStartTime;
         private final double myDuration;
         private final int myPriority;
@@ -650,6 +651,7 @@ public class Schedule extends SchedulingElement {
         public ScheduleItem(double startTime, double duration, int priority, T message) {
             idCounter = idCounter + 1;
             myId = idCounter;
+            myName = "Item:" + myId;
             if (startTime < 0.0) {
                 throw new IllegalArgumentException("The start time must be >= 0.0");
             }
@@ -661,6 +663,14 @@ public class Schedule extends SchedulingElement {
             myPriority = priority;
             myMessage = message;
             mySchedule = Schedule.this;
+        }
+
+        public String getName() {
+            return myName;
+        }
+
+        public void setName(String name) {
+            myName = name;
         }
 
         public T getMessage() {
@@ -696,6 +706,8 @@ public class Schedule extends SchedulingElement {
             StringBuilder sb = new StringBuilder();
             sb.append("ID = ");
             sb.append(myId);
+            sb.append("name = ");
+            sb.append(myName);
             sb.append(" : Priority = ");
             sb.append(myPriority);
             sb.append(" : Start time = ");
