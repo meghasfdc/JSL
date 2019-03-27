@@ -16,13 +16,14 @@
 package jsl.utilities.random.rng;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.reporting.JSL;
 
-public class RNStreamFactory extends Identity {
+public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
 
     //TODO is this default stream necessary? only usefulness appears to be in Constant in distribution package.
     private static RNStreamIfc DEFAULT_RNG;
@@ -57,56 +58,56 @@ public class RNStreamFactory extends Identity {
     private static final double two53 = 9007199254740992.0;
 
     // the array elements are not mutated
-    private static final double InvA1[][] = { // Inverse of A1p0
+    private static final double[][] InvA1 = { // Inverse of A1p0
             {184888585.0, 0.0, 1945170933.0},
             {1.0, 0.0, 0.0},
             {0.0, 1.0, 0.0}
     };
 
     // the array elements are not mutated
-    private static final double InvA2[][] = { // Inverse of A2p0
+    private static final double[][] InvA2 = { // Inverse of A2p0
             {0.0, 360363334.0, 4225571728.0},
             {1.0, 0.0, 0.0},
             {0.0, 1.0, 0.0}
     };
 
     // the array elements are not mutated
-    private static final double A1p0[][] = {
+    private static final double[][] A1p0 = {
             {0.0, 1.0, 0.0},
             {0.0, 0.0, 1.0},
             {-810728.0, 1403580.0, 0.0}
     };
 
     // the array elements are not mutated
-    private static final double A2p0[][] = {
+    private static final double[][] A2p0 = {
             {0.0, 1.0, 0.0},
             {0.0, 0.0, 1.0},
             {-1370589.0, 0.0, 527612.0}
     };
 
     // the array elements are not mutated
-    private static final double A1p76[][] = {
+    private static final double[][] A1p76 = {
             {82758667.0, 1871391091.0, 4127413238.0},
             {3672831523.0, 69195019.0, 1871391091.0},
             {3672091415.0, 3528743235.0, 69195019.0}
     };
 
     // the array elements are not mutated
-    private static final double A2p76[][] = {
+    private static final double[][] A2p76 = {
             {1511326704.0, 3759209742.0, 1610795712.0},
             {4292754251.0, 1511326704.0, 3889917532.0},
             {3859662829.0, 4292754251.0, 3708466080.0}
     };
 
     // the array elements are not mutated
-    private static final double A1p127[][] = {
+    private static final double[][] A1p127 = {
             {2427906178.0, 3580155704.0, 949770784.0},
             {226153695.0, 1230515664.0, 3580155704.0},
             {1988835001.0, 986791581.0, 1230515664.0}
     };
 
     // the array elements are not mutated
-    private static final double A2p127[][] = {
+    private static final double[][] A2p127 = {
             {1464411153.0, 277697599.0, 1610723613.0},
             {32183930.0, 1464411153.0, 1022607788.0},
             {2824425944.0, 32183930.0, 2093834863.0}
@@ -119,7 +120,7 @@ public class RNStreamFactory extends Identity {
      * This represents the state of the factory. This array changes
      * as streams are created. Here it is initialized to the default starting point.
      */
-    private double nextSeed[] = {12345, 12345, 12345, 12345, 12345, 12345};
+    private double[] nextSeed = {12345, 12345, 12345, 12345, 12345, 12345};
 
     /**
      * Creates a factory with no name
@@ -131,7 +132,7 @@ public class RNStreamFactory extends Identity {
     /**
      * Creates a factory with the provided name
      *
-     * @param name
+     * @param name a name for the factory, may be null
      */
     public RNStreamFactory(String name) {
         super(name);
@@ -140,17 +141,17 @@ public class RNStreamFactory extends Identity {
     /**
      * Returns a clone of the factory that will produce exactly the same streams
      *
-     * @return
+     * @return new instance of the factory
      */
     public RNStreamFactory newInstance() {
         return newInstance(getName() + " Clone");
     }
 
     /**
-     * Returns a clone of the factory that will produce exactly the same streams
+     * Returns a new instance of the factory that will produce exactly the same streams
      *
-     * @param name
-     * @return
+     * @param name the name for the factory, may be null
+     * @return the new instance of the factory
      */
     public RNStreamFactory newInstance(String name) {
         RNStreamFactory f = new RNStreamFactory(name);
@@ -161,9 +162,9 @@ public class RNStreamFactory extends Identity {
     /**
      * Returns a reference to a "global" stream factory
      *
-     * @return
+     * @return a reference to a "global" stream factory
      */
-    public static final RNStreamFactory getDefaultFactory() {
+    public static RNStreamFactory getDefaultFactory() {
         return DefaultFactory;
     }
 
@@ -172,7 +173,7 @@ public class RNStreamFactory extends Identity {
      *
      * @param f must not be null
      */
-    public static final void setDefaultFactory(RNStreamFactory f) {
+    public static void setDefaultFactory(RNStreamFactory f) {
         if (f == null) {
             throw new IllegalArgumentException("The supplied RNStreamFactory was null");
         }
@@ -182,30 +183,16 @@ public class RNStreamFactory extends Identity {
     /**
      * Returns a global default stream from the default factory
      *
-     * @return
+     * @return the default stream
      */
-    public final static RNStreamIfc getDefaultStream() {
+    public static RNStreamIfc getDefaultStream() {
         if (DEFAULT_RNG == null) {
             DEFAULT_RNG = getDefaultFactory().getStream();
         }
         return DEFAULT_RNG;
     }
 
-    /**
-     * Tells the factory to make and return a RNStream
-     *
-     * @return
-     */
-    public final RNStreamIfc getStream() {
-        return getStream(null);
-    }
-
-    /**
-     * Tells the factory to make and return a RNStream with the provided name
-     *
-     * @param name
-     * @return
-     */
+    @Override
     public final RNStreamIfc getStream(String name) {
         // create the stream using the current seed state of the factory
         RNStream stream = new RNStream(name);
@@ -230,7 +217,7 @@ public class RNStreamFactory extends Identity {
     public final void advanceSeeds(int n) {
         for (int k = 1; k <= n; k++) {
             matVecModM(A1p127, nextSeed, nextSeed, m1);
-            double temp[] = new double[3];
+            double[] temp = new double[3];
             for (int i = 0; i < 3; ++i) {
                 temp[i] = nextSeed[i + 3];
             }
@@ -246,11 +233,12 @@ public class RNStreamFactory extends Identity {
         StringBuilder sb = new StringBuilder();
         sb.append("Random number Factory name: ");
         sb.append(getName());
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         sb.append("Random number Factory ID: ");
         sb.append(getId());
-        sb.append("\n");
-        sb.append("The current package seed is now:\n");
+        sb.append(System.lineSeparator());
+        sb.append("The current package seed is now:");
+        sb.append(System.lineSeparator());
         sb.append(Arrays.toString(getFactorySeed()));
         return sb.toString();
     }
@@ -281,8 +269,8 @@ public class RNStreamFactory extends Identity {
     /* Works even if v = s.                                */
     //TODO this method mutates the array v
     // A, s, m are unchanged
-    private static void matVecModM(double A[][], double s[], double v[], double m) {
-        double x[] = new double[3];
+    private static void matVecModM(double[][] A, double[] s, double[] v, double m) {
+        double[] x = new double[3];
         for (int i = 0; i < 3; ++i) {
             x[i] = multModM(A[i][0], s[0], 0.0, m);
             x[i] = multModM(A[i][1], s[1], x[i], m);
@@ -296,10 +284,10 @@ public class RNStreamFactory extends Identity {
     /* Returns C = A*B MOD m */
     /* Note: work even if A = C or B = C or A = B = C.         */
     // A is not mutated, B is not mutated, C is mutated
-    private static void matMatModM(double A[][], double B[][], double C[][], double m) {
+    private static void matMatModM(double[][] A, double[][] B, double[][] C, double m) {
         int i, j;
-        double V[] = new double[3];
-        double W[][] = new double[3][3];
+        double[] V = new double[3];
+        double[][] W = new double[3][3];
         for (i = 0; i < 3; ++i) {
             for (j = 0; j < 3; ++j) {
                 V[j] = B[j][i];
@@ -318,7 +306,7 @@ public class RNStreamFactory extends Identity {
 
     /* Compute matrix B = (A^(2^e) Mod m);  works even if A = B */
     // A is copied to B, B is mutated
-    private static void matTwoPowModM(double A[][], double B[][], double m, int e) {
+    private static void matTwoPowModM(double[][] A, double[][] B, double m, int e) {
         int i, j;
         /* initialize: B = A */
         if (A != B) {
@@ -336,10 +324,10 @@ public class RNStreamFactory extends Identity {
 
     /* Compute matrix D = A^c Mod m ;  works even if A = B */
     // A is copied to W, W is used to compute B, B is mutated
-    private static void matPowModM(double A[][], double B[][], double m, int c) {
+    private static void matPowModM(double[][] A, double[][] B, double m, int c) {
         int i, j;
         int n = c;
-        double W[][] = new double[3][3];
+        double[][] W = new double[3][3];
 
         /* initialize: W = A; B = I */
         for (i = 0; i < 3; i++) {
@@ -415,7 +403,7 @@ public class RNStreamFactory extends Identity {
     /**
      * Causes all the managed streams to use antithetic or not
      *
-     * @param flag
+     * @param flag true means antithetic
      */
     public final void setAllAntithetic(boolean flag) {
         if (myStreamManager != null) {
@@ -427,17 +415,17 @@ public class RNStreamFactory extends Identity {
      * Returns the stream manager if stream management has been turned on, else
      * it will return null
      *
-     * @return
+     * @return an Optional holding the stream manager or null
      */
-    public final RandomStreamManagerIfc getStreamManager() {
-        return myStreamManager;
+    public final Optional<RandomStreamManagerIfc> getStreamManager() {
+        return Optional.ofNullable(myStreamManager);
     }
 
     /**
      * Gets the default initial package seed: seed = {12345, 12345, 12345,
      * 12345, 12345, 12345};
      *
-     * @return
+     * @return an array holding the initial seed values
      */
     public final long[] getDefaultInitialFactorySeed() {
         long[] seed = {12345, 12345, 12345, 12345, 12345, 12345};
@@ -447,7 +435,7 @@ public class RNStreamFactory extends Identity {
     /**
      * Returns the current package seed
      *
-     * @return
+     * @return the array of seed values for the current state
      */
     public final long[] getFactorySeed() {
         long[] seed = new long[6];
