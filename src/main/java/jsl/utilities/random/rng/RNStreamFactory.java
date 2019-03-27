@@ -25,7 +25,6 @@ import jsl.utilities.reporting.JSL;
 
 public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
 
-    //TODO is this default stream necessary? only usefulness appears to be in Constant in distribution package.
     private static RNStreamIfc DEFAULT_RNG;
 
     private static RNStreamFactory DefaultFactory = new RNStreamFactory("Default");

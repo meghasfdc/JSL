@@ -45,7 +45,7 @@ import static jsl.utilities.random.distributions.Normal.stdNormalInvCDF;
  */
 public class JSLRandom {
 
-    public static enum AlgoType {Inverse, AcceptanceRejection};
+    public enum AlgoType {Inverse, AcceptanceRejection};
 
     private static Beta myBeta;
 
@@ -69,7 +69,7 @@ public class JSLRandom {
     }
 
     /**
-     * @return returns a new stream using the Stream API
+     * @return returns a new stream from the default stream factory using the Stream API
      */
     public static DoubleStream getDoubleStream() {
         return createRNStream().asDoubleStream();
@@ -391,8 +391,7 @@ public class JSLRandom {
         double u = rng.randU01();
         double z = Normal.stdNormalInvCDF(u);
         double y = Math.exp((z - alpha1) / alpha2);
-        double x = (min + max * y) / (y + 1.0);
-        return x;
+        return (min + max * y) / (y + 1.0);
     }
 
     /**
