@@ -51,6 +51,14 @@ public class DEmpiricalList<T> implements RElementIfc<T> {
 
     }
 
+    /**
+     *
+     * @return a copy of the underlying CDF array
+     */
+    public double[] getCDF(){
+        return Arrays.copyOf(myCDF, myCDF.length);
+    }
+
     @Override
     public T getRandomElement() {
         return JSLRandom.randomlySelect(myElements, myCDF, myRNG);
