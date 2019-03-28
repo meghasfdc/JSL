@@ -67,6 +67,8 @@ public class NHPDriverLicenseBureauWithQ extends SchedulingElement {
         f.addRateSegment(180.0, 0.167);
         f.addRateSegment(240.0, 0.05);
 
+        // by default the schedule will rate function will repeat
+
         myArrivalRV = new NHPPTimeBtwEventRV(this, f);
 
         myWaitingQ = new Queue(this, "DriverLicenseQ");

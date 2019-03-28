@@ -20,6 +20,8 @@ import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.utilities.random.distributions.Exponential;
+import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.ConstantRV;
 import jsl.utilities.random.rvariable.ExponentialRV;
 
 /**
@@ -76,6 +78,9 @@ public class NHPPTimeBtwEventRV extends RandomVariable {
      */
     protected EndOfCycle myCycle;
 
+    protected final ExponentialRV myRate1Expo;
+    protected RNStreamIfc myRNStream;
+
     /**
      *
      * @param parent the parent
@@ -115,6 +120,9 @@ public class NHPPTimeBtwEventRV extends RandomVariable {
     public NHPPTimeBtwEventRV(ModelElement parent, InvertibleCumulativeRateFunctionIfc rateFunction,
                               double lastRate, String name) {
         super(parent, new ExponentialRV(1.0), name);
+
+        myRate1Expo = (ExponentialRV) getInitialRandomSource();
+        myRNStream = myRate1Expo.getRandomNumberStream();
 
         setRateFunction(rateFunction);
 
@@ -164,8 +172,8 @@ public class NHPPTimeBtwEventRV extends RandomVariable {
         myPPTime = myCycleStartTime;
         myNumCycles = 0;
         myUseLastRateFlag = false;
-        Exponential e = (Exponential) myRandomSource;
-        e.setMean(1.0);
+//        ExponentialRV e = (ExponentialRV) myRandomSource;
+//        e.setMean(1.0);
 
         //   	if (myCycle != null)
         //   		myCycle.scheduleEvent(myCycleLength);
@@ -204,8 +212,11 @@ public class NHPPTimeBtwEventRV extends RandomVariable {
                 myUseLastRateFlag = true;
                 //System.out.println("setting use last rate flag");
                 // set source for last rate, will be used from now on
-                Exponential e = (Exponential) myRandomSource;
-                e.setMean(1.0 / myLastRate);
+                // ensure new rv uses same stream with new parameter
+                //System.out.printf("%f > setting the rate to last rate = %f %n", getTime(), myLastRate);
+                ExponentialRV e = new ExponentialRV(1.0 / myLastRate, myRNStream);
+                // update the random source
+                setRandomSource(e);
                 // need to use the residual amount, to get the time of the next event
                 // using the inverse function for the final constant rate
                 double tone = myRateFunction.getTimeRangeUpperLimit() + residual / myLastRate;

@@ -83,7 +83,7 @@ public class TestNHPPPWConstantRepeat extends ModelElement {
         new TestNHPPPWConstantRepeat(s.getModel(), f);
         // set the parameters of the experiment
         // set the parameters of the experiment
-        s.setNumberOfReplications(1000);
+        s.setNumberOfReplications(10000);
         s.setLengthOfReplication(100.0);
 
         // tell the simulation to run

@@ -41,13 +41,13 @@ public class TestNHPPPWLinearNonRepeat extends ModelElement {
 
     protected PiecewiseRateFunction myPWRF;
 
-    public TestNHPPPWLinearNonRepeat(ModelElement parent, PiecewiseRateFunction f) {
-        this(parent, f, null);
+    public TestNHPPPWLinearNonRepeat(ModelElement parent, PiecewiseRateFunction f, double lastRate) {
+        this(parent, f, lastRate,null);
     }
 
-    public TestNHPPPWLinearNonRepeat(ModelElement parent, PiecewiseRateFunction f, String name) {
+    public TestNHPPPWLinearNonRepeat(ModelElement parent, PiecewiseRateFunction f, double lastRate, String name) {
         super(parent, name);
-        myNHPPGenerator = new NHPPEventGenerator(this, f, myListener, 2.0, null);
+        myNHPPGenerator = new NHPPEventGenerator(this, f, myListener, lastRate, null);
         myPWRF = f;
         myCountersFC = new ArrayList<Counter>();
         int n = f.getNumberSegments();
@@ -84,7 +84,7 @@ public class TestNHPPPWLinearNonRepeat extends ModelElement {
         System.out.println("intervals");
         System.out.println(f);
 
-        new TestNHPPPWLinearNonRepeat(s.getModel(), f);
+        new TestNHPPPWLinearNonRepeat(s.getModel(), f, 2.0);
 
         // set the parameters of the experiment
         // set the parameters of the experiment

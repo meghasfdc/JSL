@@ -41,13 +41,13 @@ public class TestNHPPPWConstantNonRepeat extends ModelElement {
 
     protected PiecewiseRateFunction myPWRF;
 
-    public TestNHPPPWConstantNonRepeat(ModelElement parent, PiecewiseRateFunction f) {
-        this(parent, f, null);
+    public TestNHPPPWConstantNonRepeat(ModelElement parent, PiecewiseRateFunction f, double lastRate) {
+        this(parent, f, lastRate, null);
     }
 
-    public TestNHPPPWConstantNonRepeat(ModelElement parent, PiecewiseRateFunction f, String name) {
+    public TestNHPPPWConstantNonRepeat(ModelElement parent, PiecewiseRateFunction f, double lastRate, String name) {
         super(parent, name);
-        myNHPPGenerator = new NHPPEventGenerator(this, f, myListener, 2.0, null);
+        myNHPPGenerator = new NHPPEventGenerator(this, f, myListener, lastRate, null);
         myPWRF = f;
         myCountersFC = new ArrayList<Counter>();
         int n = f.getNumberSegments();
@@ -81,11 +81,11 @@ public class TestNHPPPWConstantNonRepeat extends ModelElement {
         System.out.println("intervals");
         System.out.println(f);
 
-        new TestNHPPPWConstantNonRepeat(s.getModel(), f);
+        new TestNHPPPWConstantNonRepeat(s.getModel(), f, 1.0);
 
         // set the parameters of the experiment
         // set the parameters of the experiment
-        s.setNumberOfReplications(1000);
+        s.setNumberOfReplications(10);
         s.setLengthOfReplication(100.0);
 
         // tell the simulation to run

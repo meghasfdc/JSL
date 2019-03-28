@@ -77,7 +77,7 @@ public class TestNHPPPWConstant extends ModelElement {
 
         // set the parameters of the experiment
         // set the parameters of the experiment
-        s.setNumberOfReplications(1);
+        s.setNumberOfReplications(10000);
         s.setLengthOfReplication(50.0);
 
         // tell the simulation to run
