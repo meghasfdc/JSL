@@ -36,7 +36,9 @@ public class DatabaseFactoryTest {
 //        testPostgresPropertiesFile();
 
 //        testSPDatabaseCreation();
-        testDatabaseCreation();
+       // testDatabaseCreation();
+
+        testHSQLDB();
     }
 
     public static void testDatabaseCreation(){
@@ -120,6 +122,12 @@ public class DatabaseFactoryTest {
         System.out.println(task);
         task.getCreationScriptCommands().forEach(System.out::println);
         db.printTableAsText("s");
+    }
+
+    public static void testHSQLDB(){
+        Path path = JSLDatabase.dbDir.resolve("tempHSQLDB");
+        DataSource dataSource = DatabaseFactory.getHSQLDBEmbeddedDataSource(path, true);
+        Database db = new Database("label", dataSource, SQLDialect.HSQLDB);
     }
 
     public static void testPostgresLocalHostJSLDb() {

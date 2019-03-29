@@ -394,6 +394,33 @@ public class DatabaseFactory {
         return getDataSource(props);
     }
 
+    public static DataSource getHSQLDBEmbeddedDataSource(Path pathToDb, boolean create) {
+        return getHSQLDBEmbeddedDataSource(pathToDb, "SA", null, create);
+    }
+
+    public static DataSource getHSQLDBEmbeddedDataSource(Path pathToDb, String user, String pWord, boolean create) {
+        Objects.requireNonNull(pathToDb, "The path name to the database must not be null");
+        Properties props = new Properties();
+        props.setProperty("dataSourceClassName", "org.hsqldb.jdbc.JDBCDataSource");
+        if (user == null){
+            props.setProperty("dataSource.user", "SA");
+        } else {
+            props.setProperty("dataSource.user", user);
+        }
+        if (pWord != null){
+            props.setProperty("dataSource.password", pWord);
+        }
+        String s;
+        if (create){
+            s = pathToDb.toString() + ";true";
+        }else {
+            s = pathToDb.toString() + ";false";
+        }
+        //props.setProperty("dataSource.databaseName", "jdbc:hsqldb:file:" + s);
+        props.setProperty("dataSource.databaseName", "jdbc:hsqldb:file:" + s + ";shutdown=true");
+        return getDataSource(props);
+    }
+
     /**
      * Assumes that the properties are appropriately configured to create a DataSource
      * via  HikariCP
