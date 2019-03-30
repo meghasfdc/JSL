@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -126,8 +125,17 @@ public class DatabaseFactoryTest {
 
     public static void testHSQLDB(){
         Path path = JSLDatabase.dbDir.resolve("tempHSQLDB");
+        System.out.println(path);
         DataSource dataSource = DatabaseFactory.getHSQLDBEmbeddedDataSource(path, true);
         Database db = new Database("label", dataSource, SQLDialect.HSQLDB);
+        Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
+        Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
+        Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
+
+        DbCreateTask task = db.create()
+                .withTables(tables).withInserts(inserts).withConstraints(alters)
+                .execute();
+        System.out.println(task);
     }
 
     public static void testPostgresLocalHostJSLDb() {

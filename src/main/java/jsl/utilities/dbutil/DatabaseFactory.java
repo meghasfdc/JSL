@@ -1,7 +1,5 @@
 package jsl.utilities.dbutil;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.MoreFiles;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jsl.utilities.reporting.JSLDatabase;
@@ -14,8 +12,10 @@ import org.jooq.exception.DataAccessException;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -410,14 +410,16 @@ public class DatabaseFactory {
         if (pWord != null){
             props.setProperty("dataSource.password", pWord);
         }
+        Path p = pathToDb.resolve(pathToDb.getFileName());
+        //Path p = pathToDb;
         String s;
         if (create){
-            s = pathToDb.toString() + ";true";
+            s = p.toString() + ";true";
         }else {
-            s = pathToDb.toString() + ";false";
+            s = p.toString() + ";false";
         }
-        //props.setProperty("dataSource.databaseName", "jdbc:hsqldb:file:" + s);
-        props.setProperty("dataSource.databaseName", "jdbc:hsqldb:file:" + s + ";shutdown=true");
+        props.setProperty("dataSource.databaseName", "jdbc:hsqldb:file:" + s);
+        //props.setProperty("dataSource.databaseName", "jdbc:hsqldb:file:" + s + ";shutdown=true");
         return getDataSource(props);
     }
 
