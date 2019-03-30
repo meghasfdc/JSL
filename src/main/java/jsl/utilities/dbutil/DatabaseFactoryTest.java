@@ -35,9 +35,9 @@ public class DatabaseFactoryTest {
 //        testPostgresPropertiesFile();
 
 //        testSPDatabaseCreation();
-       // testDatabaseCreation();
+        testDatabaseCreation();
 
-        testHSQLDB();
+//        testHSQLDB();
     }
 
     public static void testDatabaseCreation(){
@@ -123,20 +123,20 @@ public class DatabaseFactoryTest {
         db.printTableAsText("s");
     }
 
-    public static void testHSQLDB(){
-        Path path = JSLDatabase.dbDir.resolve("tempHSQLDB");
-        System.out.println(path);
-        DataSource dataSource = DatabaseFactory.getHSQLDBEmbeddedDataSource(path, true);
-        Database db = new Database("label", dataSource, SQLDialect.HSQLDB);
-        Path tables = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Tables.sql");
-        Path inserts = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Insert.sql");
-        Path alters = JSLDatabase.dbScriptsDir.resolve("SPDatabase_Alter.sql");
-
-        DbCreateTask task = db.create()
-                .withTables(tables).withInserts(inserts).withConstraints(alters)
-                .execute();
-        System.out.println(task);
-    }
+//    public static void testHSQLDB(){
+//        Path path = JSLDatabase.dbDir.resolve("tempHSQLDB");
+//        System.out.println(path);
+//        DataSource dataSource = DatabaseFactory.getHSQLDBEmbeddedDataSource(path, true);
+//        Database db = new Database("label", dataSource, SQLDialect.HSQLDB);
+//
+//        Path spd = JSLDatabase.dbScriptsDir.resolve("SPDatabase_ALL.sql");
+//
+//        DbCreateTask task = db.create().withCreationScript(spd).execute();
+//
+//        System.out.println(task);
+//
+//        db.executeCommand("SHUTDOWN");
+//    }
 
     public static void testPostgresLocalHostJSLDb() {
         String dbName = "test";
