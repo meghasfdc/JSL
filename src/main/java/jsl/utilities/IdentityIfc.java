@@ -15,9 +15,14 @@
  */
 package jsl.utilities;
 
-/**
+/** An interface to defining the identity of an object in terms
+ *  of a name and a number
  */
 public interface IdentityIfc extends GetNameIfc {
 
+    /**
+     *
+     * @return an int representing the id of the object
+     */
     int getId();
 }

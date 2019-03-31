@@ -15,7 +15,8 @@
  */
 package jsl.utilities;
 
-/**
+/**  A class to assist with the naming and numbering of objects.  The number
+ *  cannot change, but the name can be changed.
  *
  * @author rossetti
  */
@@ -33,10 +34,17 @@ public class Identity implements IdentityIfc {
      */
     private int myId;
 
+    /**
+     * Assumes the name is null.
+     */
     public Identity(){
         this(null);
     }
 
+    /**
+     *
+     * @param name the name to be used for the identity, can be null
+     */
     public Identity(String name) {
         myIdCounter_ = myIdCounter_ + 1;
         myId = myIdCounter_;
@@ -53,19 +61,20 @@ public class Identity implements IdentityIfc {
 
     /** Returns the id for this object
      *
-     * @return
+     * @return the id for this object
      */
     @Override
     public final int getId() {
         return (myId);
     }
 
-    /** Sets the name
+    /** Sets the name. If null, a name is constructed based on the simple class name
+     *  and the id of the object
      * @param str The name as a string.
      */
     public final void setName(String str) {
         if (str == null) {
-            myName = this.getClass().getSimpleName();
+            myName = this.getClass().getSimpleName() + "#" + getId();
         } else {
             myName = str;
         }

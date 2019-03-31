@@ -15,15 +15,15 @@
  */
 package jsl.utilities.random.rng;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 import jsl.utilities.Identity;
 import jsl.utilities.IdentityIfc;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.reporting.JSL;
 
-public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
+import java.util.Arrays;
+import java.util.Optional;
+
+public class RNStreamFactory extends Identity {
 
     private static RNStreamIfc DEFAULT_RNG;
 
@@ -191,7 +191,12 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         return DEFAULT_RNG;
     }
 
-    @Override
+    /**
+     * Tells the provider to make and return a RNStream with the provided name
+     *
+     * @param name can be null
+     * @return the made stream
+     */
     public final RNStreamIfc getStream(String name) {
         // create the stream using the current seed state of the factory
         RNStream stream = new RNStream(name);
@@ -205,6 +210,15 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         }
 
         return stream;
+    }
+
+    /**
+     * Tells the factory to make and return a RNStream
+     *
+     * @return the made stream
+     */
+    public final RNStreamIfc getStream() {
+        return getStream(null);
     }
 
     /**
@@ -522,17 +536,17 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         /**
          * The current state of the stream
          */
-        private double Cg[] = new double[6];
+        private double[] Cg = new double[6];
 
         /**
          * The starting point of the current substream
          */
-        private double Bg[] = new double[6];
+        private double[] Bg = new double[6];
 
         /**
          * The starting point of the current stream
          */
-        private double Ig[] = new double[6];
+        private double[] Ig = new double[6];
 
         /**
          * This stream generates antithetic variates if and only if {\tt anti =
@@ -574,9 +588,9 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         }
 
         /**
-         * Returns a clone of the stream with exactly the same state
+         * Returns a duplicate of the stream with exactly the same state
          *
-         * @return
+         * @return the created stream
          */
         @Override
         public RNStream newInstance() {
@@ -584,10 +598,10 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         }
 
         /**
-         * Returns a clone of the stream that has exactly the same state
+         * Returns a duplicate of the stream that has exactly the same state
          *
-         * @param name
-         * @return
+         * @param name the name of the duplicate
+         * @return the created stream
          */
         @Override
         public RNStream newInstance(String name) {
@@ -604,10 +618,10 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         }
 
         /**
-         * Returns a clone of the stream that has exactly the same state, but
+         * Returns a duplicate of the stream that has exactly the same state, but
          * generates antithetic values compared to its original
          *
-         * @return
+         * @return the created stream
          */
         @Override
         public RNStream newAntitheticInstance() {
@@ -615,11 +629,11 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         }
 
         /**
-         * Returns a clone of the stream that has exactly the same state, but
+         * Returns a duplicate of the stream that has exactly the same state, but
          * generates antithetic values compared to its original
          *
-         * @param name
-         * @return
+         * @param name the name of the stream
+         * @return the created stream
          */
         @Override
         public RNStream newAntitheticInstance(String name) {
@@ -668,7 +682,7 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         /**
          * Returns the seed for the start of the stream
          *
-         * @return
+         * @return the seed for the start of the stream
          */
         public final long[] getStartStreamSeed() {
             long[] seed = new long[6];
@@ -692,7 +706,7 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         /**
          * Returns the seed for the start of the substream
          *
-         * @return
+         * @return the seed for the start of the substream
          */
         public final long[] getStartSubStreamSeed() {
             long[] seed = new long[6];
@@ -721,7 +735,7 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         public final void advanceToNextSubstream() {
             int i;
             matVecModM(A1p76, Bg, Bg, m1);
-            double temp[] = new double[3];
+            double[] temp = new double[3];
             for (i = 0; i < 3; ++i) {
                 temp[i] = Bg[i + 3];
             }
@@ -748,7 +762,8 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
          * Returns whether or not the antithetic option is on (true) or off
          * (false)
          *
-         * @return
+         * @return whether or not the antithetic option is on (true) or off
+         *          (false)
          */
         @Override
         public final boolean getAntitheticOption() {
@@ -775,8 +790,8 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
          * 0, then n = -2^-e + c; and if e = 0, then n = c. Note, c is allowed
          * to take negative values
          *
-         * @param e A long
-         * @param c A long
+         * @param e an integer
+         * @param c an integer
          */
         public final void advanceState(int e, int c) {
             double B1[][] = new double[3][3], C1[][] = new double[3][3];
@@ -826,7 +841,7 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
          * @param seed the array of seeds
          * @return returns true if the seed is valid
          */
-        public final boolean setSeed(long seed[]) {
+        public final boolean setSeed(long[] seed) {
             int i;
             if (CheckSeed(seed) != 0) {
                 return false;                   // FAILURE
@@ -985,7 +1000,7 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         /**
          * The previous U(0,1) generated (returned) by randU01()
          *
-         * @return
+         * @return previous U(0,1) generated (returned) by randU01()
          */
         @Override
         public final double getPrevU01() {
@@ -995,7 +1010,7 @@ public class RNStreamFactory extends Identity implements RNStreamProviderIfc {
         /**
          * Returns the antithetic of the previous U(0,1) i.e. 1.0 - getPrevU01()
          *
-         * @return
+         * @return the antithetic of the previous U(0,1) i.e. 1.0 - getPrevU01()
          */
         @Override
         public final double getAntitheticValue() {

@@ -18,5 +18,9 @@ package jsl.utilities;
 
 public interface GetNameIfc {
 
+    /**
+     *
+     * @return a string representing the name of the object
+     */
     String getName();
 }

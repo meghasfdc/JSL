@@ -17,25 +17,73 @@
 package jsl.utilities.random.rng;
 
 /**
- *  An interface to define the ability to provide a random number stream (RNStreamIfc)
+ *  An interface to define the ability to provide random number streams (RNStreamIfc)
+ *  Conceptualizes this process as making a sequence of streams, numbered 1, 2, 3, ...
  *  for use in generating pseudo-random numbers that can be controlled.
  */
 public interface RNStreamProviderIfc {
 
-    /**
-     * Tells the provider to make and return a RNStream with the provided name
+    /** It is useful to designate one of the streams in the sequence of streams as
+     *  the default stream from the provider.  When clients don't care to get new
+     *  streams, this method guarantees that the same stream is returned every time.
      *
-     * @param name can be null
-     * @return the made stream
+     * @return the default stream from this provider
      */
-    RNStreamIfc getStream(String name);
+    RNStreamIfc defaultRNStream();
+
+    /** The sequence number associated with the default random number stream. This
+     * allows clients to know what stream number has been assigned to the default.
+     *
+     * @return the stream number of the default random number stream for this provider
+     */
+    int defaultRNStreamNumber();
 
     /**
-     * Tells the factory to make and return a RNStream
+     * Tells the provider to make and return the next RNStreamIfc in the sequence
+     * of streams
      *
      * @return the made stream
      */
-    default RNStreamIfc getStream() {
-        return getStream(null);
-    }
+    RNStreamIfc nextRNStream();
+
+    /** Each call to nextStream() makes another stream in the sequence of streams.
+     * This method should return the number of streams provided by the provider. If nextStream() is
+     * called once, then lastRNStreamNumber() should return 1.  If nextStream() is called
+     * twice then lastRNStreamNumber() should return 2, etc. Thus, this method
+     * returns the number in the sequence associated with the last stream made.
+     * If lastRNStreamNumber() returns 0, then no streams have been provided.
+     *
+     * @return the number in the sequence associated with the last stream made
+     */
+    int lastRNStreamNumber();
+
+    /**
+     * Tells the provider to return the ith stream of the sequence of streams that it provides.
+     * If i is greater than lastRNStreamNumber() then lastRNStreamNumber() is advanced
+     * according to the additional number of streams. For example, if lastRNStreamNumber() = 10
+     * and i = 15, then streams 11, 12, 13, 14, 15 are assumed provided and stream 15 is returned and
+     * lastRNStreamNumber() now equals 15.  If i is less than or equal to lastRNStreamNumber(),
+     * then no advancement occurs, lastRNStreamNumber() stays at its current value and the ith
+     * stream is returned.
+     *
+     * @param i the ith stream in the sequence of provided streams, must be 1, 2, 3 ...
+     * @return the ith RNStreamIfc provided in the sequence of streams
+     */
+    RNStreamIfc rnStream(int i);
+
+    /**
+     * Advances the state of the provider through n streams. Acts as if n streams were created, without
+     * actually creating the streams.  lastRNStreamNumber() remains the same after calling
+     * this method. In other words, this method should act as if nextRNStream() was not called.
+     *
+     * @param n the number of times to advance
+     */
+    void advanceStreams(int n);
+
+    /**
+     *  Causes the provider to act as if it has never created any streams. Thus, the next call
+     *  to nextRNStream() after the reset should return the 1st stream in the sequence of streams
+     *  that this provider would normally provide in the order in which they would be provided.
+     */
+    void resetRNStreamSequence();
 }
