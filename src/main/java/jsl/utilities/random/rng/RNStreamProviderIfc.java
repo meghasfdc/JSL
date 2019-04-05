@@ -29,7 +29,9 @@ public interface RNStreamProviderIfc {
      *
      * @return the default stream from this provider
      */
-    RNStreamIfc defaultRNStream();
+    default RNStreamIfc defaultRNStream(){
+        return rnStream(defaultRNStreamNumber());
+    }
 
     /** The sequence number associated with the default random number stream. This
      * allows clients to know what stream number has been assigned to the default.
