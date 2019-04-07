@@ -17,6 +17,7 @@ package jsl.utilities.random.rng;
 
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.rvariable.AR1NormalRV;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 import java.util.Objects;
 
@@ -40,14 +41,14 @@ public class AR1CorrelatedRNStreamStream implements RNStreamIfc {
      *
      */
     public AR1CorrelatedRNStreamStream() {
-        this(0.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, JSLRandom.nextRNStream());
     }
 
     /**
      * @param correlation the correlation, must be within [-1,1]
      */
     public AR1CorrelatedRNStreamStream(double correlation) {
-        this(correlation, RNStreamFactory.getDefaultFactory().getStream());
+        this(correlation, JSLRandom.nextRNStream());
     }
 
     /**

@@ -29,11 +29,11 @@ import java.util.stream.DoubleStream;
 /**
  * An interface for defining random variables. The methods sample() and getValue() gets a new
  * value of the random variable sampled accordingly.  The method getPreviousValue() returns
- * the value from the last call to sample()/getValue(). The value returned by getPreviousValue() stays
- * the same until the next call to sample()/getValue().  The methods sample()/getValue() always get
- * the next random value.  If sample()/getValue() is never called then getPreviousValue() returns Double.NaN.
- * Use sample()/getValue() to get a new random value and use getPreviousValue() to get the last sampled value.
- *
+ * the value from the last call to sample() or getValue(). The value returned by getPreviousValue() stays
+ * the same until the next call to sample() or getValue().  The methods sample() or getValue() always get
+ * the next random value.  If sample() or getValue() is never called then getPreviousValue() returns Double.NaN.
+ * Use sample() or getValue() to get a new random value and use getPreviousValue() to get the last sampled value.
+ * <p>
  * The preferred approach to creating random variables is to sub-class AbstractRVariable.
  */
 public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanceIfc,
@@ -46,7 +46,7 @@ public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanc
         Bernoulli, Beta, ChiSquared, Binomial, Constant, DUniform, Exponential,
         Gamma, GeneralizedBeta, Geometric, JohnsonB, Laplace, LogLogistic, Lognormal,
         NegativeBinomial, Normal, PearsonType5, PearsonType6, Poisson, ShiftedGeometric,
-        Triangular, Uniform, Weibull, DEmpirical
+        Triangular, Uniform, Weibull, DEmpirical, Empirical
     }
 
     /**
@@ -54,6 +54,21 @@ public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanc
      */
     default double getValue() {
         return sample();
+    }
+
+    /**
+     * @param n the number of values to sum, must be 1 or more
+     * @return the sum of n values of getValue()
+     */
+    default double getSumOfValues(int n) {
+        if (n < 1) {
+            throw new IllegalArgumentException(("There must be at least 1 in the sum"));
+        }
+        double sum = 0.0;
+        for (int i = 1; i <= n; i++) {
+            sum = sum + getValue();
+        }
+        return sum;
     }
 
     /**
@@ -66,10 +81,11 @@ public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanc
      * @return a new instance with same parameter values, with a different stream
      */
     default RVariableIfc newInstance() {
-        return newInstance(JSLRandom.createRNStream());
+        return newInstance(JSLRandom.nextRNStream());
     }
 
-    /** This method facilitates turning instances of RVariableIfc into Java DoubleStream
+    /**
+     * This method facilitates turning instances of RVariableIfc into Java DoubleStream
      * for use in the Stream API
      *
      * @return the generated random number using sample()
@@ -79,11 +95,12 @@ public interface RVariableIfc extends RandomIfc, SampleIfc, NewAntitheticInstanc
         return sample();
     }
 
-    /** Turns the doubles into a DoubleStream for the Stream API
+    /**
+     * Turns the doubles into a DoubleStream for the Stream API
      *
-     * @return  a DoubleStream representation of the random variable
+     * @return a DoubleStream representation of the random variable
      */
-    default DoubleStream asDoubleStream(){
+    default DoubleStream asDoubleStream() {
         return DoubleStream.generate(this);
     }
 

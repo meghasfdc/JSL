@@ -20,7 +20,6 @@
  */
 package jsl.utilities.random.sp;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.statistic.IntegerFrequency;
@@ -52,7 +51,7 @@ public class DMarkovChain {
      * @param prob
      */
     public DMarkovChain(int initialState, double[][] prob) {
-        this(initialState, prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(initialState, prob, JSLRandom.nextRNStream());
     }
 
     /**

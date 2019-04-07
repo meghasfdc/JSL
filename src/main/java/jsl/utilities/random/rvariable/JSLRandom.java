@@ -38,6 +38,9 @@ import static jsl.utilities.random.distributions.Normal.stdNormalInvCDF;
  * the randomness. Methods that do not have a RNStreamIfc parameter use,
  * getDefaultRNStream() as the source of randomness. That is, they all <b>share</b> the same
  * stream, which is the default stream from the default random number stream factory.
+ * The user has the option of supplying a stream number to identify the stream
+ * from the underlying stream provider. By default, stream 1 is the default stream
+ * for the default provider. Stream 2 refers to the 2nd stream, etc.
  * <p>
  * Also provides a number of methods for sampling with and without replacement
  * from arrays and lists as well as creating permutations of arrays and lists.
@@ -73,15 +76,24 @@ public class JSLRandom {
     }
 
     /**
-     * @return gets a new stream of pseudo random numbers from the default random
-     * number stream factory
+     * @return gets the next stream of pseudo random numbers from the default random
+     * number stream provider
      */
-    public static RNStreamIfc createRNStream() {
+    public static RNStreamIfc nextRNStream() {
         return myStreamProvider.nextRNStream();
     }
 
     /**
-     * @return the default stream from the default random number stream factory
+     *
+     * @param streamNum the stream number associated with the stream
+     * @return the stream associated with the stream number from the underlying stream provider
+     */
+    public static RNStreamIfc rnStream(int streamNum){
+        return myStreamProvider.rnStream(streamNum);
+    }
+
+    /**
+     * @return the default stream from the default random number stream provider
      */
     public static RNStreamIfc getDefaultRNStream() {
         return myStreamProvider.defaultRNStream();
@@ -91,7 +103,7 @@ public class JSLRandom {
      * @return returns a new stream from the default stream factory using the Stream API
      */
     public static DoubleStream createDoubleStream() {
-        return createRNStream().asDoubleStream();
+        return nextRNStream().asDoubleStream();
     }
 
     /**
@@ -113,7 +125,7 @@ public class JSLRandom {
 
     /**
      * @param pSuccess the probability of success, must be in (0,1)
-     * @param rng      the RngIfc
+     * @param rng      the RNStreamIfc
      * @return the random value
      */
     public static double rBernoulli(double pSuccess, RNStreamIfc rng) {
@@ -151,7 +163,7 @@ public class JSLRandom {
     /**
      * @param pSuccess the probability of success, must be in (0,1)
      * @param nTrials  the number of trials, must be greater than 0
-     * @param rng      the RngIfc, must not be null
+     * @param rng      the RNStreamIfc, must not be null
      * @return the random value
      */
     public static int rBinomial(double pSuccess, int nTrials, RNStreamIfc rng) {
@@ -184,7 +196,7 @@ public class JSLRandom {
 
     /**
      * @param mean the mean of the Poisson, must be greater than 0
-     * @param rng  the RngIfc, must not be null
+     * @param rng  the RNStreamIfc, must not be null
      * @return the random value
      */
     public static int rPoisson(double mean, RNStreamIfc rng) {
@@ -220,7 +232,7 @@ public class JSLRandom {
      *
      * @param minimum the minimum of the range
      * @param maximum the maximum of the range
-     * @param rng     the RngIfc, must not be null
+     * @param rng     the RNStreamIfc, must not be null
      * @return the random value
      */
     public static int rDUniform(int minimum, int maximum, RNStreamIfc rng) {
@@ -247,7 +259,7 @@ public class JSLRandom {
 
     /**
      * @param pSuccess the probability of success, must be in (0,1)
-     * @param rng      the RngIfc, must not be null
+     * @param rng      the RNStreamIfc, must not be null
      * @return the random value
      */
     public static int rGeometric(double pSuccess, RNStreamIfc rng) {
@@ -271,7 +283,7 @@ public class JSLRandom {
     /**
      * @param pSuccess   the probability of success
      * @param rSuccesses number of trials until rth success
-     * @param streamNum the stream number from the stream provider to use
+     * @param streamNum  the stream number from the stream provider to use
      * @return the random value
      */
     public static int rNegBinomial(double pSuccess, double rSuccesses, int streamNum) {
@@ -281,12 +293,41 @@ public class JSLRandom {
     /**
      * @param pSuccess   the probability of success
      * @param rSuccesses number of trials until rth success
-     * @param rng        the RngIfc, must not be null
+     * @param rng        the RNStreamIfc, must not be null
      * @return the random value
      */
     public static int rNegBinomial(double pSuccess, double rSuccesses, RNStreamIfc rng) {
         Objects.requireNonNull(rng, "The supplied RNStreamIfc was null");
         return NegativeBinomial.negBinomialInvCDF(rng.randU01(), pSuccess, rSuccesses);
+    }
+
+    /**
+     * Generates a continuous U(0,1) using the default stream
+     *
+     * @return the random value
+     */
+    public static double rUniform() {
+        return rUniform(0.0, 1.0, getDefaultRNStream());
+    }
+
+    /**
+     * Generates a continuous U(0,1) using the supplied stream number
+     *
+     * @param streamNum the stream number from the stream provider to use
+     * @return the random value
+     */
+    public static double rUniform(int streamNum) {
+        return rUniform(0.0, 1.0, streamNum);
+    }
+
+    /**
+     * Generates a continuous U(0,1) using the supplied stream
+     *
+     * @param rnStream the RNStreamIfc, must not be null
+     * @return the random value
+     */
+    public static double rUniform(RNStreamIfc rnStream) {
+        return rUniform(0.0, 1.0, rnStream);
     }
 
     /**
@@ -303,8 +344,8 @@ public class JSLRandom {
     /**
      * Generates a continuous uniform over the range
      *
-     * @param minimum the minimum of the range, must be less than maximum
-     * @param maximum the maximum of the range
+     * @param minimum   the minimum of the range, must be less than maximum
+     * @param maximum   the maximum of the range
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -317,7 +358,7 @@ public class JSLRandom {
      *
      * @param minimum the minimum of the range, must be less than maximum
      * @param maximum the maximum of the range
-     * @param rng     the RngIfc, must not be null
+     * @param rng     the RNStreamIfc, must not be null
      * @return the random value
      */
     public static double rUniform(double minimum, double maximum, RNStreamIfc rng) {
@@ -331,6 +372,35 @@ public class JSLRandom {
     }
 
     /**
+     * Generates a N(0,1) random value using the default stream
+     *
+     * @return the random value
+     */
+    public static double rNormal() {
+        return rNormal(0.0, 1.0, getDefaultRNStream());
+    }
+
+    /**
+     * Generates a N(0,1) random value using the supplied stream number
+     *
+     * @param streamNum the stream number from the stream provider to use
+     * @return the random value
+     */
+    public static double rNormal(int streamNum) {
+        return rNormal(0.0, 1.0, streamNum);
+    }
+
+    /**
+     * Generates a N(0,1) random value using the supplied stream
+     *
+     * @param rng the RNStreamIfc, must not null
+     * @return the random value
+     */
+    public static double rNormal(RNStreamIfc rng) {
+        return rNormal(0.0, 1.0, rng);
+    }
+
+    /**
      * @param mean     the mean of the normal
      * @param variance the variance of the normal, must be greater than 0
      * @return the random value
@@ -340,8 +410,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean     the mean of the normal
-     * @param variance the variance of the normal, must be greater than 0
+     * @param mean      the mean of the normal
+     * @param variance  the variance of the normal, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -352,7 +422,7 @@ public class JSLRandom {
     /**
      * @param mean     the mean of the normal
      * @param variance the variance of the normal, must be greater than 0
-     * @param rng      the RngIfc, must not null
+     * @param rng      the RNStreamIfc, must not null
      * @return the random value
      */
     public static double rNormal(double mean, double variance, RNStreamIfc rng) {
@@ -375,9 +445,9 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean     the mean of the lognormal, must be greater than 0
-     * @param variance the variance of the lognormal, must be greater than 0
-     * @param  streamNum the stream number from the stream provider to use
+     * @param mean      the mean of the lognormal, must be greater than 0
+     * @param variance  the variance of the lognormal, must be greater than 0
+     * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
     public static double rLogNormal(double mean, double variance, int streamNum) {
@@ -387,7 +457,7 @@ public class JSLRandom {
     /**
      * @param mean     the mean of the lognormal, must be greater than 0
      * @param variance the variance of the lognormal, must be greater than 0
-     * @param rng      the RngIfc, must not be null
+     * @param rng      the RNStreamIfc, must not be null
      * @return the random value
      */
     public static double rLogNormal(double mean, double variance, RNStreamIfc rng) {
@@ -417,8 +487,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape, must be greater than 0
-     * @param scale the scale, must be greater than 0
+     * @param shape     the shape, must be greater than 0
+     * @param scale     the scale, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -429,7 +499,7 @@ public class JSLRandom {
     /**
      * @param shape the shape, must be greater than 0
      * @param scale the scale, must be greater than 0
-     * @param rng   the RngIfc, must not null
+     * @param rng   the RNStreamIfc, must not null
      * @return the random value
      */
     public static double rWeibull(double shape, double scale, RNStreamIfc rng) {
@@ -463,7 +533,7 @@ public class JSLRandom {
     }
 
     /**
-     * @param mean the mean, must be greater than 0
+     * @param mean      the mean, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -473,7 +543,7 @@ public class JSLRandom {
 
     /**
      * @param mean the mean, must be greater than 0
-     * @param rng  the RngIfc, must not null
+     * @param rng  the RNStreamIfc, must not null
      * @return the random value
      */
     public static double rExponential(double mean, RNStreamIfc rng) {
@@ -498,10 +568,10 @@ public class JSLRandom {
     }
 
     /**
-     * @param alpha1 alpha1 parameter
-     * @param alpha2 alpha2 parameter, must be greater than zero
-     * @param min    the min, must be less than max
-     * @param max    the max
+     * @param alpha1    alpha1 parameter
+     * @param alpha2    alpha2 parameter, must be greater than zero
+     * @param min       the min, must be less than max
+     * @param max       the max
      * @param streamNum the stream number from the stream provider to use
      * @return the generated value
      */
@@ -515,7 +585,7 @@ public class JSLRandom {
      * @param alpha2 alpha2 parameter, must be greater than zero
      * @param min    the min, must be less than max
      * @param max    the max
-     * @param rng    the RngIfc, must not be null
+     * @param rng    the RNStreamIfc, must not be null
      * @return the generated value
      */
     public static double rJohnsonB(double alpha1, double alpha2,
@@ -543,8 +613,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape, must be greater than 0
-     * @param scale the scale, must be greater than 0
+     * @param shape     the shape, must be greater than 0
+     * @param scale     the scale, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the generated value
      */
@@ -555,7 +625,7 @@ public class JSLRandom {
     /**
      * @param shape the shape, must be greater than 0
      * @param scale the scale, must be greater than 0
-     * @param rng   the RngIfc, must not be null
+     * @param rng   the RNStreamIfc, must not be null
      * @return the generated value
      */
     public static double rLogLogistic(double shape, double scale, RNStreamIfc rng) {
@@ -578,9 +648,9 @@ public class JSLRandom {
     }
 
     /**
-     * @param min  the min, must be less than or equal to mode
-     * @param mode the mode, must be less than or equal to max
-     * @param max  the max
+     * @param min       the min, must be less than or equal to mode
+     * @param mode      the mode, must be less than or equal to max
+     * @param max       the max
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -593,7 +663,7 @@ public class JSLRandom {
      * @param min  the min, must be less than or equal to mode
      * @param mode the mode, must be less than or equal to max
      * @param max  the max
-     * @param rng  the RngIfc, must not be null
+     * @param rng  the RNStreamIfc, must not be null
      * @return the random value
      */
     public static double rTriangular(double min, double mode,
@@ -638,7 +708,7 @@ public class JSLRandom {
     /**
      * @param shape the shape, must be greater than 0.0
      * @param scale the scale, must be greater than 0.0
-     * @param rng   the RngIfc, must not null
+     * @param rng   the RNStreamIfc, must not null
      * @return the generated value
      */
     public static double rGamma(double shape, double scale, RNStreamIfc rng) {
@@ -646,8 +716,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape, must be greater than 0.0
-     * @param scale the scale, must be greater than 0.0
+     * @param shape     the shape, must be greater than 0.0
+     * @param scale     the scale, must be greater than 0.0
      * @param streamNum the stream number from the stream provider to use
      * @return the generated value
      */
@@ -656,10 +726,10 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape, must be greater than 0.0
-     * @param scale the scale, must be greater than 0.0
+     * @param shape     the shape, must be greater than 0.0
+     * @param scale     the scale, must be greater than 0.0
      * @param streamNum the stream number from the stream provider to use
-     * @param type, must be appropriate algorithm type, if null then inverse transform is the default
+     * @param type,     must be appropriate algorithm type, if null then inverse transform is the default
      * @return the generated value
      */
     public static double rGamma(double shape, double scale, int streamNum, AlgoType type) {
@@ -669,7 +739,7 @@ public class JSLRandom {
     /**
      * @param shape the shape, must be greater than 0.0
      * @param scale the scale, must be greater than 0.0
-     * @param rng   the RngIfc, must not null
+     * @param rng   the RNStreamIfc, must not null
      * @param type, must be appropriate algorithm type, if null then inverse transform is the default
      * @return the generated value
      */
@@ -686,7 +756,7 @@ public class JSLRandom {
      *
      * @param shape the shape, must be greater than 0.0
      * @param scale the scale, must be greater than 0.0
-     * @param rng   the RngIfc, must not null
+     * @param rng   the RNStreamIfc, must not null
      * @return the generated value
      */
     private static double rInvGamma(double shape, double scale, RNStreamIfc rng) {
@@ -716,7 +786,7 @@ public class JSLRandom {
      *
      * @param shape the shape, must be greater than 0.0
      * @param scale the scale, must be greater than 0.0
-     * @param rng   the RngIfc, must not null
+     * @param rng   the RNStreamIfc, must not null
      * @return the generated value
      */
     private static double rARGamma(double shape, double scale, RNStreamIfc rng) {
@@ -812,7 +882,7 @@ public class JSLRandom {
     }
 
     /**
-     * @param dof degrees of freedom, must be greater than 0
+     * @param dof       degrees of freedom, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -822,7 +892,7 @@ public class JSLRandom {
 
     /**
      * @param dof degrees of freedom, must be greater than 0
-     * @param rng the RngIfc, must not be null
+     * @param rng the RNStreamIfc, must not be null
      * @return the random value
      */
     public static double rChiSquared(double dof, RNStreamIfc rng) {
@@ -843,8 +913,8 @@ public class JSLRandom {
     }
 
     /**
-     * @param shape the shape, must be greater than 0
-     * @param scale the scale, must be greater than 0
+     * @param shape     the shape, must be greater than 0
+     * @param scale     the scale, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the generated value
      */
@@ -855,7 +925,7 @@ public class JSLRandom {
     /**
      * @param shape the shape, must be greater than 0
      * @param scale the scale, must be greater than 0
-     * @param rng   the RngIfc, must not be null
+     * @param rng   the RNStreamIfc, must not be null
      * @return the generated value
      */
     public static double rPearsonType5(double shape, double scale, RNStreamIfc rng) {
@@ -881,8 +951,8 @@ public class JSLRandom {
     /**
      * This beta is restricted to the range of (0,1)
      *
-     * @param alpha1 alpha1 parameter
-     * @param alpha2 alpha2 parameter
+     * @param alpha1    alpha1 parameter
+     * @param alpha2    alpha2 parameter
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -895,7 +965,7 @@ public class JSLRandom {
      *
      * @param alpha1 alpha1 parameter
      * @param alpha2 alpha2 parameter
-     * @param rng    the RngIfc
+     * @param rng    the RNStreamIfc
      * @return the random value
      */
     public static double rBeta(double alpha1, double alpha2, RNStreamIfc rng) {
@@ -923,10 +993,10 @@ public class JSLRandom {
     /**
      * This beta is restricted to the range of (minimum,maximum)
      *
-     * @param alpha1  alpha1 parameter
-     * @param alpha2  alpha2 parameter
-     * @param minimum the minimum of the range, must be less than maximum
-     * @param maximum the maximum of the range
+     * @param alpha1    alpha1 parameter
+     * @param alpha2    alpha2 parameter
+     * @param minimum   the minimum of the range, must be less than maximum
+     * @param maximum   the maximum of the range
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -942,7 +1012,7 @@ public class JSLRandom {
      * @param alpha2  alpha2 parameter
      * @param minimum the minimum of the range, must be less than maximum
      * @param maximum the maximum of the range
-     * @param rng     the RngIfc
+     * @param rng     the RNStreamIfc
      * @return the random value
      */
     public static double rBetaG(double alpha1, double alpha2,
@@ -972,9 +1042,9 @@ public class JSLRandom {
     /**
      * Pearson Type 6
      *
-     * @param alpha1 alpha1 parameter
-     * @param alpha2 alpha2 parameter
-     * @param beta   the beta parameter, must be greater than 0
+     * @param alpha1    alpha1 parameter
+     * @param alpha2    alpha2 parameter
+     * @param beta      the beta parameter, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -989,7 +1059,7 @@ public class JSLRandom {
      * @param alpha1 alpha1 parameter
      * @param alpha2 alpha2 parameter
      * @param beta   the beta parameter, must be greater than 0
-     * @param rng    the RngIfc, must not be null
+     * @param rng    the RNStreamIfc, must not be null
      * @return the random value
      */
     public static double rPearsonType6(double alpha1, double alpha2,
@@ -1016,8 +1086,8 @@ public class JSLRandom {
     /**
      * Generates according to a Laplace(mean, scale)
      *
-     * @param mean  mean or location parameter
-     * @param scale scale parameter, must be greater than 0
+     * @param mean      mean or location parameter
+     * @param scale     scale parameter, must be greater than 0
      * @param streamNum the stream number from the stream provider to use
      * @return the random value
      */
@@ -1030,7 +1100,7 @@ public class JSLRandom {
      *
      * @param mean  mean or location parameter
      * @param scale scale parameter, must be greater than 0
-     * @param rng   the RngIfc, must not be null
+     * @param rng   the RNStreamIfc, must not be null
      * @return the random value
      */
     public static double rLaplace(double mean, double scale, RNStreamIfc rng) {
@@ -1051,6 +1121,17 @@ public class JSLRandom {
      */
     public static int randomlySelect(int[] array) {
         return randomlySelect(array, getDefaultRNStream());
+    }
+
+    /**
+     * Randomly select an element from the array
+     *
+     * @param array     the array to select from
+     * @param streamNum the stream number from the stream provider to use
+     * @return the randomly selected value
+     */
+    public static int randomlySelect(int[] array, int streamNum) {
+        return randomlySelect(array, myStreamProvider.rnStream(streamNum));
     }
 
     /**
@@ -1085,6 +1166,17 @@ public class JSLRandom {
     /**
      * Randomly select an element from the array
      *
+     * @param array     the array to select from
+     * @param streamNum the stream number from the stream provider to use
+     * @return the randomly selected value
+     */
+    public static double randomlySelect(double[] array, int streamNum) {
+        return randomlySelect(array, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly select an element from the array
+     *
      * @param array the array to select from
      * @param rng   the source of randomness
      * @return the randomly selected value
@@ -1111,6 +1203,19 @@ public class JSLRandom {
      */
     public static double randomlySelect(double[] array, double[] cdf) {
         return randomlySelect(array, cdf, getDefaultRNStream());
+    }
+
+    /**
+     * Randomly selects from the array using the supplied cdf
+     *
+     * @param array     array to select from
+     * @param cdf       the cumulative probability associated with each element of
+     *                  array
+     * @param streamNum the stream number from the stream provider to use
+     * @return the randomly selected value
+     */
+    public static double randomlySelect(double[] array, double[] cdf, int streamNum) {
+        return randomlySelect(array, cdf, myStreamProvider.rnStream(streamNum));
     }
 
     /**
@@ -1167,6 +1272,19 @@ public class JSLRandom {
     /**
      * Randomly selects from the array using the supplied cdf
      *
+     * @param array     array to select from
+     * @param cdf       the cumulative probability associated with each element of
+     *                  array
+     * @param streamNum the stream number from the stream provider to use
+     * @return the randomly selected value
+     */
+    public static int randomlySelect(int[] array, double[] cdf, int streamNum) {
+        return randomlySelect(array, cdf, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly selects from the array using the supplied cdf
+     *
      * @param array array to select from
      * @param cdf   the cumulative probability associated with each element of
      *              array
@@ -1214,6 +1332,20 @@ public class JSLRandom {
      */
     public static <T> T randomlySelect(List<T> list, double[] cdf) {
         return randomlySelect(list, cdf, getDefaultRNStream());
+    }
+
+    /**
+     * Randomly selects from the list using the supplied cdf
+     *
+     * @param <T>       the type returned
+     * @param list      list to select from
+     * @param cdf       the cumulative probability associated with each element of
+     *                  array
+     * @param streamNum the stream number from the stream provider to use
+     * @return the randomly selected value
+     */
+    public static <T> T randomlySelect(List<T> list, double[] cdf, int streamNum) {
+        return randomlySelect(list, cdf, myStreamProvider.rnStream(streamNum));
     }
 
     /**
@@ -1343,6 +1475,18 @@ public class JSLRandom {
     /**
      * Randomly select from the list
      *
+     * @param <T>       The type of element in the list
+     * @param list      the list
+     * @param streamNum the stream number from the stream provider to use
+     * @return the randomly selected element
+     */
+    public static <T> T randomlySelect(List<T> list, int streamNum) {
+        return randomlySelect(list, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly select from the list
+     *
      * @param <T>  The type of element in the list
      * @param list the list
      * @param rng  the source of randomness
@@ -1379,6 +1523,17 @@ public class JSLRandom {
      * Randomly permutes the supplied array using the supplied random
      * number generator, the array is changed
      *
+     * @param x         the array
+     * @param streamNum the stream number from the stream provider to use
+     */
+    public static void permutation(double[] x, int streamNum) {
+        permutation(x, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly permutes the supplied array using the supplied random
+     * number generator, the array is changed
+     *
      * @param x   the array
      * @param rng the source of randomness
      */
@@ -1387,8 +1542,8 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * The array x is changed, such that the first sampleSize elements contain the sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
      * using the default random number generator
      *
      * @param x          the array
@@ -1399,8 +1554,20 @@ public class JSLRandom {
     }
 
     /**
-     * The array x is changed, such that the first sampleSize elements contain the generate.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * The array x is changed, such that the first sampleSize elements contain the sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
+     *
+     * @param x          the array
+     * @param sampleSize the generate size
+     * @param streamNum  the stream number from the stream provider to use
+     */
+    public static void sampleWithoutReplacement(double[] x, int sampleSize, int streamNum) {
+        sampleWithoutReplacement(x, sampleSize, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * The array x is changed, such that the first sampleSize elements contain the sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
      *
      * @param x          the array
      * @param sampleSize the generate size
@@ -1457,6 +1624,17 @@ public class JSLRandom {
      * Randomly permutes the supplied array using the supplied random
      * number generator, the array is changed.
      *
+     * @param x         the array
+     * @param streamNum the stream number from the stream provider to use
+     */
+    public static void permutation(int[] x, int streamNum) {
+        permutation(x, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly permutes the supplied array using the supplied random
+     * number generator, the array is changed.
+     *
      * @param x   the array
      * @param rng the source of randomness
      */
@@ -1466,7 +1644,7 @@ public class JSLRandom {
 
     /**
      * The array x is changed, such that the first sampleSize elements contain the generated sample.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
      * using the default random number generator
      *
      * @param x          the array
@@ -1478,7 +1656,19 @@ public class JSLRandom {
 
     /**
      * The array x is changed, such that the first sampleSize elements contain the generated sample.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
+     *
+     * @param x          the array
+     * @param sampleSize the generate size
+     * @param streamNum  the stream number from the stream provider to use
+     */
+    public static void sampleWithoutReplacement(int[] x, int sampleSize, int streamNum) {
+        sampleWithoutReplacement(x, sampleSize, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
      *
      * @param x          the array
      * @param sampleSize the generate size
@@ -1512,7 +1702,18 @@ public class JSLRandom {
     }
 
     /**
-     * Randomly permutes the supplied array using the suppled random
+     * Randomly permutes the supplied array using the supplied random
+     * number generator, the array is changed.
+     *
+     * @param x         the array
+     * @param streamNum the stream number from the stream provider to use
+     */
+    public static void permutation(boolean[] x, int streamNum) {
+        permutation(x, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly permutes the supplied array using the supplied random
      * number generator, the array is changed.
      *
      * @param x   the array
@@ -1524,7 +1725,7 @@ public class JSLRandom {
 
     /**
      * The array x is changed, such that the first sampleSize elements contain the generated sample.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
      * using the default random number generator
      *
      * @param x          the array
@@ -1536,7 +1737,19 @@ public class JSLRandom {
 
     /**
      * The array x is changed, such that the first sampleSize elements contain the generated sample.
-     * That is, x[0], x[1], ... , x[sampleSize-1] is the random generate without replacement
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
+     *
+     * @param x          the array
+     * @param sampleSize the generate size
+     * @param streamNum  the stream number from the stream provider to use
+     */
+    public static void sampleWithoutReplacement(boolean[] x, int sampleSize, int streamNum) {
+        sampleWithoutReplacement(x, sampleSize, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the random sample without replacement
      *
      * @param x          the array
      * @param sampleSize the generate size
@@ -1570,7 +1783,18 @@ public class JSLRandom {
     }
 
     /**
-     * Randomly permutes the supplied array using the suppled random
+     * Randomly permutes the supplied array using the supplied random
+     * number generator, the array is changed
+     *
+     * @param x         the array
+     * @param streamNum the stream number from the stream provider to use
+     */
+    public static <T> void permutation(T[] x, int streamNum) {
+        permutation(x, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly permutes the supplied array using the supplied random
      * number generator, the array is changed
      *
      * @param x   the array
@@ -1598,6 +1822,18 @@ public class JSLRandom {
      *
      * @param x          the array
      * @param sampleSize the generate size
+     * @param streamNum  the stream number from the stream provider to use
+     */
+    public static <T> void sampleWithoutReplacement(T[] x, int sampleSize, int streamNum) {
+        sampleWithoutReplacement(x, sampleSize, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * The array x is changed, such that the first sampleSize elements contain the generated sample.
+     * That is, x[0], x[1], ... , x[sampleSize-1] is the randomly sampled values without replacement
+     *
+     * @param x          the array
+     * @param sampleSize the generate size
      * @param rng        the source of randomness
      */
     public static <T> void sampleWithoutReplacement(T[] x, int sampleSize, RNStreamIfc rng) {
@@ -1617,7 +1853,7 @@ public class JSLRandom {
     }
 
     /**
-     * Randomly permutes the supplied List using the suppled random
+     * Randomly permutes the supplied List using the supplied random
      * number generator, the list is changed
      *
      * @param <T> the type of the list
@@ -1628,7 +1864,19 @@ public class JSLRandom {
     }
 
     /**
-     * Randomly permutes the supplied List using the suppled random
+     * Randomly permutes the supplied List using the supplied random
+     * number generator, the list is changed
+     *
+     * @param <T>       the type of the list
+     * @param x         the list
+     * @param streamNum the stream number from the stream provider to use
+     */
+    public static <T> void permutation(List<T> x, int streamNum) {
+        permutation(x, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * Randomly permutes the supplied List using the supplied random
      * number generator, the list is changed
      *
      * @param <T> the type of the list
@@ -1641,7 +1889,7 @@ public class JSLRandom {
 
     /**
      * The List x is changed, such that the first sampleSize elements contain the generate.
-     * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random generate without replacement
+     * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random sample without replacement
      * using the default random number generator
      *
      * @param <T>        the type of the list
@@ -1654,7 +1902,20 @@ public class JSLRandom {
 
     /**
      * The List x is changed, such that the first sampleSize elements contain the generate.
-     * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random generate without replacement
+     * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random sample without replacement
+     *
+     * @param <T>        the type of the list
+     * @param x          the list
+     * @param sampleSize the generate size
+     * @param streamNum  the stream number from the stream provider to use
+     */
+    public static <T> void sampleWithoutReplacement(List<T> x, int sampleSize, int streamNum) {
+        sampleWithoutReplacement(x, sampleSize, myStreamProvider.rnStream(streamNum));
+    }
+
+    /**
+     * The List x is changed, such that the first sampleSize elements contain the generate.
+     * That is, x.get(0), x.get(1), ... , x.get(sampleSize-1) is the random sample without replacement
      *
      * @param <T>        the type of the list
      * @param x          the list

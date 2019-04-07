@@ -17,11 +17,8 @@ package ex.montecarlo;
 
 import jsl.utilities.Interval;
 import jsl.utilities.math.FunctionIfc;
-import jsl.utilities.random.distributions.Uniform;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
-import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.statistic.Statistic;
 
 import java.util.Objects;
@@ -38,7 +35,11 @@ public class CrudeMCIntegral {
     private RNStreamIfc myStream;
 
     public CrudeMCIntegral(double lowerLimit, double upperLimit, FunctionIfc function) {
-        this(new Interval(lowerLimit, upperLimit), function, RNStreamFactory.getDefaultFactory().getStream());
+        this(new Interval(lowerLimit, upperLimit), function, JSLRandom.nextRNStream());
+    }
+
+    public CrudeMCIntegral(double lowerLimit, double upperLimit, FunctionIfc function, int streamNum) {
+        this(lowerLimit, upperLimit, function, JSLRandom.rnStream(streamNum));
     }
 
     public CrudeMCIntegral(double lowerLimit, double upperLimit, FunctionIfc function, RNStreamIfc stream) {
@@ -46,7 +47,7 @@ public class CrudeMCIntegral {
     }
 
     public CrudeMCIntegral(Interval interval, FunctionIfc function) {
-        this(interval, function, RNStreamFactory.getDefaultFactory().getStream());
+        this(interval, function, JSLRandom.nextRNStream());
     }
 
     public CrudeMCIntegral(Interval interval, FunctionIfc function, RNStreamIfc stream) {

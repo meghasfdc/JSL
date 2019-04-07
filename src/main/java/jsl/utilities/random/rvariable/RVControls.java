@@ -44,7 +44,7 @@ public abstract class RVControls extends Controls {
      * with a new stream
      */
     public final RVariableIfc makeRVariable(){
-        return makeRVariable(JSLRandom.createRNStream());
+        return makeRVariable(JSLRandom.nextRNStream());
     }
 
     /**

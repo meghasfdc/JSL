@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -29,7 +28,11 @@ public final class BinomialRV extends AbstractRVariable {
     private int myNumTrials;
 
     public BinomialRV(double prob, int numTrials){
-        this(prob, numTrials, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, numTrials, JSLRandom.nextRNStream());
+    }
+
+    public BinomialRV(double prob, int numTrials, int streamNum){
+        this(prob, numTrials, JSLRandom.rnStream(streamNum));
     }
 
     public BinomialRV(double prob, int numTrials, RNStreamIfc rng){
@@ -46,7 +49,7 @@ public final class BinomialRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final BinomialRV newInstance(RNStreamIfc rng){

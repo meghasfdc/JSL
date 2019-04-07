@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -33,7 +32,11 @@ public final class JohnsonBRV extends AbstractRVariable {
     private final double myMax;
 
     public JohnsonBRV(double alpha1, double alpha2, double min, double max){
-        this(alpha1, alpha2, min, max, RNStreamFactory.getDefaultFactory().getStream());
+        this(alpha1, alpha2, min, max, JSLRandom.nextRNStream());
+    }
+
+    public JohnsonBRV(double alpha1, double alpha2, double min, double max, int streamNum){
+        this(alpha1, alpha2, min, max, JSLRandom.rnStream(streamNum));
     }
 
     public JohnsonBRV(double alpha1, double alpha2, double min, double max, RNStreamIfc rng){

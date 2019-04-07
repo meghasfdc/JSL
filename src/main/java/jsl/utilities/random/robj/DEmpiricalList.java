@@ -15,12 +15,10 @@
  */
 package jsl.utilities.random.robj;
 
-import java.util.*;
-
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
-import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.JSLRandom;
+
+import java.util.*;
 
 public class DEmpiricalList<T> implements RElementIfc<T> {
 
@@ -31,7 +29,7 @@ public class DEmpiricalList<T> implements RElementIfc<T> {
     protected final RNStreamIfc myRNG;
 
     public DEmpiricalList(List<T> elements, double[] cdf) {
-        this(elements, cdf, RNStreamFactory.getDefaultFactory().getStream());
+        this(elements, cdf, JSLRandom.nextRNStream());
     }
 
     public DEmpiricalList(List<T> elements, double[] cdf, RNStreamIfc rng) {

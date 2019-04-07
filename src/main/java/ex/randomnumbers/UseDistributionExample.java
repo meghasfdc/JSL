@@ -25,8 +25,8 @@ import jsl.utilities.random.distributions.Binomial;
 import jsl.utilities.random.distributions.DUniform;
 import jsl.utilities.random.distributions.Normal;
 import jsl.utilities.random.distributions.Uniform;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.RNStreamProvider;
 import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
@@ -100,17 +100,17 @@ public class UseDistributionExample {
         }
 
         //illustrate fine stream control
-        // make a factory for creating streams
-        RNStreamFactory f1 = new RNStreamFactory();
+        // make a provider for creating streams
+        RNStreamProvider f1 = new RNStreamProvider();
 
-        // get the first stream from the factory
-        RNStreamIfc f1s1 = f1.getStream();
+        // get the first stream from the provider
+        RNStreamIfc f1s1 = f1.nextRNStream();
 
-        // make another factory, the factories are identical
-        RNStreamFactory f2 = new RNStreamFactory();
+        // make another provider, the providers are identical
+        RNStreamProvider f2 = new RNStreamProvider();
 
         // thus the first streams returned are identical
-        RNStreamIfc f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.nextRNStream();
 
         // now tell the stream to produce antithetic random numbers
         // f2s1 and f1s1 are now antithetic to each other

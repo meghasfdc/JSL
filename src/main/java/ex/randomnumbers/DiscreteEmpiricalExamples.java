@@ -23,8 +23,8 @@
 package ex.randomnumbers;
 
 import jsl.utilities.random.distributions.DEmpiricalCDF;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.RNStreamProvider;
 import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 
@@ -39,13 +39,9 @@ public class DiscreteEmpiricalExamples {
      */
     public static void main(String[] args) {    
         // make a factory for creating streams
-        RNStreamFactory f1 = new RNStreamFactory();
+        RNStreamProvider f1 = new RNStreamProvider();
         // get the first stream from the factory
-        RNStreamIfc f1s1 = f1.getStream();
-        // make another factory, the factories are identical
-        RNStreamFactory f2 = new RNStreamFactory();
-        // thus the first streams returned are identical
-        RNStreamIfc f2s1 = f2.getStream();
+        RNStreamIfc f1s1 = f1.nextRNStream();
 
         double[] values = {1.0, 2.0, 3.0, 4.0};
         double[] cdf = {1.0/6.0, 3.0/6.0, 5.0/6.0, 1.0};

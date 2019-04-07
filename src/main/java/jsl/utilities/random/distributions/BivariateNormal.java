@@ -16,9 +16,9 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.ParametersIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 /** Allows for the generation of bivariate normal
  *  random variables
@@ -43,7 +43,7 @@ public class BivariateNormal implements RNStreamControlIfc, ParametersIfc {
      *
      */
     public BivariateNormal() {
-        this(0.0, 1.0, 0.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 1.0, 0.0, 1.0, 0.0, JSLRandom.nextRNStream());
     }
 
     /** Constructs a standard bivariate normal with no correlation
@@ -62,7 +62,7 @@ public class BivariateNormal implements RNStreamControlIfc, ParametersIfc {
      * @param rho
      */
     public BivariateNormal(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean1, var1, mean2, var2, rho, JSLRandom.nextRNStream());
     }
 
     /** Interprets the array of parameters as the parameters
@@ -75,7 +75,7 @@ public class BivariateNormal implements RNStreamControlIfc, ParametersIfc {
      * @param param
      */
     public BivariateNormal(double[] param) {
-        this(param[0], param[1], param[2], param[3], param[4], RNStreamFactory.getDefaultFactory().getStream());
+        this(param[0], param[1], param[2], param[3], param[4], JSLRandom.nextRNStream());
     }
 
     /** Interprets the array of parameters as the parameters

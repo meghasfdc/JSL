@@ -21,7 +21,6 @@ import jsl.utilities.controls.Controls;
 import jsl.utilities.random.ParametersIfc;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.SampleIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 
@@ -52,7 +51,7 @@ public class DPopulation implements RandomIfc, SampleIfc, ControllableIfc, Param
      * @param elements
      */
     public DPopulation(double[] elements) {
-        this(elements, RNStreamFactory.getDefaultFactory().getStream(), null);
+        this(elements, JSLRandom.nextRNStream(), null);
     }
 
     /**

@@ -16,7 +16,6 @@
 
 package ex.randomnumbers;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.reporting.JSL;
@@ -32,7 +31,7 @@ public class TestGammaGeneration {
 
     public static void main(String[] args) {
 
-        RNStreamIfc stream = RNStreamFactory.getDefaultStream();
+        RNStreamIfc stream = JSLRandom.getDefaultRNStream();
 
         long arTime = runGammaAR(1000000, stream);
 

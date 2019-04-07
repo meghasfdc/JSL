@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -27,7 +26,11 @@ public final class ChiSquaredRV extends AbstractRVariable {
     private final double dof;
 
     public ChiSquaredRV(double dof){
-        this(dof, RNStreamFactory.getDefaultFactory().getStream());
+        this(dof, JSLRandom.nextRNStream());
+    }
+
+    public ChiSquaredRV(double dof, int streamNum){
+        this(dof, JSLRandom.rnStream(streamNum));
     }
 
     public ChiSquaredRV(double dof, RNStreamIfc rng){
@@ -40,7 +43,7 @@ public final class ChiSquaredRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final ChiSquaredRV newInstance(RNStreamIfc rng){

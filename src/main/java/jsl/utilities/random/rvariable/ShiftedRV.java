@@ -1,6 +1,5 @@
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 import java.util.Objects;
@@ -20,7 +19,17 @@ public final class ShiftedRV extends AbstractRVariable {
      * @param rv the random variable to shift
      */
     public ShiftedRV(double shift, RVariableIfc rv){
-        this(shift, rv, RNStreamFactory.getDefaultFactory().getStream());
+        this(shift, rv, JSLRandom.nextRNStream());
+    }
+
+    /**
+     *
+     * @param shift a non-negative value
+     * @param rv the random variable to shift
+     * @param streamNum the stream number
+     */
+    public ShiftedRV(double shift, RVariableIfc rv, int streamNum) {
+        this(shift, rv, JSLRandom.rnStream(streamNum));
     }
 
     /**

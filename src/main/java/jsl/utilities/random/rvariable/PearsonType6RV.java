@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -29,7 +28,11 @@ public final class PearsonType6RV extends AbstractRVariable {
     private final double myBeta;
 
     public PearsonType6RV(double alpha1, double alpha2, double beta){
-        this(alpha1, alpha2, beta, RNStreamFactory.getDefaultFactory().getStream());
+        this(alpha1, alpha2, beta, JSLRandom.nextRNStream());
+    }
+
+    public PearsonType6RV(double alpha1, double alpha2, double beta, int streamNum){
+        this(alpha1, alpha2, beta, JSLRandom.rnStream(streamNum));
     }
 
     public PearsonType6RV(double alpha1, double alpha2, double beta, RNStreamIfc rng){

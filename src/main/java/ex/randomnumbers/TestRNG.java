@@ -16,18 +16,18 @@
 
 package ex.randomnumbers;
 
-import static jsl.utilities.random.rng.RNGTEST.*;
+import jsl.utilities.random.distributions.Normal;
+import jsl.utilities.random.rng.MarseRobertsLCG;
+import jsl.utilities.random.rng.RandU01Ifc;
+import jsl.utilities.random.rvariable.JSLRandom;
+import jsl.utilities.reporting.StatisticReporter;
+import jsl.utilities.statistic.Statistic;
+import jsl.utilities.statistic.StatisticAccessorIfc;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.rng.MarseRobertsLCG;
-import jsl.utilities.random.rng.RandU01Ifc;
-import jsl.utilities.reporting.StatisticReporter;
-import jsl.utilities.statistic.Statistic;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.statistic.StatisticAccessorIfc;
+import static jsl.utilities.random.rng.RNGTEST.*;
 
 public class TestRNG {
 
@@ -36,7 +36,7 @@ public class TestRNG {
         int n = 100; // number of replications
         int m = 5000; // number tested for runs up and correlation test
 
-        testRNG(RNStreamFactory.getDefaultStream(), n, m);
+        testRNG(JSLRandom.getDefaultRNStream(), n, m);
 
         testRNG(new MarseRobertsLCG(4), n, m);
 

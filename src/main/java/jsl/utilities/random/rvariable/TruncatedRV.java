@@ -23,6 +23,16 @@ public class TruncatedRV extends AbstractRVariable {
     protected final double myDeltaFUFL;
 
     public TruncatedRV(DistributionIfc distribution, double cdfLL, double cdfUL,
+                       double truncLL, double truncUL) {
+        this(distribution, cdfLL, cdfUL, truncLL, truncUL, JSLRandom.nextRNStream());
+    }
+
+    public TruncatedRV(DistributionIfc distribution, double cdfLL, double cdfUL,
+                       double truncLL, double truncUL, int streamNum) {
+        this(distribution, cdfLL, cdfUL, truncLL, truncUL, JSLRandom.rnStream(streamNum));
+    }
+
+    public TruncatedRV(DistributionIfc distribution, double cdfLL, double cdfUL,
                        double truncLL, double truncUL, RNStreamIfc rng) {
         super(rng);
         if (distribution == null) {

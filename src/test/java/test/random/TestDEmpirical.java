@@ -21,15 +21,15 @@
  */
 package test.random;
 
-import java.util.Arrays;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.distributions.DEmpiricalCDF;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.JSLRandom;
-import jsl.utilities.random.rng.RNStreamFactory;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -58,7 +58,7 @@ public class TestDEmpirical {
 
         assertTrue(JSLMath.compareArrays(makePairs, pp) == true);
 
-        RNStreamIfc defaultStream = RNStreamFactory.getDefaultStream();
+        RNStreamIfc defaultStream = JSLRandom.getDefaultRNStream();
 
         DEmpiricalRV d = new DEmpiricalRV(x, p, defaultStream);
 

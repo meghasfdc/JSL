@@ -21,9 +21,8 @@
 package ex.montecarlo;
 
 import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.distributions.Uniform;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.RNStreamProvider;
 import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.UniformRV;
@@ -100,17 +99,17 @@ public class AntitheticVRT {
     }
 
     public static void example2() {
-        RNStreamFactory f1 = new RNStreamFactory();
+        RNStreamProvider f1 = new RNStreamProvider();
 
         // get a stream
-        RNStreamIfc s1 = f1.getStream();
+        RNStreamIfc s1 = f1.nextRNStream();
 
         System.out.println(s1);
 
-        RNStreamFactory f2 = new RNStreamFactory();
+        RNStreamProvider f2 = new RNStreamProvider();
 
         // get a stream
-        RNStreamIfc s2 = f2.getStream();
+        RNStreamIfc s2 = f2.nextRNStream();
 
         s2.setAntitheticOption(true);
 

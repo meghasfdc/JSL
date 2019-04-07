@@ -20,10 +20,9 @@
  */
 package ex.randomnumbers;
 
-import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamFactory.RNStream;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rng.RNStreamProvider;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.StatisticXY;
@@ -42,19 +41,19 @@ public class UseRNG {
 
     public static void crn() {
         
-        // make a factory for creating streams
-        RNStreamFactory f1 = new RNStreamFactory();
+        // make a provider for creating streams
+        RNStreamProvider f1 = new RNStreamProvider();
 
-        // get the first stream from the factory
-        RNStreamIfc f1s1 = f1.getStream();
+        // get the first stream from the provider
+        RNStreamIfc f1s1 = f1.nextRNStream();
 
-        RNStreamIfc f1s2 = f1.getStream();
+        RNStreamIfc f1s2 = f1.nextRNStream();
 
-        // make another factory, the factories are identical
-        RNStreamFactory f2 = new RNStreamFactory();
+        // make another provider, the providers are identical
+        RNStreamProvider f2 = new RNStreamProvider();
 
         // thus the first streams returned are identical
-        RNStreamIfc f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.nextRNStream();
 
         for (int i = 0; i < 10; i++) {
             System.out.println("f1s1 = " + f1s1.randU01() + " f2s1 = " + f2s1.randU01());
@@ -86,16 +85,16 @@ public class UseRNG {
      */
     public static void antithetic() {
         // make a factory for creating streams
-        RNStreamFactory f1 = new RNStreamFactory();
+        RNStreamProvider f1 = new RNStreamProvider();
 
         // get the first stream from the factory
-        RNStreamIfc f1s1 = f1.getStream();
+        RNStreamIfc f1s1 = f1.nextRNStream();
 
         // make another factory, the factories are identical
-        RNStreamFactory f2 = new RNStreamFactory();
+        RNStreamProvider f2 = new RNStreamProvider();
 
         // thus the first streams returned are identical
-        RNStreamIfc f2s1 = f2.getStream();
+        RNStreamIfc f2s1 = f2.nextRNStream();
         
         // now tell the stream to produce antithetic random numbers
         // f2s1 and f1s1 are now antithetic to each other
@@ -128,15 +127,15 @@ public class UseRNG {
     public static void test1() {
         // TODO code application logic here
         System.out.println("My first Java print satement");
-        RNStreamIfc defaultStream = RNStreamFactory.getDefaultStream();
+        RNStreamIfc defaultStream = JSLRandom.getDefaultRNStream();
 
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + defaultStream.randU01());
         }
 
-        RNStreamFactory f = new RNStreamFactory();
-        RNStreamIfc s1 = f.getStream();
-        System.out.println("Stream 1");
+        RNStreamProvider f = new RNStreamProvider();
+        RNStreamIfc s1 = f.nextRNStream();
+        System.out.println("first stream");
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + s1.randU01());
         }
@@ -152,8 +151,8 @@ public class UseRNG {
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + s1.randU01());
         }
-        RNStreamIfc s2 = f.getStream();
-        System.out.println("Sream 2");
+        RNStreamIfc s2 = f.nextRNStream();;
+        System.out.println("2nd stream");
         for (int i = 1; i <= 3; i++) {
             System.out.println("u = " + s2.randU01());
         }

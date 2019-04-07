@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -38,7 +37,16 @@ public final class ExponentialRV extends AbstractRVariable {
      * @param mean must be greater than 0.0
      */
     public ExponentialRV(double mean){
-        this(mean, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, JSLRandom.nextRNStream());
+    }
+
+    /**
+     *
+     * @param mean must be greater than 0.0
+     * @param streamNum the stream number
+     */
+    public ExponentialRV(double mean, int streamNum){
+        this(mean, JSLRandom.rnStream(streamNum));
     }
 
     /**

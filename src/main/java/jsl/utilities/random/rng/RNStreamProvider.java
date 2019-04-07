@@ -26,7 +26,8 @@ import java.util.List;
  * streams are made a warning message is logged.  Generally, unless you know what you are doing
  * you should not need an immense number of streams.  Instead, use a small number of
  * streams many times. Conceptually this provider could have a possibly infinite number of streams,
- * which would have bad memory implications.  The default stream if not set is the first stream.
+ * which would have bad memory implications.  Thus, the reason for the warning.
+ * The default stream if not set is the first stream.
  */
 public final class RNStreamProvider implements RNStreamProviderIfc {
 
@@ -63,8 +64,9 @@ public final class RNStreamProvider implements RNStreamProviderIfc {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("RNStreamProvider{");
-        sb.append("StreamNumberWarningLimit=").append(myStreamNumberWarningLimit);
-        sb.append(", DefaultStreamNum=").append(myDefaultStreamNum);
+        sb.append("StreamNumberWarningLimit=").append(getStreamNumberWarningLimit());
+        sb.append(", DefaultStreamNum=").append(defaultRNStreamNumber());
+        sb.append(", Number of Streams Provided =").append(lastRNStreamNumber());
         sb.append('}');
         return sb.toString();
     }
@@ -119,7 +121,7 @@ public final class RNStreamProvider implements RNStreamProviderIfc {
     }
 
     @Override
-    public void advanceStreams(int n) {
+    public void advanceStreamMechanism(int n) {
         myStreamFactory.advanceSeeds(n);
     }
 

@@ -20,9 +20,9 @@ import jsl.observers.ObservableComponent;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
 import jsl.utilities.math.FunctionIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -84,7 +84,7 @@ public class MetropolisHastings1D implements RNStreamControlIfc, ObservableIfc {
         myProposalFun = proposalFun;
         myAcceptanceStat = new Statistic("Acceptance Statistics");
         myObservedStat = new Statistic("Observed Value Statistics");
-        myRNG = RNStreamFactory.getDefaultFactory().getStream();
+        myRNG = JSLRandom.nextRNStream();
         myObservableComponent = new ObservableComponent();
     }
 

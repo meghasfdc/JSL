@@ -1,6 +1,5 @@
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 public class StudentTRV extends AbstractRVariable {
@@ -12,7 +11,16 @@ public class StudentTRV extends AbstractRVariable {
      * @param dof  degrees of freedom
      */
     public StudentTRV(double dof) {
-        this (dof, RNStreamFactory.getDefaultFactory().getStream());
+        this (dof, JSLRandom.nextRNStream());
+    }
+
+    /** Constructs a StudentT distribution dof degrees of freedom
+     *
+     * @param dof  degrees of freedom
+     * @param streamNum the stream number
+     */
+    public StudentTRV(double dof, int streamNum) {
+        this(dof, JSLRandom.rnStream(streamNum));
     }
 
     /** Constructs a StudentT distribution dof degrees of freedom

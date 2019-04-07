@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.robj.DPopulation;
 
@@ -28,7 +27,11 @@ public final class EmpiricalRV extends AbstractRVariable {
     private final DPopulation myPop;
 
     public EmpiricalRV(double[] data){
-        this(data, RNStreamFactory.getDefaultFactory().getStream());
+        this(data, JSLRandom.nextRNStream());
+    }
+
+    public EmpiricalRV(double [] data, int streamNum) {
+        this(data, JSLRandom.rnStream(streamNum));
     }
 
     public EmpiricalRV(double [] data, RNStreamIfc rng) {
@@ -54,5 +57,26 @@ public final class EmpiricalRV extends AbstractRVariable {
     protected final double generate() {
         double v = myPop.getValue();
         return v;
+    }
+
+    /**
+     * The key is "Population", an empty array of size 1 is made. The user of the control
+     * can provide any size population back
+     *
+     * @return a control for Bernoulli random variables
+     */
+    public static RVControls makeControls() {
+        return new RVControls(RVariableIfc.RVType.Empirical) {
+            @Override
+            protected final void fillControls() {
+                addDoubleArrayControl("Population", new double[1]);
+                setName(RVariableIfc.RVType.Empirical.name());
+            }
+
+            public final RVariableIfc makeRVariable(RNStreamIfc rnStream) {
+                double[] population = getDoubleArrayControl("Population");
+                return new EmpiricalRV(population, rnStream);
+            }
+        };
     }
 }

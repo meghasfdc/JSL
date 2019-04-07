@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -28,7 +27,11 @@ public final class LogLogisticRV extends AbstractRVariable {
     private final double myScale;
 
     public LogLogisticRV(double shape, double scale){
-        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
+        this(shape, scale, JSLRandom.nextRNStream());
+    }
+
+    public LogLogisticRV(double shape, double scale, int streamNum){
+        this(shape, scale, JSLRandom.rnStream(streamNum));
     }
 
     public LogLogisticRV(double shape, double scale, RNStreamIfc rng){

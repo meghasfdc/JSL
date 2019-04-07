@@ -19,9 +19,9 @@ package jsl.utilities.random.mcmc;
 import jsl.observers.ObservableComponent;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.statistic.Statistic;
 
 import java.util.ArrayList;
@@ -94,7 +94,7 @@ public class MetropolisHastingsMV implements RNStreamControlIfc, ObservableIfc {
         for(int i=0;i<myInitialX.length;i++){
             myObservedStatList.add(new Statistic("X:" + (i+1)));
         }
-        myRNG = RNStreamFactory.getDefaultFactory().getStream();
+        myRNG = JSLRandom.nextRNStream();
         myObservableComponent = new ObservableComponent();
     }
 

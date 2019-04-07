@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -27,7 +26,11 @@ public final class ShiftedGeometricRV extends AbstractRVariable {
     private final double myProbSuccess;
 
     public ShiftedGeometricRV(double prob){
-        this(prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, JSLRandom.nextRNStream());
+    }
+
+    public ShiftedGeometricRV(double prob, int streamNum){
+        this(prob, JSLRandom.rnStream(streamNum));
     }
 
     public ShiftedGeometricRV(double prob, RNStreamIfc rng){

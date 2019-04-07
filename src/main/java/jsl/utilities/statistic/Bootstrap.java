@@ -21,11 +21,11 @@ import jsl.utilities.Interval;
 import jsl.utilities.math.JSLMath;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.robj.DPopulation;
 import jsl.utilities.random.rvariable.EmpiricalRV;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 
@@ -366,7 +366,7 @@ public class Bootstrap implements IdentityIfc, RNStreamControlIfc {
         List<RVariableIfc> list = new ArrayList<>();
         RNStreamIfc rnStream = null;
         if (useCRN){
-            rnStream = RNStreamFactory.getDefaultFactory().getStream();
+            rnStream = JSLRandom.nextRNStream();
         }
         for(Statistic s: myBSStatList){
             if ((s.myData != null)){

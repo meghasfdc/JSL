@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -27,7 +26,11 @@ public final class PoissonRV extends AbstractRVariable {
     private final double mean;
 
     public PoissonRV(double mean){
-        this(mean, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, JSLRandom.nextRNStream());
+    }
+
+    public PoissonRV(double mean, int streamNum){
+        this(mean, JSLRandom.rnStream(streamNum));
     }
 
     public PoissonRV(double mean, RNStreamIfc rng){

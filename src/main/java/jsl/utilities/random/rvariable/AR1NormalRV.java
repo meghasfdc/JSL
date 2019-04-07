@@ -16,8 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.controls.Controls;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 public class AR1NormalRV extends AbstractRVariable {
@@ -36,7 +34,7 @@ public class AR1NormalRV extends AbstractRVariable {
      *
      */
     public AR1NormalRV() {
-        this(0.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 1.0, 0.0, JSLRandom.nextRNStream());
     }
 
     public AR1NormalRV(RNStreamIfc rng) {
@@ -48,7 +46,7 @@ public class AR1NormalRV extends AbstractRVariable {
      * @param correlation
      */
     public AR1NormalRV(double correlation) {
-        this(0.0, 1.0, correlation, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 1.0, correlation, JSLRandom.nextRNStream());
     }
 
     /** Creates an autoregressive order 1 normal process
@@ -58,7 +56,7 @@ public class AR1NormalRV extends AbstractRVariable {
      * @param correlation
      */
     public AR1NormalRV(double mean, double variance, double correlation) {
-        this(mean, variance, correlation, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, variance, correlation, JSLRandom.nextRNStream());
     }
 
     /** Creates an autoregressive order 1 normal process

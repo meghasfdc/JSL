@@ -15,19 +15,13 @@
  */
 package jsl.modeling.queue;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
-import java.util.function.Predicate;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * The Queue class provides the ability to hold entities (QObjects) within the
@@ -1258,7 +1252,7 @@ public class Queue<T extends QObject> extends ModelElement implements
         private boolean myResetStartStreamOption = true;
         private boolean myResetNextSubStreamOption = true;
         private int myNext;
-        private final RNStreamIfc myStream = RNStreamFactory.getDefaultFactory().getStream();
+        private final RNStreamIfc myStream = JSLRandom.nextRNStream();
 
         @Override
         protected void add(T qObject) {

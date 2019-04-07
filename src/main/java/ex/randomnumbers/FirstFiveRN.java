@@ -20,8 +20,8 @@
  */
 package ex.randomnumbers;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 /**
  *
@@ -33,8 +33,7 @@ public class FirstFiveRN {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        RNStreamFactory f = RNStreamFactory.getDefaultFactory();
-        RNStreamIfc g1 = f.getStream();
+        RNStreamIfc g1 = JSLRandom.nextRNStream();
         double u1;
         for (int i = 1; i <= 5; i++) {
             u1 = g1.randU01();

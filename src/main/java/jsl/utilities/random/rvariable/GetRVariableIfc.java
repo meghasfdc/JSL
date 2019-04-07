@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 public interface GetRVariableIfc {
@@ -24,6 +23,6 @@ public interface GetRVariableIfc {
     RVariableIfc getRandomVariable(RNStreamIfc rng);
 
     default RVariableIfc getRandomVariable(){
-        return getRandomVariable(RNStreamFactory.getDefaultFactory().getStream());
+        return getRandomVariable(JSLRandom.nextRNStream());
     }
 }

@@ -16,9 +16,9 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.ParametersIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 /**  Allows for the generation of bivariate lognormal random variables.
  *
@@ -45,7 +45,7 @@ public class BivariateLogNormal implements RNStreamControlIfc, ParametersIfc {
      * 
      */
     public BivariateLogNormal() {
-        this(1.0, 1.0, 1.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(1.0, 1.0, 1.0, 1.0, 0.0, JSLRandom.nextRNStream());
     }
 
     /** Constructs a bivariate lognormal with mean's = 1.0, variance = 1.0. correlation = 0.0
@@ -65,7 +65,7 @@ public class BivariateLogNormal implements RNStreamControlIfc, ParametersIfc {
      * @param rho the corrlation
      */
     public BivariateLogNormal(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean1, var1, mean2, var2, rho, JSLRandom.nextRNStream());
     }
 
     /** Interprets the array of parameters as the parameters
@@ -79,7 +79,7 @@ public class BivariateLogNormal implements RNStreamControlIfc, ParametersIfc {
      */
     public BivariateLogNormal(double[] param) {
         this(param[0], param[1], param[2], param[3], param[4],
-                RNStreamFactory.getDefaultFactory().getStream());
+                JSLRandom.nextRNStream());
     }
 
     /** Interprets the array of parameters as the parameters
