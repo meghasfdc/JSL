@@ -16,10 +16,21 @@
 
 package jsl.utilities.random.rng;
 
+import jsl.utilities.reporting.JSL;
+
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A concrete implementation of RNStreamProviderIfc.  If more than getStreamNumberWarningLimit()
+ * streams are made a warning message is logged.  Generally, unless you know what you are doing
+ * you should not need an immense number of streams.  Instead, use a small number of
+ * streams many times. Conceptually this provider could have a possibly infinite number of streams,
+ * which would have bad memory implications.  The default stream if not set is the first stream.
+ */
 public final class RNStreamProvider implements RNStreamProviderIfc {
+
+    private int myStreamNumberWarningLimit = 5000;
 
     private final RNStreamFactory myStreamFactory;
 
@@ -27,10 +38,17 @@ public final class RNStreamProvider implements RNStreamProviderIfc {
 
     private final int myDefaultStreamNum;
 
+    /**
+     * Assumes stream 1 is the default
+     */
     public RNStreamProvider(){
         this(1);
     }
 
+    /**
+     *
+     * @param defaultStreamNum the stream number to use as the default
+     */
     public RNStreamProvider(int defaultStreamNum) {
         if (defaultStreamNum <= 0){
             throw new IllegalArgumentException("The default stream number must be > 0");
@@ -38,6 +56,33 @@ public final class RNStreamProvider implements RNStreamProviderIfc {
         myDefaultStreamNum = defaultStreamNum;
         myStreamFactory = new RNStreamFactory();
         myStreams = new ArrayList<>();
+        // get the default stream number, this makes the intermediate streams also
+        defaultRNStream();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("RNStreamProvider{");
+        sb.append("StreamNumberWarningLimit=").append(myStreamNumberWarningLimit);
+        sb.append(", DefaultStreamNum=").append(myDefaultStreamNum);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    /**
+     *
+     * @return the limit associated with the warning message concerning the number of streams created
+     */
+    public final int getStreamNumberWarningLimit(){
+        return myStreamNumberWarningLimit;
+    }
+
+    /**
+     *
+     * @param limit the limit associated with the warning message concerning the number of streams created
+     */
+    public final void setStreamNumberWarningLimit(int limit){
+        myStreamNumberWarningLimit = limit;
     }
 
     @Override
@@ -49,6 +94,10 @@ public final class RNStreamProvider implements RNStreamProviderIfc {
     public RNStreamIfc nextRNStream() {
         RNStreamIfc stream = myStreamFactory.getStream();
         myStreams.add(stream);
+        if (myStreams.size() > myStreamNumberWarningLimit){
+            JSL.LOGGER.warn("The number of streams made is now = {}", myStreams.size());
+            JSL.LOGGER.warn("Increase the stream warning limit if you don't want to see this message");
+        }
         return stream;
     }
 

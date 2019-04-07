@@ -22,18 +22,20 @@ package jsl.utilities.random.rng;
  */
 public interface RNStreamNewInstanceIfc {
 
-    /** Returns a clone of the stream with
+    /** Returns a copy of the stream with
      *  exactly the same state
      *
-     * @return
+     * @return Returns a copy of the stream with
+     *        exactly the same state
      */
     RNStreamIfc newInstance();
 
-    /** Returns a clone of the stream that
+    /** Returns a copy of the stream that
      *  has exactly the same state
      *
-     * @param name
-     * @return
+     * @param name  the name of the new instance
+     * @return Returns a copy of the stream with
+     *        exactly the same state
      */
     RNStreamIfc newInstance(String name);
 }

@@ -21,9 +21,9 @@ package jsl.utilities.random.rng;
  */
 public interface GetAntitheticValueIfc {
 
-    /** Returns the antithetic value of the previous GetValueIfc
+    /** Returns the antithetic value of the previous value
      * 
-     * @return
+     * @return the antithetic value of the previous value
      */
     double getAntitheticValue();
 

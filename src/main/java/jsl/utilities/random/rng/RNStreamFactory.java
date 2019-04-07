@@ -21,7 +21,6 @@ import jsl.utilities.math.JSLMath;
 import jsl.utilities.reporting.JSL;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 public class RNStreamFactory extends Identity {
 
@@ -112,8 +111,6 @@ public class RNStreamFactory extends Identity {
             {2824425944.0, 32183930.0, 2093834863.0}
     };
 
-    private RNGStreamManager myStreamManager;
-
     /**
      * Default seed of the package and seed for the next stream to be created.
      * This represents the state of the factory. This array changes
@@ -200,15 +197,8 @@ public class RNStreamFactory extends Identity {
     public final RNStreamIfc getStream(String name) {
         // create the stream using the current seed state of the factory
         RNStream stream = new RNStream(name);
-
         // advance the factory for next stream
         advanceSeeds(1);
-
-        // save the stream if needed within a stream manager
-        if (myStreamManager != null) {
-            myStreamManager.add(stream);
-        }
-
         return stream;
     }
 
@@ -364,77 +354,6 @@ public class RNStreamFactory extends Identity {
     }
 
     /**
-     * Turns on stream management. Every stream created after this call will be
-     * placed in a list so that they can be managed together
-     */
-    public final void turnOnStreamManager() {
-        if (myStreamManager == null) {
-            myStreamManager = new RNGStreamManager();
-        }
-    }
-
-    /**
-     * Turns off stream management. Every stream previously managed will be
-     * removed and cannot again be managed
-     */
-    public final void turnOffStreamManager() {
-        if (myStreamManager != null) {
-            myStreamManager.clear();
-        }
-        myStreamManager = null;
-    }
-
-    /**
-     * Causes all managed streams to return to the beginning of their starting
-     * stream
-     */
-    public final void resetAllStartStreams() {
-        if (myStreamManager != null) {
-            myStreamManager.resetStartStream();
-        }
-    }
-
-    /**
-     * Causes all managed stream to return to their start of their current
-     * substream
-     */
-    public final void resetAllStartSubstreams() {
-        if (myStreamManager != null) {
-            myStreamManager.resetStartSubstream();
-        }
-    }
-
-    /**
-     * Causes all managed streams to advance to their next substream
-     */
-    public final void advanceAllNextSubstreams() {
-        if (myStreamManager != null) {
-            myStreamManager.advanceToNextSubstream();
-        }
-    }
-
-    /**
-     * Causes all the managed streams to use antithetic or not
-     *
-     * @param flag true means antithetic
-     */
-    public final void setAllAntithetic(boolean flag) {
-        if (myStreamManager != null) {
-            myStreamManager.setAntitheticOption(flag);
-        }
-    }
-
-    /**
-     * Returns the stream manager if stream management has been turned on, else
-     * it will return null
-     *
-     * @return an Optional holding the stream manager or null
-     */
-    public final Optional<RandomStreamManagerIfc> getStreamManager() {
-        return Optional.ofNullable(myStreamManager);
-    }
-
-    /**
      * Gets the default initial package seed: seed = {12345, 12345, 12345,
      * 12345, 12345, 12345};
      *
@@ -452,6 +371,7 @@ public class RNStreamFactory extends Identity {
      */
     public final long[] getFactorySeed() {
         long[] seed = new long[6];
+
         for (int i = 0; i < 6; ++i) {
             seed[i] = (long) nextSeed[i];
         }
@@ -477,7 +397,7 @@ public class RNStreamFactory extends Identity {
      * otherwise.
      *
      * @param seed the seeds
-     * @return
+     * @return true if the seeds are set after validation
      */
     public final boolean setFactorySeed(long seed[]) {
         // Must use long because there is no unsigned int type.
@@ -572,7 +492,7 @@ public class RNStreamFactory extends Identity {
         /**
          * Makes a stream with the given name
          *
-         * @param name
+         * @param name the name of the stream
          */
         private RNStream(String name) {
             myStreamCounter_ = myStreamCounter_ + 1;
@@ -587,22 +507,11 @@ public class RNStreamFactory extends Identity {
 
         }
 
-        /**
-         * Returns a duplicate of the stream with exactly the same state
-         *
-         * @return the created stream
-         */
         @Override
         public RNStream newInstance() {
             return newInstance(null);
         }
 
-        /**
-         * Returns a duplicate of the stream that has exactly the same state
-         *
-         * @param name the name of the duplicate
-         * @return the created stream
-         */
         @Override
         public RNStream newInstance(String name) {
             RNStream s = new RNStream(name);
@@ -617,24 +526,11 @@ public class RNStreamFactory extends Identity {
             return s;
         }
 
-        /**
-         * Returns a duplicate of the stream that has exactly the same state, but
-         * generates antithetic values compared to its original
-         *
-         * @return the created stream
-         */
         @Override
         public RNStream newAntitheticInstance() {
             return newAntitheticInstance(null);
         }
 
-        /**
-         * Returns a duplicate of the stream that has exactly the same state, but
-         * generates antithetic values compared to its original
-         *
-         * @param name the name of the stream
-         * @return the created stream
-         */
         @Override
         public RNStream newAntitheticInstance(String name) {
             RNStream s = newInstance(name);
@@ -646,21 +542,11 @@ public class RNStreamFactory extends Identity {
             return s;
         }
 
-        /**
-         * Gets the name.
-         *
-         * @return The name of object.
-         */
         @Override
         public final String getName() {
             return myName;
         }
 
-        /**
-         * Returns the id for this object
-         *
-         * @return
-         */
         @Override
         public final int getId() {
             return (myId);
