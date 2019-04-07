@@ -121,6 +121,11 @@ public final class RNStreamProvider implements RNStreamProviderIfc {
     }
 
     @Override
+    public int getStreamNumber(RNStreamIfc stream) {
+        return myStreams.indexOf(stream) + 1;
+    }
+
+    @Override
     public void advanceStreamMechanism(int n) {
         myStreamFactory.advanceSeeds(n);
     }

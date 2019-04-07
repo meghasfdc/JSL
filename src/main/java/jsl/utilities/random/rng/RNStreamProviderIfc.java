@@ -77,6 +77,14 @@ public interface RNStreamProviderIfc {
     RNStreamIfc rnStream(int i);
 
     /**
+     *
+     * @param stream the stream to find the number for
+     * @return the stream number of the stream for this provider or 0 if the stream has not been
+     * provided by this provider
+     */
+    int getStreamNumber(RNStreamIfc stream);
+
+    /**
      * Advances the state of the provider through n streams. Acts as if n streams were created, without
      * actually creating the streams.  lastRNStreamNumber() remains the same after calling
      * this method. In other words, this method should act as if nextRNStream() was not called but
