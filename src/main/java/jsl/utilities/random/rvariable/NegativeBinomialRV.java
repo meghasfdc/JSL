@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -29,7 +28,11 @@ public final class NegativeBinomialRV extends AbstractRVariable {
     private double myNumSuccesses;
 
     public NegativeBinomialRV(double prob, double numSuccess){
-        this(prob, numSuccess, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, numSuccess, JSLRandom.nextRNStream());
+    }
+
+    public NegativeBinomialRV(double prob, double numSuccess, int streamNum){
+        this(prob, numSuccess, JSLRandom.rnStream(streamNum));
     }
 
     public NegativeBinomialRV(double prob, double numSuccess, RNStreamIfc rng){

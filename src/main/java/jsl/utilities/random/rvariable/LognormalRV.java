@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -29,7 +28,11 @@ public final class LognormalRV extends AbstractRVariable {
     private final double myVar;
 
     public LognormalRV(double mean, double variance){
-        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, variance, JSLRandom.nextRNStream());
+    }
+
+    public LognormalRV(double mean, double variance, int streamNum){
+        this(mean, variance, JSLRandom.rnStream(streamNum));
     }
 
     public LognormalRV(double mean, double variance, RNStreamIfc rng){

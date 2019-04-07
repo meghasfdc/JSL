@@ -34,7 +34,7 @@ public interface MVRVariableIfc extends RNStreamControlIfc,
      * @return a new instance with same parameter value
      */
     default MVRVariableIfc newInstance() {
-        return newInstance(RNStreamFactory.getDefaultFactory().getStream());
+        return newInstance(JSLRandom.nextRNStream());
     }
 
 }

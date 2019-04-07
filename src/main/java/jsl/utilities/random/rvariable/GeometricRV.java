@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -27,7 +26,11 @@ public final class GeometricRV extends AbstractRVariable {
     private final double myProbSuccess;
 
     public GeometricRV(double prob){
-        this(prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, JSLRandom.nextRNStream());
+    }
+
+    public GeometricRV(double prob, int streamNum){
+        this(prob, JSLRandom.rnStream(streamNum));
     }
 
     public GeometricRV(double prob, RNStreamIfc rng){
@@ -40,7 +43,7 @@ public final class GeometricRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final GeometricRV newInstance(RNStreamIfc rng){

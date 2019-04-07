@@ -16,7 +16,6 @@
 package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.distributions.Normal;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /** Allows for the generation of bivariate normal
@@ -40,7 +39,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
      *
      */
     public BivariateNormalRV() {
-        this(0.0, 1.0, 0.0, 1.0, 0.0, RNStreamFactory.getDefaultFactory().getStream());
+        this(0.0, 1.0, 0.0, 1.0, 0.0, JSLRandom.nextRNStream());
     }
 
     /** Constructs a standard bivariate normal with no correlation
@@ -52,24 +51,37 @@ public class BivariateNormalRV extends AbstractMVRVariable{
 
     /**
      *
-     * @param mean1
-     * @param var1
-     * @param mean2
-     * @param var2
-     * @param rho
+     * @param mean1 mean of first coordinate
+     * @param var1 variance of first coordinate
+     * @param mean2 mean of 2nd coordinate
+     * @param var2 variance of 2nd coordinate
+     * @param rho correlation between X1 and X2
      */
     public BivariateNormalRV(double mean1, double var1, double mean2, double var2, double rho) {
-        this(mean1, var1, mean2, var2, rho, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean1, var1, mean2, var2, rho, JSLRandom.nextRNStream());
     }
 
     /** Constructs a bivariate normal with the provided parameters
      *
-     * @param mean1
-     * @param var1
-     * @param mean2
-     * @param var2
-     * @param rho
-     * @param rng
+     * @param mean1 mean of first coordinate
+     * @param var1 variance of first coordinate
+     * @param mean2 mean of 2nd coordinate
+     * @param var2 variance of 2nd coordinate
+     * @param rho correlation between X1 and X2
+     * @param streamNum the stream number
+     */
+    public BivariateNormalRV(double mean1, double var1, double mean2, double var2, double rho, int streamNum) {
+        this(mean1, var1, mean2, var2, rho, JSLRandom.rnStream(streamNum));
+    }
+
+    /** Constructs a bivariate normal with the provided parameters
+     *
+     * @param mean1 mean of first coordinate
+     * @param var1 variance of first coordinate
+     * @param mean2 mean of 2nd coordinate
+     * @param var2 variance of 2nd coordinate
+     * @param rho correlation between X1 and X2
+     * @param rng the RNStreamIfc
      */
     public BivariateNormalRV(double mean1, double var1, double mean2, double var2, double rho, RNStreamIfc rng) {
         super(rng);
@@ -89,10 +101,9 @@ public class BivariateNormalRV extends AbstractMVRVariable{
         myRho = rho;
     }
 
-
     /** Gets the first mean
      *
-     * @return
+     * @return the first mean
      */
     public final double getMean1() {
         return myMu1;
@@ -100,7 +111,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
 
     /** Gets the first variance
      *
-     * @return
+     * @return the first variance
      */
     public final double getVariance1() {
         return myVar1;
@@ -108,7 +119,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
 
     /** Gets the second mean
      *
-     * @return
+     * @return the second mean
      */
     public final double getMean2() {
         return myMu2;
@@ -116,7 +127,7 @@ public class BivariateNormalRV extends AbstractMVRVariable{
 
     /** Gets the 2nd variance
      *
-     * @return
+     * @return the 2nd variance
      */
     public final double getVariance2() {
         return myVar2;
@@ -124,16 +135,13 @@ public class BivariateNormalRV extends AbstractMVRVariable{
 
     /** Gets the correlation
      *
-     * @return
+     * @return the correlation
      */
     public final double getCorrelation() {
         return myRho;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public final double[] sample() {
         double[] x = new double[2];
         double z0 = Normal.stdNormalInvCDF(myRNG.randU01());

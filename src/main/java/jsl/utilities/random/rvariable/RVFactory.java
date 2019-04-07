@@ -16,8 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.controls.Controls;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -62,6 +60,7 @@ public class RVFactory {
         myFactories.put(Triangular, TriangularRV.makeControls());
         myFactories.put(Uniform, UniformRV.makeControls());
         myFactories.put(Weibull, WeibullRV.makeControls());
+        myFactories.put(Empirical, EmpiricalRV.makeControls());
     }
 
     /**

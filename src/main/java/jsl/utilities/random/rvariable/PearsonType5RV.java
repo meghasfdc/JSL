@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -28,7 +27,11 @@ public final class PearsonType5RV extends AbstractRVariable {
     private final double myScale;
 
     public PearsonType5RV(double shape, double scale){
-        this(shape, scale, RNStreamFactory.getDefaultFactory().getStream());
+        this(shape, scale, JSLRandom.nextRNStream());
+    }
+
+    public PearsonType5RV(double shape, double scale, int streamNum){
+        this(shape, scale, JSLRandom.rnStream(streamNum));
     }
 
     public PearsonType5RV(double shape, double scale, RNStreamIfc rng){

@@ -16,8 +16,8 @@
 
 package ex.montecarlo.dicepackage;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 
 public class Die implements RollIfc {
@@ -35,7 +35,7 @@ public class Die implements RollIfc {
             throw new IllegalArgumentException("Number of sides must be > 0");
 
         myNumSides = sides;
-        myRNG = RNStreamFactory.getDefaultStream();
+        myRNG = JSLRandom.getDefaultRNStream();
 
     }
 

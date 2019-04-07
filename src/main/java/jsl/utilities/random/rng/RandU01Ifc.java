@@ -30,7 +30,7 @@ public interface RandU01Ifc extends GetAntitheticValueIfc, DoubleSupplier {
     /**
      * The previous U(0,1) generated (returned) by randU01()
      *
-     * @return
+     * @return previous U(0,1) generated (returned) by randU01()
      */
     double getPrevU01();
 
@@ -45,7 +45,7 @@ public interface RandU01Ifc extends GetAntitheticValueIfc, DoubleSupplier {
 
     /** Turns the doubles into a DoubleStream for the Stream API
      *
-     * @return
+     * @return the doubles into a DoubleStream for the Stream API
      */
     default DoubleStream asDoubleStream(){
         return DoubleStream.generate(this);

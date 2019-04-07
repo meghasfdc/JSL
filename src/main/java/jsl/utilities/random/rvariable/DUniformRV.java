@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -28,7 +27,11 @@ public final class DUniformRV extends AbstractRVariable {
     private final int max;
 
     public DUniformRV(int min, int max){
-        this(min, max, RNStreamFactory.getDefaultFactory().getStream());
+        this(min, max, JSLRandom.nextRNStream());
+    }
+
+    public DUniformRV(int min, int max, int streamNum){
+        this(min, max, JSLRandom.rnStream(streamNum));
     }
 
     public DUniformRV(int min, int max, RNStreamIfc rng){
@@ -42,7 +45,7 @@ public final class DUniformRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final DUniformRV newInstance(RNStreamIfc rng){

@@ -15,22 +15,16 @@
  */
 package jsl.modeling.resource;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.RandomElementIfc;
 import jsl.modeling.elements.Schedule;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.observers.ModelElementObserver;
-import jsl.utilities.random.rvariable.JSLRandom;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
+
+import java.util.*;
 
 /**
  * A ResourcePool represents a list of ResourceUnits from which
@@ -438,7 +432,7 @@ public class ResourcePool extends ModelElement implements RandomElementIfc {
      */
     public RNStreamIfc getRandomness() {
         if (myRNG == null) {
-            myRNG = RNStreamFactory.getDefaultFactory().getStream();
+            myRNG = JSLRandom.nextRNStream();
         }
         return myRNG;
     }

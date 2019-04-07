@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -26,10 +25,28 @@ public final class BernoulliRV extends AbstractRVariable {
 
     private final double myProbSuccess;
 
+    /** Uses a new stream from the default provider of streams
+     *
+     * @param prob the probability, must be in [0,1]
+     */
     public BernoulliRV(double prob){
-        this(prob, RNStreamFactory.getDefaultFactory().getStream());
+        this(prob, JSLRandom.nextRNStream());
     }
 
+    /**
+     *
+     * @param prob the probability, must be in [0,1]
+     * @param streamNum the stream number
+     */
+    public BernoulliRV(double prob, int streamNum){
+        this(prob, JSLRandom.rnStream(streamNum));
+    }
+
+    /**
+     *
+     * @param prob the probability, must be in [0,1]
+     * @param rng the RNStreamIfc to use
+     */
     public BernoulliRV(double prob, RNStreamIfc rng){
         super(rng);
         if ((prob < 0.0) || (prob > 1.0)) {
@@ -40,7 +57,7 @@ public final class BernoulliRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final BernoulliRV newInstance(RNStreamIfc rng){

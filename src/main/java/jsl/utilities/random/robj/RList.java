@@ -15,15 +15,10 @@
  */
 package jsl.utilities.random.robj;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import jsl.utilities.random.rng.RNStreamFactory;
-
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
+
+import java.util.*;
 
 abstract public class RList<T> implements RListIfc<T> {
 
@@ -33,7 +28,7 @@ abstract public class RList<T> implements RListIfc<T> {
 
     public RList() {
         myElements = new ArrayList<T>();
-        myRNG = RNStreamFactory.getDefaultFactory().getStream();
+        myRNG = JSLRandom.nextRNStream();
     }
 
     /** The object cannot be null, but it can be added more than once

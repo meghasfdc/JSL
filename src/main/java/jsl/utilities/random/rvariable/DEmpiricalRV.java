@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 import java.util.Arrays;
@@ -41,7 +40,19 @@ public final class DEmpiricalRV extends AbstractRVariable {
      * array
      */
     public DEmpiricalRV(double[] values, double[] cdf){
-        this(values, cdf, RNStreamFactory.getDefaultFactory().getStream());
+        this(values, cdf, JSLRandom.nextRNStream());
+    }
+
+    /**
+     * Randomly selects from the array using the supplied cdf
+     *
+     * @param values array to select from
+     * @param cdf the cumulative probability associated with each element of
+     * array
+     * @param streamNum the stream number
+     */
+    public DEmpiricalRV(double[] values, double[] cdf, int streamNum){
+        this(values, cdf, JSLRandom.rnStream(streamNum));
     }
 
     /**
@@ -75,7 +86,7 @@ public final class DEmpiricalRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final DEmpiricalRV newInstance(RNStreamIfc rng){

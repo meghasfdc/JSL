@@ -15,9 +15,6 @@
  */
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamIfc;
-
 /**
  * @author rossetti
  *

@@ -20,10 +20,10 @@ import jsl.utilities.NewInstanceIfc;
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
 import jsl.utilities.random.ParametersIfc;
-import jsl.utilities.random.rng.RNStreamFactory;
-import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rng.RNStreamControlIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.BernoulliRV;
+import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.statistic.Statistic;
 
 /**
@@ -75,7 +75,7 @@ public class TwoStateMarkovChain implements TwoStateMarkovChainIfc, Controllable
     }
 
     public TwoStateMarkovChain(int initialState, double p11, double p01) {
-        this(initialState, p11, p01, RNStreamFactory.getDefaultFactory().getStream());
+        this(initialState, p11, p01, JSLRandom.nextRNStream());
     }
 
     public TwoStateMarkovChain(int initialState, double p11, double p01, RNStreamIfc rng) {
@@ -130,7 +130,7 @@ public class TwoStateMarkovChain implements TwoStateMarkovChainIfc, Controllable
     }
 
     public void setProbabilities(double p11, double p01) {
-        setProbabilities(p11, p01, RNStreamFactory.getDefaultFactory().getStream());
+        setProbabilities(p11, p01, JSLRandom.nextRNStream());
     }
 
     public void setProbabilities(double p11, double p01, RNStreamIfc rng) {

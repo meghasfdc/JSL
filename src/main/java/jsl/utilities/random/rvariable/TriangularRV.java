@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -31,7 +30,11 @@ public final class TriangularRV extends AbstractRVariable {
     private final double myMode;
 
     public TriangularRV(double min, double mode, double max){
-        this(min, mode, max, RNStreamFactory.getDefaultFactory().getStream());
+        this(min, mode, max, JSLRandom.nextRNStream());
+    }
+
+    public TriangularRV(double min, double mode, double max, int streamNum){
+        this(min, mode, max, JSLRandom.rnStream(streamNum));
     }
 
     public TriangularRV(double min, double mode, double max, RNStreamIfc rng){

@@ -20,8 +20,8 @@
  */
 package ex.randomnumbers;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.JSLRandom;
 
 /**
  *
@@ -33,9 +33,8 @@ public class RNStreamExample {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        RNStreamFactory f = RNStreamFactory.getDefaultFactory();
-        RNStreamIfc g1 = f.getStream();
-        RNStreamIfc g2 = f.getStream();
+        RNStreamIfc g1 = JSLRandom.nextRNStream();
+        RNStreamIfc g2 = JSLRandom.nextRNStream();
         System.out.println("Two different streams from the same factory.");
         System.out.println("Note that they produce different random numbers");
         double u1;

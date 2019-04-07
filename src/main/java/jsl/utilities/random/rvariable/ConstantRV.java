@@ -54,7 +54,7 @@ public class ConstantRV implements RVariableIfc, IdentityIfc {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final ConstantRV newInstance(RNStreamIfc rng){

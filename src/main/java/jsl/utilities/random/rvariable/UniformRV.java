@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -32,7 +31,11 @@ public final class UniformRV extends AbstractRVariable {
     }
 
     public UniformRV(double min, double max){
-        this(min, max, RNStreamFactory.getDefaultFactory().getStream());
+        this(min, max, JSLRandom.nextRNStream());
+    }
+
+    public UniformRV(double min, double max, int streamNum){
+        this(min, max, JSLRandom.rnStream(streamNum));
     }
 
     public UniformRV(double min, double max, RNStreamIfc rng){

@@ -16,7 +16,6 @@
 package jsl.utilities.random.distributions;
 
 import jsl.utilities.math.JSLMath;
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;

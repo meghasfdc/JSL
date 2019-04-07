@@ -148,9 +148,6 @@ abstract public class AbstractRVariable implements RVariableIfc, IdentityIfc {
 
     @Override
     public final void setRandomNumberStream(RNStreamIfc stream) {
-        if (stream == null) {
-            throw new NullPointerException("RngIfc rng must be non-null");
-        }
-        myRNStream = stream;
+        myRNStream = Objects.requireNonNull(stream,"RNStreamIfc stream must be non-null" );
     }
 }

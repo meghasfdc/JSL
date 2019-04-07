@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.robj.DEmpiricalList;
 
@@ -30,17 +29,25 @@ public class MixtureRV extends AbstractRVariable {
     /**
      * @param list   a list holding the random variables to select from
      * @param cdf    the cumulative probability associated with each element of the list
-     * @throws NullPointerException if rng is null
      */
     public MixtureRV(List<RVariableIfc> list, double[] cdf) {
-        this(list, cdf, RNStreamFactory.getDefaultFactory().getStream());
+        this(list, cdf, JSLRandom.nextRNStream());
+    }
+
+    /**
+     * @param list   a list holding the random variables to select from
+     * @param cdf    the cumulative probability associated with each element of the list
+     * @param streamNum the stream number
+     */
+    public MixtureRV(List<RVariableIfc> list, double[] cdf, int streamNum) {
+        this(list, cdf, JSLRandom.rnStream(streamNum));
     }
 
     /**
      * @param list   a list holding the random variables to select from
      * @param cdf    the cumulative probability associated with each element of the list
      * @param stream the source of the randomness
-     * @throws NullPointerException if rng is null
+     * @throws NullPointerException if stream is null
      */
     public MixtureRV(List<RVariableIfc> list, double[] cdf, RNStreamIfc stream) {
         super(stream);

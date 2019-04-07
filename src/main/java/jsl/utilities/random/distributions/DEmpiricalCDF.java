@@ -15,14 +15,15 @@
  */
 package jsl.utilities.random.distributions;
 
-import java.util.*;
-
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.DEmpiricalRV;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
 import jsl.utilities.random.rvariable.JSLRandom;
 import jsl.utilities.random.rvariable.RVariableIfc;
+
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Objects;
 
 /**
  * Provides a representation for a discrete distribution with

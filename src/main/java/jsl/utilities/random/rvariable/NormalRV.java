@@ -16,7 +16,6 @@
 
 package jsl.utilities.random.rvariable;
 
-import jsl.utilities.random.rng.RNStreamFactory;
 import jsl.utilities.random.rng.RNStreamIfc;
 
 /**
@@ -40,7 +39,11 @@ public final class NormalRV extends AbstractRVariable {
     }
 
     public NormalRV(double mean, double variance){
-        this(mean, variance, RNStreamFactory.getDefaultFactory().getStream());
+        this(mean, variance, JSLRandom.nextRNStream());
+    }
+
+    public NormalRV(double mean, double variance, int streamNum){
+        this(mean, variance, JSLRandom.rnStream(streamNum));
     }
 
     public NormalRV(double mean, double variance, RNStreamIfc rng){
@@ -54,7 +57,7 @@ public final class NormalRV extends AbstractRVariable {
 
     /**
      *
-     * @param rng the RngIfc to use
+     * @param rng the RNStreamIfc to use
      * @return a new instance with same parameter value
      */
     public final NormalRV newInstance(RNStreamIfc rng){
