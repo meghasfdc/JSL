@@ -40,15 +40,15 @@ import java.util.Optional;
  */
 public class SingleQueueStation extends Station {
 
-    private Queue myWaitingQ;
+    protected final Queue myWaitingQ;
 
     private GetValueIfc myServiceTime;
 
-    private TimeWeighted myNS;
+    protected final TimeWeighted myNS;
 
-    private SResource myResource;
+    protected final SResource myResource;
 
-    private EndServiceAction myEndServiceAction;
+    private final EndServiceAction myEndServiceAction;
 
     private boolean myUseQObjectSTFlag;
 
@@ -226,7 +226,7 @@ public class SingleQueueStation extends Station {
     /**
      * Tells the station to use the QObject to determine the service time
      *
-     * @param option
+     * @param option true means the station uses the QObject's getValueObject() to determine the service time
      */
     public final void setUseQObjectServiceTimeOption(boolean option) {
         myUseQObjectSTFlag = option;
@@ -235,7 +235,7 @@ public class SingleQueueStation extends Station {
     /**
      * Whether or not the station uses the QObject to determine the service time
      *
-     * @return
+     * @return true means the station uses the QObject's getValueObject() to determine the service time
      */
     public final boolean getUseQObjectServiceTimeOption() {
         return myUseQObjectSTFlag;
@@ -244,7 +244,7 @@ public class SingleQueueStation extends Station {
     /**
      * The current number in the queue
      *
-     * @return
+     * @return The current number in the queue
      */
     public final int getNumberInQueue() {
         return myWaitingQ.size();
@@ -253,7 +253,7 @@ public class SingleQueueStation extends Station {
     /**
      * The current number in the station (in queue + in service)
      *
-     * @return
+     * @return current number in the station (in queue + in service)
      */
     public final int getNumberInStation() {
         return (int) myNS.getValue();
@@ -262,7 +262,7 @@ public class SingleQueueStation extends Station {
     /**
      * The initial capacity of the resource at the station
      *
-     * @return
+     * @return initial capacity of the resource at the station
      */
     public final int getInitialResourceCapacity() {
         return (myResource.getInitialCapacity());
@@ -271,7 +271,7 @@ public class SingleQueueStation extends Station {
     /**
      * Sets the initial capacity of the station's resource
      *
-     * @param capacity
+     * @param capacity the initial capacity of the station's resource
      */
     public final void setInitialCapacity(int capacity) {
         myResource.setInitialCapacity(capacity);
@@ -280,7 +280,7 @@ public class SingleQueueStation extends Station {
     /**
      * If the service time is null, it is assumed to be zero
      *
-     * @param st
+     * @param st the GetValueIfc implementor that provides the service time
      */
     public final void setServiceTime(GetValueIfc st) {
         if (st == null) {
@@ -293,7 +293,7 @@ public class SingleQueueStation extends Station {
      * The object used to determine the service time when not using the QObject
      * option
      *
-     * @return
+     * @return the object used to determine the service time when not using the QObject
      */
     public final GetValueIfc getServiceTime() {
         return myServiceTime;
@@ -302,7 +302,7 @@ public class SingleQueueStation extends Station {
     /**
      * Across replication statistics on the number busy servers
      *
-     * @return
+     * @return Across replication statistics on the number busy servers
      */
     public final StatisticAccessorIfc getNBAcrossReplicationStatistic() {
         return myResource.getNBAcrossReplicationStatistic();
@@ -311,7 +311,7 @@ public class SingleQueueStation extends Station {
     /**
      * Across replication statistics on the number in system
      *
-     * @return
+     * @return Across replication statistics on the number in system
      */
     public final StatisticAccessorIfc getNSAcrossReplicationStatistic() {
         return myNS.getAcrossReplicationStatistic();
@@ -320,7 +320,7 @@ public class SingleQueueStation extends Station {
     /**
      * Within replication statistics on the number in system
      *
-     * @return
+     * @return Within replication statistics on the number in system
      */
     public final WeightedStatisticIfc getNSWithinReplicationStatistic() {
         return myNS.getWithinReplicationStatistic();
@@ -337,7 +337,7 @@ public class SingleQueueStation extends Station {
     /**
      * The capacity of the resource. Maximum number of units that can be busy.
      *
-     * @return
+     * @return The capacity of the resource. Maximum number of units that can be busy.
      */
     public final int getCapacity() {
         return myResource.getCapacity();
@@ -346,7 +346,7 @@ public class SingleQueueStation extends Station {
     /**
      * Current number of busy servers
      *
-     * @return
+     * @return Current number of busy servers
      */
     public final int getNumBusyServers() {
         return myResource.getNumBusy();
@@ -355,16 +355,17 @@ public class SingleQueueStation extends Station {
     /**
      * Fraction of the capacity that is busy.
      *
-     * @return
+     * @return  Fraction of the capacity that is busy.
      */
     public final double getFractionBusy() {
-        return getNumBusyServers() / getCapacity();
+        double capacity = getCapacity();
+        return getNumBusyServers() / capacity;
     }
 
     /**
      * Whether the queue is empty
      *
-     * @return
+     * @return Whether the queue is empty
      */
     public final boolean isQueueEmpty() {
         return myWaitingQ.isEmpty();
@@ -373,7 +374,7 @@ public class SingleQueueStation extends Station {
     /**
      * Whether the queue is not empty
      *
-     * @return
+     * @return Whether the queue is not empty
      */
     public final boolean isQueueNotEmpty() {
         return myWaitingQ.isNotEmpty();
@@ -382,8 +383,8 @@ public class SingleQueueStation extends Station {
     /**
      * Adds a QueueListenerIfc to the underlying queue
      *
-     * @param listener
-     * @return
+     * @param listener the listener to queue state changes
+     * @return true if added
      */
     public final boolean addQueueListener(QueueListenerIfc listener) {
         return myWaitingQ.addQueueListener(listener);
@@ -392,21 +393,33 @@ public class SingleQueueStation extends Station {
     /**
      * Removes a QueueListenerIfc from the underlying queue
      *
-     * @param listener
-     * @return
+     * @param listener the listener to queue state changes
+     * @return true if removed
      */
     public boolean removeQueueListener(QueueListenerIfc listener) {
         return myWaitingQ.removeQueueListener(listener);
     }
 
+    /**
+     *
+     * @param discipline the new discipline
+     */
     public final void changeDiscipline(Discipline discipline) {
         myWaitingQ.changeDiscipline(discipline);
     }
 
+    /**
+     *
+     * @return the initial queue discipline
+     */
     public final Discipline getInitialDiscipline() {
         return myWaitingQ.getInitialDiscipline();
     }
 
+    /**
+     *
+     * @param discipline the initial queue discipline
+     */
     public final void setInitialDiscipline(Discipline discipline) {
         myWaitingQ.setInitialDiscipline(discipline);
     }
