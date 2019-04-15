@@ -33,6 +33,7 @@ import jsl.utilities.dbutil.DatabaseIfc;
 import jsl.utilities.jsldbsrc.tables.records.*;
 import jsl.utilities.statistic.*;
 import org.jooq.DSLContext;
+import org.jooq.Record12;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -54,6 +56,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static jsl.utilities.jsldbsrc.Tables.*;
+import static org.jooq.impl.DSL.*;
 
 /**
  * An embedded database that represents the statistical output from simulation runs. See the
@@ -1238,6 +1241,64 @@ public class JSLDatabase {
         return fetch;
     }
 
+    /** Returns all of the pairwise differences (A - B) for each response variable, time weighted, and
+     * counters based on within replication data.
+     *
+     * (sim_name, A_SIM_NUM, STAT_NAME, A_EXP_NUM, REP_NUM, A_VALUE, B_SIM_NUM, B_EXP_NAME,
+     * B_VALUE, DIFF_NAME, A_MINUS_B)
+     *
+     * @return the jooq Result holding the records
+     */
+    public Result<PwDiffWithinRepViewRecord> getPairWiseWithinRepViewRecords(){
+        Result<PwDiffWithinRepViewRecord> fetch = myDb.getDSLContext()
+                .selectFrom(PW_DIFF_WITHIN_REP_VIEW)
+                .orderBy(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.STAT_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.REP_NUM).fetch();
+        return fetch;
+    }
+
+    /** Across replication summary statistics for all pairwise differences
+     * (sim_name, stat_name, A_EXP_NAME, B_EXP_NAME, DIFF_NAME, AVG_A, STD_DEV_A, AVG_B, STD_DEV_B
+     * AVG_DIFF_A_MINUS_B, STD_DEV_DIFF_A_MINUS_B, STAT_COUNT)
+     *
+     * @return the jooq Result
+     */
+    public Result<Record12<String, String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal,
+            BigDecimal, BigDecimal, Integer>> getPairWiseAcrossRepRecords(){
+        Result<Record12<String, String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal,
+                BigDecimal, BigDecimal, Integer>> fetch = myDb.getDSLContext()
+                .select(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.STAT_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.A_EXP_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.B_EXP_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.DIFF_NAME,
+                        avg(PW_DIFF_WITHIN_REP_VIEW.A_VALUE).as("AVG_A"),
+                        stddevSamp(PW_DIFF_WITHIN_REP_VIEW.A_VALUE).as("STD_DEV_A"),
+                        avg(PW_DIFF_WITHIN_REP_VIEW.B_VALUE).as("AVG_B"),
+                        stddevSamp(PW_DIFF_WITHIN_REP_VIEW.B_VALUE).as("STD_DEV_B"),
+                        avg(PW_DIFF_WITHIN_REP_VIEW.A_MINUS_B).as("AVG_DIFF_A_MINUS_B"),
+                        stddevSamp(PW_DIFF_WITHIN_REP_VIEW.A_MINUS_B).as("STD_DEV_DIFF_A_MINUS_B"),
+                        count(PW_DIFF_WITHIN_REP_VIEW.A_MINUS_B).as("STAT_COUNT"))
+                .from(PW_DIFF_WITHIN_REP_VIEW)
+                .orderBy(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.STAT_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.A_EXP_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.B_EXP_NAME,
+                        PW_DIFF_WITHIN_REP_VIEW.DIFF_NAME).fetch();
+        return fetch;
+    }
+
+    /** Across replication summary statistics for all pairwise differences
+     * (sim_name, stat_name, A_EXP_NAME, B_EXP_NAME, DIFF_NAME, AVG_A, STD_DEV_A, AVG_B, STD_DEV_B
+     * AVG_DIFF_A_MINUS_B, STD_DEV_DIFF_A_MINUS_B, STAT_COUNT)
+     *
+     * @return the ResultSet
+     */
+    public ResultSet getPairWiseAcrossRepRecordsAsResultSet(){
+        return getPairWiseAcrossRepRecords().intoResultSet();
+    }
+
     /**
      * @return the within replication view records as a JDBC ResultSet
      */
@@ -1495,6 +1556,32 @@ public class JSLDatabase {
         Table table = null;
         try {
             table = Table.read().db(getBatchStatRecordsAsResultSet(), tblName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return table;
+    }
+
+    /**
+     * @param tblName the name of the Tablesaw table
+     * @return the pairwise difference results a Tablesaw Table
+     */
+    public final Table getPairWiseAcrossRepRecordsAsTablesawTable(String tblName) throws SQLException {
+        return Table.read().db(getPairWiseAcrossRepRecordsAsResultSet(), tblName);
+    }
+
+    /**
+     * Squelches the SQLException
+     *
+     * @param tblName the name of the Tablesaw table
+     * @return the pairwise difference results as a Tablesaw Table or null
+     */
+    public final Table getPairWiseAcrossRepRecordsAsTablesawTableNE(String tblName) {
+
+        Table table = null;
+        try {
+            table = Table.read().db(getPairWiseAcrossRepRecordsAsResultSet(), tblName);
         } catch (SQLException e) {
             e.printStackTrace();
         }
