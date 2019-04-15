@@ -11,6 +11,7 @@ import jsl.utilities.jsldbsrc.tables.AcrossRepView;
 import jsl.utilities.jsldbsrc.tables.BatchStat;
 import jsl.utilities.jsldbsrc.tables.BatchStatView;
 import jsl.utilities.jsldbsrc.tables.ModelElement;
+import jsl.utilities.jsldbsrc.tables.PwDiffWithinRepView;
 import jsl.utilities.jsldbsrc.tables.SimulationRun;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterStat;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
@@ -56,6 +57,11 @@ public class Tables {
      * The table <code>JSL_DB.MODEL_ELEMENT</code>.
      */
     public static final ModelElement MODEL_ELEMENT = jsl.utilities.jsldbsrc.tables.ModelElement.MODEL_ELEMENT;
+
+    /**
+     * The table <code>JSL_DB.PW_DIFF_WITHIN_REP_VIEW</code>.
+     */
+    public static final PwDiffWithinRepView PW_DIFF_WITHIN_REP_VIEW = jsl.utilities.jsldbsrc.tables.PwDiffWithinRepView.PW_DIFF_WITHIN_REP_VIEW;
 
     /**
      * The table <code>JSL_DB.SIMULATION_RUN</code>.

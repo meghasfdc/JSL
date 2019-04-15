@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
 
-    private static final long serialVersionUID = -495440928;
+    private static final long serialVersionUID = -1629536490;
 
     /**
      * The reference instance of <code>JSL_DB.ACROSS_REP_STAT</code>
@@ -223,7 +223,7 @@ public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
      */
     @Override
     public UniqueKey<AcrossRepStatRecord> getPrimaryKey() {
-        return Keys.SQL181016084244620;
+        return Keys.SQL190415110855930;
     }
 
     /**
@@ -231,7 +231,7 @@ public class AcrossRepStat extends TableImpl<AcrossRepStatRecord> {
      */
     @Override
     public List<UniqueKey<AcrossRepStatRecord>> getKeys() {
-        return Arrays.<UniqueKey<AcrossRepStatRecord>>asList(Keys.SQL181016084244620);
+        return Arrays.<UniqueKey<AcrossRepStatRecord>>asList(Keys.SQL190415110855930);
     }
 
     /**

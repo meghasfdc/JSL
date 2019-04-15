@@ -77,7 +77,7 @@ public class JSLDatabase {
             "across_rep_stat", "within_rep_stat", "model_element", "simulation_run");
 
     private static final List<String> JSLViewNames = Arrays.asList("within_rep_response_view",
-            "within_rep_counter_view", "across_rep_view", "batch_stat_view", "within_rep_view");
+            "within_rep_counter_view", "across_rep_view", "batch_stat_view", "within_rep_view", "pw_diff_within_rep_view");
 
     private static String jslSchemaName = "JSL_DB";
 

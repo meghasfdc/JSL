@@ -236,16 +236,16 @@ FROM (JSL_DB.SIMULATION_RUN JOIN JSL_DB.WITHIN_REP_COUNTER_STAT on JSL_DB.SIMULA
             JOIN JSL_DB.MODEL_ELEMENT ON ELEMENT_ID = JSL_DB.WITHIN_REP_COUNTER_STAT.ELEMENT_ID_FK);  
             
 -- PW_DIFF_WITHIN_REP_VIEW computes the pairwise differences across difference simulation experiments
--- create view JSL_DB.PW_DIFF_WITHIN_REP_VIEW
--- as (select JSL_DB.SIMULATION_RUN.SIM_NAME, A.SIM_RUN_ID_FK AS A_SIM_NUM, A.STAT_NAME, A.EXP_NAME as A_EXP_NAME, A.REP_NUM, A.VALUE as A_VALUE,
---            B.SIM_RUN_ID_FK as B_SIM_NUM, B.EXP_NAME as B_EXP_NAME, B.VALUE as B_VALUE,
---            '(' || A.EXP_NAME || ' - ' || B.EXP_NAME || ')' as DIFF_NAME, (A.VALUE - B.VALUE) as A_MINUS_B
---     from JSL_DB.WITHIN_REP_VIEW as A, JSL_DB.WITHIN_REP_VIEW as B, JSL_DB.SIMULATION_RUN
---     where A.SIM_RUN_ID_FK = JSL_DB.SIMULATION_RUN.ID
---       and A.STAT_NAME = B.STAT_NAME
---       and A.REP_NUM = B.REP_NUM
---       and A.SIM_RUN_ID_FK > B.SIM_RUN_ID_FK
---       and A.ELEMENT_NAME = B.ELEMENT_NAME);
+create view JSL_DB.PW_DIFF_WITHIN_REP_VIEW
+as (select JSL_DB.SIMULATION_RUN.SIM_NAME, A.SIM_RUN_ID_FK AS A_SIM_NUM, A.STAT_NAME, A.EXP_NAME as A_EXP_NAME, A.REP_NUM, A.VALUE as A_VALUE,
+           B.SIM_RUN_ID_FK as B_SIM_NUM, B.EXP_NAME as B_EXP_NAME, B.VALUE as B_VALUE,
+           '(' || A.EXP_NAME || ' - ' || B.EXP_NAME || ')' as DIFF_NAME, (A.VALUE - B.VALUE) as A_MINUS_B
+    from JSL_DB.WITHIN_REP_VIEW as A, JSL_DB.WITHIN_REP_VIEW as B, JSL_DB.SIMULATION_RUN
+    where A.SIM_RUN_ID_FK = JSL_DB.SIMULATION_RUN.ID
+      and A.STAT_NAME = B.STAT_NAME
+      and A.REP_NUM = B.REP_NUM
+      and A.SIM_RUN_ID_FK > B.SIM_RUN_ID_FK
+      and A.ELEMENT_NAME = B.ELEMENT_NAME);
 --
 -- PW_DIFF_AR_REP_VIEW computes the across replication summary statistics over the pairwise differences
 -- select statement works, but create view does not work for derby, 3-28-2019

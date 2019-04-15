@@ -15,6 +15,7 @@ import jsl.utilities.jsldbsrc.tables.AcrossRepView;
 import jsl.utilities.jsldbsrc.tables.BatchStat;
 import jsl.utilities.jsldbsrc.tables.BatchStatView;
 import jsl.utilities.jsldbsrc.tables.ModelElement;
+import jsl.utilities.jsldbsrc.tables.PwDiffWithinRepView;
 import jsl.utilities.jsldbsrc.tables.SimulationRun;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterStat;
 import jsl.utilities.jsldbsrc.tables.WithinRepCounterView;
@@ -40,7 +41,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class JslDb extends SchemaImpl {
 
-    private static final long serialVersionUID = -1751533744;
+    private static final long serialVersionUID = 1798396887;
 
     /**
      * The reference instance of <code>JSL_DB</code>
@@ -71,6 +72,11 @@ public class JslDb extends SchemaImpl {
      * The table <code>JSL_DB.MODEL_ELEMENT</code>.
      */
     public final ModelElement MODEL_ELEMENT = jsl.utilities.jsldbsrc.tables.ModelElement.MODEL_ELEMENT;
+
+    /**
+     * The table <code>JSL_DB.PW_DIFF_WITHIN_REP_VIEW</code>.
+     */
+    public final PwDiffWithinRepView PW_DIFF_WITHIN_REP_VIEW = jsl.utilities.jsldbsrc.tables.PwDiffWithinRepView.PW_DIFF_WITHIN_REP_VIEW;
 
     /**
      * The table <code>JSL_DB.SIMULATION_RUN</code>.
@@ -132,6 +138,7 @@ public class JslDb extends SchemaImpl {
             BatchStat.BATCH_STAT,
             BatchStatView.BATCH_STAT_VIEW,
             ModelElement.MODEL_ELEMENT,
+            PwDiffWithinRepView.PW_DIFF_WITHIN_REP_VIEW,
             SimulationRun.SIMULATION_RUN,
             WithinRepCounterStat.WITHIN_REP_COUNTER_STAT,
             WithinRepCounterView.WITHIN_REP_COUNTER_VIEW,
