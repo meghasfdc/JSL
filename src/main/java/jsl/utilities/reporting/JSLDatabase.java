@@ -1281,7 +1281,7 @@ public class JSLDatabase {
                         stddevSamp(PW_DIFF_WITHIN_REP_VIEW.A_MINUS_B).as("STD_DEV_DIFF_A_MINUS_B"),
                         count(PW_DIFF_WITHIN_REP_VIEW.A_MINUS_B).as("STAT_COUNT"))
                 .from(PW_DIFF_WITHIN_REP_VIEW)
-                .orderBy(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
+                .groupBy(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
                         PW_DIFF_WITHIN_REP_VIEW.STAT_NAME,
                         PW_DIFF_WITHIN_REP_VIEW.A_EXP_NAME,
                         PW_DIFF_WITHIN_REP_VIEW.B_EXP_NAME,
