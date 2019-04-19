@@ -104,10 +104,10 @@ public class JSLDatabase {
     }
 
     private final DatabaseIfc myDb;
+    private boolean myClearDbFlag;
+
     private final Simulation mySimulation;
-    private boolean myClearDbFlag = true;
     protected SimulationRunRecord myCurrentSimRunRecord;
-    private String tblName;
     private SimulationDatabaseObserver mySimulationObserver;
 
     /**
@@ -141,15 +141,51 @@ public class JSLDatabase {
      *                        experiment
      */
     public JSLDatabase(DatabaseIfc database, Simulation simulation, boolean clearDataOption) {
-        Objects.requireNonNull(database, "The database was null");
         Objects.requireNonNull(simulation, "The simulation was null");
+        executeJSLDbCreationScriptOnDatabase(database);
         myDb = database;
-        if (!myDb.containsSchema(getJSLSchemaName())) {
-            DatabaseIfc.LOG.warn("The database {} does not contain schema {}", myDb.getLabel(), getJSLSchemaName());
-            // assume that the schema has not been made and run the table creation script
+        myDb.setDefaultSchemaName(getJSLSchemaName());
+        mySimulation = simulation;
+        myClearDbFlag = clearDataOption;
+        myCurrentSimRunRecord = null;
+        startObservingModel();
+    }
+
+    /** Creates an embedded Derby database with the name and in the db directory that has the
+     *  JSL_DB schema
+     *
+     * @param dbName the name must not be null
+     * @return a database that has the JSL schema
+     */
+    public static DatabaseIfc createEmbeddedDerbyDatabaseWithJSLSchema(String dbName){
+        return createEmbeddedDerbyDatabaseWithJSLSchema(dbName, dbDir);
+    }
+
+    /**  Creates an embedded Derby database with the name and in the supplied directory that has the
+     *  JSL_DB schema
+     *
+     * @param dbName the name must not be null
+     * @param dbDirectory the path to the database directory
+     * @return a database that has the JSL schema
+     */
+    public static DatabaseIfc createEmbeddedDerbyDatabaseWithJSLSchema(String dbName, Path dbDirectory) {
+        DatabaseIfc database = DatabaseFactory.createEmbeddedDerbyDatabase(dbName, dbDirectory);
+        executeJSLDbCreationScriptOnDatabase(database);
+        return database;
+    }
+
+    /** Executes the JSL database creation script on the database if the database does not already
+     *  have a JSL_DB schema.
+     *
+     * @param db the database, must not be null
+     */
+    public static void executeJSLDbCreationScriptOnDatabase(DatabaseIfc db) {
+        Objects.requireNonNull(db, "The database was null");
+        if (!db.containsSchema(getJSLSchemaName())) {
+            DatabaseIfc.LOG.warn("The database {} does not contain schema {}", db.getLabel(), getJSLSchemaName());
             try {
                 DatabaseIfc.LOG.warn("Assume the schema has not be made and execute the creation script JSLDb.sql");
-                boolean b = myDb.executeScript(dbScriptsDir.resolve("JSLDb.sql"));
+                boolean b = db.executeScript(dbScriptsDir.resolve("JSLDb.sql"));
                 if (b == false) {
                     throw new DataAccessException("The execution script JSLDb.sql did not fully execute");
                 }
@@ -158,11 +194,6 @@ public class JSLDatabase {
                 throw new DataAccessException("Unable to execute JSLDb.sql creation script");
             }
         }
-        myDb.setDefaultSchemaName(getJSLSchemaName());
-        mySimulation = simulation;
-        myClearDbFlag = clearDataOption;
-        myCurrentSimRunRecord = null;
-        startObservingModel();
     }
 
     /**
@@ -423,7 +454,7 @@ public class JSLDatabase {
             // no clear option, need to check if simulation record exists
             String simName = mySimulation.getName();
             String expName = mySimulation.getExperimentName();
-            if (simulationRunRecordExists(simName, expName)){
+            if (simulationRunRecordExists(simName, expName)) {
                 JSL.LOGGER.error("A simulation run record exists for simulation: {}, and experiment: {}",
                         simName, expName);
                 JSL.LOGGER.error("You attempted to run a simulation for a run that has ");
@@ -1241,15 +1272,16 @@ public class JSLDatabase {
         return fetch;
     }
 
-    /** Returns all of the pairwise differences (A - B) for each response variable, time weighted, and
+    /**
+     * Returns all of the pairwise differences (A - B) for each response variable, time weighted, and
      * counters based on within replication data.
-     *
+     * <p>
      * (sim_name, A_SIM_NUM, STAT_NAME, A_EXP_NUM, REP_NUM, A_VALUE, B_SIM_NUM, B_EXP_NAME,
      * B_VALUE, DIFF_NAME, A_MINUS_B)
      *
      * @return the jooq Result holding the records
      */
-    public Result<PwDiffWithinRepViewRecord> getPairWiseWithinRepViewRecords(){
+    public Result<PwDiffWithinRepViewRecord> getPairWiseWithinRepViewRecords() {
         Result<PwDiffWithinRepViewRecord> fetch = myDb.getDSLContext()
                 .selectFrom(PW_DIFF_WITHIN_REP_VIEW)
                 .orderBy(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
@@ -1258,14 +1290,15 @@ public class JSLDatabase {
         return fetch;
     }
 
-    /** Across replication summary statistics for all pairwise differences
+    /**
+     * Across replication summary statistics for all pairwise differences
      * (sim_name, stat_name, A_EXP_NAME, B_EXP_NAME, DIFF_NAME, AVG_A, STD_DEV_A, AVG_B, STD_DEV_B
      * AVG_DIFF_A_MINUS_B, STD_DEV_DIFF_A_MINUS_B, STAT_COUNT)
      *
      * @return the jooq Result
      */
     public Result<Record12<String, String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal,
-            BigDecimal, BigDecimal, Integer>> getPairWiseAcrossRepRecords(){
+            BigDecimal, BigDecimal, Integer>> getPairWiseAcrossRepRecords() {
         Result<Record12<String, String, String, String, String, BigDecimal, BigDecimal, BigDecimal, BigDecimal,
                 BigDecimal, BigDecimal, Integer>> fetch = myDb.getDSLContext()
                 .select(PW_DIFF_WITHIN_REP_VIEW.SIM_NAME,
@@ -1289,13 +1322,14 @@ public class JSLDatabase {
         return fetch;
     }
 
-    /** Across replication summary statistics for all pairwise differences
+    /**
+     * Across replication summary statistics for all pairwise differences
      * (sim_name, stat_name, A_EXP_NAME, B_EXP_NAME, DIFF_NAME, AVG_A, STD_DEV_A, AVG_B, STD_DEV_B
      * AVG_DIFF_A_MINUS_B, STD_DEV_DIFF_A_MINUS_B, STAT_COUNT)
      *
      * @return the ResultSet
      */
-    public ResultSet getPairWiseAcrossRepRecordsAsResultSet(){
+    public ResultSet getPairWiseAcrossRepRecordsAsResultSet() {
         return getPairWiseAcrossRepRecords().intoResultSet();
     }
 
