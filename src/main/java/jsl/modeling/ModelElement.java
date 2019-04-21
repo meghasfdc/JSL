@@ -2569,15 +2569,16 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * parent and will no longer have a model.  This can only be done when
      * the simulation that contains the model is not running.
      *
-     * It has very serious side-effects. After invoking this method:
+     * This method has very serious side-effects. After invoking this method:
      *
      * 1) All children of this model element will have been removed from the
      * model.
      * 2) This model element will be removed from its parent's model,
      * element list and from the model. The getParentModelElement() method will
-     * return null.
+     * return null. In other words, this model element will no longer be connected
+     * to a parent model element.
      * 3) This model element and all its children will no longer be
-     * connected In other words, there is no longer a parent/child relationship
+     * connected. In other words, there is no longer a parent/child relationship
      * between this model element and its former children.
      * 4) This model element and all of its children will no longer belong to a model.
      * Their getModel() method will return null
@@ -2586,7 +2587,7 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * 7) Warm up and timed update listeners are set to null
      * 9) Any reference to a spatial model is set to null
      * 10) All observers of this model element are detached
-     * 11) All child model elements are removed. It will no longer have any children
+     * 11) All child model elements are removed. It will no longer have any children.
 
      * Since it has been removed from the model, it and its children will no
      * longer participate in any of the standard model element actions, e.g.
@@ -2595,6 +2596,15 @@ public abstract class ModelElement implements IdentityIfc, ObservableIfc {
      * Notes: 1) This method removes from the list of model elements. Thus, if a
      * client attempts to use this method, via code that is iterating the list a
      * concurrent modification exception will occur.
+     * 2) The user is responsible for ensuring that other references to this model
+     * element are correctly handled.  If references to this model element exist within
+     * other data structures/collections then the user is responsible for appropriately
+     * addressing those references. This is especially important for any observers
+     * of the removed model element.  The observers will be notified that the model
+     * element is being removed. It is up to the observer to correctly react to
+     * the removal. If the observer is a sub-class of ModelElementObserver then
+     * implementing the removedFromModel() method can be used. If the observer is a
+     * general Observer, then use REMOVED_FROM_MODEL to check if the element is being removed.
      */
    // @Deprecated
     public final void removeFromModel() {

@@ -15,19 +15,19 @@
  */
 package jsl.modeling;
 
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimerTask;
-
-import jsl.utilities.reporting.JSLDatabase;
 import jsl.observers.ObservableIfc;
 import jsl.observers.ObserverIfc;
 import jsl.observers.scheduler.ExecutiveTraceReport;
 import jsl.observers.textfile.IPLogReport;
 import jsl.utilities.reporting.JSL;
+import jsl.utilities.reporting.JSLDatabase;
+import jsl.utilities.reporting.JSLDatabaseObserver;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.StatisticAccessorIfc;
+
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Simulation represents a model and experiment that can be run. It encapsulates
@@ -42,29 +42,37 @@ import jsl.utilities.statistic.StatisticAccessorIfc;
  * <p>
  * If a default embedded database is created then whether or not the current data in the
  * database will be cleared prior to the run is controlled by the
- * setClearDatabaseOptionForDefaultDatabase() option.  Clearing the data is the default option.
+ * setClearDataBeforeExperimentOption() option.  Clearing the data is the default option.
  * Clearing the database causes the previous embedded database to clear any data prior
  * to an experiment invoked with the run() method of Simulation.
  * <p>
- * If the setClearDatabaseOptionForDefaultDatabase() is set to false, then any subsequent calls
- * to run() will add their generated data to the simulation database.  This is useful when comparing data across simulation
- * runs if the simulation inputs are changed between runs within the same program execution.
- * Use setClearDatabaseOptionForDefaultDatabase() prior to invoking the run() method.
+ * If the setClearDataBeforeExperimentOption() is set to false, then any subsequent calls
+ * to run() will add their generated data to the simulation database.  This is useful when
+ * comparing data across simulation runs if the simulation inputs are changed between runs
+ * within the same program execution. If you set the clear data option to false and continue
+ * to use the same simulation instance, then you must change the experiment name between
+ * invocations of the run() method; otherwise, you will get an error/warning because you
+ * will be attempting to over write previous data in the database.
+ *
+ * Use setClearDataBeforeExperimentOption() prior to invoking the run() method in order for
+ * it to have an affect on the next experiment.
  * <p>
  * Note: If you do not want a previously created embedded database to be overwritten then
- * you can do any of these possibilities:
+ * you have many possibilities:
  * 1) change the name of the simulation and run with the create embedded database option on to
- * create a new embedded database.
+ * create a new embedded database. The created database will have a new name and thus not over write the previous
+ * database.
  * 2) change how you create the simulation to not create an embedded database. This will prevent
  * a new embedded database with the same name from being created and over writing a previously
  * created database.
+ * 3) change the name of the embedded Derby database file within the operating system.
  * <p>
  * If you want to add more results from a new program execution to a previously created
  * embedded database without deleting it, then create the simulation without an
- * embedded database and create a new JSLDatabase that references the previously created
- * embedded database as the backing database. Make sure that you don't set the clear
- * database option to true; otherwise, you will still lose the previously stored data
- * when the first experiment is run.
+ * embedded database and create a new JSLDatabaseObserver that references the previously created
+ * embedded database as the backing database and uses the simulation reference.
+ * Make sure that you don't set the clear database option to true; otherwise, you will still lose
+ * the previously stored data when the first experiment is run.
  *
  * @author Manuel Rossetti (rossetti@uark.edu)
  */
@@ -121,6 +129,8 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
      * the default database for holding statistical output
      */
     private JSLDatabase myDefaultJSLDatabase;
+
+    private JSLDatabaseObserver myDefaultJSLDbObserver;
 
     /**
      * Creates a simulation to run a model using the default scheduling executive.
@@ -186,8 +196,11 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
         //setSimulation() is package final, should be no leaking this
         myModel.setSimulation(this);
         if (createDefaultDatabase) {
-            myDefaultJSLDatabase = JSLDatabase.createEmbeddedDerbyJSLDatabase(this,
-                    true);
+            // use the simulation name
+            String name = getName().replaceAll("\\s+", "");
+            String dbName = "JSLDb_" + name;
+            myDefaultJSLDatabase = JSLDatabase.createEmbeddedDerbyJSLDatabase(dbName);
+            myDefaultJSLDbObserver = new JSLDatabaseObserver(myDefaultJSLDatabase, this, true);
         }
     }
 
@@ -1001,25 +1014,33 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
         return Optional.ofNullable(myDefaultJSLDatabase);
     }
 
-    /** Tells the default JSLDatabase to stop observing the model if it exists
+    /**
+     * Is available only if the simulation was created with the option
+     * of automatically creating an embedded database
      *
-     * @return the default database if it exists
+     * @return the JSLDatabaseObserver or null if not created/attached
      */
-    public final Optional<JSLDatabase> stopDefaultDatabaseModelObservation(){
-        if (myDefaultJSLDatabase != null){
-            myDefaultJSLDatabase.stopObservingModel();
+    public final Optional<JSLDatabaseObserver> getDefaultJSLDatabaseObserver(){
+        return Optional.ofNullable(myDefaultJSLDbObserver);
+    }
+
+    /** Tells the default JSLDatabaseObserver to stop observing the model if it exists
+     *
+     */
+    public final void stopDefaultDatabaseModelObservation(){
+        if (myDefaultJSLDbObserver != null){
+            myDefaultJSLDbObserver.stopObserving();
         }
-        return getDefaultJSLDatabase();
     }
 
     /**
-     *  If a default database exists and if it is not already observing the model it is
-     *  told to start observing the model. If the default database does not exist then
+     *  If a default JSLDatabaseObserver exists and if it is not already observing the model it is
+     *  told to start observing the model. If the default JSLDatabaseObserver does not exist then
      *  this method has no effect and writes a warning to the log file.
      */
     public final void startDefaultDatabaseModelObservation(){
-        if (myDefaultJSLDatabase != null){
-            myDefaultJSLDatabase.startObservingModel();
+        if (myDefaultJSLDbObserver != null){
+            myDefaultJSLDbObserver.startObserving();
         } else {
             JSL.LOGGER.warn("Tried to start default database observation when one does not exist");
         }
@@ -1029,15 +1050,15 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
      * True is the default setting
      *
      * @return true means that if the auto create embedded database option was
-     * specified as true, then its current clear database option is returned. If
+     * specified as true, then the current clear database option is returned. If
      * no default database was specified to be created then this method always
      * returns false, because there is no database to clear.
      */
-    public final boolean isClearDatabaseOptionOnForDefaultDatabase() {
-        if (myDefaultJSLDatabase == null) {
+    public final boolean getClearDataBeforeExperimentOption() {
+        if (myDefaultJSLDbObserver == null) {
             return false;
         }
-        return myDefaultJSLDatabase.getClearDatabaseOption();
+        return myDefaultJSLDbObserver.getClearDataBeforeExperimentOption();
     }
 
     /**
@@ -1047,12 +1068,41 @@ public class Simulation implements ObservableIfc, IterativeProcessIfc,
      * @param option true means that the automatically created database will be
      *               cleared prior to each experiment
      */
-    public void setClearDatabaseOptionForDefaultDatabase(boolean option) {
-        if (myDefaultJSLDatabase != null) {
-            myDefaultJSLDatabase.setClearDatabaseOption(option);
+    public void setClearDataBeforeExperimentOption(boolean option) {
+        if (myDefaultJSLDbObserver != null) {
+            myDefaultJSLDbObserver.setClearDataBeforeExperimentOption(option);
         } else {
             JSL.LOGGER.warn("Tried to set the clear database option when no database exists to clear");
         }
+    }
+
+    /** The database will not be cleared before experiments
+     *
+     * @param dbName the name of the underlying JSLDatabase, must not be null
+     * @return the JSLDatabaseObserver
+     */
+    public JSLDatabaseObserver createJSLDatabaseObserver(String dbName){
+        JSLDatabase jslDatabase = JSLDatabase.createEmbeddedDerbyJSLDatabase(dbName);
+        return new JSLDatabaseObserver(jslDatabase, this, false);
+    }
+
+    /** The database will not be cleared before experiments
+     *
+     * @param jslDatabase the JSLDatabase, must not be null
+     * @return the JSLDatabaseObserver
+     */
+    public JSLDatabaseObserver createJSLDatabaseObserver(JSLDatabase jslDatabase){
+        return new JSLDatabaseObserver(jslDatabase, this, false);
+    }
+
+    /**
+     *
+     * @param jslDatabase the JSLDatabase, must not be null
+     * @param clearDataBeforeExperiment true means clear before experiments
+     * @return the JSLDatabaseObserver
+     */
+    public JSLDatabaseObserver createJSLDatabaseObserver(JSLDatabase jslDatabase, boolean clearDataBeforeExperiment){
+        return new JSLDatabaseObserver(jslDatabase, this, clearDataBeforeExperiment);
     }
 
     /**

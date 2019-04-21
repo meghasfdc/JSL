@@ -21,15 +21,8 @@ import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
-import jsl.utilities.dbutil.DatabaseFactory;
 import jsl.utilities.random.RandomIfc;
 import jsl.utilities.random.rvariable.ExponentialRV;
-import jsl.utilities.reporting.JSLDatabase;
-import jsl.utilities.statistic.MultipleComparisonAnalyzer;
-
-import javax.sql.DataSource;
-import java.io.PrintWriter;
-import java.util.*;
 
 public class DriveThroughPharmacy extends SchedulingElement {
 
@@ -171,160 +164,22 @@ public class DriveThroughPharmacy extends SchedulingElement {
     }
 
     public static void main(String[] args) {
-        //runModelWithPostGresDB(1);
         runModel(1);
         //runModel(2);
     }
 
     public static void runModel(int numServers) {
-
-        PrintWriter printWriter = new PrintWriter(System.out);
-        Simulation sim = new Simulation("Drive Through Pharmacy", true);
-
-        sim.turnOnStatisticalBatching();
-        sim.setClearDatabaseOptionForDefaultDatabase(false);
-        // get the model
-        Model m = sim.getModel();
-
-        // add DriveThroughPharmacy to the main model
-        DriveThroughPharmacy dtp = new DriveThroughPharmacy(m, numServers);
-        dtp.setArrivalRS(new ExponentialRV(6.0));
-        dtp.setServiceRS(new ExponentialRV(3.0));
-        //m.turnOnTimeIntervalCollection(100);
-        // set the parameters of the experiment
-        sim.setNumberOfReplications(30);
-        sim.setLengthOfReplication(20000.0);
-        sim.setLengthOfWarmUp(5000.0);
-        SimulationReporter r = sim.makeSimulationReporter();
-
-//        for(ModelElement me: m.getModelElements()){
-//            System.out.println(me);
-//        }
-//
-//        System.out.println(m.getModelElementsAsString());
-
-        r.turnOnReplicationCSVStatisticReporting();
-        sim.setExperimentName("1st Run");
-        System.out.println("Simulation started.");
-        sim.run();
-        r.printAcrossReplicationSummaryStatistics();
-
-        //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
-        dtp.setNumberOfPharmacists(2);
-        sim.setExperimentName("2nd Run");
-        //sim.setExperimentName("1st Run");//To test error message
-        sim.run();
-        System.out.println("Simulation completed.");
-        r.printAcrossReplicationSummaryStatistics();
-
-        //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
-        String responseName = dtp.getSystemTimeResponse().getName();
-        Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
-
-        if (!db.isPresent()){
-            return;
-        }
-
-//        Result<WithinRepViewRecord> resultSet = db.get().getWithRepViewRecords();
-//        resultSet.format(printWriter);
-
-        Set<String> expNames = new LinkedHashSet<>();
-        expNames.add("1st Run");
-        expNames.add("2nd Run");
-
-        Map<String, double[]> withRepAveragesAsMap = db.get()
-                .getWithinRepViewValuesAsMapForExperiments(expNames, responseName);
-
-        System.out.println();
-        for(String name: withRepAveragesAsMap.keySet()){
-            double[] doubles = withRepAveragesAsMap.get(name);
-            System.out.println(name);
-            System.out.println(Arrays.toString(doubles));
-        }
-        System.out.println();
-        MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
-        multipleComparisonAnalyzer.setName("System Time Analysis");
-        System.out.println(multipleComparisonAnalyzer);
-
-//        try {
-//            System.out.println();
-//            System.out.println("Tablesaw work");
-//            Table tablesawTable = sim.getJSLDatabase().getAcrossRepStatRecordsAsTablesawTable("AcrossRepStats");
-//            //System.out.println(tablesawTable.columnNames());
-//            //System.out.println(tablesawTable.structure().print());
-//            System.out.println(tablesawTable.print());
-//            System.out.println("Tablesaw work");
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-
-
-    }
-
-    public static void runModelWithPostGresDB(int numServers) {
-
-        PrintWriter printWriter = new PrintWriter(System.out);
         Simulation sim = new Simulation("Drive Through Pharmacy");
-
-        sim.turnOnStatisticalBatching();
-//        sim.setClearDatabaseOptionForDefaultDatabase(false);
-
-        JSLDatabase jslDatabase = JSLDatabase.getPostgresLocalHostJSLDatabase(sim,
-                false, "test", "test", "test");
-
-        // get the model
-        Model m = sim.getModel();
-
-        // add DriveThroughPharmacy to the main model
-        DriveThroughPharmacy dtp = new DriveThroughPharmacy(m, numServers);
-        dtp.setArrivalRS(new ExponentialRV(6.0));
-        dtp.setServiceRS(new ExponentialRV(3.0));
-        //m.turnOnTimeIntervalCollection(100);
-        // set the parameters of the experiment
         sim.setNumberOfReplications(30);
         sim.setLengthOfReplication(20000.0);
         sim.setLengthOfWarmUp(5000.0);
-        SimulationReporter r = sim.makeSimulationReporter();
+        // add DriveThroughPharmacy to the main model
+        DriveThroughPharmacy dtp = new DriveThroughPharmacy(sim.getModel(), numServers);
+        dtp.setArrivalRS(new ExponentialRV(6.0));
+        dtp.setServiceRS(new ExponentialRV(3.0));
 
-        r.turnOnReplicationCSVStatisticReporting();
-        sim.setExperimentName("1st Run");
-        System.out.println("Simulation started.");
         sim.run();
-        r.printAcrossReplicationSummaryStatistics();
-
-        //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
-        dtp.setNumberOfPharmacists(2);
-        sim.setExperimentName("2nd Run");
-        //sim.setExperimentName("1st Run");//To test error message
-        sim.run();
-        System.out.println("Simulation completed.");
-        r.printAcrossReplicationSummaryStatistics();
-
-        //sim.getJSLDatabase().getAcrossRepStatRecords().format(printWriter);
-        String responseName = dtp.getSystemTimeResponse().getName();
-
-//        Result<WithinRepViewRecord> resultSet = db.get().getWithRepViewRecords();
-//        resultSet.format(printWriter);
-
-        Set<String> expNames = new LinkedHashSet<>();
-        expNames.add("1st Run");
-        expNames.add("2nd Run");
-
-        Map<String, double[]> withRepAveragesAsMap = jslDatabase
-                .getWithinRepViewValuesAsMapForExperiments(expNames, responseName);
-
-        System.out.println();
-        for(String name: withRepAveragesAsMap.keySet()){
-            double[] doubles = withRepAveragesAsMap.get(name);
-            System.out.println(name);
-            System.out.println(Arrays.toString(doubles));
-        }
-        System.out.println();
-        MultipleComparisonAnalyzer multipleComparisonAnalyzer = new MultipleComparisonAnalyzer(withRepAveragesAsMap);
-        multipleComparisonAnalyzer.setName("System Time Analysis");
-        System.out.println(multipleComparisonAnalyzer);
-
+        sim.printHalfWidthSummaryReport();
     }
 
 }

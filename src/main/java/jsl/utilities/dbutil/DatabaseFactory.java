@@ -1,7 +1,5 @@
 package jsl.utilities.dbutil;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.MoreFiles;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jsl.utilities.reporting.JSLDatabase;
@@ -14,8 +12,10 @@ import org.jooq.exception.DataAccessException;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -95,7 +95,7 @@ public class DatabaseFactory {
     /**
      * The database must already exist. It is not created. An exception is thrown if it does not exist.
      *
-     * @param pathToDb  the full path to the directory that is the database, must not be null
+     * @param pathToDb the full path to the directory that is the database, must not be null
      * @return the database
      */
     public static DatabaseIfc getEmbeddedDerbyDatabase(Path pathToDb) {
@@ -143,8 +143,9 @@ public class DatabaseFactory {
         return Files.exists(fullPath);
     }
 
-    /** This does not check if the database is shutdown.  It simply removes the
-     *  database from the file system.  If it doesn't exist, then nothing happends.
+    /**
+     * This does not check if the database is shutdown.  It simply removes the
+     * database from the file system.  If it doesn't exist, then nothing happends.
      *
      * @param pathToDb the path to the embedded database on disk
      */
@@ -237,16 +238,18 @@ public class DatabaseFactory {
         return ds;
     }
 
-    /** Sends a shutdown connection to the database.
+    /**
+     * Sends a shutdown connection to the database.
      *
      * @param pathToDb a path to the database, must not be null
-      * @return true if successfully shutdown
+     * @return true if successfully shutdown
      */
     public static boolean shutDownEmbeddedDerbyDatabase(Path pathToDb) {
         return shutDownEmbeddedDerbyDatabase(pathToDb, null, null);
     }
 
-    /** Sends a shutdown connection to the database.
+    /**
+     * Sends a shutdown connection to the database.
      *
      * @param pathToDb a path to the database, must not be null
      * @param user     a user name, can be null
@@ -382,16 +385,29 @@ public class DatabaseFactory {
      */
     public static DataSource getPostGresDataSource(String dbServerName, String dbName, String user,
                                                    String pWord, int portNumber) {
+        Properties props = makePostGresProperties(dbServerName, dbName, user, pWord);
+        return getDataSource(props);
+    }
+
+    /**
+     * @param dbServerName the database server name, must not be null
+     * @param dbName       the database name, must not be null
+     * @param user         the user, must not be null
+     * @param pWord        the password, must not be null
+     * @return the Properties instance
+     */
+    public static Properties makePostGresProperties(String dbServerName, String dbName, String user, String pWord) {
         Objects.requireNonNull(dbServerName, "The name to the database server must not be null");
         Objects.requireNonNull(dbName, "The path name to the database must not be null");
+        Objects.requireNonNull(user, "The user for the database must not be null");
+        Objects.requireNonNull(pWord, "The password for the database must not be null");
         Properties props = new Properties();
         props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
         props.setProperty("dataSource.user", user);
         props.setProperty("dataSource.password", pWord);
         props.setProperty("dataSource.databaseName", dbName);
         props.setProperty("dataSource.serverName", dbServerName);
-        props.setProperty("dataSource.portNumber", Integer.toString(portNumber));
-        return getDataSource(props);
+        return props;
     }
 
     /**
