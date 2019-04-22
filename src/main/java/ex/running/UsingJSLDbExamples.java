@@ -55,6 +55,8 @@ public class UsingJSLDbExamples {
         // shows 2 databases (default and a postgres database)
         //testPostgressDb();
 
+        showMultipleRunsOfSameSimulation();
+
     }
 
     /**
@@ -93,7 +95,6 @@ public class UsingJSLDbExamples {
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
@@ -161,7 +162,7 @@ public class UsingJSLDbExamples {
             System.out.println();
         }
 
-        // get the new JSLDatabase from the observer
+        // get the other JSLDatabase from the observer
         JSLDatabase db2 = jslDatabaseObserver.getJSLDatabase();
         System.out.println("Printing across replication records from 2nd db");
         db2.getAcrossRepStatRecords().format(System.out);
@@ -170,7 +171,9 @@ public class UsingJSLDbExamples {
     }
 
     /**
-     * Illustrates how to use a Postgres database
+     * Illustrates how to use a Postgres database.  When running this method, you must
+     * have a local Postgres server running and the database server needs to have the appropriate
+     * user and password account set up.
      */
     public static void testPostgressDb(){
         PrintWriter out = new PrintWriter(System.out);
@@ -206,7 +209,8 @@ public class UsingJSLDbExamples {
 
     /**
      *  Illustrate how to get data from a previously executed simulation that
-     *  had data in database
+     *  had data in database. This method assumes that a database called, JSLDb_DriveThroughPharmacy
+     *  exists within the jslOutput/db directory.
      */
     public static void showDbReuse() {
         // assumes that a database called JSLDb_DriveThroughPharmacy is in the jslOutput/db directory
@@ -216,6 +220,40 @@ public class UsingJSLDbExamples {
         JSLDatabase jslDatabase = new JSLDatabase(database);
         // just write out some results
         jslDatabase.getAcrossRepStatRecords().format(System.out);
+    }
+
+    public static void showMultipleRunsOfSameSimulation(){
+        // make the simulation with a default database
+        Simulation sim = new Simulation("MultiRun", true);
+        // set the parameters of the experiment
+        sim.setNumberOfReplications(30);
+        sim.setLengthOfReplication(20000.0);
+        sim.setLengthOfWarmUp(5000.0);
+
+        // create the model element and attach it to the main model
+        DriverLicenseBureauWithQ driverLicenseBureauWithQ = new DriverLicenseBureauWithQ(sim.getModel());
+        sim.setExperimentName("1stRun");
+        // tell the simulation to run
+        System.out.println("Simulation started.");
+        sim.run();
+        System.out.println("Simulation completed.");
+
+        //sim.setExperimentName("2ndRun");
+        driverLicenseBureauWithQ.setServiceDistributionInitialRandomSource(new ExponentialRV(0.7));
+
+        // tell the simulation to run
+        System.out.println("Simulation started.");
+        sim.run();
+        System.out.println("Simulation completed.");
+
+        // get the default JSL database
+        Optional<JSLDatabase> db = sim.getDefaultJSLDatabase();
+
+        if (db.isPresent()) {
+            System.out.println("Printing across replication records");
+            db.get().getAcrossRepStatRecords().format(System.out);
+            System.out.println();
+        }
     }
 
     /**
