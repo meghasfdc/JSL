@@ -408,24 +408,24 @@ public class Queue<T extends QObject> extends ModelElement implements
     }
 
     /**
-     * Places the QObject in the queue, with the default priority of 1
+     * Places the QObject in the queue, uses the priority associated with the QObject, which is 1 by default
      * Automatically, updates the number in queue response variable.
      *
      * @param queueingObject the QObject to enqueue
      */
     public final void enqueue(T queueingObject) {
-        enqueue(queueingObject, 1, queueingObject.getAttachedObject());
+        enqueue(queueingObject, queueingObject.getPriority(), queueingObject.getAttachedObject());
     }
 
     /**
-     * Places the QObject in the queue, with the default priority of 1
+     * Places the QObject in the queue, uses the priority associated with the QObject, which is 1 by default
      * Automatically, updates the number in queue response variable.
      * @param <S> The type of the object being attached to the QObject
      * @param queueingObject the QObject to enqueue
      * @param obj an Object to be "wrapped" and queued while the QObject is in the queue
      */
     public final <S> void enqueue(T queueingObject, S obj) {
-        enqueue(queueingObject, 1, obj);
+        enqueue(queueingObject, queueingObject.getPriority(), obj);
     }
 
     /**
