@@ -40,8 +40,7 @@ public class TestIntervalSchedule {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Simulation sim = new Simulation("DLB_with_Q", false);
- //       sim.setClearDatabaseOptionForDefaultDatabase(false);
+        Simulation sim = new Simulation("DLB_with_Q");
         Model m = sim.getModel();
         // create the model element and attach it to the main model
         new DriverLicenseBureauWithQ(m);
