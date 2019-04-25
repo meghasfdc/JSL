@@ -171,7 +171,7 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      * times the confidence coefficient as determined by an appropriate sampling
      * distribution
      *
-     * @param level
+     * @param level the confidence level
      * @return A double representing the half-width or Double.NaN if &lt; 1
      * observation
      */
@@ -189,14 +189,14 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
     /**
      * A confidence interval for the mean based on the confidence level
      *
-     * @return
+     * @return the interval
      */
     public Interval getConfidenceInterval();
 
     /**
      * Returns the relative error: getStandardError() / getAverage()
      *
-     * @return
+     * @return the relative error
      */
     public double getRelativeError();
 
@@ -204,7 +204,7 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      * Returns the relative width of the default confidence interval: 2.0 *
      * getHalfWidth() / getAverage()
      *
-     * @return
+     * @return the relative width
      */
     public double getRelativeWidth();
 
@@ -212,15 +212,16 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      * Returns the relative width of the level of the confidence interval: 2.0 *
      * getHalfWidth(level) / getAverage()
      *
-     * @return
+     *  @param level the confidence level
+     * @return the relative width for the level
      */
     public double getRelativeWidth(double level);
 
     /**
      * A confidence interval for the mean based on the confidence level
      *
-     * @param level
-     * @return
+     * @param level the confidence level
+     * @return the interval
      */
     public Interval getConfidenceInterval(double level);
 
@@ -269,7 +270,7 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      * noted. This method reports the number of missing points that occurred
      * during the collection
      *
-     * @return
+     * @return the number missing
      */
     public double getNumberMissing();
 
@@ -278,8 +279,8 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      * (int)Math.floor(Math.log10(a*getStandardError())) See doi
      * 10.1287.opre.1080.0529 by Song and Schmeiser
      *
-     * @param a
-     * @return
+     * @param a the std error multiplier
+     * @return the meaningful digit
      */
     public int getLeadingDigitRule(double a);
 
@@ -310,7 +311,7 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      *
      * The array must be of size 23 or an exception will be thrown
      *
-     * @param statistics
+     * @param statistics an array of statistic values
      */
     public void getStatistics(double[] statistics);
 
@@ -330,7 +331,7 @@ public interface StatisticAccessorIfc extends GetCSVStatisticIfc {
      * statistics[20] = getLag1Correlation(); statistics[21] =
      * getVonNeumannLag1TestStatistic(); statistics[22] = getNumberMissing();
      *
-     * @return
+     * @return an array of values
      */
     public double[] getStatistics();
 }

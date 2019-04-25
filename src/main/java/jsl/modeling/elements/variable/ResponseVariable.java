@@ -323,11 +323,6 @@ public class ResponseVariable extends Variable implements
         return myWithinRepStats;
     }
 
-    @Override
-    public void setWithinReplicationStatisticName(String name) {
-        myWithinRepStats.setName(name);
-    }
-
     public void resetWithinReplicationStatistics() {
         myWithinRepStats.reset();
     }
@@ -439,7 +434,6 @@ public class ResponseVariable extends Variable implements
                 myAcrossRepStats.collect(myWithinRepStats.getAverage());
             }
         }
-
     }
 
     /**
@@ -455,21 +449,6 @@ public class ResponseVariable extends Variable implements
             myAcrossRepStats = new Statistic(getName());
         }
         return myAcrossRepStats;
-    }
-
-    /**
-     * A convenience method to set the name of the underlying Statistic for
-     * tabulating across replication statistics
-     *
-     * @param name
-     */
-    @Override
-    public final void setAcrossReplicationStatisticName(String name) {
-        if (myAcrossRepStats == null) {
-            myAcrossRepStats = new Statistic();
-        }
-
-        myAcrossRepStats.setName(name);
     }
 
     @Override

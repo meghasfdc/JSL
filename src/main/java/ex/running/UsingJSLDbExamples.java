@@ -50,12 +50,13 @@ public class UsingJSLDbExamples {
         //showDbReuse();
 
         // show multiple simulation runs captured to a database
-        //testMCBRuns();
+        testMCBRuns();
 
         // shows 2 databases (default and a postgres database)
         //testPostgressDb();
 
-        showMultipleRunsOfSameSimulation();
+        // shows running the same simulation twice in a row
+        //showMultipleRunsOfSameSimulation();
 
     }
 
@@ -238,7 +239,7 @@ public class UsingJSLDbExamples {
         sim.run();
         System.out.println("Simulation completed.");
 
-        //sim.setExperimentName("2ndRun");
+        sim.setExperimentName("2ndRun");
         driverLicenseBureauWithQ.setServiceDistributionInitialRandomSource(new ExponentialRV(0.7));
 
         // tell the simulation to run
@@ -252,6 +253,8 @@ public class UsingJSLDbExamples {
         if (db.isPresent()) {
             System.out.println("Printing across replication records");
             db.get().getAcrossRepStatRecords().format(System.out);
+            System.out.println();
+            db.get().getAcrossRepViewRecords().format(System.out);
             System.out.println();
         }
     }

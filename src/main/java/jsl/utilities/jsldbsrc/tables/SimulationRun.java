@@ -38,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SimulationRun extends TableImpl<SimulationRunRecord> {
 
-    private static final long serialVersionUID = -572861285;
+    private static final long serialVersionUID = -2023250669;
 
     /**
      * The reference instance of <code>JSL_DB.SIMULATION_RUN</code>
@@ -188,7 +188,7 @@ public class SimulationRun extends TableImpl<SimulationRunRecord> {
      */
     @Override
     public UniqueKey<SimulationRunRecord> getPrimaryKey() {
-        return Keys.SQL190415110855730;
+        return Keys.SQL190425121448230;
     }
 
     /**
@@ -196,7 +196,7 @@ public class SimulationRun extends TableImpl<SimulationRunRecord> {
      */
     @Override
     public List<UniqueKey<SimulationRunRecord>> getKeys() {
-        return Arrays.<UniqueKey<SimulationRunRecord>>asList(Keys.SQL190415110855730, Keys.SR_NAME_EXP_UNIQUE);
+        return Arrays.<UniqueKey<SimulationRunRecord>>asList(Keys.SQL190425121448230, Keys.SR_NAME_EXP_UNIQUE);
     }
 
     /**

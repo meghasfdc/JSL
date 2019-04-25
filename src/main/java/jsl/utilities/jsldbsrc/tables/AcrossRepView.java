@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AcrossRepView extends TableImpl<AcrossRepViewRecord> {
 
-    private static final long serialVersionUID = 1963431712;
+    private static final long serialVersionUID = 1081269592;
 
     /**
      * The reference instance of <code>JSL_DB.ACROSS_REP_VIEW</code>
@@ -55,11 +55,6 @@ public class AcrossRepView extends TableImpl<AcrossRepViewRecord> {
      * The column <code>JSL_DB.ACROSS_REP_VIEW.EXP_NAME</code>.
      */
     public final TableField<AcrossRepViewRecord, String> EXP_NAME = createField("EXP_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
-
-    /**
-     * The column <code>JSL_DB.ACROSS_REP_VIEW.ELEMENT_NAME</code>.
-     */
-    public final TableField<AcrossRepViewRecord, String> ELEMENT_NAME = createField("ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.ACROSS_REP_VIEW.STAT_NAME</code>.

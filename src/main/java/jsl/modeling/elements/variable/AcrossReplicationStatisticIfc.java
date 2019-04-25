@@ -23,7 +23,7 @@ public interface AcrossReplicationStatisticIfc {
     /** Returns a StatisticAccessorIfc for the across replication statistics
      *  that have been collected on this Counter
      * 
-     * @return
+     * @return an accessor to get statistics
      */
     public StatisticAccessorIfc getAcrossReplicationStatistic();
 
@@ -31,12 +31,8 @@ public interface AcrossReplicationStatisticIfc {
      *  the underlying CounterObserver For other statistics use
      *  getAcrossReplicationStatistic()
      * 
-     * @return
+     * @return the across replication average
      */
     public double getAcrossReplicationAverage();
 
-    /**
-     * @param name
-     */
-    public void setAcrossReplicationStatisticName(String name);
 }
