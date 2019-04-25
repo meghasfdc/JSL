@@ -1074,7 +1074,6 @@ public class JSLDatabase {
                 .selectFrom(WITHIN_REP_RESPONSE_VIEW)
                 .orderBy(WITHIN_REP_RESPONSE_VIEW.SIM_RUN_ID_FK,
                         WITHIN_REP_RESPONSE_VIEW.EXP_NAME,
-                        WITHIN_REP_RESPONSE_VIEW.ELEMENT_NAME,
                         WITHIN_REP_RESPONSE_VIEW.STAT_NAME,
                         WITHIN_REP_RESPONSE_VIEW.REP_NUM).fetch();
         return fetch;
@@ -1090,7 +1089,6 @@ public class JSLDatabase {
                 .selectFrom(WITHIN_REP_COUNTER_VIEW)
                 .orderBy(WITHIN_REP_COUNTER_VIEW.SIM_RUN_ID_FK,
                         WITHIN_REP_COUNTER_VIEW.EXP_NAME,
-                        WITHIN_REP_COUNTER_VIEW.ELEMENT_NAME,
                         WITHIN_REP_COUNTER_VIEW.STAT_NAME,
                         WITHIN_REP_COUNTER_VIEW.REP_NUM).fetch();
         return fetch;
@@ -1106,7 +1104,6 @@ public class JSLDatabase {
                 .selectFrom(ACROSS_REP_VIEW)
                 .orderBy(ACROSS_REP_VIEW.SIM_RUN_ID_FK,
                         ACROSS_REP_VIEW.EXP_NAME,
-                        ACROSS_REP_VIEW.ELEMENT_NAME,
                         ACROSS_REP_VIEW.STAT_NAME).fetch();
         return fetch;
     }
@@ -1128,7 +1125,6 @@ public class JSLDatabase {
                 .selectFrom(BATCH_STAT_VIEW)
                 .orderBy(BATCH_STAT_VIEW.SIM_RUN_ID_FK,
                         BATCH_STAT_VIEW.EXP_NAME,
-                        BATCH_STAT_VIEW.ELEMENT_NAME,
                         BATCH_STAT_VIEW.STAT_NAME).fetch();
         return fetch;
     }
@@ -1146,7 +1142,6 @@ public class JSLDatabase {
                 .selectFrom(WITHIN_REP_VIEW)
                 .orderBy(WITHIN_REP_VIEW.SIM_RUN_ID_FK,
                         WITHIN_REP_VIEW.EXP_NAME,
-                        WITHIN_REP_VIEW.ELEMENT_NAME,
                         WITHIN_REP_VIEW.STAT_NAME,
                         WITHIN_REP_VIEW.REP_NUM).fetch();
         return fetch;
@@ -1248,7 +1243,7 @@ public class JSLDatabase {
                 .select(WITHIN_REP_VIEW.VALUE)
                 .from(WITHIN_REP_VIEW)
                 .where(WITHIN_REP_VIEW.SIM_RUN_ID_FK.eq(simId))
-                .and(WITHIN_REP_VIEW.ELEMENT_NAME.eq(responseName))
+                .and(WITHIN_REP_VIEW.STAT_NAME.eq(responseName))
                 .fetch(WITHIN_REP_VIEW.VALUE);
         Statistic s = new Statistic(Doubles.toArray(list));
         s.setName(responseName);
@@ -1265,7 +1260,7 @@ public class JSLDatabase {
     public final Map<Integer, double[]> getWithRepViewValuesAsMap(String responseName) {
         Map<Integer, List<Double>> rMap = myDb.getDSLContext()
                 .selectFrom(WITHIN_REP_VIEW)
-                .where(WITHIN_REP_VIEW.ELEMENT_NAME.eq(responseName))
+                .where(WITHIN_REP_VIEW.STAT_NAME.eq(responseName))
                 .fetch()
                 .intoGroups(WITHIN_REP_VIEW.SIM_RUN_ID_FK, WITHIN_REP_VIEW.VALUE);
         Map<Integer, double[]> cMap = new LinkedHashMap<>();

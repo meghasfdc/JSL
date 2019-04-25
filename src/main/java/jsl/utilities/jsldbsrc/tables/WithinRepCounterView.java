@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WithinRepCounterView extends TableImpl<WithinRepCounterViewRecord> {
 
-    private static final long serialVersionUID = -2102731917;
+    private static final long serialVersionUID = 388091840;
 
     /**
      * The reference instance of <code>JSL_DB.WITHIN_REP_COUNTER_VIEW</code>
@@ -55,11 +55,6 @@ public class WithinRepCounterView extends TableImpl<WithinRepCounterViewRecord> 
      * The column <code>JSL_DB.WITHIN_REP_COUNTER_VIEW.EXP_NAME</code>.
      */
     public final TableField<WithinRepCounterViewRecord, String> EXP_NAME = createField("EXP_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
-
-    /**
-     * The column <code>JSL_DB.WITHIN_REP_COUNTER_VIEW.ELEMENT_NAME</code>.
-     */
-    public final TableField<WithinRepCounterViewRecord, String> ELEMENT_NAME = createField("ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.WITHIN_REP_COUNTER_VIEW.STAT_NAME</code>.

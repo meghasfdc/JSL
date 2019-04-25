@@ -141,19 +141,11 @@ public class AggregateCounter extends Aggregate implements CounterActionIfc {
     }
 
     /**
-     * @return
+     * @return a statistical accessor for across replication statistics
      * @see jsl.modeling.elements.variable.AcrossReplicationStatisticIfc#getAcrossReplicationStatistic()
      */
     public StatisticAccessorIfc getAcrossReplicationStatistic() {
         return myAggCounter.getAcrossReplicationStatistic();
-    }
-
-    /**
-     * @param name
-     * @see jsl.modeling.elements.variable.Counter#setAcrossReplicationStatisticName(java.lang.String)
-     */
-    public void setAcrossReplicationStatisticName(String name) {
-        myAggCounter.setAcrossReplicationStatisticName(name);
     }
 
     @Override

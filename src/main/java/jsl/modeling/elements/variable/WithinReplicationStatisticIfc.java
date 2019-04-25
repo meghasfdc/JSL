@@ -35,9 +35,4 @@ public interface WithinReplicationStatisticIfc {
      */
     WeightedStatisticIfc getWithinReplicationStatistic();
 
-    /** Allows the name of the statistic to be changed
-     *
-     * @param name
-     */
-    void setWithinReplicationStatisticName(String name);
 }

@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BatchStatView extends TableImpl<BatchStatViewRecord> {
 
-    private static final long serialVersionUID = -816362892;
+    private static final long serialVersionUID = 1029682136;
 
     /**
      * The reference instance of <code>JSL_DB.BATCH_STAT_VIEW</code>
@@ -55,11 +55,6 @@ public class BatchStatView extends TableImpl<BatchStatViewRecord> {
      * The column <code>JSL_DB.BATCH_STAT_VIEW.EXP_NAME</code>.
      */
     public final TableField<BatchStatViewRecord, String> EXP_NAME = createField("EXP_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
-
-    /**
-     * The column <code>JSL_DB.BATCH_STAT_VIEW.ELEMENT_NAME</code>.
-     */
-    public final TableField<BatchStatViewRecord, String> ELEMENT_NAME = createField("ELEMENT_NAME", org.jooq.impl.SQLDataType.VARCHAR(510).nullable(false), this, "");
 
     /**
      * The column <code>JSL_DB.BATCH_STAT_VIEW.STAT_NAME</code>.

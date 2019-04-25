@@ -509,20 +509,6 @@ public class Counter extends Aggregatable implements CounterActionIfc, DefaultRe
     }
 
     /**
-     * A convenience method to set the name of the underlying Statistic for
-     * tabulating across replication statistics
-     *
-     * @param name
-     */
-    public final void setAcrossReplicationStatisticName(String name) {
-        if (myAcrossRepStat == null) {
-            myAcrossRepStat = new Statistic();
-        }
-
-        myAcrossRepStat.setName(name);
-    }
-
-    /**
      * Sets the value of the counter, ensures a check against the limit Does not
      * notify any update observers
      *
