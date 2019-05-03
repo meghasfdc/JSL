@@ -1135,7 +1135,7 @@ public class JSLDatabase {
      * is the within replication average. In the case of a Counter, the value field is the
      * last value of the counter variable (i.e. the total count for the replication).
      *
-     * @return a jooq Result holding (simid, exp_name, element_name, stat_name, rep_num, value)
+     * @return a jooq Result holding (simid, exp_name, stat_name, rep_num, value)
      */
     public final Result<WithinRepViewRecord> getWithinRepViewRecords() {
         Result<WithinRepViewRecord> fetch = myDb.getDSLContext()

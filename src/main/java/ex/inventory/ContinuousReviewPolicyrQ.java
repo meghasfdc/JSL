@@ -105,7 +105,7 @@ public class ContinuousReviewPolicyrQ extends SchedulingElement {
 
         double bbar = myBackOrder.getWithinReplicationStatistic().getAverage();
         double of = myNumReplenishment.getValue(); // this is a Counter
-        double TC = 30.0 * ibar + 100.0 * bbar + 15.0 * of;
+        double TC = 30.0 * ibar + 100.0 * bbar + 15.0 * (of/10.0);
         myTotalCost.setValue(TC); // this is a ResponseVariable
         JSL.out.println("----------------------------------------------------------------------");
         JSL.out.println("Replication:" + getSimulation().getCurrentReplicationNumber());
@@ -184,7 +184,8 @@ public class ContinuousReviewPolicyrQ extends SchedulingElement {
         s.run();
         
         SimulationReporter r = s.makeSimulationReporter();
-        r.printAcrossReplicationStatistics();
+        r.printAcrossReplicationSummaryStatistics();
+        //r.printAcrossReplicationStatistics();
         System.out.println("Done!");
     }
 }

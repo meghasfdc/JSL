@@ -29,10 +29,14 @@ import jsl.modeling.SimulationReporter;
 import jsl.modeling.StatisticalBatchingElement;
 import jsl.modeling.elements.variable.TWBatchingElement;
 import jsl.modeling.elements.variable.TimeWeighted;
+import jsl.observers.textfile.CSVResponseReport;
 import jsl.utilities.random.distributions.Exponential;
 import jsl.utilities.random.rvariable.ExponentialRV;
 import jsl.utilities.reporting.StatisticReporter;
 import jsl.utilities.statistic.Statistic;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -48,7 +52,8 @@ public class SimulationDemos {
         //batchingDemo2();
         //replicationDeletion();
         //runEachRepSeparately();
-        halfWidthSequentialSampling();
+        //halfWidthSequentialSampling();
+        demoResponseReport();
     }
 
     public static void batchingDemo() {
@@ -185,5 +190,27 @@ public class SimulationDemos {
         
         System.out.println("Simulation completed.");
         r.printAcrossReplicationSummaryStatistics();
+    }
+
+    public static void demoResponseReport(){
+        Simulation sim = new Simulation("Drive Through Pharmacy");
+         Model m = sim.getModel();
+        // add DriveThroughPharmacy to the main model
+        DriveThroughPharmacy driveThroughPharmacy = new DriveThroughPharmacy(m);
+        // set the parameters of the experiment
+        sim.setNumberOfReplications(10);
+        sim.setLengthOfWarmUp(1000.0);
+        sim.setLengthOfReplication(3000.0);
+        List<String> responseNames = Arrays.asList("System Time", "# in System", "Num Served");
+        CSVResponseReport report = new CSVResponseReport("DTPResponseReport", responseNames);
+        m.addObserver(report);
+        System.out.println("Simulation started.");
+        sim.run();
+        System.out.println("Simulation completed.");
+
+        System.out.println("Simulation started.");
+        sim.run();
+        System.out.println("Simulation completed.");
+
     }
 }

@@ -16,6 +16,7 @@
 package ex.models;
 
 import jsl.modeling.*;
+import jsl.modeling.elements.variable.Counter;
 import jsl.modeling.elements.variable.RandomVariable;
 import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.elements.variable.TimeWeighted;
@@ -37,6 +38,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
     private ResponseVariable mySysTime;
     private ArrivalEventAction myArrivalEventAction;
     private EndServiceEventAction myEndServiceEventAction;
+    private Counter myNumCustomers;
 
     public DriveThroughPharmacy(ModelElement parent) {
         this(parent, 1,
@@ -56,6 +58,7 @@ public class DriveThroughPharmacy extends SchedulingElement {
         myNumBusy = new TimeWeighted(this, 0.0, "NumBusy");
         myNS = new TimeWeighted(this, 0.0, "# in System");
         mySysTime = new ResponseVariable(this, "System Time");
+        myNumCustomers = new Counter(this, "Num Served");
         myArrivalEventAction = new ArrivalEventAction();
         myEndServiceEventAction = new EndServiceEventAction();
     }
@@ -160,7 +163,8 @@ public class DriveThroughPharmacy extends SchedulingElement {
 
     private void departSystem(QObject departingCustomer) {
         mySysTime.setValue(getTime() - departingCustomer.getCreateTime());
-        myNS.decrement(); // customer left system      
+        myNS.decrement(); // customer left system
+        myNumCustomers.increment();
     }
 
     public static void main(String[] args) {
