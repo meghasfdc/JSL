@@ -38,7 +38,7 @@ import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.exception.DataAccessException;
-import tech.tablesaw.api.Table;
+//import tech.tablesaw.api.Table;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -1339,158 +1339,158 @@ public class JSLDatabase {
         return responseMap;
     }
 
-    /**
-     * @param tblsawTableName the name of the table saw table
-     * @return the within replication view records as a Tablesaw Table
-     * @throws SQLException an SQLException
-     */
-    public final Table getWithinRepViewRecordsAsTablesawTable(String tblsawTableName) throws SQLException {
-        return Table.read().db(getWithinRepViewRecordsAsResultSet(), tblsawTableName);
-    }
-
-    /**
-     * Squelches the SQLException
-     *
-     * @param tblsawTableName the name of the table saw table, must not be null
-     * @return the within replication view records as a Tablesaw Table
-     */
-    public final Table getWithinRepViewRecordsAsTablesawTableNE(String tblsawTableName) {
-        Objects.requireNonNull(tblsawTableName, "The supplied table name must not be null");
-        Table table = null;
-        try {
-            table = Table.read().db(getWithinRepViewRecordsAsResultSet(), tblsawTableName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return table;
-    }
-
-    /**
-     * @param tblsawTableName the name of the table saw table
-     * @return the within replication view records as a Tablesaw Table
-     * @throws SQLException an SQLException
-     */
-    public final Table getAcrossRepViewRecordsAsTablesawTable(String tblsawTableName) throws SQLException {
-        return Table.read().db(getAcrossRepViewRecordsAsResultSet(), tblsawTableName);
-    }
-
-    /**
-     * Squelches the SQLException
-     *
-     * @param tblsawTableName the name of the table saw table, must not be null
-     * @return the within replication view records as a Tablesaw Table
-     */
-    public final Table getAcrossRepViewRecordsAsTablesawTableNE(String tblsawTableName) {
-        Objects.requireNonNull(tblsawTableName, "The supplied table name must not be null");
-        Table table = null;
-        try {
-            table = Table.read().db(getAcrossRepViewRecordsAsResultSet(), tblsawTableName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return table;
-    }
-
-    /**
-     * @param tblName the name of the Tablesaw table
-     * @return the within replication statistics as a Tablesaw Table
-     */
-    public final Table getWithinRepStatRecordsAsTablesawTable(String tblName) throws SQLException {
-        return Table.read().db(getWithinRepStatRecordsAsResultSet(), tblName);
-    }
-
-    /**
-     * Squelches the SQLException
-     *
-     * @param tblName the name of the Tablesaw table, must not be null
-     * @return the within replication statistics as a Tablesaw Table or null
-     */
-    public final Table getWithinRepStatRecordsAsTablesawTableNE(String tblName) {
-        Objects.requireNonNull(tblName, "The supplied table name must not be null");
-        Table table = null;
-        try {
-            table = Table.read().db(getWithinRepStatRecordsAsResultSet(), tblName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return table;
-    }
-
-
-    /**
-     * @param tblName the name of the Tablesaw table, must not be null
-     * @return the across replication statistics as a Tablesaw Table
-     */
-    public final Table getAcrossRepStatRecordsAsTablesawTable(String tblName) throws SQLException {
-        return Table.read().db(getAcrossRepStatRecordsAsResultSet(), tblName);
-    }
-
-    /**
-     * Squelches the SQLException
-     *
-     * @param tblName the name of the Tablesaw table, must not be null
-     * @return the across replication statistics as a Tablesaw Table or null
-     */
-    public final Table getAcrossRepStatRecordsAsTablesawTableNE(String tblName) {
-        Objects.requireNonNull(tblName, "The supplied table name must not be null");
-        Table table = null;
-        try {
-            table = Table.read().db(getAcrossRepStatRecordsAsResultSet(), tblName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return table;
-    }
-
-    /**
-     * @param tblName the name of the Tablesaw table
-     * @return the batch statistics as a Tablesaw Table
-     */
-    public final Table getBatchStatRecordsAsTablesawTable(String tblName) throws SQLException {
-        return Table.read().db(getBatchStatRecordsAsResultSet(), tblName);
-    }
-
-    /**
-     * Squelches the SQLException
-     *
-     * @param tblName the name of the Tablesaw table, must not be null
-     * @return the batch statistics as a Tablesaw Table or null
-     */
-    public final Table getBatchStatRecordsAsTablesawTableNE(String tblName) {
-        Objects.requireNonNull(tblName, "The supplied table name must not be null");
-        Table table = null;
-        try {
-            table = Table.read().db(getBatchStatRecordsAsResultSet(), tblName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return table;
-    }
-
-    /**
-     * @param tblName the name of the Tablesaw table, must not be null
-     * @return the pairwise difference results a Tablesaw Table
-     */
-    public final Table getPairWiseAcrossRepRecordsAsTablesawTable(String tblName) throws SQLException {
-        return Table.read().db(getPairWiseAcrossRepRecordsAsResultSet(), tblName);
-    }
-
-    /**
-     * Squelches the SQLException
-     *
-     * @param tblName the name of the Tablesaw table
-     * @return the pairwise difference results as a Tablesaw Table or null
-     */
-    public final Table getPairWiseAcrossRepRecordsAsTablesawTableNE(String tblName) {
-        Objects.requireNonNull(tblName, "The supplied table name must not be null");
-        Table table = null;
-        try {
-            table = Table.read().db(getPairWiseAcrossRepRecordsAsResultSet(), tblName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return table;
-    }
+//    /**
+//     * @param tblsawTableName the name of the table saw table
+//     * @return the within replication view records as a Tablesaw Table
+//     * @throws SQLException an SQLException
+//     */
+//    public final Table getWithinRepViewRecordsAsTablesawTable(String tblsawTableName) throws SQLException {
+//        return Table.read().db(getWithinRepViewRecordsAsResultSet(), tblsawTableName);
+//    }
+//
+//    /**
+//     * Squelches the SQLException
+//     *
+//     * @param tblsawTableName the name of the table saw table, must not be null
+//     * @return the within replication view records as a Tablesaw Table
+//     */
+//    public final Table getWithinRepViewRecordsAsTablesawTableNE(String tblsawTableName) {
+//        Objects.requireNonNull(tblsawTableName, "The supplied table name must not be null");
+//        Table table = null;
+//        try {
+//            table = Table.read().db(getWithinRepViewRecordsAsResultSet(), tblsawTableName);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return table;
+//    }
+//
+//    /**
+//     * @param tblsawTableName the name of the table saw table
+//     * @return the within replication view records as a Tablesaw Table
+//     * @throws SQLException an SQLException
+//     */
+//    public final Table getAcrossRepViewRecordsAsTablesawTable(String tblsawTableName) throws SQLException {
+//        return Table.read().db(getAcrossRepViewRecordsAsResultSet(), tblsawTableName);
+//    }
+//
+//    /**
+//     * Squelches the SQLException
+//     *
+//     * @param tblsawTableName the name of the table saw table, must not be null
+//     * @return the within replication view records as a Tablesaw Table
+//     */
+//    public final Table getAcrossRepViewRecordsAsTablesawTableNE(String tblsawTableName) {
+//        Objects.requireNonNull(tblsawTableName, "The supplied table name must not be null");
+//        Table table = null;
+//        try {
+//            table = Table.read().db(getAcrossRepViewRecordsAsResultSet(), tblsawTableName);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return table;
+//    }
+//
+//    /**
+//     * @param tblName the name of the Tablesaw table
+//     * @return the within replication statistics as a Tablesaw Table
+//     */
+//    public final Table getWithinRepStatRecordsAsTablesawTable(String tblName) throws SQLException {
+//        return Table.read().db(getWithinRepStatRecordsAsResultSet(), tblName);
+//    }
+//
+//    /**
+//     * Squelches the SQLException
+//     *
+//     * @param tblName the name of the Tablesaw table, must not be null
+//     * @return the within replication statistics as a Tablesaw Table or null
+//     */
+//    public final Table getWithinRepStatRecordsAsTablesawTableNE(String tblName) {
+//        Objects.requireNonNull(tblName, "The supplied table name must not be null");
+//        Table table = null;
+//        try {
+//            table = Table.read().db(getWithinRepStatRecordsAsResultSet(), tblName);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return table;
+//    }
+//
+//
+//    /**
+//     * @param tblName the name of the Tablesaw table, must not be null
+//     * @return the across replication statistics as a Tablesaw Table
+//     */
+//    public final Table getAcrossRepStatRecordsAsTablesawTable(String tblName) throws SQLException {
+//        return Table.read().db(getAcrossRepStatRecordsAsResultSet(), tblName);
+//    }
+//
+//    /**
+//     * Squelches the SQLException
+//     *
+//     * @param tblName the name of the Tablesaw table, must not be null
+//     * @return the across replication statistics as a Tablesaw Table or null
+//     */
+//    public final Table getAcrossRepStatRecordsAsTablesawTableNE(String tblName) {
+//        Objects.requireNonNull(tblName, "The supplied table name must not be null");
+//        Table table = null;
+//        try {
+//            table = Table.read().db(getAcrossRepStatRecordsAsResultSet(), tblName);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return table;
+//    }
+//
+//    /**
+//     * @param tblName the name of the Tablesaw table
+//     * @return the batch statistics as a Tablesaw Table
+//     */
+//    public final Table getBatchStatRecordsAsTablesawTable(String tblName) throws SQLException {
+//        return Table.read().db(getBatchStatRecordsAsResultSet(), tblName);
+//    }
+//
+//    /**
+//     * Squelches the SQLException
+//     *
+//     * @param tblName the name of the Tablesaw table, must not be null
+//     * @return the batch statistics as a Tablesaw Table or null
+//     */
+//    public final Table getBatchStatRecordsAsTablesawTableNE(String tblName) {
+//        Objects.requireNonNull(tblName, "The supplied table name must not be null");
+//        Table table = null;
+//        try {
+//            table = Table.read().db(getBatchStatRecordsAsResultSet(), tblName);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return table;
+//    }
+//
+//    /**
+//     * @param tblName the name of the Tablesaw table, must not be null
+//     * @return the pairwise difference results a Tablesaw Table
+//     */
+//    public final Table getPairWiseAcrossRepRecordsAsTablesawTable(String tblName) throws SQLException {
+//        return Table.read().db(getPairWiseAcrossRepRecordsAsResultSet(), tblName);
+//    }
+//
+//    /**
+//     * Squelches the SQLException
+//     *
+//     * @param tblName the name of the Tablesaw table
+//     * @return the pairwise difference results as a Tablesaw Table or null
+//     */
+//    public final Table getPairWiseAcrossRepRecordsAsTablesawTableNE(String tblName) {
+//        Objects.requireNonNull(tblName, "The supplied table name must not be null");
+//        Table table = null;
+//        try {
+//            table = Table.read().db(getPairWiseAcrossRepRecordsAsResultSet(), tblName);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return table;
+//    }
 
     /**
      * @return a reference to the underlying database via a DatabaseIfc

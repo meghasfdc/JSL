@@ -82,12 +82,12 @@ public class TestBootstrap {
 
         multiBootstrap.generateSamples(20, true);
 
-        String data = multiBootstrap.getTablesawTable().print();
+//        String data = multiBootstrap.getTablesawTable().print();
 
         System.out.println(multiBootstrap);
-        System.out.println(data);
+//        System.out.println(data);
 
-        System.out.println(multiBootstrap.getTablesawTable().summary());
+//        System.out.println(multiBootstrap.getTablesawTable().summary());
 
     }
 }

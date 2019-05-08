@@ -19,8 +19,8 @@ package jsl.utilities.statistic;
 import jsl.utilities.random.SampleIfc;
 import jsl.utilities.random.rng.RNStreamControlIfc;
 import jsl.utilities.random.rvariable.RVariableIfc;
-import tech.tablesaw.api.DoubleColumn;
-import tech.tablesaw.api.Table;
+//import tech.tablesaw.api.DoubleColumn;
+//import tech.tablesaw.api.Table;
 
 import java.util.*;
 
@@ -381,27 +381,27 @@ public class MultiBootstrap implements RNStreamControlIfc {
         return map;
     }
 
-    /** The columns are name:avg, name:var where name is the name of each bootstrap.
-     *  Each row is the observed generate average, generate variance for each of the
-     *  bootstrap samples associated with the named bootstrap.
-     *
-     * @return a Tablesaw Table holding the bootstrap generate averages and variances
-     */
-    public Table getTablesawTable(){
-        Table table = Table.create(getName());
-        Map<String, double[]> averages = getBootstrapSampleAverages();
-        for(String name: averages.keySet()){
-            DoubleColumn dc = DoubleColumn.create(name + ":avg", averages.get(name));
-           // DoubleColumn dc = new DoubleColumn(name + ":avg", averages.get(name));
-            table.addColumns(dc);
-        }
-        Map<String, double[]> variances = getBootstrapSampleVariances();
-        for(String name: variances.keySet()){
-            DoubleColumn dc = DoubleColumn.create(name + ":var", variances.get(name));
-            table.addColumns(dc);
-        }
-        return table;
-    }
+//    /** The columns are name:avg, name:var where name is the name of each bootstrap.
+//     *  Each row is the observed generate average, generate variance for each of the
+//     *  bootstrap samples associated with the named bootstrap.
+//     *
+//     * @return a Tablesaw Table holding the bootstrap generate averages and variances
+//     */
+//    public Table getTablesawTable(){
+//        Table table = Table.create(getName());
+//        Map<String, double[]> averages = getBootstrapSampleAverages();
+//        for(String name: averages.keySet()){
+//            DoubleColumn dc = DoubleColumn.create(name + ":avg", averages.get(name));
+//           // DoubleColumn dc = new DoubleColumn(name + ":avg", averages.get(name));
+//            table.addColumns(dc);
+//        }
+//        Map<String, double[]> variances = getBootstrapSampleVariances();
+//        for(String name: variances.keySet()){
+//            DoubleColumn dc = DoubleColumn.create(name + ":var", variances.get(name));
+//            table.addColumns(dc);
+//        }
+//        return table;
+//    }
 
     /**
      * @param name the name of the Bootstrap to get

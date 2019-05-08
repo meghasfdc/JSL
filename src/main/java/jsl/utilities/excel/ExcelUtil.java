@@ -49,7 +49,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import tech.tablesaw.columns.Column;
+//import tech.tablesaw.columns.Column;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
@@ -870,46 +870,46 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Writes the contents from a Tablesaw Table to the Excel sheet. Includes the column names as the first row of
-     * the sheet.
-     *
-     * @param table the Tablesaw Table, must not be null
-     * @param sheet the Excel sheet to write to, must not be null
-     */
-    public static void writeTablesawTableAsExcelSheet(tech.tablesaw.api.Table table, Sheet sheet) {
-        Objects.requireNonNull(table, "The Tablesaw table must not be null");
-        Objects.requireNonNull(sheet, "The workbook sheet must not be null");
-
-        List<String> columnNames = table.columnNames();
-        Row header = sheet.createRow(0);
-        int i = 0;
-        for (String name : columnNames) {
-            Cell cell = header.createCell(i);
-            cell.setCellValue(name);
-            sheet.setColumnWidth(i, (name.length() + 2) * 256);
-            i++;
-        }
-        // make all of the rows and their cells
-        int nCols = columnNames.size();
-        int nRows = getMaxColumnSize(table);
-        Cell[][] cells = new Cell[nRows][nCols];
-        int rowCnt = 1;
-        // this makes cells even if the cell might not hold data
-        for (int r = 0; r < nRows; r++) {
-            Row excelRow = sheet.createRow(rowCnt);
-            for (int c = 0; c < nCols; c++) {
-                cells[r][c] = excelRow.createCell(c, CellType.BLANK);
-            }
-            rowCnt++;
-        }
-        // now fill the cells from the rows of the columns of the table
-        for (int c = 0; c < nCols; c++) {
-            for (int r = 0; r < table.column(c).size(); r++) {
-                writeCell(cells[r][c], table.column(c).get(r));
-            }
-        }
-    }
+//    /**
+//     * Writes the contents from a Tablesaw Table to the Excel sheet. Includes the column names as the first row of
+//     * the sheet.
+//     *
+//     * @param table the Tablesaw Table, must not be null
+//     * @param sheet the Excel sheet to write to, must not be null
+//     */
+//    public static void writeTablesawTableAsExcelSheet(tech.tablesaw.api.Table table, Sheet sheet) {
+//        Objects.requireNonNull(table, "The Tablesaw table must not be null");
+//        Objects.requireNonNull(sheet, "The workbook sheet must not be null");
+//
+//        List<String> columnNames = table.columnNames();
+//        Row header = sheet.createRow(0);
+//        int i = 0;
+//        for (String name : columnNames) {
+//            Cell cell = header.createCell(i);
+//            cell.setCellValue(name);
+//            sheet.setColumnWidth(i, (name.length() + 2) * 256);
+//            i++;
+//        }
+//        // make all of the rows and their cells
+//        int nCols = columnNames.size();
+//        int nRows = getMaxColumnSize(table);
+//        Cell[][] cells = new Cell[nRows][nCols];
+//        int rowCnt = 1;
+//        // this makes cells even if the cell might not hold data
+//        for (int r = 0; r < nRows; r++) {
+//            Row excelRow = sheet.createRow(rowCnt);
+//            for (int c = 0; c < nCols; c++) {
+//                cells[r][c] = excelRow.createCell(c, CellType.BLANK);
+//            }
+//            rowCnt++;
+//        }
+//        // now fill the cells from the rows of the columns of the table
+//        for (int c = 0; c < nCols; c++) {
+//            for (int r = 0; r < table.column(c).size(); r++) {
+//                writeCell(cells[r][c], table.column(c).get(r));
+//            }
+//        }
+//    }
 
     /** Starts as the last row number of the sheet and looks up in the column to find the first non-null cell
      *
@@ -946,30 +946,30 @@ public class ExcelUtil {
         return false;
     }
 
-    /**
-     * @param table the Tablesaw Table, must not be null
-     * @return the sizes of all of the columns of the table (i.e. the number of elements in each column) as an array
-     */
-    public static int[] getColumnSizes(tech.tablesaw.api.Table table) {
-        Objects.requireNonNull(table, "The Tablesaw table must not be null");
-        List<Column<?>> columns = table.columns();
-        int[] sizes = new int[columns.size()];
-        int i = 0;
-        for (Column c : columns) {
-            sizes[i] = c.size();
-            i++;
-        }
-        return sizes;
-    }
-
-    /**
-     * @param table the Tablesaw Table, must not be null
-     * @return the size of the column that has the most elements
-     */
-    public static int getMaxColumnSize(tech.tablesaw.api.Table table) {
-        return JSLMath.getMax(getColumnSizes(table));
-    }
-
+//    /**
+//     * @param table the Tablesaw Table, must not be null
+//     * @return the sizes of all of the columns of the table (i.e. the number of elements in each column) as an array
+//     */
+//    public static int[] getColumnSizes(tech.tablesaw.api.Table table) {
+//        Objects.requireNonNull(table, "The Tablesaw table must not be null");
+//        List<Column<?>> columns = table.columns();
+//        int[] sizes = new int[columns.size()];
+//        int i = 0;
+//        for (Column c : columns) {
+//            sizes[i] = c.size();
+//            i++;
+//        }
+//        return sizes;
+//    }
+//
+//    /**
+//     * @param table the Tablesaw Table, must not be null
+//     * @return the size of the column that has the most elements
+//     */
+//    public static int getMaxColumnSize(tech.tablesaw.api.Table table) {
+//        return JSLMath.getMax(getColumnSizes(table));
+//    }
+//
     // removed because Tablesaw columns may have a differing number of rows within a table
 //    /**
 //     * Writes a single row from a Tablesaw Table to a row in an Excel Sheet
