@@ -195,6 +195,32 @@ public class Geometric extends Distribution implements DiscreteDistributionIfc, 
         return (Math.ceil((Math.log(1.0 - prob) / (Math.log(1.0 - myProbSuccess))) - 1.0));
     }
 
+        public static boolean canMatchMoments(double... moments) {
+        if (moments.length < 1) {
+            throw new IllegalArgumentException("Must provide a mean.");
+        }
+        double mean = moments[0];
+        if (mean > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static double[] getParametersFromMoments(double... moments) {
+        if (!canMatchMoments(moments)) {
+            throw new IllegalArgumentException("Mean must be positive. You provided " + moments[0] + ".");
+        }
+        double mean = moments[0];
+        double p = 1 / (mean + 1);
+        return new double[]{p};
+    }
+
+    public static Geometric createFromMoments(double... moments) {
+        double[] prob = getParametersFromMoments(moments);
+        return new Geometric(prob);
+    }
+
     @Override
     public double firstOrderLossFunction(double x) {
         double mu = getMean();

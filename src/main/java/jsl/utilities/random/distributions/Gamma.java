@@ -818,6 +818,40 @@ public class Gamma extends Distribution implements ContinuousDistributionIfc,
         return param;
     }
 
+        /**
+     * Computes the parameters (shape and scale) by matching to mean and
+     * variance element[0] = shape element[1] = scale
+     *
+     */
+        public static double[] getParametersFromMoments(double... moments) {
+        if (moments.length < 2) {
+            throw new IllegalArgumentException("The mean and variance must be provided. You only provided " + moments.length + " moments.");
+        }
+        double mean = moments[0];
+        if (mean <= 0.0) {
+            throw new IllegalArgumentException("The mean must be > 0");
+        }
+        double var = moments[1];
+        if (var <= 0.0) {
+            throw new IllegalArgumentException("The variance must be > 0");
+        }
+
+        double[] param = new double[2];
+
+        double shape = (mean * mean) / (var);
+        double scale = var / mean;
+
+        param[0] = shape;
+        param[1] = scale;
+
+        return param;
+    }
+
+        public static Gamma createFromMoments(double... moments) {
+        double[] param = getParametersFromMoments(moments);
+        return new Gamma(param);
+    }
+
     @Override
     public double firstOrderLossFunction(double x) {
         if (x <= 0.0) {

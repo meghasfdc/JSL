@@ -25,8 +25,8 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  *  This distribution is commonly use to model the time between events
  *
  */
-public class Exponential extends Distribution implements 
-        ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
+public class Exponential extends Distribution implements
+        LossFunctionDistributionIfc,  ContinuousDistributionIfc, InverseCDFIfc, GetRVariableIfc {
 
     private double myMean;
 
@@ -166,4 +166,13 @@ public class Exponential extends Distribution implements
         return new ExponentialRV(getMean(), rng);
     }
 
+    @Override
+    public double firstOrderLossFunction(double x) {
+        return Math.exp(-getMean() * x) / getMean();
+    }
+
+    @Override
+    public double secondOrderLossFunction(double x) {
+        return firstOrderLossFunction(x) / getMean();
+    }
 }

@@ -23,7 +23,7 @@ import jsl.utilities.random.rvariable.ShiftedRV;
 /** Represents a Distribution that has been Shifted (translated to the right)
  *  The shift must be &gt;= 0.0
  */
-public class ShiftedDistribution extends Distribution {
+public class ShiftedDistribution extends Distribution implements  LossFunctionDistributionIfc {
 
     protected DistributionIfc myDistribution;
 
@@ -145,4 +145,20 @@ public class ShiftedDistribution extends Distribution {
         return (myDistribution.invCDF(p) + myShift);
     }
 
+    @Override
+    public double firstOrderLossFunction(double x) {
+        LossFunctionDistributionIfc cdf = (LossFunctionDistributionIfc) myDistribution;
+        return cdf.firstOrderLossFunction(x - myShift);
+    }
+
+    @Override
+    public double secondOrderLossFunction(double x) {
+        LossFunctionDistributionIfc cdf = (LossFunctionDistributionIfc) myDistribution;
+        return cdf.secondOrderLossFunction(x - myShift);
+    }
+
+        public double thirdOrderLossFunction(double x) {
+        Poisson first = (Poisson) myDistribution;
+        return first.thirdOrderLossFunction(x - myShift);
+    }
 }
