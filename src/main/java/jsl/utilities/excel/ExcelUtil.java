@@ -55,6 +55,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
@@ -288,9 +289,7 @@ public class ExcelUtil {
      * @return an Apache POI XSSFWorkbook or null if there was a problem opening the workbook.
      */
     public static XSSFWorkbook openExistingExcelWorkbook(Path pathToWorkbook) {
-        if (pathToWorkbook == null) {
-            throw new IllegalArgumentException("The path to the workbook was null");
-        }
+        Objects.requireNonNull(pathToWorkbook, "The path to the workbook must not be null");
         File file = pathToWorkbook.toFile();
 
         OPCPackage pkg = null;
@@ -844,6 +843,49 @@ public class ExcelUtil {
     }
 
     /**
+     *
+     * @param pathToWb the path to the workbook, must not be null. If the workbook exists it is used, if
+     *                 it does not exist at the path then a new workbook created at the location
+     * @param sheetName the name of the sheet to write to, must not be null, if it already exists
+     *                  then a new sheet with name sheetName_n is created where n is one more than the number of sheets
+     * @param records the jooq Result to write to the sheet, must not be null
+     */
+    public static void writeResultRecordsToExcelWorkbook(Path pathToWb, String sheetName, Result<Record> records) {
+        Objects.requireNonNull(pathToWb, "The path to the workbook must not be null");
+        Objects.requireNonNull(records, "The Result records must not be null");
+        Objects.requireNonNull(sheetName, "The workbook sheet name must not be null");
+        Workbook workbook = null;
+        if (Files.exists(pathToWb)) {
+            // already exists
+            workbook = openExistingExcelWorkbook(pathToWb);
+        } else {
+            // doesn't exist, make it
+            workbook = new SXSSFWorkbook(100);
+        }
+        Sheet sheet = workbook.getSheet(sheetName);
+        if (sheet == null) {
+            sheet = workbook.createSheet(sheetName);
+        } else {
+            // sheet already exists
+            int n = workbook.getNumberOfSheets() + 1;
+            String name = sheetName + "_" + n;
+            sheet = workbook.createSheet(name);
+        }
+
+        writeResultRecordsAsExcelSheet(records, sheet);
+
+        try {
+            FileOutputStream out = new FileOutputStream(pathToWb.toFile());
+            workbook.write(out);
+            workbook.close();
+            out.close();
+        } catch (IOException e) {
+            LOG.error("IOException {} ", pathToWb, e);
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Writes the results from a query to the Excel sheet. Includes the field names as the first row of
      * the sheet.
      *
@@ -911,14 +953,15 @@ public class ExcelUtil {
 //        }
 //    }
 
-    /** Starts as the last row number of the sheet and looks up in the column to find the first non-null cell
+    /**
+     * Starts as the last row number of the sheet and looks up in the column to find the first non-null cell
      *
-     * @param sheet the sheet holding the column, must not be null
+     * @param sheet       the sheet holding the column, must not be null
      * @param columnIndex the column index, must be 0 or greater, since POI is 0 based columns
      * @return the number of rows that have data in the particular column as defined by not having
      * a null cell.
      */
-    public static int getColumnSize(Sheet sheet, int columnIndex){
+    public static int getColumnSize(Sheet sheet, int columnIndex) {
         Objects.requireNonNull(sheet, "The workbook sheet must not be null");
 
         int lastRow = sheet.getLastRowNum();
@@ -930,7 +973,6 @@ public class ExcelUtil {
     }
 
     /**
-     *
      * @param cell the cell to check
      * @return true if it null or blank or string and empty
      */
