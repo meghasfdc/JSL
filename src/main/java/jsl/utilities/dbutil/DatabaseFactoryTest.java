@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -24,7 +23,7 @@ public class DatabaseFactoryTest {
         //     testDatabaseCreation();
         //testDerbyEmbeddedExisting();
         //       testExcelDbExport();
-        //      testExcelDbImport();
+              testExcelDbImport();
 
         //       metaDataTest();
 
@@ -36,7 +35,7 @@ public class DatabaseFactoryTest {
 //        testPostgresPropertiesFile();
 
 //        testSPDatabaseCreation();
-        testDatabaseCreation();
+//        testDatabaseCreation();
     }
 
     public static void testDatabaseCreation(){

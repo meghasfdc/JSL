@@ -24,20 +24,17 @@ package jsl.utilities.excel;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import jsl.utilities.dbutil.DatabaseIfc;
-import jsl.utilities.dbutil.DbCreateTask;
-import jsl.utilities.math.JSLMath;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -49,7 +46,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-//import tech.tablesaw.columns.Column;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
@@ -61,6 +57,8 @@ import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+//import tech.tablesaw.columns.Column;
 
 /**
  * @author rossetti
@@ -255,10 +253,11 @@ public class ExcelUtil {
     }
 
     /**
-     * Opens the workbook for reading and writes the sheets of the workbook into database tables.
+     * Opens the workbook for reading only and writes the sheets of the workbook into database tables.
      * The list of names is the names of the
      * sheets in the workbook and the names of the tables that need to be written. They are in the
-     * order that is required for entering data so that no integrity constraints are violated.
+     * order that is required for entering data so that no integrity constraints are violated. The
+     * underlying workbook is closed after the operation.
      *
      * @param pathToWorkbook the path to the workbook. Must be valid workbook with .xlsx extension
      * @param skipFirstRow   if true the first row of each sheet is skipped
@@ -269,7 +268,7 @@ public class ExcelUtil {
     public static void writeWorkbookToDatabase(Path pathToWorkbook, boolean skipFirstRow, DatabaseIfc db,
                                                List<String> tableNames) throws IOException {
 
-        XSSFWorkbook workbook = openExistingExcelWorkbook(pathToWorkbook);
+        XSSFWorkbook workbook = openExistingXSSFWorkbookReadOnly(pathToWorkbook);
         if (workbook == null) {
             throw new IOException("There was a problem opening the workbook!");
         }
@@ -288,13 +287,13 @@ public class ExcelUtil {
      * @param pathToWorkbook the path to a valid Excel xlsx workbook
      * @return an Apache POI XSSFWorkbook or null if there was a problem opening the workbook.
      */
-    public static XSSFWorkbook openExistingExcelWorkbook(Path pathToWorkbook) {
+    public static XSSFWorkbook openExistingXSSFWorkbookReadOnly(Path pathToWorkbook) {
         Objects.requireNonNull(pathToWorkbook, "The path to the workbook must not be null");
         File file = pathToWorkbook.toFile();
 
         OPCPackage pkg = null;
         try {
-            pkg = OPCPackage.open(file);
+            pkg = OPCPackage.open(file, PackageAccess.READ);
         } catch (InvalidFormatException e) {
             LOG.error("The workbook has an invalid format. See Apache POI InvalidFormatException");
             return null;
@@ -303,12 +302,52 @@ public class ExcelUtil {
         XSSFWorkbook wb = null;
         try {
             wb = new XSSFWorkbook(pkg);
-            LOG.info("Opened workbook at: {}", pathToWorkbook);
+            LOG.info("Opened workbook for reading only at: {}", pathToWorkbook);
         } catch (IOException e) {
             LOG.error("There was an IO error when trying to open the workbook at: {}", pathToWorkbook);
         }
         return wb;
     }
+
+//    /**
+//     * IO exceptions are squelched in this method.  If there is a problem, then null is returned.
+//     * Opens an Apache POI XSSFWorkbook instance. The user is responsible for closing the workbook
+//     * when done.
+//     *
+//     * @param pathToWorkbook the path to a valid Excel xlsx workbook
+//     * @return an Apache POI XSSFWorkbook or null if there was a problem opening the workbook.
+//     */
+//    public static XSSFWorkbook openExistingXSSFWorkbook(Path pathToWorkbook) {
+//        Objects.requireNonNull(pathToWorkbook, "The path to the workbook must not be null");
+//        File file = pathToWorkbook.toFile();
+//
+//       // new FileInputStream(pathToWorkbook.);
+//
+//
+//        OPCPackage pkg = null;
+//        try {
+//            InputStream inputStream = Files.newInputStream(pathToWorkbook);
+//            FileInputStream fileIS = new FileInputStream(inputStream);
+//
+//            pkg = OPCPackage.open(fileIS, PackageAccess.READ_WRITE);
+//        } catch (InvalidFormatException e) {
+//            LOG.error("The workbook has an invalid format. See Apache POI InvalidFormatException");
+//            return null;
+//        } catch (IOException e) {
+//            LOG.error("The workbook had a problem being opened: IOException");
+//            return null;
+//        }
+//        //TODO consider using SXSSFWorkbook
+//        XSSFWorkbook wb = null;
+//        try {
+//            InputStream inputStream = Files.newInputStream(pathToWorkbook);
+//            wb = new XSSFWorkbook(inputStream);
+//            LOG.info("Opened workbook for writing only at: {}", pathToWorkbook);
+//        } catch (IOException e) {
+//            LOG.error("There was an IO error when trying to open the workbook at: {}", pathToWorkbook);
+//        }
+//        return wb;
+//    }
 
     /**
      * Writes the sheets of the workbook into database tables. The list of names is the names of the
@@ -842,6 +881,33 @@ public class ExcelUtil {
         writeResultRecordsAsExcelSheet(records, sheet);
     }
 
+//    /** Causes the records in the Result to be added to the workbook.  The workbook remains open after
+//     * the call. The user is responsible for calling close() on the workbook to save/write the updated
+//     * workbook to the file system.
+//     *
+//     * @param workbook the workbook, must not be null
+//     * @param sheetName the name of the sheet to write to, must not be null, if it already exists
+//     *                  then a new sheet with name sheetName_n is created where n is one more than the number of sheets
+//     * @param records the jooq Result to write to the sheet, must not be null
+//     */
+//    public static void writeResultRecordsToExcelWorkbook(Workbook workbook, String sheetName, Result<Record> records) {
+//        Objects.requireNonNull(workbook, "The workbook must not be null");
+//        Objects.requireNonNull(records, "The Result records must not be null");
+//        Objects.requireNonNull(sheetName, "The workbook sheet name must not be null");
+//        Sheet sheet = workbook.getSheet(sheetName);
+//        if (sheet == null) {
+//            sheet = workbook.createSheet(sheetName);
+//        } else {
+//            // sheet already exists
+//            int n = workbook.getNumberOfSheets() + 1;
+//            String name = sheetName + "_" + n;
+//            sheet = workbook.createSheet(name);
+//        }
+//        LOG.info("Created new sheet {} in workbook for writing Result records", sheetName);
+//        writeResultRecordsAsExcelSheet(records, sheet);
+//        LOG.info("Wrote {} records to sheet {}", records.size(), sheetName);
+//    }
+
     /**
      *
      * @param pathToWb the path to the workbook, must not be null. If the workbook exists it is used, if
@@ -854,14 +920,62 @@ public class ExcelUtil {
         Objects.requireNonNull(pathToWb, "The path to the workbook must not be null");
         Objects.requireNonNull(records, "The Result records must not be null");
         Objects.requireNonNull(sheetName, "The workbook sheet name must not be null");
-        Workbook workbook = null;
-        if (Files.exists(pathToWb)) {
-            // already exists
-            workbook = openExistingExcelWorkbook(pathToWb);
+
+        if (Files.exists(pathToWb)){
+            //already exists write to existing file
+            writeRecordsToExistingWorkbook(pathToWb, sheetName, records);
         } else {
-            // doesn't exist, make it
-            workbook = new SXSSFWorkbook(100);
+            // doesn't exist need to create the workbook then write
+            writeRecordsToNewWorkbook(pathToWb, sheetName, records);
         }
+    }
+
+    private static void writeRecordsToNewWorkbook(Path pathToWb, String sheetName, Result<Record> records){
+        Workbook wb = new XSSFWorkbook();
+        LOG.info("Created workbook {} for writing records", pathToWb);
+        Sheet sheet = createSheet(wb, sheetName);
+        writeResultRecordsAsExcelSheet(records, sheet);
+        LOG.info("Wrote {} records to sheet {} in workbook {}", records.size(), sheetName, pathToWb);
+        try (OutputStream fileOut = new FileOutputStream(pathToWb.toString())) {
+            wb.write(fileOut);
+            LOG.info("Wrote workbook {} to file.", pathToWb);
+            wb.close();
+        }catch (FileNotFoundException e) {
+            LOG.error("FileNotFoundException {} ", pathToWb, e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            LOG.error("IOException {} ", pathToWb, e);
+            e.printStackTrace();
+        }
+    }
+
+    private static void writeRecordsToExistingWorkbook(Path pathToWb, String sheetName, Result<Record> records){
+        try (InputStream inp = new FileInputStream(pathToWb.toString())) {
+            Workbook wb = WorkbookFactory.create(inp);
+            LOG.info("Opened workbook {} for writing records", pathToWb);
+            Sheet sheet = createSheet(wb, sheetName);
+            LOG.info("Created new sheet {} in workbook {} ", sheetName, pathToWb);
+            writeResultRecordsAsExcelSheet(records, sheet);
+            LOG.info("Wrote {} records to sheet {} in workbook {}", records.size(), sheetName, pathToWb);
+            // Write workbook to a file
+            try (OutputStream fileOut = new FileOutputStream(pathToWb.toString())) {
+                wb.write(fileOut);
+                LOG.info("Wrote workbook {} to file.", pathToWb);
+            }
+            wb.close();
+        } catch (FileNotFoundException e) {
+            LOG.error("FileNotFoundException {} ", pathToWb, e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            LOG.error("IOException {} ", pathToWb, e);
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            LOG.error("InvalidFormatException {} ", pathToWb, e);
+            e.printStackTrace();
+        }
+    }
+
+    private static Sheet createSheet(Workbook workbook, String sheetName){
         Sheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
             sheet = workbook.createSheet(sheetName);
@@ -871,18 +985,8 @@ public class ExcelUtil {
             String name = sheetName + "_" + n;
             sheet = workbook.createSheet(name);
         }
-
-        writeResultRecordsAsExcelSheet(records, sheet);
-
-        try {
-            FileOutputStream out = new FileOutputStream(pathToWb.toFile());
-            workbook.write(out);
-            workbook.close();
-            out.close();
-        } catch (IOException e) {
-            LOG.error("IOException {} ", pathToWb, e);
-            e.printStackTrace();
-        }
+        LOG.info("Created new sheet {} in workbook", sheetName);
+        return sheet;
     }
 
     /**

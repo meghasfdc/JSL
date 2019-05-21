@@ -21,22 +21,29 @@
  */
 package jsl.utilities.excel;
 
-import java.io.*;
-import java.lang.invoke.MethodHandles;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.SQLException;
-
+import jsl.utilities.dbutil.DatabaseFactory;
+import jsl.utilities.dbutil.DatabaseIfc;
+import jsl.utilities.jsldbsrc.tables.records.AcrossRepViewRecord;
 import jsl.utilities.reporting.JSL;
+import jsl.utilities.reporting.JSLDatabase;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 
 
 /**
@@ -54,12 +61,48 @@ public class ExcelTesting {
      */
     public static void main(String[] args) throws IOException, SQLException  {
 //        createWorkBookTest("testworkbook");
-       readWorkBookTest("testworkbook");
+       //readWorkBookTest("testworkbook");
 //        writeSheetAsCSVTest();
 //        writeWorkbookAsCSVTest();
-
+//        XSSFWorkbook workbook = ExcelUtil.openExistingExcelWorkbook(JSL.ExcelDir.resolve("results.xlsx"));
+//        System.out.println(workbook.getSheetName(0));
+        writeResultsToWorkbookWorkSheetTest1("name1");
+        writeResultsToWorkbookWorkSheetTest1("name2");
     }
 
+    public static void writeResultsToWorkbookWorkSheetTest1(String sheetName){
+        // get some results to write
+        DatabaseIfc db = DatabaseFactory.getEmbeddedDerbyDatabase("JSLDb_DLB_with_Q");
+        JSLDatabase jslDatabase = new JSLDatabase(db);
+        Result<AcrossRepViewRecord> records = jslDatabase.getAcrossRepViewRecords();
+        records.format(System.out);
+
+        Path path = JSL.ExcelDir.resolve("results.xlsx");
+        //XSSFWorkbook workbook = ExcelUtil.openExistingXSSFWorkbook(path);
+        Result<Record> result = records.into(records.fields());
+
+        ExcelUtil.writeResultRecordsToExcelWorkbook(path, sheetName, result);
+        System.out.println();
+
+//        try (OutputStream fileOut = new FileOutputStream(path.toFile())) {
+//            System.out.println(workbook);
+//            workbook.write(fileOut);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            //workbook.getPackage().flush();
+//            workbook.close();
+//            //workbook.getPackage().close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        System.out.println("Done!");
+    }
 
     /**
      * Creates an Excel workbook in the current working directory with the
