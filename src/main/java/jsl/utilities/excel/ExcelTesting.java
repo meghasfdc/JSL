@@ -83,24 +83,6 @@ public class ExcelTesting {
 
         ExcelUtil.writeResultRecordsToExcelWorkbook(path, sheetName, result);
         System.out.println();
-
-//        try (OutputStream fileOut = new FileOutputStream(path.toFile())) {
-//            System.out.println(workbook);
-//            workbook.write(fileOut);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            //workbook.getPackage().flush();
-//            workbook.close();
-//            //workbook.getPackage().close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
         System.out.println("Done!");
     }
 
