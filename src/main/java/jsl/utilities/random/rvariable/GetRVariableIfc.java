@@ -18,10 +18,31 @@ package jsl.utilities.random.rvariable;
 
 import jsl.utilities.random.rng.RNStreamIfc;
 
+/**
+ *  An interface for getting random variables
+ */
 public interface GetRVariableIfc {
 
+    /**
+     *
+     * @param rng the stream to use
+     * @return a random variable
+     */
     RVariableIfc getRandomVariable(RNStreamIfc rng);
 
+    /**
+     *
+     * @param streamNum the stream number to use
+     * @return a random variable
+     */
+    default RVariableIfc getRandomVariable(int streamNum){
+        return getRandomVariable(JSLRandom.rnStream(streamNum));
+    }
+
+    /**
+     *
+     * @return an instance of the random variable based on the next stream
+     */
     default RVariableIfc getRandomVariable(){
         return getRandomVariable(JSLRandom.nextRNStream());
     }
