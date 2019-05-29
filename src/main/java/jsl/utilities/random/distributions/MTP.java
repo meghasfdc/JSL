@@ -159,6 +159,10 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
         return myMixProb1 * SD1.secondOrderLossFunction(x) + myMixProb2 * SD2.secondOrderLossFunction(x);
     }
 
+    public double thirdOrderLossFunction(double x) {
+        return myMixProb1 * SD1.thirdOrderLossFunction(x) + myMixProb2 * SD2.thirdOrderLossFunction(x);
+    }
+
     /**
      *
      * @param rate the rate

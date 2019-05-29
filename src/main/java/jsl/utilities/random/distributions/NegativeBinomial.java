@@ -777,6 +777,34 @@ public class NegativeBinomial extends Distribution implements DiscreteDistributi
         }
     }
 
+    public static boolean canMatchMoments(double... moments) {
+        if (moments.length < 2) {
+            throw new IllegalArgumentException("Must provide a mean and a variance. You provided " + moments.length + " moments.");
+        }
+        double mean = moments[0];
+        double var = moments[1];
+        if (mean > 0 && var > 0 && mean < var) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static double[] getParametersFromMoments(double... moments) {
+        if (!canMatchMoments(moments)) {
+            throw new IllegalArgumentException("Mean and variance must be positive and mean < variance. Your mean: " + moments[0] + " and variance: " + moments[1]);
+        }
+        double mean = moments[0];
+        double var = moments[1];
+        double vmr = var / mean;
+        return new double[]{1 / vmr, mean / (vmr - 1)};
+    }
+
+    public static NegativeBinomial createFromMoments(double... moments) {
+        double[] param = getParametersFromMoments(moments);
+        return new NegativeBinomial(param[0], param[1]);
+    }
+
     @Override
     public double firstOrderLossFunction(double x) {
         double mu = getMean();

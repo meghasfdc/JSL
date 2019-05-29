@@ -225,6 +225,37 @@ public class Binomial extends Distribution implements DiscreteDistributionIfc, L
         return (param);
     }
 
+    public static boolean canMatchMoments(double... moments) {
+        if (moments.length < 2) {
+            throw new IllegalArgumentException("Must provide a mean and a variance. You provided " + moments.length + " moments.");
+        }
+        double mean = moments[0];
+        double var = moments[1];
+        boolean validN = var >= mean * (1 - mean);
+
+        if (var > 0 && var < mean && validN) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static double[] getParametersFromMoments(double... moments) {
+        if (!canMatchMoments(moments)) {
+            throw new IllegalArgumentException("Mean and variance must be positive, mean > variance, and variance >= mean*(1-mean). Your mean: " + moments[0] + " and variance: " + moments[1]);
+        }
+        double mean = moments[0];
+        double var = moments[1];
+        int n = (int) (mean * mean / (mean - var) + 0.5);
+        double p = mean / n;
+        return new double[]{p, n};
+    }
+
+    public static Binomial createFromMoments(double... moments) {
+        double[] param = getParametersFromMoments(moments);
+        return new Binomial(param);
+    }
+
     /** Computes the first order loss function for the
      * distribution function for given value of x, G1(x) = E[max(X-x,0)]
      * @param x The value to be evaluated

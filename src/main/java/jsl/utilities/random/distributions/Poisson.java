@@ -122,6 +122,30 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc, Lo
         return (cdf((int) x));
     }
 
+        public static boolean canMatchMoments(double... moments) {
+        if (moments.length < 1) {
+            throw new IllegalArgumentException("Must provide a mean.");
+        }
+        double mean = moments[0];
+        if (mean > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static double[] getParametersFromMoments(double... moments) {
+        if (!canMatchMoments(moments)) {
+            throw new IllegalArgumentException("Mean must be positive. You provided " + moments[0] + ".");
+        }
+        return new double[]{moments[0]};
+    }
+
+    public static Poisson createFromMoments(double... moments) {
+        double[] prob = getParametersFromMoments(moments);
+        return new Poisson(prob);
+    }
+
     @Override
     public final double firstOrderLossFunction(double x) {
         double mu = getMean();
@@ -157,6 +181,14 @@ public class Poisson extends Distribution implements DiscreteDistributionIfc, Lo
         {
             return sbm;
         }
+    }
+
+       public double thirdOrderLossFunction(double x) {
+        double term1 = Math.pow(myMean, 3) * this.complementaryCDF(x - 3);
+        double term2 = 3 * myMean * myMean * x * this.complementaryCDF(x - 2);
+        double term3 = 3 * myMean * x * (x + 1) * this.complementaryCDF(x - 1);
+        double term4 = x * (x + 1) * (x + 2) * this.complementaryCDF(x);
+        return (term1 - term2 + term3 - term4) / 3.0;
     }
 
     @Override
