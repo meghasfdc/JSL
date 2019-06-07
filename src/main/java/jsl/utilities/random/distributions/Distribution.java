@@ -20,6 +20,9 @@ import jsl.utilities.NewInstanceIfc;
 import jsl.utilities.controls.ControllableIfc;
 import jsl.utilities.controls.Controls;
 import jsl.utilities.math.FunctionIfc;
+import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.InverseCDFRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.rootfinding.BisectionRootFinder;
 
 /**
@@ -116,6 +119,11 @@ public abstract class Distribution implements DistributionIfc, ControllableIfc, 
 
     @Override
     abstract public Distribution newInstance();
+
+    @Override
+    public RVariableIfc getRandomVariable(RNStreamIfc rng) {
+        return new InverseCDFRV(newInstance(), rng);
+    }
 
     @Override
     public String toString() {

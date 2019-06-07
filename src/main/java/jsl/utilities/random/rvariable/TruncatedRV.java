@@ -22,16 +22,44 @@ public class TruncatedRV extends AbstractRVariable {
 
     protected final double myDeltaFUFL;
 
+    /**
+     * Constructs a truncated random variable based on the provided distribution
+     *
+     * @param distribution the distribution to truncate, must not be null
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     */
     public TruncatedRV(DistributionIfc distribution, double cdfLL, double cdfUL,
                        double truncLL, double truncUL) {
         this(distribution, cdfLL, cdfUL, truncLL, truncUL, JSLRandom.nextRNStream());
     }
 
+    /**
+     * Constructs a truncated random variable based on the provided distribution
+     *
+     * @param distribution the distribution to truncate, must not be null
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     * @param streamNum A positive integer to identify the stream
+     */
     public TruncatedRV(DistributionIfc distribution, double cdfLL, double cdfUL,
                        double truncLL, double truncUL, int streamNum) {
         this(distribution, cdfLL, cdfUL, truncLL, truncUL, JSLRandom.rnStream(streamNum));
     }
 
+    /**
+     * Constructs a truncated random variable based on the provided distribution
+     *
+     * @param distribution the distribution to truncate, must not be null
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     */
     public TruncatedRV(DistributionIfc distribution, double cdfLL, double cdfUL,
                        double truncLL, double truncUL, RNStreamIfc rng) {
         super(rng);

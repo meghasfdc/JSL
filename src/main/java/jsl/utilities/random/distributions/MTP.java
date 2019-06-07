@@ -15,6 +15,10 @@
  */
 package jsl.utilities.random.distributions;
 
+import jsl.utilities.random.rng.RNStreamIfc;
+import jsl.utilities.random.rvariable.InverseCDFRV;
+import jsl.utilities.random.rvariable.RVariableIfc;
+
 /** Represents a Mixed translated Poisson random variable
  * 
  * 
@@ -84,7 +88,7 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
     /** Returns a new instance of the random source with the same parameters
      *  but an independent generator
      *
-     * @return
+     * @return a new instance with the same parameters
      */
     public final MTP newInstance() {
         return (new MTP(getParameters()));
@@ -188,6 +192,11 @@ public class MTP extends Distribution implements LossFunctionDistributionIfc {
         SD1.myDistribution.setParameters(parameter);
         SD2.myDistribution.setParameters(parameter);
         myMean = rate;
+    }
+
+    @Override
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
+        return new InverseCDFRV(newInstance(), rng);
     }
 
     public static void main(String[] args) {

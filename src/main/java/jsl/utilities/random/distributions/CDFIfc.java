@@ -20,8 +20,6 @@
  */
 package jsl.utilities.random.distributions;
 
-import jsl.utilities.random.ParametersIfc;
-
 /** Provides an interface for functions related to
  *  a cumulative distribution function CDF
  *
@@ -60,16 +58,5 @@ public interface CDFIfc {
     default double complementaryCDF(double x) {
         return (1.0 - cdf(x));
     }
-
-    /** Provides the inverse cumulative distribution function for the distribution
-     *
-     * While closed form solutions for the inverse cdf may not exist, numerical search
-     * methods can be used to solve F(X) = U.
-     *
-     * @param p The probability to be evaluated for the inverse, p must be [0,1] or
-     * an IllegalArgumentException is thrown
-     * @return The inverse cdf evaluated at the supplied probability
-     */
-    double invCDF(double p);
 
 }

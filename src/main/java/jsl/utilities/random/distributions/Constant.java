@@ -24,12 +24,8 @@ import jsl.utilities.random.rvariable.RVariableIfc;
  * Constructs a degenerate distribution with all probability at the provided
  * point. Once made the value of the constant cannot be changed.
  *
- * A default RngIfc is supplied, but it does not perform any random generation.
- * For efficiency purposes the default RngIfc is shared (common) across all
- * instances of Constant.
  *
  */
-@Deprecated
 public class Constant extends Distribution implements DiscreteDistributionIfc, GetRVariableIfc {
 
     /**
