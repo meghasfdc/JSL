@@ -17,13 +17,15 @@ package jsl.utilities.random.distributions;
 
 import jsl.utilities.random.rng.RNStreamIfc;
 import jsl.utilities.random.rvariable.GetRVariableIfc;
+import jsl.utilities.random.rvariable.InverseCDFRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
 import jsl.utilities.random.rvariable.ShiftedRV;
 
-/** Represents a Distribution that has been Shifted (translated to the right)
- *  The shift must be &gt;= 0.0
+/**
+ * Represents a Distribution that has been Shifted (translated to the right)
+ * The shift must be &gt;= 0.0
  */
-public class ShiftedDistribution extends Distribution implements  LossFunctionDistributionIfc {
+public class ShiftedDistribution extends Distribution implements LossFunctionDistributionIfc {
 
     protected DistributionIfc myDistribution;
 
@@ -31,20 +33,22 @@ public class ShiftedDistribution extends Distribution implements  LossFunctionDi
 
     protected double myShift;
 
-    /** Constructs a shifted distribution based on the provided distribution
+    /**
+     * Constructs a shifted distribution based on the provided distribution
      *
      * @param distribution the distribution to shift
-     * @param shift The linear shift
+     * @param shift        The linear shift
      */
     public ShiftedDistribution(DistributionIfc distribution, double shift) {
         this(distribution, shift, null);
     }
 
-    /** Constructs a shifted distribution based on t he provided distribution
+    /**
+     * Constructs a shifted distribution based on t he provided distribution
      *
      * @param distribution the distribution to shift
-     * @param shift The linear shift
-     * @param name an optional name/label
+     * @param shift        The linear shift
+     * @param name         an optional name/label
      */
     public ShiftedDistribution(DistributionIfc distribution, double shift, String name) {
         super(name);
@@ -57,10 +61,11 @@ public class ShiftedDistribution extends Distribution implements  LossFunctionDi
         return (new ShiftedDistribution(d, myShift));
     }
 
-    /** Changes the underlying distribution and the shift
+    /**
+     * Changes the underlying distribution and the shift
      *
      * @param distribution must not be null
-     * @param shift must be &gt;=0.0
+     * @param shift        must be &gt;=0.0
      */
     public final void setDistribution(DistributionIfc distribution, double shift) {
         if (distribution == null) {
@@ -70,7 +75,8 @@ public class ShiftedDistribution extends Distribution implements  LossFunctionDi
         setShift(shift);
     }
 
-    /** Changes the shift
+    /**
+     * Changes the shift
      *
      * @param shift must be &gt;=0.0
      */
@@ -81,7 +87,8 @@ public class ShiftedDistribution extends Distribution implements  LossFunctionDi
         myShift = shift;
     }
 
-    /** Sets the parameters of the shifted distribution
+    /**
+     * Sets the parameters of the shifted distribution
      * shift = parameter[0]
      * If supplied, the other elements of the array are used in setting the
      * parameters of the underlying distribution.  If only the shift is supplied
@@ -119,7 +126,8 @@ public class ShiftedDistribution extends Distribution implements  LossFunctionDi
         return myShift + myDistribution.getMean();
     }
 
-    /** Gets the parameters for the shifted distribution
+    /**
+     * Gets the parameters for the shifted distribution
      * shift = parameter[0]
      * The other elements of the returned array are
      * the parameters of the underlying distribution
@@ -157,8 +165,13 @@ public class ShiftedDistribution extends Distribution implements  LossFunctionDi
         return cdf.secondOrderLossFunction(x - myShift);
     }
 
-        public double thirdOrderLossFunction(double x) {
+    public double thirdOrderLossFunction(double x) {
         Poisson first = (Poisson) myDistribution;
         return first.thirdOrderLossFunction(x - myShift);
+    }
+
+    @Override
+    public final RVariableIfc getRandomVariable(RNStreamIfc rng) {
+        return new InverseCDFRV(newInstance(), rng);
     }
 }

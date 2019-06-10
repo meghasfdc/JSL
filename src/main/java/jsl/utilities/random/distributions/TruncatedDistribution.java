@@ -44,7 +44,7 @@ public class TruncatedDistribution extends Distribution implements GetRVariableI
     /**
      * Constructs a truncated distribution based on the provided distribution
      *
-     * @param distribution
+     * @param distribution the distribution to truncate, must not be null
      * @param cdfLL        The lower limit of the range of support of the distribution
      * @param cdfUL        The upper limit of the range of support of the distribution
      * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
@@ -58,7 +58,7 @@ public class TruncatedDistribution extends Distribution implements GetRVariableI
     /**
      * Constructs a truncated distribution based on the provided distribution
      *
-     * @param distribution
+     * @param distribution the distribution to truncate, must not be null
      * @param cdfLL        The lower limit of the range of support of the distribution
      * @param cdfUL        The upper limit of the range of support of the distribution
      * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
@@ -73,15 +73,22 @@ public class TruncatedDistribution extends Distribution implements GetRVariableI
 
     /**
      * Returns a new instance of the random source with the same parameters
-     * but an independent generator
      *
-     * @return
+     * @return the new instance
      */
     public final TruncatedDistribution newInstance() {
         DistributionIfc d = (DistributionIfc) myDistribution.newInstance();
         return (new TruncatedDistribution(d, myCDFLL, myCDFUL, myLowerLimit, myUpperLimit));
     }
 
+    /**
+     *
+     * @param distribution the distribution to truncate, must not be null
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     */
     public final void setDistribution(DistributionIfc distribution, double cdfLL, double cdfUL,
                                       double truncLL, double truncUL) {
         if (distribution == null) {
@@ -91,6 +98,13 @@ public class TruncatedDistribution extends Distribution implements GetRVariableI
         setLimits(cdfLL, cdfUL, truncLL, truncUL);
     }
 
+    /**
+     *
+     * @param cdfLL        The lower limit of the range of support of the distribution
+     * @param cdfUL        The upper limit of the range of support of the distribution
+     * @param truncLL      The truncated lower limit (if moved in from cdfLL), must be &gt;= cdfLL
+     * @param truncUL      The truncated upper limit (if moved in from cdfUL), must be &lt;= cdfUL
+     */
     public final void setLimits(double cdfLL, double cdfUL, double truncLL, double truncUL) {
         if (truncLL >= truncUL) {
             throw new IllegalArgumentException("The lower limit must be < the upper limit");
@@ -217,9 +231,7 @@ public class TruncatedDistribution extends Distribution implements GetRVariableI
         return (myUpperLimit);
     }
 
-    /* (non-Javadoc)
-     * @see jsl.utilities.random.DistributionIfc#cdf(double)
-     */
+    @Override
     public final double cdf(double x) {
         if (x < myLowerLimit) {
             return 0.0;

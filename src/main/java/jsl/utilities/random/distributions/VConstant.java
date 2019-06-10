@@ -26,7 +26,6 @@ package jsl.utilities.random.distributions;
  *
  * @author rossetti
  */
-@Deprecated
 public class VConstant extends Constant {
 
     public VConstant(double value) {
