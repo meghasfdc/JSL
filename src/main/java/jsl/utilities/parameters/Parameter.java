@@ -20,14 +20,14 @@ import com.google.common.collect.Range;
 
 import java.util.Objects;
 
-public class NamedParameter<T extends Comparable> implements NamedParameterIfc<T> {
+public class Parameter<T extends Comparable> implements ParameterIfc<T> {
 
     private final String myName;
     private final Range<T> myRange;
     private T myInitialValue;
     private T myValue;
 
-    public NamedParameter(String name, T initialValue, Range<T> range) {
+    public Parameter(String name, T initialValue, Range<T> range) {
         Objects.requireNonNull(name, "The name cannot be null");
         Objects.requireNonNull(initialValue, "The initial value cannot be null");
         Objects.requireNonNull(range, "The range cannot be null");

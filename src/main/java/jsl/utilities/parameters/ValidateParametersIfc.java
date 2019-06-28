@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package jsl.utilities;
+package jsl.utilities.parameters;
 
 import com.google.common.collect.Range;
 import jsl.utilities.math.JSLMath;

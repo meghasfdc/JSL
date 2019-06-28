@@ -18,7 +18,7 @@ package jsl.utilities.parameters;
 
 import com.google.common.collect.Range;
 
-public interface NamedParameterIfc<C extends Comparable>  {
+public interface ParameterIfc<C extends Comparable>  {
 
     /**
      *
