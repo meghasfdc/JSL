@@ -18,8 +18,8 @@ package jsl.modeling.elements.processview.description.commands;
 import jsl.modeling.ModelElement;
 import jsl.modeling.elements.processview.description.ProcessCommand;
 import jsl.modeling.elements.entity.Entity;
-import jsl.modeling.elements.variable.*;
 import jsl.utilities.GetValueIfc;
+import jsl.utilities.SetValueIfc;
 
 import java.util.*;
 

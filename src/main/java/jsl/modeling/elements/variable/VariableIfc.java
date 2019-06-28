@@ -18,6 +18,7 @@ package jsl.modeling.elements.variable;
 
 import jsl.utilities.GetValueIfc;
 import jsl.utilities.PreviousValueIfc;
+import jsl.utilities.SetValueIfc;
 
 /** A generic interface for defining variables to be used in the simulation
  * model.

@@ -56,7 +56,7 @@ public class Attribute implements AttributeIfc {
 	}
 
 	/* (non-Javadoc)
-	 * @see jsl.modeling.elements.variable.SetValueIfc#setValue(double)
+	 * @see jsl.utilities.SetValueIfc#setValue(double)
 	 */
 	public void setValue(double value) {
 		myValue = value;

@@ -15,6 +15,7 @@
  */
 package jsl.utilities.math;
 
+import com.google.common.primitives.Ints;
 import jsl.utilities.random.distributions.Gamma;
 
 import java.io.PrintStream;
@@ -232,8 +233,8 @@ public final class JSLMath {
     /**
      * Returns true if Math.abs(a-b) &lt; precision
      *
-     * @param a the first number
-     * @param b the second number
+     * @param a         the first number
+     * @param b         the second number
      * @param precision the precision to check
      * @return true if within the precision
      */
@@ -414,7 +415,7 @@ public final class JSLMath {
      * changing the result of the computation
      *
      * @return the number that can be added to some value without noticeably
-     *       changing the result of the computation
+     * changing the result of the computation
      */
     public static double getSmallNumber() {
         if (smallNumber == 0) {
@@ -446,7 +447,7 @@ public final class JSLMath {
     /**
      * Returns the factorial (n!) of the number
      *
-     * @param n The number to take the factorial of
+     * @param n The number to take the factorial of, Must be greater than or equal to zero
      * @return The factorial of the number.
      */
     public static double factorial(int n) {
@@ -481,7 +482,7 @@ public final class JSLMath {
     /**
      * Computes the natural logarithm of the factorial operator. ln(n!)
      *
-     * @param n The value to be operated on.
+     * @param n The value to be operated on. Must be greater than or equal to zero
      * @return the log of the factorial
      */
     public static double logFactorial(int n) {
@@ -507,13 +508,70 @@ public final class JSLMath {
     }
 
     /**
+     *
+     * @param array the array to search, must not be null
+     * @return an array that contains the indices of those elements of array that were false
+     */
+    public static int[] findFalse(boolean[] array) {
+        Objects.requireNonNull(array, "The array was null");
+        ArrayList<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < array.length; i++) {
+            if (!array[i]) indexes.add(i);
+        }
+        return Ints.toArray(indexes);
+    }
+
+    /**
+     *
+     * @param array the array to search, must not be null
+     * @return an array that contains the indices of those elements of array that were true
+     */
+    public static int[] findTrue(boolean[] array) {
+        Objects.requireNonNull(array, "The array was null");
+        ArrayList<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < array.length; i++) {
+            if (array[i]) indexes.add(i);
+        }
+        return Ints.toArray(indexes);
+    }
+
+    /**
+     *
+     * @param array the array to check, must not be null
+     * @return true if all elements of the array are true
+     */
+    public static boolean isAllTrue(boolean[] array){
+        Objects.requireNonNull(array, "The array was null");
+        boolean b = true; // assume true
+        for (int i = 0; i < array.length; i++) {
+            if (!array[i]) return false;
+        }
+        return b;
+    }
+
+    /**
+     *
+     * @param array the array to check, must not be null
+     * @return true if all elements of the array are false
+     */
+    public static boolean isAllFalse(boolean[] array){
+        Objects.requireNonNull(array, "The array was null");
+        boolean b = true; // assume all are false
+        for (int i = 0; i < array.length; i++) {
+            if (array[i]) return false; // if one is true, then all can't be false
+        }
+        return b;
+    }
+
+    /**
      * Returns the index associated with the minimum element in the array For
      * ties, this returns the first found
      *
-     * @param x the array
+     * @param x the array, must not be null
      * @return the index associated with the minimum element
      */
     public static int getIndexOfMin(double[] x) {
+        Objects.requireNonNull(x, "The array was null");
         int index = 0;
         double min = Double.MAX_VALUE;
         for (int i = 0; i < x.length; i++) {
@@ -541,6 +599,7 @@ public final class JSLMath {
      * @return the index associated with the maximum element
      */
     public static int getIndexOfMax(double[] x) {
+        Objects.requireNonNull(x, "The array was null");
         int index = 0;
         double max = Double.MIN_VALUE;
         for (int i = 0; i < x.length; i++) {
@@ -568,6 +627,7 @@ public final class JSLMath {
      * @return the index associated with the minimum element
      */
     public static int getIndexOfMin(int[] x) {
+        Objects.requireNonNull(x, "The array was null");
         int index = 0;
         double min = Double.MAX_VALUE;
         for (int i = 0; i < x.length; i++) {
@@ -595,6 +655,7 @@ public final class JSLMath {
      * @return the index associated with the maximum element
      */
     public static int getIndexOfMax(int[] x) {
+        Objects.requireNonNull(x, "The array was null");
         int index = 0;
         double max = Double.MIN_VALUE;
         for (int i = 0; i < x.length; i++) {
@@ -622,6 +683,7 @@ public final class JSLMath {
      * @return the index associated with the minimum element
      */
     public static int getIndexOfMin(long[] x) {
+        Objects.requireNonNull(x, "The array was null");
         int index = 0;
         double min = Double.MAX_VALUE;
         for (int i = 0; i < x.length; i++) {
@@ -649,6 +711,7 @@ public final class JSLMath {
      * @return the index associated with the maximum element
      */
     public static int getIndexOfMax(long[] x) {
+        Objects.requireNonNull(x, "The array was null");
         int index = 0;
         double max = Double.MIN_VALUE;
         for (int i = 0; i < x.length; i++) {
@@ -661,11 +724,11 @@ public final class JSLMath {
     }
 
     /**
-     *
      * @param array the array to operate on
      * @return getMax() - getMin()
      */
-    public static double getRange(double[] array){
+    public static double getRange(double[] array) {
+        Objects.requireNonNull(array, "The array was null");
         double max = getMax(array);
         double min = getMin(array);
         return max - min;
@@ -752,9 +815,7 @@ public final class JSLMath {
      * @return the transformed array
      */
     public static double[] addConstant(double[] a, double c) {
-        if (a == null) {
-            throw new IllegalArgumentException("The array was null.");
-        }
+        Objects.requireNonNull(a, "The array cannot be null");
         for (int i = 0; i < a.length; i++) {
             a[i] = a[i] + c;
         }
@@ -776,9 +837,7 @@ public final class JSLMath {
      * @return the transformed array
      */
     public static double[] multiplyConstant(double[] a, double c) {
-        if (a == null) {
-            throw new IllegalArgumentException("The array was null.");
-        }
+        Objects.requireNonNull(a, "The array cannot be null");
         for (int i = 0; i < a.length; i++) {
             a[i] = a[i] * c;
         }
@@ -909,20 +968,15 @@ public final class JSLMath {
         return n;
     }
 
-    /**
-     * @param first  the first array
-     * @param second the second array
+    /** If arrays have different lengths this always returns false.
+     *
+     * @param first  the first array, must not be null
+     * @param second the second array, must not be null
      * @return true if all elements are equal
      */
     public static boolean compareArrays(double[] first, double[] second) {
-        if (first == null) {
-            throw new IllegalArgumentException("the first array was null");
-        }
-
-        if (second == null) {
-            throw new IllegalArgumentException("the second array was null");
-        }
-
+        Objects.requireNonNull(first, "The first array cannot be null");
+        Objects.requireNonNull(second, "The second array cannot be null");
         if (first.length != second.length) {
             return false;
         }

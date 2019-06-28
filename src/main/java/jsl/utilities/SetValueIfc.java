@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Manuel D. Rossetti, rossetti@uark.edu
+ * Copyright (c) 2019. Manuel D. Rossetti, rossetti@uark.edu
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package jsl.modeling.elements.variable;
+package jsl.utilities;
 
 /**
  * 
@@ -23,5 +23,5 @@ public interface SetValueIfc {
     /** Sets the value 
      * @param value used in the setting.
      */
-    public void setValue(double value);
+    void setValue(double value);
 }
