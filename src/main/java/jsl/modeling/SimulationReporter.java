@@ -903,7 +903,9 @@ public class SimulationReporter {
      *  System.out
      */
     public final void printAcrossReplicationHalfWidthSummaryReport(){
-        writeAcrossReplicationHalfWidthSummaryReport(new PrintWriter(System.out));
+        PrintWriter printWriter = new PrintWriter(System.out);
+        writeAcrossReplicationHalfWidthSummaryReport(printWriter);
+        printWriter.flush();
     }
 
     /** Writes a half-width summary report for the across replication statistics
@@ -915,6 +917,7 @@ public class SimulationReporter {
         StatisticReporter statisticReporter = new StatisticReporter(list);
         StringBuilder report = statisticReporter.getHalfWidthSummaryReport();
         out.println(report.toString());
+        out.flush();
     }
 
     /**
