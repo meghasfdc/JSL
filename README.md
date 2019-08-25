@@ -2,6 +2,10 @@ The JSL repository.
 
 This is a Gradle based project.
 
+## JSL Book
+
+https://rossetti.git-pages.uark.edu/jslbookdownbook
+
 ## JSL Documentation
 
 If you are looking for the JSL documentation you can find it here:
