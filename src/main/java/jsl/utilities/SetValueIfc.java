@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Manuel D. Rossetti, rossetti@uark.edu
+ * Copyright (c) 2019. Manuel D. Rossetti, rossetti@uark.edu
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,17 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package jsl.utilities;
 
-package jsl.modeling.elements.variable;
-
-import jsl.utilities.GetValueIfc;
-import jsl.utilities.PreviousValueIfc;
-import jsl.utilities.SetValueIfc;
-
-/** A generic interface for defining variables to be used in the simulation
- * model.
+/**
+ * 
  */
-public interface VariableIfc extends GetValueIfc, SetValueIfc, PreviousValueIfc, InitialValueIfc, TimeWeightedIfc {
-        
-}
+public interface SetValueIfc {
 
+    /** Sets the value 
+     * @param value used in the setting.
+     */
+    void setValue(double value);
+}

@@ -20,6 +20,7 @@ import jsl.modeling.Model;
 import jsl.modeling.ModelElement;
 import jsl.modeling.SchedulingElement;
 import jsl.modeling.Simulation;
+import jsl.modeling.elements.variable.ResponseVariable;
 import jsl.modeling.queue.QObject;
 import jsl.modeling.queue.Queue;
 import jsl.modeling.elements.variable.RandomVariable;
@@ -57,6 +58,12 @@ public class MachineRepair extends SchedulingElement {
 
     protected int myNumOperators;
 
+    protected double breakDownCost = 60.0;
+
+    protected double laborCost = 15.0;
+
+    protected ResponseVariable hourlyCost;
+
     /**
      * 
      * @param parent
@@ -80,6 +87,8 @@ public class MachineRepair extends SchedulingElement {
         myNumBusyOperators = new TimeWeighted(this, 0.0, "Num Busy Operators");
         myTBFailure = new RandomVariable(this, tbFailure);
         myRepairTime = new RandomVariable(this, repTime);
+        hourlyCost = new ResponseVariable(this, "Hourly Cost");
+
     }
 
     @Override
@@ -88,6 +97,13 @@ public class MachineRepair extends SchedulingElement {
         for (int i = 1; i <= myNumMachines; i++) {
             scheduleEvent(myTBFailure, FAILURE);
         }
+    }
+
+    @Override
+    protected void replicationEnded() {
+        double avgBroken = myNumFailedMachines.getWithinReplicationStatistic().getAverage();
+        double cost = avgBroken*breakDownCost + laborCost*myNumOperators;
+        hourlyCost.setValue(cost);
     }
 
     @Override
@@ -137,19 +153,18 @@ public class MachineRepair extends SchedulingElement {
         Simulation s = new Simulation("Machine Repair");
         s.setLengthOfReplication(11000.0);
         s.setLengthOfWarmUp(1000.0);
-        s.setNumberOfReplications(20);
+        s.setNumberOfReplications(30);
 
         Model m = s.getModel();
 
         int numMachines = 5;
-        int numOperators = 1;
+        int numOperators = 4;
         RandomIfc tbf = new ExponentialRV(10.0);
         RandomIfc rt = new ExponentialRV(4.0);
         MachineRepair machineRepair = new MachineRepair(m, numOperators, numMachines, tbf, rt);
-
-        s.run();
-        
         SimulationReporter r = s.makeSimulationReporter();
-        r.printAcrossReplicationStatistics();
+        s.run();
+
+        s.printHalfWidthSummaryReport();
     }
 }

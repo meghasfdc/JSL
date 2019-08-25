@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Manuel D. Rossetti, rossetti@uark.edu
+ * Copyright (c) 2019. Manuel D. Rossetti, rossetti@uark.edu
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,15 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package jsl.modeling.elements.variable;
+
+package jsl.utilities.random.distributions;
 
 /**
- * 
+ *  A promise to return estimated parameter values for the distribution implementing the interface based
+ *  on the supplied data
  */
-public interface SetValueIfc {
+public interface EstimateParametersIfc {
 
-    /** Sets the value 
-     * @param value used in the setting.
+    /**
+     *
+     * @param data the data to base the likelihood on, must not be null
+     * @return an array holding the parameters of the distribution implementing the interface
      */
-    public void setValue(double value);
+    double[] estimateParameters(double[] data);
 }

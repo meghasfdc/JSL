@@ -18,12 +18,11 @@ package ex.statistics;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import jsl.utilities.random.distributions.DistributionIfc;
-import jsl.utilities.random.distributions.Gamma;
-import jsl.utilities.random.distributions.Normal;
+
 import jsl.utilities.random.rvariable.GammaRV;
 import jsl.utilities.random.rvariable.NormalRV;
 import jsl.utilities.random.rvariable.RVariableIfc;
+import jsl.utilities.reporting.TextIO;
 import jsl.utilities.statistic.BatchStatistic;
 import jsl.utilities.statistic.Statistic;
 import jsl.utilities.statistic.WeightedStatistic;
@@ -199,10 +198,12 @@ public class TestStatistic {
     }
     
     public static void test8(){
+        TextIO.writeFile("temp.txt");
         NormalRV n = new NormalRV(10, 2);
           WeightedStatistic ws = new WeightedStatistic("ws test 8");
           for(int i=1; i<=100;i++){
               ws.collect(n.getValue(), 1.0);
+              TextIO.putln(ws.getLastValue());
           }
           System.out.println(ws);
     }

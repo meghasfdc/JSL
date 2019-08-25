@@ -18,7 +18,7 @@ package jsl.modeling.elements.entity;
 import java.util.ArrayList;
 import java.util.List;
 import jsl.modeling.ModelElement;
-import jsl.modeling.elements.variable.SetValueIfc;
+import jsl.utilities.SetValueIfc;
 import jsl.utilities.GetValueIfc;
 
 /**

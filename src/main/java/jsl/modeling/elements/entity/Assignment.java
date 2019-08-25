@@ -15,7 +15,7 @@
  */
 package jsl.modeling.elements.entity;
 
-import jsl.modeling.elements.variable.SetValueIfc;
+import jsl.utilities.SetValueIfc;
 import jsl.utilities.GetValueIfc;
 
 /**
